@@ -191,7 +191,7 @@ pub extern "C" fn update_presence(
                             details
                         };
                         presence_large_image =
-                            format!("{}/editor/text.png", GITHUB_ASSETS_URL);
+                            format!("{}/language/text.png", GITHUB_ASSETS_URL);
                         presence_large_text = "New buffer".to_string();
                     } else {
                         let file = ptr_to_string(filetype);
