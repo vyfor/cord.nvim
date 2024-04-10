@@ -21,7 +21,7 @@ use crate::{
 };
 
 const GITHUB_ASSETS_URL: &str =
-    "https://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
+    "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
 
 static mut RICH_CLIENT: Option<RichClient> = None;
 static mut CLIENT_IMAGE: String = String::new();
