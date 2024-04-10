@@ -114,4 +114,4 @@ This project is in beta. Feel free to open an issue or pull request for missing 
 > Certain plugins, particularly file browser ones, tend to break the event sequence. Thus, it was decided to use a timer. Regardless of that, Cord continues to rely on autocommands for aspects less prone to change, such as workspace or Git repository.
 
 ### Dependency-free?
-> Every aspect, including FFI, JSON serialization and pipe connection, is implemented from scratch to avoid reliance on external crates, simply to prevent any increase in compile times. Serialization is mainly hard-coded for performance improvements. 🤫
+> Every aspect, including FFI, JSON serialization and pipe connection, is implemented from scratch to avoid reliance on external crates, simply to prevent any increase in compile times. Serialization is mainly hard-coded to improve performance, even by a negligible amount. 🤫
