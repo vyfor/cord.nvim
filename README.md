@@ -1,6 +1,6 @@
 # 🧩 Cord
 
-![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/c2f674f7-916d-42d6-95c4-a10666fc8fbf)
+![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/d4d3ef5c-a347-46ea-a1a8-24a7086ee47e)
 
 🚀 **Cord** is a Discord Rich Presence plugin designed for Neovim, written in Rust.
 
