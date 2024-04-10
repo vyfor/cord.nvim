@@ -131,7 +131,7 @@ pub extern "C" fn update_presence(
                     }
                     presence_details = IDLE_TEXT.to_string();
                     presence_large_image =
-                        format!("{}/editor/idle.png", GITHUB_ASSETS_URL);
+                        format!("{}/editor/idle.png?v=1", GITHUB_ASSETS_URL);
                     presence_large_text = IDLE_TOOLTIP.to_string();
                 }
                 "netrw" | "dirvish" | "TelescopePrompt" => {
@@ -147,7 +147,7 @@ pub extern "C" fn update_presence(
                     presence_details =
                         FILE_BROWSER_TEXT.replace("{}", file_browser.1);
                     presence_large_image = format!(
-                        "{}/file_browser/{}.png",
+                        "{}/file_browser/{}.png?v=1",
                         GITHUB_ASSETS_URL, file_browser.0
                     );
                     presence_large_text = file_browser.1.to_string();
@@ -165,7 +165,7 @@ pub extern "C" fn update_presence(
                     presence_details =
                         PLUGIN_MANAGER_TEXT.replace("{}", plugin_manager.1);
                     presence_large_image = format!(
-                        "{}/plugin_manager/{}.png",
+                        "{}/plugin_manager/{}.png?v=1",
                         GITHUB_ASSETS_URL, plugin_manager.0
                     );
                     presence_large_text = plugin_manager.1.to_string();
@@ -191,7 +191,7 @@ pub extern "C" fn update_presence(
                             details
                         };
                         presence_large_image =
-                            format!("{}/language/text.png", GITHUB_ASSETS_URL);
+                            format!("{}/language/text.png?v=1", GITHUB_ASSETS_URL);
                         presence_large_text = "New buffer".to_string();
                     } else {
                         let file = ptr_to_string(filetype);
@@ -217,7 +217,7 @@ pub extern "C" fn update_presence(
                             details
                         };
                         presence_large_image = format!(
-                            "{}/language/{}.png",
+                            "{}/language/{}.png?v=1",
                             GITHUB_ASSETS_URL, language.0
                         );
                         presence_large_text = language.1.to_string();
