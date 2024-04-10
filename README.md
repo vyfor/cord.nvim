@@ -110,7 +110,7 @@ This project is in beta. Feel free to open an issue or pull request for missing 
 ### Why was Lua not considered?
 > The internal code needs to run on a separate thread due to Discord's ratelimit enforcement between connections. Implementing multithreading is much simpler in Rust compared to Lua. Although, a considerable part of the codebase still relies on Lua code.
 
-### Why does Cord uses a timer-based approach?
+### Why does Cord use a timer-based approach?
 > Certain plugins, particularly file browser ones, tend to break the event sequence. Thus, it was decided to use a timer. Regardless of that, Cord continues to rely on autocommands for aspects less prone to change, such as workspace or Git repository.
 
 ### Dependency-free?
