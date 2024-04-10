@@ -7,8 +7,13 @@ use crate::ipc::utils;
 
 impl Connection for RichClient {
     fn connect(client_id: u64) -> Result<Self, Box<dyn std::error::Error>> {
+        let path = var("XDG_RUNTIME_DIR")
+            .or_else(|_| var("TMPDIR"))
+            .or_else(|_| var("TMP"))
+            .or_else(|_| var("TEMP"))
+            .unwrap_or_else(|_| "/tmp".to_string());
         for i in 0..10 {
-            match UnixStream::connect(format!("/tmp/discord-ipc-{}", i)) {
+            match UnixStream::connect(format!("{}/discord-ipc-{}", path, i)) {
                 Ok(stream) => {
                     return Ok(RichClient {
                         client_id: client_id,
