@@ -1,4 +1,4 @@
-use std::fs::OpenOptions;
+use std::env::var;
 use std::io::{self, Read, Write};
 use std::os::unix::net::UnixStream;
 
@@ -33,9 +33,8 @@ impl Connection for RichClient {
 
     fn write(&mut self, opcode: u32, data: Option<&[u8]>) -> io::Result<()> {
         if let Some(packet) = data {
-            self.stream.write_all(
-                utils::encode(opcode, packet.len() as u32).as_slice(),
-            )?;
+            self.stream
+                .write_all(utils::encode(opcode, packet.len() as u32).as_slice())?;
             self.stream.write_all(packet)?;
         } else {
             self.stream.write_all(utils::encode(opcode, 0).as_slice())?;
@@ -60,17 +59,11 @@ impl Connection for RichClient {
     fn handshake(&mut self) -> io::Result<()> {
         self.write(
             0,
-            Some(
-                (format!("{{\"v\": 1,\"client_id\":\"{}\"}}", self.client_id))
-                    .as_bytes(),
-            ),
+            Some((format!("{{\"v\": 1,\"client_id\":\"{}\"}}", self.client_id)).as_bytes()),
         )
     }
 
-    fn update(
-        &mut self,
-        packet: &crate::rpc::packet::Packet,
-    ) -> io::Result<()> {
+    fn update(&mut self, packet: &crate::rpc::packet::Packet) -> io::Result<()> {
         if packet.activity != self.last_activity {
             self.write(1, Some(packet.to_json().unwrap().as_bytes()))
         } else {
