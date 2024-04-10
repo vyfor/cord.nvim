@@ -7,6 +7,13 @@ pub struct RichClient {
     pub last_activity: Option<Activity>,
 }
 
+#[cfg(not(target_os = "windows"))]
+pub struct RichClient {
+    pub client_id: u64,
+    pub stream: std::os::unix::net::UnixStream,
+    pub last_activity: Option<Activity>,
+}
+
 pub trait Connection {
     fn connect(
         client_id: u64,
