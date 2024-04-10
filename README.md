@@ -5,7 +5,7 @@
 ![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/d4d3ef5c-a347-46ea-a1a8-24a7086ee47e)
 
 ## 💎 Features
-- Lightweight
+- Lightweight and dependency-free
 - Blazingly fast startup due to non-blocking, asynchronous nature
 - Highly [configurable](https://github.com/vyfor/cord.nvim#-configuration) in Lua
 - Offers a rich icon set for various components
@@ -103,3 +103,12 @@ require('cord').setup({
 ## 🌱 Contributing
 This project is in beta. Feel free to open an issue or pull request for missing icons or features. You can also contact me on Discord **[vyfor](https://discord.com/users/446729269872427018)** if you have any questions.
 
+## ❓ FAQ
+### Why Rust?
+> There are two primary reasons as to why the project has been rewritten in Rust. Firstly, the compilation process: Kotlin/Native, despite compiling to native code, still relies on the JVM for its compiler, which is inconvenient, aside from that, compile times are quite slow. Secondly, Rust is known for its performance and safety, which is why the change was made.
+
+### Why was Lua not considered?
+> The internal code needs to run on a separate thread due to Discord's ratelimit enforcement between connections. Implementing multithreading is much simpler in Rust compared to Lua. Although, a considerable part of the codebase still relies on Lua code.
+
+### Why does Cord uses a timer-based approach?
+> Certain plugins, particularly file browser ones, tend to break the event sequence. Thus, it was decided to use a timer. Regardless of that, Cord continues to rely on autocommands for aspects less prone to change, such as workspace or Git repository.
