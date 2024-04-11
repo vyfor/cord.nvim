@@ -34,10 +34,9 @@ impl Connection for RichClient {
     fn write(&mut self, opcode: u32, data: Option<&[u8]>) -> io::Result<()> {
         if let Some(pipe) = self.pipe.as_mut() {
             if let Some(packet) = data {
-                pipe.write_all(
-                    utils::encode(opcode, packet.len() as u32).as_slice(),
-                )?;
-                pipe.write_all(packet)?;
+                let mut payload = utils::encode(opcode, packet.len() as u32);
+                payload.append(&mut packet.to_vec());
+                pipe.write_all(payload.as_slice())?;
             } else {
                 pipe.write_all(utils::encode(opcode, 0).as_slice())?;
             }
