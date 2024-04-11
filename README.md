@@ -6,6 +6,7 @@
 
 ## 💎 Features
 - Lightweight and dependency-free
+- Cross-platform support (Windows, Linux, macOS)
 - Blazingly fast startup due to non-blocking, asynchronous nature
 - Highly [configurable](https://github.com/vyfor/cord.nvim#-configuration) in Lua
 - Offers a rich icon set for various components
@@ -16,7 +17,7 @@
 
 ## 🔌 Requirements
 - **Neovim compiled with LuaJIT**
-- **Rust compiler**
+- **[Rust compiler](https://www.rust-lang.org/tools/install)**
 
 ## 📦 Installation
 <details>
@@ -55,7 +56,7 @@
 require('cord').setup({
   usercmds = true,                              -- Enable user commands
   timer = {
-    enable = true,                              -- Enable timer
+    enable = true,                              -- Enable automatically updating presence
     interval = 1500,                            -- Timer's update interval in milliseconds (min 500)
     reset_on_idle = false,                      -- Reset start timestamp on idle
     reset_on_change = false,                    -- Reset start timestamp on presence change
