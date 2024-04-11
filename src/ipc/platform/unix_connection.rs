@@ -32,36 +32,39 @@ impl Connection for RichClient {
     }
 
     fn write(&mut self, opcode: u32, data: Option<&[u8]>) -> io::Result<()> {
-        if let Some(pipe) = self.pipe.as_mut() {
-            if let Some(packet) = data {
-                let mut payload = utils::encode(opcode, packet.len() as u32);
-                payload.append(&mut packet.to_vec());
-                pipe.write_all(payload.as_slice())?;
-            } else {
-                pipe.write_all(utils::encode(opcode, 0).as_slice())?;
-            }
+        if let Some(pipe) = &mut self.pipe {
+            let payload = match data {
+                Some(packet) => {
+                    let mut payload =
+                        utils::encode(opcode, packet.len() as u32);
+                    payload.extend_from_slice(packet);
+                    payload
+                }
+                None => utils::encode(opcode, 0),
+            };
+            pipe.write_all(&payload)?;
         }
         Ok(())
     }
 
     fn read(&mut self) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-        if let Some(pipe) = self.pipe.as_mut() {
-            let mut header = [0; 8];
-            pipe.read_exact(&mut header)?;
-            let mut buffer = vec![0u8; utils::decode(&header) as usize];
-            pipe.read_exact(&mut buffer)?;
-            return Ok(buffer);
-        }
-
-        Err("Pipe not found".into())
+        self.pipe
+            .as_mut()
+            .map_or(Err("Pipe not found".into()), |pipe| {
+                let mut header = [0; 8];
+                pipe.read_exact(&mut header)?;
+                let size = utils::decode(&header) as usize;
+                let mut buffer = vec![0u8; size];
+                pipe.read_exact(&mut buffer)?;
+                Ok(buffer)
+            })
     }
 
     fn close(&mut self) -> io::Result<()> {
         if let Some(mut pipe) = self.pipe.take() {
-            pipe.write_all(utils::encode(2, 0).as_slice())?;
-            pipe.flush()?;
+            pipe.write_all(&utils::encode(2, 0))?;
+            pipe.shutdown(std::net::Shutdown::Both)?;
         }
-
         Ok(())
     }
 
