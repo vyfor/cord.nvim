@@ -17,7 +17,7 @@ impl Connection for RichClient {
                 Ok(pipe) => {
                     return Ok(RichClient {
                         client_id: client_id,
-                        pipe: pipe,
+                        pipe: Some(pipe),
                         last_activity: None,
                     })
                 }
@@ -32,28 +32,36 @@ impl Connection for RichClient {
     }
 
     fn write(&mut self, opcode: u32, data: Option<&[u8]>) -> io::Result<()> {
-        if let Some(packet) = data {
-            self.pipe.write_all(
-                utils::encode(opcode, packet.len() as u32).as_slice(),
-            )?;
-            self.pipe.write_all(packet)?;
-        } else {
-            self.pipe.write_all(utils::encode(opcode, 0).as_slice())?;
+        if let Some(pipe) = self.pipe.as_mut() {
+            if let Some(packet) = data {
+                pipe.write_all(
+                    utils::encode(opcode, packet.len() as u32).as_slice(),
+                )?;
+                pipe.write_all(packet)?;
+            } else {
+                pipe.write_all(utils::encode(opcode, 0).as_slice())?;
+            }
         }
         Ok(())
     }
 
-    fn read(&mut self) -> io::Result<Vec<u8>> {
-        let mut header = [0; 8];
-        self.pipe.read(&mut header)?;
-        let mut buffer = vec![0u8; utils::decode(&header) as usize];
-        self.pipe.read(&mut buffer)?;
-        Ok(buffer)
+    fn read(&mut self) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+        if let Some(pipe) = self.pipe.as_mut() {
+            let mut header = [0; 8];
+            pipe.read(&mut header)?;
+            let mut buffer = vec![0u8; utils::decode(&header) as usize];
+            pipe.read(&mut buffer)?;
+            return Ok(buffer);
+        }
+
+        Err("Pipe not found".into())
     }
 
     fn close(&mut self) -> io::Result<()> {
-        self.pipe.write_all(utils::encode(2, 0).as_slice())?;
-        self.pipe.flush()?;
+        if let Some(mut pipe) = self.pipe.take() {
+            pipe.write_all(utils::encode(2, 0).as_slice())?;
+            pipe.flush()?;
+        }
 
         Ok(())
     }
@@ -73,10 +81,10 @@ impl Connection for RichClient {
         packet: &crate::rpc::packet::Packet,
     ) -> io::Result<()> {
         if packet.activity != self.last_activity {
-            self.write(1, Some(packet.to_json().unwrap().as_bytes()))
-        } else {
-            Ok(())
+            return self.write(1, Some(packet.to_json().unwrap().as_bytes()));
         }
+
+        Ok(())
     }
 
     fn clear(&mut self) -> io::Result<()> {

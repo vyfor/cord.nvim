@@ -3,14 +3,14 @@ use crate::rpc::packet::Activity;
 #[cfg(target_os = "windows")]
 pub struct RichClient {
     pub client_id: u64,
-    pub pipe: std::fs::File,
+    pub pipe: Option<std::fs::File>,
     pub last_activity: Option<Activity>,
 }
 
 #[cfg(not(target_os = "windows"))]
 pub struct RichClient {
     pub client_id: u64,
-    pub stream: std::os::unix::net::UnixStream,
+    pub pipe: std::os::unix::net::UnixStream,
     pub last_activity: Option<Activity>,
 }
 
@@ -18,7 +18,7 @@ pub trait Connection {
     fn connect(
         client_id: u64,
     ) -> Result<RichClient, Box<dyn std::error::Error>>;
-    fn read(&mut self) -> std::io::Result<Vec<u8>>;
+    fn read(&mut self) -> Result<Vec<u8>, Box<dyn std::error::Error>>;
     fn write(
         &mut self,
         opcode: u32,

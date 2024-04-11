@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ActivityAssets {
     pub large_image: Option<String>,
     pub large_text: Option<String>,
@@ -6,13 +6,13 @@ pub struct ActivityAssets {
     pub small_text: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ActivityButton {
     pub label: String,
     pub url: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Activity {
     pub details: Option<String>,
     pub state: Option<String>,

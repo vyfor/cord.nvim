@@ -5,6 +5,7 @@ pub mod rpc;
 
 use std::{
     ffi::{c_char, CStr},
+    sync::{Arc, Mutex},
     time::UNIX_EPOCH,
 };
 
@@ -23,7 +24,7 @@ use crate::{
 const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
 
-static mut RICH_CLIENT: Option<RichClient> = None;
+static mut RICH_CLIENT: Option<Arc<Mutex<RichClient>>> = None;
 static mut CLIENT_IMAGE: String = String::new();
 static mut CWD: Option<String> = None;
 static mut START_TIME: Option<u128> = None;
@@ -102,7 +103,7 @@ pub extern "C" fn init(
                     .expect("Failed to handshake with Rich Client");
                 client.read().expect("Failed to read from Rich Client");
 
-                RICH_CLIENT = Some(client);
+                RICH_CLIENT = Some(Arc::new(Mutex::new(client)));
             };
         });
     }
@@ -176,11 +177,10 @@ pub extern "C" fn update_presence(
                             return false;
                         }
                         let details = if is_read_only {
-                            &VIEWING_TEXT
+                            VIEWING_TEXT.replace("{}", "a new file")
                         } else {
-                            &EDITING_TEXT
-                        }
-                        .replace("{}", "a new file");
+                            EDITING_TEXT.replace("{}", "a new file")
+                        };
                         presence_details = if !cursor_position.is_null() {
                             format!(
                                 "{}:{}",
@@ -190,8 +190,10 @@ pub extern "C" fn update_presence(
                         } else {
                             details
                         };
-                        presence_large_image =
-                            format!("{}/language/text.png?v=1", GITHUB_ASSETS_URL);
+                        presence_large_image = format!(
+                            "{}/language/text.png?v=1",
+                            GITHUB_ASSETS_URL
+                        );
                         presence_large_text = "New buffer".to_string();
                     } else {
                         let file = ptr_to_string(filetype);
@@ -202,11 +204,10 @@ pub extern "C" fn update_presence(
                             .unwrap_or(&("text", &file))
                             .to_owned();
                         let details = if is_read_only {
-                            &VIEWING_TEXT
+                            VIEWING_TEXT.replace("{}", &ptr_to_string(filename))
                         } else {
-                            &EDITING_TEXT
-                        }
-                        .replace("{}", &ptr_to_string(filename));
+                            EDITING_TEXT.replace("{}", &ptr_to_string(filename))
+                        };
                         presence_details = if !cursor_position.is_null() {
                             format!(
                                 "{}:{}",
@@ -228,7 +229,7 @@ pub extern "C" fn update_presence(
                 details: Some(presence_details),
                 ..Default::default()
             };
-            if let Some(cwd) = &CWD {
+            if let Some(cwd) = CWD.as_ref() {
                 if !WORKSPACE_TEXT.is_empty() {
                     activity.state = Some(if problem_count != -1 {
                         format!(
@@ -260,14 +261,15 @@ pub extern "C" fn update_presence(
                     url: repository_url,
                 }]);
             }
-
-            match client.update(&Packet {
+            let mut client = client.lock().unwrap();
+            let val = match client.update(&Packet {
                 pid: std::process::id(),
                 activity: Some(activity),
             }) {
                 Ok(_) => true,
                 Err(_) => false,
-            }
+            };
+            val
         } else {
             false
         }
@@ -280,24 +282,29 @@ pub extern "C" fn clear_presence() {
         if !INITIALIZED {
             return;
         }
-        if let Some(mut client) = RICH_CLIENT.take() {
-            if let Err(e) = client.clear() {
-                eprintln!("Failed to clear presence: {}", e);
-            }
+        if let Some(client) = RICH_CLIENT.as_ref() {
+            client
+                .lock()
+                .unwrap()
+                .clear()
+                .expect("Failed to clear presence");
         }
     }
 }
 
 #[no_mangle]
 pub extern "C" fn disconnect() {
+    eprintln!("Disconnecting...");
     unsafe {
         if !INITIALIZED {
             return;
         }
-        if let Some(mut client) = RICH_CLIENT.take() {
-            if let Err(e) = client.close() {
-                eprintln!("Failed to disconnect: {}", e);
-            }
+        if let Some(client) = RICH_CLIENT.take() {
+            client
+                .lock()
+                .unwrap()
+                .close()
+                .expect("Failed to close connection");
         }
     }
 }
