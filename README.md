@@ -57,7 +57,7 @@ require('cord').setup({
   usercmds = true,                              -- Enable user commands
   timer = {
     enable = true,                              -- Enable automatically updating presence
-    interval = 1500,                            -- Timer's update interval in milliseconds (min 500)
+    interval = 1500,                            -- Interval between presence updates in milliseconds (min 500)
     reset_on_idle = false,                      -- Reset start timestamp on idle
     reset_on_change = false,                    -- Reset start timestamp on presence change
   },
