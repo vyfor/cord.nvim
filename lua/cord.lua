@@ -76,6 +76,9 @@ local function should_update_presence(current_presence)
 end
 
 local function update_idle_presence(config)
+  if last_presence['idle'] then
+    return false
+  end
   if config.idle.show_idle and (config.idle.timeout == 0 or (os.clock() - last_updated) * 1000 >= config.idle.timeout) then
     if config.idle.disable_on_focus and is_focused then
       return false
