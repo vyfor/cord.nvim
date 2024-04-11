@@ -34,12 +34,11 @@ impl Connection for RichClient {
     fn write(&mut self, opcode: u32, data: Option<&[u8]>) -> io::Result<()> {
         if let Some(pipe) = self.pipe.as_mut() {
             if let Some(packet) = data {
-                self.stream.write_all(
-                    utils::encode(opcode, packet.len() as u32).as_slice(),
-                )?;
-                self.stream.write_all(packet)?;
+                let mut payload = utils::encode(opcode, packet.len() as u32);
+                payload.append(&mut packet.to_vec());
+                pipe.write_all(payload.as_slice())?;
             } else {
-                self.stream.write_all(utils::encode(opcode, 0).as_slice())?;
+                pipe.write_all(utils::encode(opcode, 0).as_slice())?;
             }
         }
         Ok(())
@@ -48,9 +47,9 @@ impl Connection for RichClient {
     fn read(&mut self) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
         if let Some(pipe) = self.pipe.as_mut() {
             let mut header = [0; 8];
-            self.stream.read_exact(&mut header)?;
+            pipe.read_exact(&mut header)?;
             let mut buffer = vec![0u8; utils::decode(&header) as usize];
-            self.stream.read_exact(&mut buffer)?;
+            pipe.read_exact(&mut buffer)?;
             return Ok(buffer);
         }
 
@@ -59,8 +58,8 @@ impl Connection for RichClient {
 
     fn close(&mut self) -> io::Result<()> {
         if let Some(mut pipe) = self.pipe.take() {
-            self.stream.write_all(utils::encode(2, 0).as_slice())?;
-            self.stream.flush()?;
+            pipe.write_all(utils::encode(2, 0).as_slice())?;
+            pipe.flush()?;
         }
 
         Ok(())

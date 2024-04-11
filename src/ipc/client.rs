@@ -10,7 +10,7 @@ pub struct RichClient {
 #[cfg(not(target_os = "windows"))]
 pub struct RichClient {
     pub client_id: u64,
-    pub pipe: std::os::unix::net::UnixStream,
+    pub pipe: Option<std::os::unix::net::UnixStream>,
     pub last_activity: Option<Activity>,
 }
 
