@@ -2,7 +2,7 @@
 
 ### 🚀 **Cord** is a Discord Rich Presence plugin designed for Neovim, written in Rust.
 
-![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/d4d3ef5c-a347-46ea-a1a8-24a7086ee47e)
+![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/b5744c21-b7c6-4481-ba22-50d1d5a421cb)
 
 ## 💎 Features
 - Lightweight and dependency-free
@@ -84,11 +84,11 @@ require('cord').setup({
     tooltip = '💤',                             -- Text to display when hovering over the idle image
   },
   text = {
-    viewing = 'Viewing $s',                     -- Text to display when viewing a readonly file
-    editing = 'Editing $s',                     -- Text to display when editing a file
-    file_browser = 'Browsing files in $s',      -- Text to display when browsing files (Empty string to disable)
-    plugin_manager = 'Managing plugins in $s',  -- Text to display when managing plugins (Empty string to disable)
-    workspace = 'In $s',                        -- Text to display when in a workspace (Empty string to disable)
+    viewing = 'Viewing {}',                     -- Text to display when viewing a readonly file
+    editing = 'Editing {}',                     -- Text to display when editing a file
+    file_browser = 'Browsing files in {}',      -- Text to display when browsing files (Empty string to disable)
+    plugin_manager = 'Managing plugins in {}',  -- Text to display when managing plugins (Empty string to disable)
+    workspace = 'In {}',                        -- Text to display when in a workspace (Empty string to disable)
   }
 })
 ```
