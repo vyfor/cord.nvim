@@ -10,14 +10,13 @@ use std::{
 };
 
 use mappings::{
-    file_browser::FILE_BROWSERS, language::LANGUAGES,
-    plugin_manager::PLUGIN_MANAGERS,
+    file_browser::get_file_browser, language::get_language,
+    plugin_manager::get_plugin_manager,
 };
 use rpc::activity::{ActivityAssets, ActivityButton};
 
 use crate::{
     ipc::client::{Connection, RichClient},
-    mappings::{file_browser, language, plugin_manager},
     rpc::packet::{Activity, Packet},
 };
 
@@ -57,9 +56,6 @@ pub extern "C" fn init(
             return;
         }
         INITIALIZED = true;
-        language::init();
-        file_browser::init();
-        plugin_manager::init();
         let client_id = match ptr_to_string(client).as_str() {
             "vim" => {
                 CLIENT_IMAGE = format!("{}/editor/vim.png", GITHUB_ASSETS_URL);
@@ -139,12 +135,8 @@ pub extern "C" fn update_presence(
                     if FILE_BROWSER_TEXT.is_empty() {
                         return false;
                     }
-                    let file_browser = FILE_BROWSERS
-                        .as_ref()
-                        .unwrap()
-                        .get(ptr_to_string(filetype).as_str())
-                        .unwrap_or(&("", ""))
-                        .to_owned();
+                    let filetype = ptr_to_string(filetype);
+                    let file_browser = get_file_browser(&filetype);
                     presence_details =
                         FILE_BROWSER_TEXT.replace("{}", file_browser.1);
                     presence_large_image = format!(
@@ -157,12 +149,8 @@ pub extern "C" fn update_presence(
                     if PLUGIN_MANAGER_TEXT.is_empty() {
                         return false;
                     }
-                    let plugin_manager = PLUGIN_MANAGERS
-                        .as_ref()
-                        .unwrap()
-                        .get(ptr_to_string(filetype).as_str())
-                        .unwrap_or(&("", ""))
-                        .to_owned();
+                    let filetype = ptr_to_string(filetype);
+                    let plugin_manager = get_plugin_manager(&filetype);
                     presence_details =
                         PLUGIN_MANAGER_TEXT.replace("{}", plugin_manager.1);
                     presence_large_image = format!(
@@ -196,17 +184,13 @@ pub extern "C" fn update_presence(
                         );
                         presence_large_text = "New buffer".to_string();
                     } else {
-                        let file = ptr_to_string(filetype);
-                        let language = LANGUAGES
-                            .as_ref()
-                            .unwrap()
-                            .get(file.as_str())
-                            .unwrap_or(&("text", &file))
-                            .to_owned();
+                        let filetype = ptr_to_string(filetype);
+                        let filename = ptr_to_string(filename);
+                        let language = get_language(&filetype, &filename);
                         let details = if is_read_only {
-                            VIEWING_TEXT.replace("{}", &ptr_to_string(filename))
+                            VIEWING_TEXT.replace("{}", &filename)
                         } else {
-                            EDITING_TEXT.replace("{}", &ptr_to_string(filename))
+                            EDITING_TEXT.replace("{}", &filename)
                         };
                         presence_details = if !cursor_position.is_null() {
                             format!(
@@ -294,7 +278,6 @@ pub extern "C" fn clear_presence() {
 
 #[no_mangle]
 pub extern "C" fn disconnect() {
-    eprintln!("Disconnecting...");
     unsafe {
         if !INITIALIZED {
             return;

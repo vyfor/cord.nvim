@@ -1,10 +1,6 @@
-use std::collections::HashMap;
-
-pub static mut PLUGIN_MANAGERS: Option<HashMap<&str, (&str, &str)>> = None; // <filetype, (icon, name)>
-
-pub fn init() {
-    unsafe {
-        PLUGIN_MANAGERS =
-            Some([("lazy", ("default", "Lazy"))].iter().copied().collect())
+pub fn get_plugin_manager<'a>(filetype: &'a str) -> (&'a str, &'a str) {
+    match filetype {
+        "lazy" => ("default", "Lazy"),
+        _ => ("default", &filetype),
     }
 }
