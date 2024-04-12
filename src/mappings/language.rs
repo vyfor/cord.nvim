@@ -5,9 +5,9 @@ pub fn get_language<'a>(
     match filetype {
         "asm" => ("assembly", "Assembly"),
         "bash" => ("shell", "Bash"),
-        "c" => ("c", "C"),
+        "c" => ("c", "C "),
         "cpp" => ("cpp", "C++"),
-        "csharp" => ("csharp", "C#"),
+        "cs" => ("csharp", "C#"),
         "css" => ("css", "CSS"),
         "dart" => ("dart", "Dart"),
         "dosbatch" => ("shell", "Batch"),
