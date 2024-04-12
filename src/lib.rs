@@ -131,7 +131,7 @@ pub extern "C" fn update_presence(
                         format!("{}/editor/idle.png?v=1", GITHUB_ASSETS_URL);
                     presence_large_text = IDLE_TOOLTIP.to_string();
                 }
-                "netrw" | "dirvish" | "TelescopePrompt" => {
+                "netrw" | "dirvish" | "TelescopePrompt" | "neo-tree" | "oil" | "NvimTree" | "minifiles" => {
                     if FILE_BROWSER_TEXT.is_empty() {
                         return false;
                     }
@@ -145,7 +145,7 @@ pub extern "C" fn update_presence(
                     );
                     presence_large_text = file_browser.1.to_string();
                 }
-                "lazy" | "packer" => {
+                "lazy" | "packer" | "pckr" => {
                     if PLUGIN_MANAGER_TEXT.is_empty() {
                         return false;
                     }
