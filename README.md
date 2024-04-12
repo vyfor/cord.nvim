@@ -2,7 +2,8 @@
 
 ### 🚀 **Cord** is a Discord Rich Presence plugin designed for Neovim, written in Rust.
 
-![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/b5744c21-b7c6-4481-ba22-50d1d5a421cb)
+![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/6ff91794-7264-485e-b82b-87926d7d5013)
+
 
 ## 💎 Features
 - Lightweight and dependency-free
