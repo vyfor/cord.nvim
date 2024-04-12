@@ -101,7 +101,7 @@ local function update_presence(config)
     type = vim.bo.filetype,
     readonly = vim.bo.readonly,
     cursor_line = cursor[1],
-    cursor_col = cursor[2],
+    cursor_col = cursor[2] + 1,
     problem_count = problem_count
   }
 
