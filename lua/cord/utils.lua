@@ -54,7 +54,12 @@ local function init_discord(ffi)
     void clear_presence();
     void disconnect();
     void set_cwd(const char* directory);
-    void set_repository_url(const char* url);
+    void set_buttons(
+      const char* first_label,
+      const char* first_url,
+      const char* second_label,
+      const char* second_url
+    );
     void update_time();
   ]]
 
@@ -100,13 +105,40 @@ local function validate_severity(config)
   return true
 end
 
+local function validate_buttons(config)
+  if config.display.show_repository then
+    local buttons = {}
+    local repo
+    for i, button in ipairs(config.buttons) do
+      if i > 2 then
+        vim.notify('[cord.nvim] Detected more than two buttons in the config. Only the first two will be displayed', vim.log.levels.WARN)
+        return buttons
+      end
+      if button.url == 'git' then
+        if not repo then
+          repo = fetch_repository()
+        end
+        if repo and repo ~= '' then
+          table.insert(buttons, { label = button.label, url = repo })
+        end
+      else
+        table.insert(buttons, button)
+      end
+    end
+    return buttons
+  end
+end
+
 local function update_cwd(config, discord)
   discord.set_cwd(find_workspace())
-  if config.display.show_repository then
-    local repo = fetch_repository()
-    if repo and repo ~= '' then
-      discord.set_repository_url(repo)
-    end
+
+  local buttons = validate_buttons(config)
+  if not buttons then return end
+
+  if #buttons == 1 then
+    discord.set_buttons(buttons[1].label, buttons[1].url, nil, nil)
+  elseif #buttons >= 2 then
+    discord.set_buttons(buttons[1].label, buttons[1].url, buttons[2].label, buttons[2].url)
   end
 end
 

@@ -27,7 +27,6 @@ static mut RICH_CLIENT: Option<Arc<Mutex<RichClient>>> = None;
 static mut CLIENT_IMAGE: String = String::new();
 static mut CWD: Option<String> = None;
 static mut START_TIME: Option<u128> = None;
-static mut REPOSITORY_URL: Option<String> = None;
 static mut EDITOR_TOOLTIP: String = String::new();
 static mut IDLE_TEXT: String = String::new();
 static mut IDLE_TOOLTIP: String = String::new();
@@ -36,6 +35,7 @@ static mut EDITING_TEXT: String = String::new();
 static mut FILE_BROWSER_TEXT: String = String::new();
 static mut PLUGIN_MANAGER_TEXT: String = String::new();
 static mut WORKSPACE_TEXT: String = String::new();
+static mut BUTTONS: Vec<ActivityButton> = Vec::new();
 static mut INITIALIZED: bool = false;
 
 #[no_mangle]
@@ -131,7 +131,8 @@ pub extern "C" fn update_presence(
                         format!("{}/editor/idle.png?v=1", GITHUB_ASSETS_URL);
                     presence_large_text = IDLE_TOOLTIP.to_string();
                 }
-                "netrw" | "dirvish" | "TelescopePrompt" | "neo-tree" | "oil" | "NvimTree" | "minifiles" => {
+                "netrw" | "dirvish" | "TelescopePrompt" | "neo-tree"
+                | "oil" | "NvimTree" | "minifiles" => {
                     if FILE_BROWSER_TEXT.is_empty() {
                         return false;
                     }
@@ -239,21 +240,17 @@ pub extern "C" fn update_presence(
             if let Some(presence_start_time) = START_TIME {
                 activity.timestamp = Some(presence_start_time);
             }
-            if let Some(repository_url) = REPOSITORY_URL.clone() {
-                activity.buttons = Some(vec![ActivityButton {
-                    label: "View Repository".to_string(),
-                    url: repository_url,
-                }]);
+            if !BUTTONS.is_empty() {
+                activity.buttons = Some(BUTTONS.to_vec());
             }
             let mut client = client.lock().unwrap();
-            let val = match client.update(&Packet {
+            match client.update(&Packet {
                 pid: std::process::id(),
                 activity: Some(activity),
             }) {
                 Ok(_) => true,
                 Err(_) => false,
-            };
-            val
+            }
         } else {
             false
         }
@@ -300,9 +297,30 @@ pub extern "C" fn set_cwd(value: *const c_char) {
 }
 
 #[no_mangle]
-pub extern "C" fn set_repository_url(value: *const c_char) {
+pub extern "C" fn set_buttons(
+    first_label: *const c_char,
+    first_url: *const c_char,
+    second_label: *const c_char,
+    second_url: *const c_char,
+) {
     unsafe {
-        REPOSITORY_URL = Some(ptr_to_string(value));
+        BUTTONS.clear();
+        let first_label = ptr_to_string(first_label);
+        let first_url = ptr_to_string(first_url);
+        if !first_label.is_empty() && !first_url.is_empty() {
+            BUTTONS.push(ActivityButton {
+                label: first_label,
+                url: first_url,
+            });
+        }
+        let second_label = ptr_to_string(second_label);
+        let second_url = ptr_to_string(second_url);
+        if !second_label.is_empty() && !second_url.is_empty() {
+            BUTTONS.push(ActivityButton {
+                label: second_label,
+                url: second_url,
+            })
+        }
     }
 }
 
