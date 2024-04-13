@@ -90,6 +90,16 @@ require('cord').setup({
     file_browser = 'Browsing files in {}',      -- Text to display when browsing files (Empty string to disable)
     plugin_manager = 'Managing plugins in {}',  -- Text to display when managing plugins (Empty string to disable)
     workspace = 'In {}',                        -- Text to display when in a workspace (Empty string to disable)
+  },
+  buttons = {
+    {
+      label = 'View repository',                -- Text displayed on the button
+      url = 'git',                              -- URL where the button leads to ('git' = Git repository URL)
+    },
+    -- {
+    --   label = 'View plugin',
+    --   url = 'https://github.com/vyfor/cord.nvim',
+    -- }
   }
 })
 ```

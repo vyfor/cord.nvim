@@ -40,6 +40,12 @@ cord.config = {
     plugin_manager = 'Managing plugins in {}',
     workspace = 'In {}',
   },
+  buttons = {
+    {
+      label = 'View Repository',
+      url = 'git',
+    }
+  }
 }
 
 local discord
@@ -159,7 +165,7 @@ function cord.setup(userConfig)
 end
 
 function cord.setup_autocmds(config)
-  vim.api.nvim_create_autocmd('DirChanged', { callback = function() utils.update_workspace_and_repo(config) end })
+  vim.api.nvim_create_autocmd('DirChanged', { callback = function() utils.update_cwd(config, discord) end })
   vim.api.nvim_create_autocmd('FocusGained', { callback = function() is_focused = true; last_presence = nil end })
   vim.api.nvim_create_autocmd('FocusLost', { callback = function() is_focused = false end })
 end
