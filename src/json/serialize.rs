@@ -94,14 +94,4 @@ impl Activity {
     }
 }
 
-impl Default for Activity {
-    fn default() -> Self {
-        Activity {
-            details: None,
-            state: None,
-            assets: None,
-            buttons: None,
-            timestamp: None,
-        }
-    }
-}
+

@@ -20,3 +20,15 @@ pub struct Activity {
     pub buttons: Option<Vec<ActivityButton>>,
     pub timestamp: Option<u128>,
 }
+
+impl Default for Activity {
+    fn default() -> Self {
+        Activity {
+            details: None,
+            state: None,
+            assets: None,
+            buttons: None,
+            timestamp: None,
+        }
+    }
+}
