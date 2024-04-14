@@ -44,6 +44,7 @@ impl Connection for RichClient {
             };
             pipe.write_all(&payload)?;
         }
+
         Ok(())
     }
 
@@ -65,6 +66,7 @@ impl Connection for RichClient {
             pipe.write_all(&utils::encode(2, 0))?;
             pipe.shutdown(std::net::Shutdown::Both)?;
         }
+
         Ok(())
     }
 
@@ -90,6 +92,17 @@ impl Connection for RichClient {
     }
 
     fn clear(&mut self) -> io::Result<()> {
-        self.write(1, None)
+        self.write(
+            1,
+            Some(
+                Packet {
+                    pid: std::process::id(),
+                    activity: None,
+                }
+                .to_json()
+                .unwrap()
+                .as_bytes(),
+            ),
+        )
     }
 }

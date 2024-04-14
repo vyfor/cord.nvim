@@ -4,6 +4,7 @@ use std::os::windows::fs::OpenOptionsExt;
 
 use crate::ipc::client::{Connection, RichClient};
 use crate::ipc::utils;
+use crate::rpc::packet::Packet;
 
 impl Connection for RichClient {
     fn connect(client_id: u64) -> Result<Self, Box<dyn std::error::Error>> {
@@ -44,6 +45,7 @@ impl Connection for RichClient {
             };
             pipe.write_all(&payload)?;
         }
+
         Ok(())
     }
 
@@ -64,6 +66,7 @@ impl Connection for RichClient {
         if let Some(mut pipe) = self.pipe.take() {
             pipe.write_all(&utils::encode(2, 0))?;
         }
+
         Ok(())
     }
 
@@ -84,10 +87,22 @@ impl Connection for RichClient {
         if packet.activity != self.last_activity {
             return self.write(1, Some(packet.to_json().unwrap().as_bytes()));
         }
+
         Ok(())
     }
 
     fn clear(&mut self) -> io::Result<()> {
-        self.write(1, None)
+        self.write(
+            1,
+            Some(
+                Packet {
+                    pid: std::process::id(),
+                    activity: None,
+                }
+                .to_json()
+                .unwrap()
+                .as_bytes(),
+            ),
+        )
     }
 }
