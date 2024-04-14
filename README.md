@@ -14,7 +14,7 @@
 - Automatically detects working directory and repository based on Git
 - Identifies problems across active buffers
 - Supports configurable idle status detection
-- Provides [user commands](%EF%B8%8F-user-commands) for managing the presence
+- Provides [user commands](#%EF%B8%8F-user-commands) for managing the presence
 - Is written in native code and uses Lua FFI for integration
 
 ## 🔌 Requirements
