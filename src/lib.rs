@@ -1,11 +1,10 @@
 pub mod ipc;
+pub mod json;
 pub mod mappings;
-pub mod parser;
 pub mod rpc;
 
 use std::{
     ffi::{c_char, CStr},
-    sync::{Arc, Mutex},
     time::UNIX_EPOCH,
 };
 
@@ -23,7 +22,7 @@ use crate::{
 const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
 
-static mut RICH_CLIENT: Option<Arc<Mutex<RichClient>>> = None;
+static mut RICH_CLIENT: Option<RichClient> = None;
 static mut CLIENT_IMAGE: String = String::new();
 static mut CWD: Option<String> = None;
 static mut START_TIME: Option<u128> = None;
@@ -99,7 +98,7 @@ pub extern "C" fn init(
                     .expect("Failed to handshake with Rich Client");
                 client.read().expect("Failed to read from Rich Client");
 
-                RICH_CLIENT = Some(Arc::new(Mutex::new(client)));
+                RICH_CLIENT = Some(client);
             };
         });
     }
@@ -243,7 +242,6 @@ pub extern "C" fn update_presence(
             if !BUTTONS.is_empty() {
                 activity.buttons = Some(BUTTONS.to_vec());
             }
-            let mut client = client.lock().unwrap();
             match client.update(&Packet {
                 pid: std::process::id(),
                 activity: Some(activity),
@@ -263,12 +261,8 @@ pub extern "C" fn clear_presence() {
         if !INITIALIZED {
             return;
         }
-        if let Some(client) = RICH_CLIENT.as_ref() {
-            client
-                .lock()
-                .unwrap()
-                .clear()
-                .expect("Failed to clear presence");
+        if let Some(client) = RICH_CLIENT.as_mut() {
+            client.clear().expect("Failed to clear presence");
         }
     }
 }
@@ -279,12 +273,8 @@ pub extern "C" fn disconnect() {
         if !INITIALIZED {
             return;
         }
-        if let Some(client) = RICH_CLIENT.take() {
-            client
-                .lock()
-                .unwrap()
-                .close()
-                .expect("Failed to close connection");
+        if let Some(mut client) = RICH_CLIENT.take() {
+            client.close().expect("Failed to close connection");
         }
     }
 }
