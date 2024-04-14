@@ -9,11 +9,12 @@
 - Lightweight and dependency-free
 - Cross-platform support (Windows, Linux, macOS)
 - Blazingly fast startup due to non-blocking, asynchronous nature
-- Highly [configurable](https://github.com/vyfor/cord.nvim#-configuration) in Lua
+- Highly [configurable](#-configuration) in Lua
 - Offers a rich icon set for various components
 - Automatically detects working directory and repository based on Git
 - Identifies problems across active buffers
 - Supports configurable idle status detection
+- Provides [user commands](#%EF%B8%8F-user-commands) for managing the presence
 - Is written in native code and uses Lua FFI for integration
 
 ## 🔌 Requirements
@@ -104,7 +105,7 @@ require('cord').setup({
 })
 ```
 
-### ⌨️ User commands (WIP)
+### ⌨️ User commands
 - `:CordConnect`        - Initialize presence client internally and connect to Discord
 - `:CordReconnect`      - Reconnect to Discord
 - `:CordDisconnect`     - Disconnect from Discord

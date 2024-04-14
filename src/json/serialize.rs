@@ -16,14 +16,12 @@ impl Packet {
         json_str.push_str(",\"args\":{");
 
         write!(&mut json_str, "\"pid\":{}", self.pid)?;
-
         if let Some(activity) = &self.activity {
-            json_str.push_str(",\"activity\":{");
+            json_str.push_str(",\"activity\":");
             activity.push_json(&mut json_str)?;
-            json_str.push('}');
         }
 
-        json_str.push_str("}");
+        json_str.push_str("}}");
 
         Ok(json_str)
     }
@@ -31,7 +29,7 @@ impl Packet {
 
 impl Activity {
     pub fn push_json(&self, json_str: &mut String) -> Result<(), Error> {
-        json_str.push_str("\"type\":0");
+        json_str.push_str("{\"type\":0");
 
         if let Some(timestamp) = &self.timestamp {
             write!(json_str, ",\"timestamps\":{{\"start\":{}}}", timestamp)?;
@@ -93,5 +91,3 @@ impl Activity {
         Ok(())
     }
 }
-
-
