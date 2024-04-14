@@ -4,6 +4,7 @@ use std::os::unix::net::UnixStream;
 
 use crate::ipc::client::{Connection, RichClient};
 use crate::ipc::utils;
+use crate::rpc::packet::Packet;
 
 impl Connection for RichClient {
     fn connect(client_id: u64) -> Result<Self, Box<dyn std::error::Error>> {
