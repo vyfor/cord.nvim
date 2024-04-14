@@ -57,7 +57,7 @@ local last_updated = os.clock()
 local last_presence
 
 local function connect(config)
-  return discord.init(
+  discord.init(
     config.editor.client,
     config.editor.image,
     config.editor.tooltip,
@@ -127,6 +127,7 @@ local function update_presence(config)
 end
 
 local function start_timer(config)
+  timer:stop()
   if vim.g.cord_started == nil then
     vim.g.cord_started = true
     if not utils.validate_severity(config) then return end
@@ -136,7 +137,6 @@ local function start_timer(config)
       discord.update_time()
     end
   end
-  timer:stop()
   timer:start(0, config.timer.interval, vim.schedule_wrap(function() update_presence(config) end))
 end
 
@@ -147,13 +147,9 @@ function cord.setup(userConfig)
 
     local work = vim.loop.new_async(vim.schedule_wrap(function()
       discord = utils.init_discord(ffi)
-      local err = connect(config)
-      if err ~= nil then
-        vim.api.nvim_err_writeln('[cord.nvim] Caught unexpected error: ' .. ffi.string(err))
-      else
-        if config.timer.enable then
-          start_timer(config)
-        end
+      connect(config)
+      if config.timer.enable then
+        start_timer(config)
       end
 
       vim.api.nvim_create_autocmd('ExitPre', { callback = function() discord.disconnect() end })
@@ -172,21 +168,15 @@ end
 
 function cord.setup_usercmds(config)
   vim.api.nvim_create_user_command('CordConnect', function()
-    local err = connect(config)
-    if err ~= nil then
-      vim.api.nvim_err_writeln('[cord.nvim] Caught unexpected error: ' .. ffi.string(err))
-    end
+    connect(config)
     start_timer(config)
   end, {})
 
   vim.api.nvim_create_user_command('CordReconnect', function()
     timer:stop()
     discord.disconnect()
-    local err = connect(config)
-    if err ~= nil then
-      enabled = false
-      vim.api.nvim_err_writeln('[cord.nvim] Caught unexpected error: ' .. ffi.string(err))
-    end
+    last_presence = nil
+    connect(config)
     start_timer(config)
     enabled = true
   end, {})
@@ -195,6 +185,7 @@ function cord.setup_usercmds(config)
     timer:stop()
     discord.disconnect()
     enabled = false
+    last_presence = nil
   end, {})
 
   vim.api.nvim_create_user_command('CordTogglePresence', function()
@@ -202,13 +193,13 @@ function cord.setup_usercmds(config)
       timer:stop()
       discord.clear_presence()
       enabled = false
+      last_presence = nil
     else
       start_timer(config)
       enabled = true
     end
   end, {})
 
-  -- user commands for showing and hiding the presence
   vim.api.nvim_create_user_command('CordShowPresence', function()
     start_timer(config)
     enabled = true
@@ -218,6 +209,7 @@ function cord.setup_usercmds(config)
     timer:stop()
     discord.clear_presence()
     enabled = false
+    last_presence = nil
   end, {})
 end
 

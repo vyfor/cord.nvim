@@ -275,6 +275,7 @@ pub extern "C" fn disconnect() {
         }
         if let Some(mut client) = RICH_CLIENT.take() {
             client.close().expect("Failed to close connection");
+            INITIALIZED = false;
         }
     }
 }
