@@ -124,7 +124,7 @@ This project is in beta. Feel free to open an issue or pull request for missing 
 > The internal code needs to run on a separate thread due to Discord's ratelimit enforcement between connections. Implementing multithreading is much simpler in Rust compared to Lua. Although, a considerable part of the codebase still relies on Lua code.
 
 ### Why does Cord use a timer-based approach?
-> Certain plugins, particularly file browser ones, tend to break the event sequence. Thus, it was decided to use a timer. Regardless of that, Cord continues to rely on autocommands for aspects less prone to change, such as workspace or Git repository.
+> Certain plugins often tend to break the order of events. And data such as cursor's current position needs to be fetched quite frequently and using autocommands for this task would stress the CPU. Thus, it was decided to use a timer. Regardless of that, Cord continues to rely on autocommands for aspects less prone to change, such as workspace or Git repository.
 
 ### Dependency-free?
-> Every aspect, including FFI, JSON serialization and pipe connection, is implemented from scratch to avoid reliance on external crates, simply to prevent any increase in compile times. Serialization is mainly hard-coded to improve performance, even by a negligible amount. 🤫
+> Every aspect, including FFI, JSON serialization and pipe connection, is implemented from scratch to avoid reliance on external crates and prevent any increase in compile times. Serialization is mainly hard-coded to focus on performance, even if the difference is negligible. 🤫
