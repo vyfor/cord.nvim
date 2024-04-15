@@ -54,10 +54,11 @@ local discord
 local timer = vim.loop.new_timer()
 local enabled = false
 local is_focused = true
+local force_idle = false
+local is_blacklisted = false
 local problem_count = -1
 local last_updated = os.clock()
 local last_presence
-local workspace
 
 local function connect(config)
   discord.init(
@@ -89,13 +90,23 @@ local function update_idle_presence(config)
   if last_presence['idle'] then
     return false
   end
+
+  if force_idle then
+    last_presence['idle'] = true
+    if config.timer.reset_on_idle then
+      discord.update_time()
+    end
+    discord.update_presence('', 'Cord.idle', false, nil, 0)
+    return true
+  end
+
   if config.idle.show_idle and (config.idle.timeout == 0 or (os.clock() - last_updated) * 1000 >= config.idle.timeout) then
     if config.idle.disable_on_focus and is_focused then
       return false
     end
     last_presence['idle'] = true
     if config.display.show_time and config.timer.reset_on_idle then
-      discord.set_time()
+      discord.update_time()
     end
     discord.update_presence('', 'Cord.idle', false, nil, 0)
     return true
@@ -104,10 +115,10 @@ local function update_idle_presence(config)
 end
 
 local function update_presence(config)
-  if utils.array_contains(config.display.workspace_blacklist, workspace) then
+  if is_blacklisted then
     return
   end
-  
+
   local cursor = vim.api.nvim_win_get_cursor(0)
   problem_count = utils.get_problem_count(config) or -1
   local current_presence = {
@@ -120,9 +131,10 @@ local function update_presence(config)
   }
 
   if should_update_presence(current_presence) then
+    force_idle = false
     last_updated = os.clock()
     if config.display.show_time and config.timer.reset_on_change then
-      discord.set_time()
+      discord.update_time()
     end
     local cursor_pos = config.display.show_cursor_position and (current_presence.cursor_line .. ':' .. current_presence.cursor_col) or nil
     local success = discord.update_presence(current_presence.name, current_presence.type, current_presence.readonly, cursor_pos, problem_count)
@@ -139,7 +151,7 @@ local function start_timer(config)
   if vim.g.cord_started == nil then
     vim.g.cord_started = true
     if not utils.validate_severity(config) then return end
-    workspace = utils.update_cwd(config, discord)
+    is_blacklisted = utils.array_contains(config.display.workspace_blacklist, utils.update_cwd(config, discord))
     cord.setup_autocmds(config)
     if config.display.show_time then
       discord.update_time()
@@ -169,7 +181,7 @@ function cord.setup(userConfig)
 end
 
 function cord.setup_autocmds(config)
-  vim.api.nvim_create_autocmd('DirChanged', { callback = function() workspace = utils.update_cwd(config, discord) end })
+  vim.api.nvim_create_autocmd('DirChanged', { callback = function() is_blacklisted = utils.array_contains(config.display.workspace_blacklist, utils.update_cwd(config, discord)) end })
   vim.api.nvim_create_autocmd('FocusGained', { callback = function() is_focused = true; last_presence = nil end })
   vim.api.nvim_create_autocmd('FocusLost', { callback = function() is_focused = false end })
 end
@@ -217,6 +229,26 @@ function cord.setup_usercmds(config)
     timer:stop()
     discord.clear_presence()
     enabled = false
+    last_presence = nil
+  end, {})
+
+  vim.api.nvim_create_user_command('CordToggleIdle', function()
+    if last_presence['idle'] then
+      force_idle = false
+      last_updated = os.clock()
+      last_presence = nil
+    else
+      force_idle = true
+    end
+  end, {})
+
+  vim.api.nvim_create_user_command('CordIdle', function()
+    force_idle = true
+  end, {})
+
+  vim.api.nvim_create_user_command('CordUnidle', function()
+    force_idle = false
+    last_updated = os.clock()
     last_presence = nil
   end, {})
 end
