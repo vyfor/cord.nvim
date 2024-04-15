@@ -21,6 +21,7 @@ cord.config = {
     show_repository = true,
     show_cursor_position = false,
     swap_fields = false,
+    workspace_blacklist = {},
   },
   lsp = {
     show_problem_count = false,
@@ -56,6 +57,7 @@ local is_focused = true
 local problem_count = -1
 local last_updated = os.clock()
 local last_presence
+local workspace
 
 local function connect(config)
   discord.init(
@@ -102,6 +104,10 @@ local function update_idle_presence(config)
 end
 
 local function update_presence(config)
+  if utils.array_contains(config.display.workspace_blacklist, workspace) then
+    return
+  end
+  
   local cursor = vim.api.nvim_win_get_cursor(0)
   problem_count = utils.get_problem_count(config) or -1
   local current_presence = {
@@ -133,7 +139,7 @@ local function start_timer(config)
   if vim.g.cord_started == nil then
     vim.g.cord_started = true
     if not utils.validate_severity(config) then return end
-    utils.update_cwd(config, discord)
+    workspace = utils.update_cwd(config, discord)
     cord.setup_autocmds(config)
     if config.display.show_time then
       discord.update_time()
@@ -163,7 +169,7 @@ function cord.setup(userConfig)
 end
 
 function cord.setup_autocmds(config)
-  vim.api.nvim_create_autocmd('DirChanged', { callback = function() utils.update_cwd(config, discord) end })
+  vim.api.nvim_create_autocmd('DirChanged', { callback = function() workspace = utils.update_cwd(config, discord) end })
   vim.api.nvim_create_autocmd('FocusGained', { callback = function() is_focused = true; last_presence = nil end })
   vim.api.nvim_create_autocmd('FocusLost', { callback = function() is_focused = false end })
 end

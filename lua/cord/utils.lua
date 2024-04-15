@@ -131,16 +131,19 @@ local function validate_buttons(config)
 end
 
 local function update_cwd(config, discord)
-  discord.set_cwd(find_workspace())
+  local workspace = find_workspace()
+  discord.set_cwd(workspace)
 
   local buttons = validate_buttons(config)
-  if not buttons then return end
+  if not buttons then return workspace end
 
   if #buttons == 1 then
     discord.set_buttons(buttons[1].label, buttons[1].url, nil, nil)
   elseif #buttons >= 2 then
     discord.set_buttons(buttons[1].label, buttons[1].url, buttons[2].label, buttons[2].url)
   end
+
+  return workspace
 end
 
 local function get_problem_count(config)
@@ -153,11 +156,26 @@ local function get_problem_count(config)
   end
 end
 
+local function array_contains(arr, val)
+    if arr == nil or val == nil then
+        return false
+    end
+
+    for _, value in ipairs(arr) do
+        if value == val then
+            return true
+        end
+    end
+
+    return false
+end
+
 return {
   init_discord = init_discord,
   fetch_repository = fetch_repository,
   find_workspace = find_workspace,
   validate_severity = validate_severity,
   update_cwd = update_cwd,
-  get_problem_count = get_problem_count
+  get_problem_count = get_problem_count,
+  array_contains = array_contains
 }
