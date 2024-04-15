@@ -72,6 +72,7 @@ require('cord').setup({
     show_time = true,                           -- Display start timestamp
     show_repository = true,                     -- Display 'View repository' button linked to repository url, if any
     show_cursor_position = true,                -- Display line and column number of cursor's position
+    swap_fields = false,                        -- If enabled, workspace is displayed first
   },
   lsp = {
     show_problem_count = false,                 -- Display number of diagnostics problems

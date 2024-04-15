@@ -42,7 +42,8 @@ local function init_discord(ffi)
       const char* editingText,
       const char* fileBrowserText,
       const char* pluginManagerText,
-      const char* workspaceText
+      const char* workspaceText,
+      bool swap
     );
     bool update_presence(
       const char* filename,
