@@ -25,6 +25,7 @@ const GITHUB_ASSETS_URL: &str =
 static mut RICH_CLIENT: Option<RichClient> = None;
 static mut CLIENT_IMAGE: String = String::new();
 static mut CWD: Option<String> = None;
+static mut SWAP_FIELDS: bool = false;
 static mut START_TIME: Option<u128> = None;
 static mut EDITOR_TOOLTIP: String = String::new();
 static mut IDLE_TEXT: String = String::new();
@@ -49,6 +50,7 @@ pub extern "C" fn init(
     file_browser_text: *const c_char,
     plugin_manager_text: *const c_char,
     workspace_text: *const c_char,
+    swap_fields: bool,
 ) {
     unsafe {
         if INITIALIZED {
@@ -90,6 +92,7 @@ pub extern "C" fn init(
         FILE_BROWSER_TEXT = ptr_to_string(file_browser_text);
         PLUGIN_MANAGER_TEXT = ptr_to_string(plugin_manager_text);
         WORKSPACE_TEXT = ptr_to_string(workspace_text);
+        SWAP_FIELDS = swap_fields;
 
         std::thread::spawn(move || {
             if let Ok(mut client) = RichClient::connect(client_id) {
@@ -210,12 +213,12 @@ pub extern "C" fn update_presence(
                 }
             };
             let mut activity = Activity {
-                details: Some(presence_details),
                 ..Default::default()
             };
+            let mut state = None;
             if let Some(cwd) = CWD.as_ref() {
                 if !WORKSPACE_TEXT.is_empty() {
-                    activity.state = Some(if problem_count != -1 {
+                    state = Some(if problem_count != -1 {
                         format!(
                             "{} - {} problems",
                             WORKSPACE_TEXT.replace("{}", &cwd),
@@ -223,8 +226,15 @@ pub extern "C" fn update_presence(
                         )
                     } else {
                         WORKSPACE_TEXT.replace("{}", &cwd)
-                    })
+                    });
                 }
+            }
+            if SWAP_FIELDS {
+                activity.state = Some(presence_details);
+                activity.details = state;
+            } else {
+                activity.state = state;
+                activity.details = Some(presence_details);
             }
             activity.assets = Some(ActivityAssets {
                 large_image: Some(presence_large_image),

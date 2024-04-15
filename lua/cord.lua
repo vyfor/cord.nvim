@@ -20,6 +20,7 @@ cord.config = {
     show_time = true,
     show_repository = true,
     show_cursor_position = false,
+    swap_fields = false,
   },
   lsp = {
     show_problem_count = false,
@@ -67,7 +68,8 @@ local function connect(config)
     config.text.editing,
     config.text.file_browser,
     config.text.plugin_manager,
-    config.text.workspace
+    config.text.workspace,
+    config.display.swap_fields
   )
 end
 
