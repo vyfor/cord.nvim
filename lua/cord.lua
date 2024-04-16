@@ -157,6 +157,7 @@ local function start_timer(config)
       discord.update_time()
     end
   end
+  update_presence(config)
   timer:start(0, config.timer.interval, vim.schedule_wrap(function() update_presence(config) end))
 end
 
