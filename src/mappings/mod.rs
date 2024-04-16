@@ -6,26 +6,16 @@ pub fn get_by_filetype<'a>(
     filetype: &'a str,
     filename: &'a str,
 ) -> Filetype<'a> {
-    language::get(filetype, filename)
-        .map(|language| Filetype::Language(language.0, language.1))
-        .unwrap_or_else(|| {
-            file_browser::get(filetype)
-                .map(|file_browser| {
-                    Filetype::FileBrowser(file_browser.0, file_browser.1)
-                })
-                .unwrap_or_else(|| {
-                    plugin_manager::get(filetype)
-                        .map(|plugin_manager| {
-                            Filetype::PluginManager(
-                                plugin_manager.0,
-                                plugin_manager.1,
-                            )
-                        })
-                        .unwrap_or_else(|| {
-                            Filetype::Language("default", filetype)
-                        })
-                })
-        })
+    if let Some(language) = language::get(filetype, filename) {
+        return Filetype::Language(language.0, language.1);
+    }
+    if let Some(file_browser) = file_browser::get(filetype) {
+        return Filetype::FileBrowser(file_browser.0, file_browser.1);
+    }
+    if let Some(plugin_manager) = plugin_manager::get(filetype) {
+        return Filetype::PluginManager(plugin_manager.0, plugin_manager.1);
+    }
+    Filetype::Language("text", filetype)
 }
 
 pub enum Filetype<'a> {
