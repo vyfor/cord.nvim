@@ -44,17 +44,18 @@ pub fn build_presence(
 #[inline(always)]
 pub fn get_presence_state(
     config: &Config,
+    cwd: &str,
     problem_count: i32,
 ) -> Option<String> {
-    if !config.cwd.is_empty() && !config.workspace_text.is_empty() {
+    if !cwd.is_empty() && !config.workspace_text.is_empty() {
         Some(if problem_count != -1 {
             format!(
                 "{} - {} problems",
-                config.workspace_text.replace("{}", &config.cwd),
+                config.workspace_text.replace("{}", cwd),
                 problem_count
             )
         } else {
-            config.workspace_text.replace("{}", &config.cwd)
+            config.workspace_text.replace("{}", cwd)
         })
     } else {
         None

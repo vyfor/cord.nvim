@@ -17,7 +17,11 @@ const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
 
 static mut INITIALIZED: bool = false;
+static mut CWD: String = String::new();
+static mut START_TIME: Option<u128> = None;
+static mut BUTTONS: Vec<ActivityButton> = Vec::new();
 static mut CONFIG: Option<Config> = None;
+
 struct Config {
     rich_client: RichClient,
     editor_image: String,
@@ -30,9 +34,6 @@ struct Config {
     plugin_manager_text: String,
     workspace_text: String,
     swap_fields: bool,
-    cwd: String,
-    start_time: Option<u128>,
-    buttons: Vec<ActivityButton>,
 }
 
 #[no_mangle]
@@ -105,9 +106,6 @@ pub extern "C" fn init(
                     plugin_manager_text: plugin_manager_text,
                     workspace_text: workspace_text,
                     swap_fields: swap_fields,
-                    cwd: String::new(),
-                    start_time: None,
-                    buttons: Vec::new(),
                 });
                 INITIALIZED = true;
             };
@@ -162,9 +160,11 @@ pub extern "C" fn update_presence(
 
             if config.swap_fields {
                 activity.state = Some(presence_details);
-                activity.details = get_presence_state(&config, problem_count);
+                activity.details =
+                    get_presence_state(&config, CWD.as_ref(), problem_count);
             } else {
-                activity.state = get_presence_state(&config, problem_count);
+                activity.state =
+                    get_presence_state(&config, CWD.as_ref(), problem_count);
                 activity.details = Some(presence_details);
             }
             activity.assets = Some(ActivityAssets {
@@ -177,11 +177,11 @@ pub extern "C" fn update_presence(
                     Some(config.editor_tooltip.clone())
                 },
             });
-            config.start_time.as_ref().map(|start_time| {
+            START_TIME.as_ref().map(|start_time| {
                 activity.timestamp = Some(start_time.clone());
             });
-            if !config.buttons.is_empty() {
-                activity.buttons = Some(config.buttons.clone());
+            if !BUTTONS.is_empty() {
+                activity.buttons = Some(BUTTONS.clone());
             }
 
             match config
@@ -231,13 +231,7 @@ pub extern "C" fn disconnect() {
 #[no_mangle]
 pub extern "C" fn set_cwd(value: *const c_char) {
     unsafe {
-        if !INITIALIZED {
-            return;
-        }
-
-        if let Some(config) = CONFIG.as_mut() {
-            config.cwd = ptr_to_string(value);
-        }
+        CWD = ptr_to_string(value);
     }
 }
 
@@ -249,28 +243,22 @@ pub extern "C" fn set_buttons(
     second_url: *const c_char,
 ) {
     unsafe {
-        if !INITIALIZED {
-            return;
+        BUTTONS.clear();
+        let first_label = ptr_to_string(first_label);
+        let first_url = ptr_to_string(first_url);
+        if !first_label.is_empty() && !first_url.is_empty() {
+            BUTTONS.push(ActivityButton {
+                label: first_label,
+                url: first_url,
+            });
         }
-
-        if let Some(config) = CONFIG.as_mut() {
-            config.buttons.clear();
-            let first_label = ptr_to_string(first_label);
-            let first_url = ptr_to_string(first_url);
-            if !first_label.is_empty() && !first_url.is_empty() {
-                config.buttons.push(ActivityButton {
-                    label: first_label,
-                    url: first_url,
-                });
-            }
-            let second_label = ptr_to_string(second_label);
-            let second_url = ptr_to_string(second_url);
-            if !second_label.is_empty() && !second_url.is_empty() {
-                config.buttons.push(ActivityButton {
-                    label: second_label,
-                    url: second_url,
-                })
-            }
+        let second_label = ptr_to_string(second_label);
+        let second_url = ptr_to_string(second_url);
+        if !second_label.is_empty() && !second_url.is_empty() {
+            BUTTONS.push(ActivityButton {
+                label: second_label,
+                url: second_url,
+            })
         }
     }
 }
@@ -278,17 +266,11 @@ pub extern "C" fn set_buttons(
 #[no_mangle]
 pub extern "C" fn update_time() {
     unsafe {
-        if !INITIALIZED {
-            return;
-        }
-
-        if let Some(config) = CONFIG.as_mut() {
-            config.start_time = Some(
-                std::time::SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_millis(),
-            );
-        }
+        START_TIME = Some(
+            std::time::SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_millis(),
+        );
     }
 }
