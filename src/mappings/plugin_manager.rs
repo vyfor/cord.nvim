@@ -1,8 +1,10 @@
-pub fn get_plugin_manager<'a>(filetype: &'a str) -> (&'a str, &'a str) {
-    match filetype {
+pub fn get<'a>(filetype: &'a str) -> Option<(&'a str, &'a str)> {
+    let plugin_manager = match filetype {
         "lazy" => ("default", "Lazy"),
         "pckr" => ("default", "Pckr"),
         "packer" => ("default", "Packer"),
-        _ => ("default", &filetype),
-    }
+        _ => return None,
+    };
+
+    Some(plugin_manager)
 }

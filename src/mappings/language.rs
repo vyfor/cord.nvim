@@ -1,8 +1,8 @@
-pub fn get_language<'a>(
+pub fn get<'a>(
     filetype: &'a str,
     filename: &str,
-) -> (&'a str, &'a str) {
-    match filetype {
+) -> Option<(&'a str, &'a str)> {
+    let language = match filetype {
         "asm" => ("assembly", "Assembly"),
         "bash" => ("shell", "Bash"),
         "c" => ("c", "C "),
@@ -43,6 +43,8 @@ pub fn get_language<'a>(
         "vim" => ("vim", "VimL"),
         "xml" => ("xml", "XML"),
         "yaml" => ("yaml", "YAML"),
-        _ => ("text", &filetype),
-    }
+        _ => return None,
+    };
+
+    Some(language)
 }
