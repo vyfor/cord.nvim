@@ -85,7 +85,7 @@ fn language_presence(
     let presence_details = cursor_position
         .map_or(details.clone(), |pos| format!("{}:{}", details, pos));
     let presence_large_image = format!(
-        "{}/language/{}.png?v=1",
+        "{}/language/{}.png?v=2",
         GITHUB_ASSETS_URL,
         if filename.is_empty() && filetype.is_empty() {
             "text"
@@ -106,7 +106,7 @@ fn file_browser_presence(
 ) -> (String, String, String) {
     let presence_details = config.file_browser_text.replace("{}", tooltip);
     let presence_large_image =
-        format!("{}/file_browser/{}.png?v=1", GITHUB_ASSETS_URL, icon);
+        format!("{}/file_browser/{}.png?v=2", GITHUB_ASSETS_URL, icon);
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
@@ -120,7 +120,7 @@ fn plugin_manager_presence(
 ) -> (String, String, String) {
     let presence_details = config.plugin_manager_text.replace("{}", tooltip);
     let presence_large_image =
-        format!("{}/plugin_manager/{}.png?v=1", GITHUB_ASSETS_URL, icon);
+        format!("{}/plugin_manager/{}.png?v=2", GITHUB_ASSETS_URL, icon);
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
