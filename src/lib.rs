@@ -169,7 +169,11 @@ pub extern "C" fn update_presence(
             }
             activity.assets = Some(ActivityAssets {
                 large_image: Some(presence_large_image),
-                large_text: Some(presence_large_text),
+                large_text: Some(if presence_large_text.len() < 2 {
+                    format!("{:<2}", presence_large_text)
+                } else {
+                    presence_large_text
+                }),
                 small_image: Some(config.editor_image.clone()),
                 small_text: if config.editor_tooltip.is_empty() {
                     None
