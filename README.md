@@ -4,13 +4,12 @@
 
 ![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/6ff91794-7264-485e-b82b-87926d7d5013)
 
-
 ## 💎 Features
 - Lightweight and dependency-free
 - Cross-platform support (Windows, Linux, macOS)
 - Blazingly fast startup due to non-blocking, asynchronous nature
 - Highly [configurable](#-configuration) in Lua
-- Offers a rich icon set for various components
+- Offers more than 60 icons for languages and components
 - Automatically detects working directory and repository based on Git
 - Identifies problems across active buffers
 - Supports configurable idle status detection
