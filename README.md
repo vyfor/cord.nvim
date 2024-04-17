@@ -79,7 +79,7 @@ require('cord').setup({
     show_problem_count = false,                 -- Display number of diagnostics problems
     severity = 1,                               -- 1 = Error, 2 = Warning, 3 = Info, 4 = Hint
     scope = 'workspace',                        -- buffer or workspace
-  }
+  },
   idle = {
     show_idle = true,                           -- Enable idle status
     timeout = 300000,                           -- Timeout in milliseconds after which the idle status is set, 0 to display immediately
@@ -103,7 +103,7 @@ require('cord').setup({
     --   label = 'View plugin',
     --   url = 'https://github.com/vyfor/cord.nvim',
     -- }
-  }
+  },
 })
 ```
 
