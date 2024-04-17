@@ -41,7 +41,7 @@ pub fn get<'a>(
                 ("kotlin", "Kotlin")
             }
         }
-        "tex" | "texmf" => ("latex", "LaTeX"),
+        "tex" | "texmf" | "plaintex" => ("latex", "LaTeX"),
         "lisp" => ("lisp", "Lisp"),
         "lua" => ("lua", "Lua"),
         "markdown" => ("markdown", "Markdown"),
