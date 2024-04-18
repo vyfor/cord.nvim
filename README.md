@@ -122,7 +122,7 @@ This project is in beta. Feel free to open an issue or pull request for missing 
 
 ## ❓ FAQ
 ### Why Rust?
-> There are two primary reasons as to why the project has been rewritten in Rust. Firstly, the compilation process: Kotlin/Native, despite compiling to native code, still relies on the JVM for its compiler, which is inconvenient, aside from that, compile times are quite slow. Secondly, Rust is known for its performance and safety, which is why the change was made.
+> This plugin was initially written in Kotlin. Kotlin/Native, despite compiling to native code, still relies on the JVM for its compiler which is inconvenient, and aside from that, compile times are quite slow.
 
 ### Why was Lua not considered?
 > The internal code needs to run on a separate thread due to Discord's ratelimit enforcement between connections. Implementing multithreading is much simpler in Rust compared to Lua. Although, a considerable part of the codebase still relies on Lua code.
