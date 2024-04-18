@@ -27,7 +27,8 @@
   ```lua
   {
     'vyfor/cord.nvim',
-    build = './build'
+    build = './build',
+    event = 'VeryLazy'
   }
   ```
 </details>
