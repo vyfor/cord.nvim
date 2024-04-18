@@ -2,11 +2,10 @@ pub fn get<'a>(
     filetype: &'a str,
     filename: &str,
 ) -> Option<(&'a str, &'a str)> {
-    let filename = filename.to_lowercase();
     let language = match filetype {
         "autohotkey" => ("ahk", "AutoHotkey"),
         "asm" => ("assembly", "Assembly"),
-        "bash" => ("shell", "Bash"),
+        "sh" => ("shell", "Shell script"),
         "c" => ("c", "C "),
         "clojure" => ("clojure", "Clojure"),
         "cpp" => ("cpp", "C++"),
@@ -61,9 +60,9 @@ pub fn get<'a>(
         "sql" => ("sql", "SQL"),
         "svelte" => ("svelte", "Svelte"),
         "swift" => ("swift", "Swift"),
-        "txt" => {
-            if filename == "license" {
-                ("license", "License")
+        "text" => {
+            if filename.to_lowercase() == "license" {
+                ("license", "License file")
             } else {
                 ("text", "Plain Text")
             }
@@ -83,7 +82,7 @@ pub fn get<'a>(
         "xml" => ("xml", "XML"),
         "yaml" => ("yaml", "YAML"),
         "zig" => ("zig", "Zig"),
-        _ => match filename.rsplit_once('.') {
+        _ => match filename.to_lowercase().rsplit_once('.') {
             Some((_, extension)) => match extension {
                 "gml" => ("gml", "Game Maker Language"),
                 "pcss" | "postcss" => ("postcss", "PostCSS"),
