@@ -65,7 +65,7 @@ require('cord').setup({
   },
   editor = {
     image = nil,                                -- Image ID or URL in case a custom client id is provided
-    client = 'neovim',                          -- vim, neovim, lunarvim, nvchad or your application's client id
+    client = 'neovim',                          -- vim, neovim, lunarvim, nvchad, astronvim or your application's client id
     tooltip = 'The Superior Text Editor',       -- Text to display when hovering over the editor's image
   },
   display = {

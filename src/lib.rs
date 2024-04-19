@@ -72,6 +72,10 @@ pub extern "C" fn init(
                 1220296082861326378,
                 format!("{}/editor/nvchad.png", GITHUB_ASSETS_URL),
             ),
+            "astronvim" => (
+                1230866983977746532,
+                format!("{}/editor/astronvim.png", GITHUB_ASSETS_URL),
+            ),
             id => (
                 id.parse::<u64>().expect("Invalid client ID"),
                 ptr_to_string(image),
