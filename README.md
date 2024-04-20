@@ -54,7 +54,7 @@
 </details>
 
 ## 🔧 Configuration
-> Note: the `setup()` has to be called to initialize the plugin.
+> Note: `setup()` has to be called to initialize the plugin.
 ```lua
 require('cord').setup({
   usercmds = true,                              -- Enable user commands
