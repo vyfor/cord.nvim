@@ -14,6 +14,7 @@ pub fn get<'a>(
         "css" => ("css", "CSS"),
         "d" => ("d", "D "),
         "dart" => ("dart", "Dart"),
+        "dockerfile" => ("docker", "Docker"),
         "dosbatch" => ("shell", "Batch"),
         "elixir" => ("elixir", "Elixir"),
         "erlang" => ("erlang", "Erlang"),
