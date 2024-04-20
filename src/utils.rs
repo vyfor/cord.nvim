@@ -2,7 +2,7 @@ use std::ffi::{c_char, CStr};
 
 use crate::{
     mappings::{get_by_filetype, Filetype},
-    Config, GITHUB_ASSETS_URL,
+    Config, DEFAULT_CLIENT_IDS, GITHUB_ASSETS_URL,
 };
 
 #[inline(always)]
@@ -84,15 +84,20 @@ fn language_presence(
     };
     let presence_details = cursor_position
         .map_or(details.clone(), |pos| format!("{}:{}", details, pos));
-    let presence_large_image = format!(
-        "{}/language/{}.png?v=5",
-        GITHUB_ASSETS_URL,
-        if filename.is_empty() && filetype.is_empty() {
-            "text"
-        } else {
-            icon
-        }
-    );
+    let icon_name = if filename.is_empty() && filetype.is_empty() {
+        "text"
+    } else {
+        icon
+    };
+    let presence_large_image = if DEFAULT_CLIENT_IDS
+        .get()
+        .unwrap()
+        .contains_key(&config.rich_client.client_id)
+    {
+        format!("{GITHUB_ASSETS_URL}/language/{icon_name}.png?v=5")
+    } else {
+        icon_name.to_string()
+    };
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
@@ -105,8 +110,15 @@ fn file_browser_presence(
     icon: &str,
 ) -> (String, String, String) {
     let presence_details = config.file_browser_text.replace("{}", tooltip);
-    let presence_large_image =
-        format!("{}/file_browser/{}.png?v=5", GITHUB_ASSETS_URL, icon);
+    let presence_large_image = if DEFAULT_CLIENT_IDS
+        .get()
+        .unwrap()
+        .contains_key(&config.rich_client.client_id)
+    {
+        format!("{GITHUB_ASSETS_URL}/file_browser/{icon}.png?v=5")
+    } else {
+        icon.to_string()
+    };
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
@@ -119,8 +131,15 @@ fn plugin_manager_presence(
     icon: &str,
 ) -> (String, String, String) {
     let presence_details = config.plugin_manager_text.replace("{}", tooltip);
-    let presence_large_image =
-        format!("{}/plugin_manager/{}.png?v=5", GITHUB_ASSETS_URL, icon);
+    let presence_large_image = if DEFAULT_CLIENT_IDS
+        .get()
+        .unwrap()
+        .contains_key(&config.rich_client.client_id)
+    {
+        format!("{GITHUB_ASSETS_URL}/plugin_manager/{icon}.png?v=5")
+    } else {
+        icon.to_string()
+    };
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)

@@ -5,7 +5,7 @@ mod rpc;
 mod utils;
 
 use rpc::activity::{ActivityAssets, ActivityButton};
-use std::{ffi::c_char, time::UNIX_EPOCH};
+use std::{collections::HashMap, ffi::c_char, sync::OnceLock, time::UNIX_EPOCH};
 use utils::{build_presence, get_presence_state, ptr_to_string};
 
 use crate::{
@@ -21,6 +21,7 @@ static mut CWD: String = String::new();
 static mut START_TIME: Option<u128> = None;
 static mut BUTTONS: Vec<ActivityButton> = Vec::new();
 static mut CONFIG: Option<Config> = None;
+static DEFAULT_CLIENT_IDS: OnceLock<HashMap<u64, String>> = OnceLock::new();
 
 struct Config {
     rich_client: RichClient,
@@ -55,32 +56,56 @@ pub extern "C" fn init(
             return;
         }
 
-        let (client_id, client_image) = match ptr_to_string(client).as_str() {
-            "vim" => (
-                1219918645770059796,
-                format!("{}/editor/vim.png", GITHUB_ASSETS_URL),
+        let default_clients = HashMap::from([
+            (
+                "vim",
+                (
+                    1219918645770059796,
+                    format!("{}/editor/vim.png", GITHUB_ASSETS_URL),
+                ),
             ),
-            "neovim" => (
-                1219918880005165137,
-                format!("{}/editor/neovim.png", GITHUB_ASSETS_URL),
+            (
+                "neovim",
+                (
+                    1219918880005165137,
+                    format!("{}/editor/neovim.png", GITHUB_ASSETS_URL),
+                ),
             ),
-            "lunarvim" => (
-                1220295374087000104,
-                format!("{}/editor/lunarvim.png", GITHUB_ASSETS_URL),
+            (
+                "lunarvim",
+                (
+                    1220295374087000104,
+                    format!("{}/editor/lunarvim.png", GITHUB_ASSETS_URL),
+                ),
             ),
-            "nvchad" => (
-                1220296082861326378,
-                format!("{}/editor/nvchad.png", GITHUB_ASSETS_URL),
+            (
+                "nvchad",
+                (
+                    1220296082861326378,
+                    format!("{}/editor/nvchad.png", GITHUB_ASSETS_URL),
+                ),
             ),
-            "astronvim" => (
-                1230866983977746532,
-                format!("{}/editor/astronvim.png", GITHUB_ASSETS_URL),
+            (
+                "astronvim",
+                (
+                    1230866983977746532,
+                    format!("{}/editor/astronvim.png", GITHUB_ASSETS_URL),
+                ),
             ),
-            id => (
-                id.parse::<u64>().expect("Invalid client ID"),
-                ptr_to_string(image),
-            ),
-        };
+        ]);
+
+        let _ = DEFAULT_CLIENT_IDS.set(default_clients.values().cloned().collect());
+
+        let client = ptr_to_string(client);
+        let (client_id, client_image) = default_clients
+            .get::<str>(&client)
+            .cloned()
+            .unwrap_or_else(|| {
+                (
+                    client.parse::<u64>().expect(&format!("Invalid client ID")),
+                    ptr_to_string(image),
+                )
+            });
 
         let editor_tooltip = ptr_to_string(editor_tooltip);
         let idle_text = ptr_to_string(idle_text);
