@@ -1,12 +1,14 @@
+const DEFAULT: &str = "default_file_browser";
+
 pub fn get<'a>(filetype: &'a str) -> Option<(&'a str, &'a str)> {
     let file_browser = match filetype {
-        "netrw" => ("default", "Netrw"),
+        "netrw" => (DEFAULT, "Netrw"),
         "TelescopePrompt" => ("telescope", "Telescope"),
-        "dirvish" => ("default", "Dirvish"),
-        "oil" => ("default", "Oil"),
-        "neo-tree" => ("default", "Neo-Tree"),
-        "NvimTree" => ("default", "nvim-tree"),
-        "minifiles" => ("default", "mini.files"),
+        "dirvish" => (DEFAULT, "Dirvish"),
+        "oil" => (DEFAULT, "Oil"),
+        "neo-tree" => (DEFAULT, "Neo-Tree"),
+        "NvimTree" => (DEFAULT, "nvim-tree"),
+        "minifiles" => (DEFAULT, "mini.files"),
         _ => return None,
     };
 
