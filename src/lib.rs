@@ -102,7 +102,7 @@ pub extern "C" fn init(
             .cloned()
             .unwrap_or_else(|| {
                 (
-                    client.parse::<u64>().expect(&format!("Invalid client ID")),
+                    client.parse::<u64>().expect("Invalid client ID"),
                     ptr_to_string(image),
                 )
             });
