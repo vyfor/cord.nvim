@@ -1,0 +1,8 @@
+name: "Icon: "
+description: Request a new icon
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: "Description"
+      description: "List of icon(s) to be requested. You may include a link to an image, either in PNG(1024x1024) or SVG format"
