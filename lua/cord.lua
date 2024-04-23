@@ -51,6 +51,7 @@ cord.config = {
 }
 
 local discord
+local connection_tries = 0
 local timer = vim.loop.new_timer()
 local enabled = false
 local is_focused = true
@@ -154,6 +155,16 @@ local function update_presence(config, initial)
       if initial then
         timer:stop()
         timer:start(0, config.timer.interval, vim.schedule_wrap(function() update_presence(config, false) end))
+      end
+    else
+      connection_tries = connection_tries + 1
+      if connection_tries == 16 then
+        vim.notify('[cord.nvim] Failed to connect to Discord within 15 seconds, shutting down connection', vim.log.levels.WARN)
+        connection_tries = 0
+        timer:stop()
+        discord.disconnect()
+        enabled = false
+        last_presence = nil
       end
     end
   elseif not update_idle_presence(config) then
