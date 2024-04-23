@@ -32,6 +32,12 @@ local function init_discord(ffi)
   end
 
   ffi.cdef[[
+    typedef struct {
+      const char* first_label;
+      const char* first_url;
+      const char* second_label;
+      const char* second_url;
+    } Buttons;
     void init(
       const char* client,
       const char* image,
@@ -43,9 +49,11 @@ local function init_discord(ffi)
       const char* fileBrowserText,
       const char* pluginManagerText,
       const char* workspaceText,
-      bool swap
+      const char* initialPath,
+      const Buttons* buttons,
+      const bool swap
     );
-    bool update_presence(
+    const bool update_presence(
       const char* filename,
       const char* filetype,
       bool isReadOnly,
@@ -54,47 +62,12 @@ local function init_discord(ffi)
     );
     void clear_presence();
     void disconnect();
-    void set_cwd(const char* directory);
-    void set_buttons(
-      const char* first_label,
-      const char* first_url,
-      const char* second_label,
-      const char* second_url
-    );
+    const char* update_workspace(const char* workspace);
     void update_time();
+    const char* get_workspace();
   ]]
 
   return ffi.load(new_path)
-end
-
-local function fetch_repository()
-  local handle = io.popen('git config --get remote.origin.url')
-  if not handle then
-    vim.notify('[cord.nvim] Could not fetch Git repository URL', vim.log.levels.WARN)
-    return
-  end
-  local git_url = handle:read('*a')
-  handle:close()
-
-  return git_url:match('^%s*(.-)%s*$')
-end
-
-local function find_workspace()
-  local curr_dir = vim.fn.expand('%:p:h')
-  local vcs_markers = {'.git', '.svn', '.hg'}
-
-  while curr_dir ~= '' do
-    for _, dir in ipairs(vcs_markers) do
-      if vim.fn.isdirectory(curr_dir .. '/' .. dir) == 1 then
-        return vim.fn.fnamemodify(curr_dir, ':t')
-      end
-    end
-
-    curr_dir = vim.fn.fnamemodify(curr_dir, ':h')
-    if curr_dir == vim.fn.fnamemodify(curr_dir, ':h') then break end -- reached root
-  end
-
-  return vim.fn.fnamemodify(vim.fn.getcwd(), ':t') -- fallback to cwd
 end
 
 local function validate_severity(config)
@@ -104,46 +77,6 @@ local function validate_severity(config)
     return false
   end
   return true
-end
-
-local function validate_buttons(config)
-  if config.display.show_repository then
-    local buttons = {}
-    local repo
-    for i, button in ipairs(config.buttons) do
-      if i > 2 then
-        vim.notify('[cord.nvim] Detected more than two buttons in the config. Only the first two will be displayed', vim.log.levels.WARN)
-        return buttons
-      end
-      if button.url == 'git' then
-        if not repo then
-          repo = fetch_repository()
-        end
-        if repo and repo ~= '' then
-          table.insert(buttons, { label = button.label, url = repo })
-        end
-      else
-        table.insert(buttons, button)
-      end
-    end
-    return buttons
-  end
-end
-
-local function update_cwd(config, discord)
-  local workspace = find_workspace()
-  discord.set_cwd(workspace)
-
-  local buttons = validate_buttons(config)
-  if not buttons then return workspace end
-
-  if #buttons == 1 then
-    discord.set_buttons(buttons[1].label, buttons[1].url, nil, nil)
-  elseif #buttons >= 2 then
-    discord.set_buttons(buttons[1].label, buttons[1].url, buttons[2].label, buttons[2].url)
-  end
-
-  return workspace
 end
 
 local function get_problem_count(config)
@@ -172,10 +105,7 @@ end
 
 return {
   init_discord = init_discord,
-  fetch_repository = fetch_repository,
-  find_workspace = find_workspace,
   validate_severity = validate_severity,
-  update_cwd = update_cwd,
   get_problem_count = get_problem_count,
   array_contains = array_contains
 }

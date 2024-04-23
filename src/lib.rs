@@ -5,21 +5,23 @@ mod rpc;
 mod utils;
 
 use rpc::activity::{ActivityAssets, ActivityButton};
-use std::{ffi::c_char, time::UNIX_EPOCH};
-use utils::{build_presence, get_presence_state, ptr_to_string};
+use std::{
+    ffi::{c_char, CString},
+    ptr::null,
+    time::UNIX_EPOCH,
+};
+use utils::{
+    build_presence, find_workspace, get_presence_state, ptr_to_string,
+    validate_buttons, GITHUB_ASSETS_URL,
+};
 
 use crate::{
     ipc::client::{Connection, RichClient},
     rpc::packet::{Activity, Packet},
 };
 
-const GITHUB_ASSETS_URL: &str =
-    "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
-
 static mut INITIALIZED: bool = false;
-static mut CWD: String = String::new();
 static mut START_TIME: Option<u128> = None;
-static mut BUTTONS: Vec<ActivityButton> = Vec::new();
 static mut CONFIG: Option<Config> = None;
 
 struct Config {
@@ -33,7 +35,23 @@ struct Config {
     file_browser_text: String,
     plugin_manager_text: String,
     workspace_text: String,
+    workspace: String,
+    buttons: Vec<ActivityButton>,
     swap_fields: bool,
+}
+
+#[repr(C)]
+pub struct Buttons {
+    pub first_label: *const c_char,
+    pub first_url: *const c_char,
+    pub second_label: *const c_char,
+    pub second_url: *const c_char,
+}
+
+#[repr(C)]
+pub struct StringArray {
+    pub array: *const *const c_char,
+    pub length: usize,
 }
 
 #[no_mangle]
@@ -48,6 +66,8 @@ pub extern "C" fn init(
     file_browser_text: *const c_char,
     plugin_manager_text: *const c_char,
     workspace_text: *const c_char,
+    initial_path: *const c_char,
+    buttons: *const Buttons,
     swap_fields: bool,
 ) {
     unsafe {
@@ -90,6 +110,16 @@ pub extern "C" fn init(
         let file_browser_text = ptr_to_string(file_browser_text);
         let plugin_manager_text = ptr_to_string(plugin_manager_text);
         let workspace_text = ptr_to_string(workspace_text);
+        let workspace = find_workspace(&ptr_to_string(initial_path));
+
+        let buttons = &*buttons;
+        let buttons = validate_buttons(
+            ptr_to_string(buttons.first_label),
+            ptr_to_string(buttons.first_url),
+            ptr_to_string(buttons.second_label),
+            ptr_to_string(buttons.second_url),
+            workspace.to_str().unwrap(),
+        );
 
         std::thread::spawn(move || {
             if let Ok(mut client) = RichClient::connect(client_id) {
@@ -109,6 +139,12 @@ pub extern "C" fn init(
                     file_browser_text: file_browser_text,
                     plugin_manager_text: plugin_manager_text,
                     workspace_text: workspace_text,
+                    workspace: workspace
+                        .file_name()
+                        .unwrap()
+                        .to_string_lossy()
+                        .to_string(),
+                    buttons: buttons,
                     swap_fields: swap_fields,
                 });
                 INITIALIZED = true;
@@ -147,7 +183,7 @@ pub extern "C" fn update_presence(
 
                     (
                         config.idle_text.clone(),
-                        format!("{}/editor/idle.png?v=1", GITHUB_ASSETS_URL),
+                        format!("{}/editor/idle.png?v=5", GITHUB_ASSETS_URL),
                         config.idle_tooltip.clone(),
                     )
                 } else {
@@ -164,11 +200,17 @@ pub extern "C" fn update_presence(
 
             if config.swap_fields {
                 activity.state = Some(presence_details);
-                activity.details =
-                    get_presence_state(&config, CWD.as_ref(), problem_count);
+                activity.details = get_presence_state(
+                    &config,
+                    &config.workspace,
+                    problem_count,
+                );
             } else {
-                activity.state =
-                    get_presence_state(&config, CWD.as_ref(), problem_count);
+                activity.state = get_presence_state(
+                    &config,
+                    &config.workspace,
+                    problem_count,
+                );
                 activity.details = Some(presence_details);
             }
             activity.assets = Some(ActivityAssets {
@@ -188,8 +230,8 @@ pub extern "C" fn update_presence(
             START_TIME.as_ref().map(|start_time| {
                 activity.timestamp = Some(start_time.clone());
             });
-            if !BUTTONS.is_empty() {
-                activity.buttons = Some(BUTTONS.clone());
+            if !config.buttons.is_empty() {
+                activity.buttons = Some(config.buttons.clone());
             }
 
             match config
@@ -237,41 +279,6 @@ pub extern "C" fn disconnect() {
 }
 
 #[no_mangle]
-pub extern "C" fn set_cwd(value: *const c_char) {
-    unsafe {
-        CWD = ptr_to_string(value);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn set_buttons(
-    first_label: *const c_char,
-    first_url: *const c_char,
-    second_label: *const c_char,
-    second_url: *const c_char,
-) {
-    unsafe {
-        BUTTONS.clear();
-        let first_label = ptr_to_string(first_label);
-        let first_url = ptr_to_string(first_url);
-        if !first_label.is_empty() && !first_url.is_empty() {
-            BUTTONS.push(ActivityButton {
-                label: first_label,
-                url: first_url,
-            });
-        }
-        let second_label = ptr_to_string(second_label);
-        let second_url = ptr_to_string(second_url);
-        if !second_label.is_empty() && !second_url.is_empty() {
-            BUTTONS.push(ActivityButton {
-                label: second_label,
-                url: second_url,
-            })
-        }
-    }
-}
-
-#[no_mangle]
 pub extern "C" fn update_time() {
     unsafe {
         START_TIME = Some(
@@ -280,5 +287,35 @@ pub extern "C" fn update_time() {
                 .unwrap()
                 .as_millis(),
         );
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn update_workspace(value: *const c_char) -> *const c_char {
+    unsafe {
+        let mut ws = String::new();
+        if let Some(config) = CONFIG.as_mut() {
+            if let Some(workspace) =
+                find_workspace(&ptr_to_string(value)).file_name()
+            {
+                let workspace = workspace.to_string_lossy().to_string();
+                ws = workspace.clone();
+                config.workspace = workspace;
+            }
+        }
+
+        CString::new(ws).unwrap().into_raw() as *const c_char
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn get_workspace() -> *const c_char {
+    unsafe {
+        if let Some(config) = CONFIG.as_ref() {
+            CString::new(config.workspace.clone()).unwrap().into_raw()
+                as *const c_char
+        } else {
+            null()
+        }
     }
 }
