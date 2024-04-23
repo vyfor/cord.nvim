@@ -51,14 +51,15 @@ cord.config = {
 }
 
 local discord
+local connection_tries = 0
 local timer = vim.loop.new_timer()
 local enabled = false
 local is_focused = true
 local force_idle = false
-local is_blacklisted = false
 local problem_count = -1
 local last_updated = os.clock()
 local last_presence
+local is_blacklisted
 
 local function connect(config)
   discord.init(
@@ -72,6 +73,14 @@ local function connect(config)
     config.text.file_browser,
     config.text.plugin_manager,
     config.text.workspace,
+    vim.fn.getcwd(),
+    ffi.new(
+      'Buttons',
+      (config.buttons[1] and config.buttons[1].label) or '',
+      (config.buttons[1] and config.buttons[1].url) or '',
+      (config.buttons[2] and config.buttons[2].label) or '',
+      (config.buttons[2] and config.buttons[2].url) or ''
+    ),
     config.display.swap_fields
   )
 end
@@ -114,7 +123,7 @@ local function update_idle_presence(config)
   return false
 end
 
-local function update_presence(config)
+local function update_presence(config, initial)
   if is_blacklisted then
     return
   end
@@ -140,6 +149,23 @@ local function update_presence(config)
     local success = discord.update_presence(current_presence.name, current_presence.type, current_presence.readonly, cursor_pos, problem_count)
     if success then
       last_presence = current_presence
+      if is_blacklisted == nil then
+        is_blacklisted = utils.array_contains(config.display.workspace_blacklist, ffi.string(discord.update_workspace(vim.fn.getcwd())))
+      end
+      if initial then
+        timer:stop()
+        timer:start(0, config.timer.interval, vim.schedule_wrap(function() update_presence(config, false) end))
+      end
+    else
+      connection_tries = connection_tries + 1
+      if connection_tries == 16 then
+        vim.notify('[cord.nvim] Failed to connect to Discord within 15 seconds, shutting down connection', vim.log.levels.WARN)
+        connection_tries = 0
+        timer:stop()
+        discord.disconnect()
+        enabled = false
+        last_presence = nil
+      end
     end
   elseif not update_idle_presence(config) then
     return
@@ -148,17 +174,13 @@ end
 
 local function start_timer(config)
   timer:stop()
-  if vim.g.cord_started == nil then
-    vim.g.cord_started = true
-    if not utils.validate_severity(config) then return end
-    is_blacklisted = utils.array_contains(config.display.workspace_blacklist, utils.update_cwd(config, discord))
-    cord.setup_autocmds(config)
-    if config.display.show_time then
-      discord.update_time()
-    end
+
+  if not utils.validate_severity(config) then return end
+  if config.display.show_time then
+    discord.update_time()
   end
-  update_presence(config)
-  timer:start(0, config.timer.interval, vim.schedule_wrap(function() update_presence(config) end))
+
+  timer:start(0, 1000, vim.schedule_wrap(function() update_presence(config, true) end))
 end
 
 function cord.setup(userConfig)
@@ -166,23 +188,22 @@ function cord.setup(userConfig)
     local config = vim.tbl_deep_extend('force', cord.config, userConfig or {})
     config.timer.interval = math.max(config.timer.interval, 500)
 
-    local work = vim.loop.new_async(vim.schedule_wrap(function()
-      discord = utils.init_discord(ffi)
-      connect(config)
-      if config.timer.enable then
-        start_timer(config)
-      end
+    discord = utils.init_discord(ffi)
+    connect(config)
+    if config.timer.enable then
+      cord.setup_autocmds(config)
+      start_timer(config)
+    end
 
-      vim.api.nvim_create_autocmd('ExitPre', { callback = function() discord.disconnect() end })
-      if config.usercmds then cord.setup_usercmds(config) end
-    end))
-    work:send()
+    vim.api.nvim_create_autocmd('ExitPre', { callback = function() discord.disconnect() end })
+    if config.usercmds then cord.setup_usercmds(config) end
+
     vim.g.cord_initialized = true
   end
 end
 
 function cord.setup_autocmds(config)
-  vim.api.nvim_create_autocmd('DirChanged', { callback = function() is_blacklisted = utils.array_contains(config.display.workspace_blacklist, utils.update_cwd(config, discord)) end })
+  vim.api.nvim_create_autocmd('DirChanged', { callback = function() is_blacklisted = utils.array_contains(config.display.workspace_blacklist, ffi.string(discord.update_workspace(vim.fn.getcwd()))) end })
   vim.api.nvim_create_autocmd('FocusGained', { callback = function() is_focused = true; last_presence = nil end })
   vim.api.nvim_create_autocmd('FocusLost', { callback = function() is_focused = false end })
 end

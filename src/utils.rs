@@ -1,9 +1,19 @@
-use std::ffi::{c_char, CStr};
+use std::{
+    ffi::{c_char, CStr},
+    fs::File,
+    io::{BufRead, BufReader},
+    path::PathBuf,
+};
 
 use crate::{
     mappings::{get_by_filetype, Filetype},
-    Config, GITHUB_ASSETS_URL,
+    rpc::activity::ActivityButton,
+    Config,
 };
+
+pub const GITHUB_ASSETS_URL: &str =
+    "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
+const VCS_MARKERS: [&str; 3] = [".git", ".svn", ".hg"];
 
 #[inline(always)]
 pub fn ptr_to_string(ptr: *const c_char) -> String {
@@ -13,6 +23,74 @@ pub fn ptr_to_string(ptr: *const c_char) -> String {
     let c_str = unsafe { CStr::from_ptr(ptr) };
 
     c_str.to_string_lossy().into_owned()
+}
+
+#[inline(always)]
+pub fn find_workspace(initial_path: &str) -> PathBuf {
+    let mut curr_dir = PathBuf::from(initial_path);
+
+    while !curr_dir.as_os_str().is_empty() {
+        for dir in VCS_MARKERS {
+            let marker_path = curr_dir.join(dir);
+            if marker_path.is_dir() {
+                return curr_dir;
+            }
+        }
+
+        curr_dir = match curr_dir.parent() {
+            Some(parent) => parent.to_path_buf(),
+            None => break,
+        };
+        if curr_dir.parent() == Some(&curr_dir) {
+            break;
+        }
+    }
+
+    PathBuf::from(initial_path)
+}
+
+#[inline(always)]
+pub fn validate_buttons(
+    first_label: String,
+    mut first_url: String,
+    second_label: String,
+    mut second_url: String,
+    workspace: &str,
+) -> Vec<ActivityButton> {
+    let mut buttons = Vec::with_capacity(2);
+
+    if first_url == "git" || second_url == "git" {
+        if let Some(repository) = find_repository(workspace) {
+            if first_url == "git" {
+                first_url = repository.clone();
+            }
+            if second_url == "git" {
+                second_url = repository;
+            }
+        }
+    }
+
+    if !first_label.is_empty()
+        && !first_url.is_empty()
+        && first_url.starts_with("http")
+    {
+        buttons.push(ActivityButton {
+            label: first_label,
+            url: first_url,
+        });
+    }
+
+    if !second_label.is_empty()
+        && !second_url.is_empty()
+        && second_url.starts_with("http")
+    {
+        buttons.push(ActivityButton {
+            label: second_label,
+            url: second_url,
+        });
+    }
+
+    buttons
 }
 
 #[inline(always)]
@@ -124,4 +202,34 @@ fn plugin_manager_presence(
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
+}
+
+#[inline(always)]
+fn find_repository(workspace_path: &str) -> Option<String> {
+    let config_path = format!("{}/{}", workspace_path, ".git/config");
+
+    let file = match File::open(config_path) {
+        Ok(file) => file,
+        Err(_) => return None,
+    };
+    let reader = BufReader::new(file);
+
+    let mut repo_url = String::new();
+
+    for line in reader.lines() {
+        let line = match line {
+            Ok(line) => line,
+            Err(_) => continue,
+        };
+        if line.trim_start().starts_with("url = ") {
+            repo_url = line[7..].trim().to_string();
+            break;
+        }
+    }
+
+    if repo_url.is_empty() {
+        None
+    } else {
+        Some(repo_url)
+    }
 }
