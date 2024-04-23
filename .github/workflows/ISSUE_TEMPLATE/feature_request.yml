@@ -1,0 +1,14 @@
+name: "Feature: "
+description: Request a new feature or enhancement
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: "Description"
+      description: "Description of the feature you're proposing"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Additional information"
+      description: "Any additional information you'd like to provide, including any relevant screenshots, videos, etc."
