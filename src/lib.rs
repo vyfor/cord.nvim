@@ -2,22 +2,24 @@ mod ipc;
 mod json;
 mod mappings;
 mod rpc;
+mod types;
 mod utils;
 
-use rpc::activity::{ActivityAssets, ActivityButton};
+use rpc::activity::ActivityButton;
 use std::{
     ffi::{c_char, CString},
     ptr::null,
     time::UNIX_EPOCH,
 };
+use types::AssetType;
 use utils::{
-    build_presence, find_workspace, get_presence_state, ptr_to_string,
+    build_activity, build_presence, find_workspace, ptr_to_string,
     validate_buttons, GITHUB_ASSETS_URL,
 };
 
 use crate::{
     ipc::client::{Connection, RichClient},
-    rpc::packet::{Activity, Packet},
+    rpc::packet::Packet,
 };
 
 static mut INITIALIZED: bool = false;
@@ -48,12 +50,6 @@ pub struct Buttons {
     pub second_url: *const c_char,
 }
 
-#[repr(C)]
-pub struct StringArray {
-    pub array: *const *const c_char,
-    pub length: usize,
-}
-
 #[no_mangle]
 pub extern "C" fn init(
     client: *const c_char,
@@ -67,7 +63,7 @@ pub extern "C" fn init(
     plugin_manager_text: *const c_char,
     workspace_text: *const c_char,
     initial_path: *const c_char,
-    buttons: *const Buttons,
+    buttons_ptr: *const Buttons,
     swap_fields: bool,
 ) {
     unsafe {
@@ -112,7 +108,7 @@ pub extern "C" fn init(
         let workspace_text = ptr_to_string(workspace_text);
         let workspace = find_workspace(&ptr_to_string(initial_path));
 
-        let buttons = &*buttons;
+        let buttons = &*buttons_ptr;
         let buttons = validate_buttons(
             ptr_to_string(buttons.first_label),
             ptr_to_string(buttons.first_url),
@@ -175,7 +171,7 @@ pub extern "C" fn update_presence(
                 None
             };
 
-            let (presence_details, presence_large_image, presence_large_text) =
+            let (details, large_image, large_text) =
                 if filetype.as_str() == "Cord.idle" {
                     if config.idle_text.is_empty() {
                         return false;
@@ -196,43 +192,165 @@ pub extern "C" fn update_presence(
                     )
                 };
 
-            let mut activity = Activity::default();
+            let activity = build_activity(
+                config,
+                details,
+                large_image,
+                large_text,
+                problem_count,
+                START_TIME.as_ref(),
+                config.swap_fields,
+            );
 
-            if config.swap_fields {
-                activity.state = Some(presence_details);
-                activity.details = get_presence_state(
-                    &config,
-                    &config.workspace,
-                    problem_count,
-                );
+            match config
+                .rich_client
+                .update(&Packet::new(std::process::id(), Some(activity)))
+            {
+                Ok(_) => true,
+                Err(_) => false,
+            }
+        })
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn update_presence_with_assets(
+    filename: *const c_char,
+    filetype: *const c_char,
+    name: *const c_char,
+    icon: *const c_char,
+    tooltip: *const c_char,
+    asset_type: i32,
+    is_read_only: bool,
+    cursor_position: *const c_char,
+    problem_count: i32,
+) -> bool {
+    unsafe {
+        if !INITIALIZED {
+            return false;
+        }
+
+        CONFIG.as_mut().map_or(false, |config| {
+            let filetype = ptr_to_string(filetype);
+            let mut icon = ptr_to_string(icon);
+            let mut tooltip = ptr_to_string(tooltip);
+            let cursor_position = if !cursor_position.is_null() {
+                Some(ptr_to_string(cursor_position))
             } else {
-                activity.state = get_presence_state(
-                    &config,
-                    &config.workspace,
-                    problem_count,
-                );
-                activity.details = Some(presence_details);
-            }
-            activity.assets = Some(ActivityAssets {
-                large_image: Some(presence_large_image),
-                large_text: Some(if presence_large_text.len() < 2 {
-                    format!("{:<2}", presence_large_text)
-                } else {
-                    presence_large_text
-                }),
-                small_image: Some(config.editor_image.clone()),
-                small_text: if config.editor_tooltip.is_empty() {
-                    None
-                } else {
-                    Some(config.editor_tooltip.clone())
-                },
-            });
-            START_TIME.as_ref().map(|start_time| {
-                activity.timestamp = Some(start_time.clone());
-            });
-            if !config.buttons.is_empty() {
-                activity.buttons = Some(config.buttons.clone());
-            }
+                None
+            };
+
+            let (details, large_image, large_text) =
+                match AssetType::from(asset_type) {
+                    Some(AssetType::Language) => {
+                        let filename = ptr_to_string(filename);
+                        let details = if is_read_only {
+                            config.viewing_text.replace("{}", &filename)
+                        } else {
+                            config.editing_text.replace("{}", &filename)
+                        };
+                        let details = cursor_position
+                            .map_or(details.clone(), |pos| {
+                                format!("{}:{}", details, pos)
+                            });
+
+                        if icon.is_empty() || tooltip.is_empty() {
+                            if let Some((default_icon, default_tooltip)) =
+                                mappings::language::get(&filetype, &filename)
+                            {
+                                if icon.is_empty() {
+                                    icon = format!(
+                                        "{}/language/{}.png?v=5",
+                                        GITHUB_ASSETS_URL, default_icon
+                                    );
+                                }
+                                if tooltip.is_empty() {
+                                    tooltip = default_tooltip.to_string();
+                                }
+                            } else {
+                                if icon.is_empty() {
+                                    return false;
+                                }
+                                if tooltip.is_empty() {
+                                    tooltip = ptr_to_string(name);
+                                }
+                            }
+                        }
+
+                        (details, icon, tooltip)
+                    }
+                    Some(AssetType::FileBrowser) => {
+                        let name = ptr_to_string(name);
+                        let details =
+                            config.file_browser_text.replace("{}", &name);
+
+                        if icon.is_empty() || tooltip.is_empty() {
+                            if let Some((default_icon, default_tooltip)) =
+                                mappings::file_browser::get(&filetype)
+                            {
+                                if icon.is_empty() {
+                                    icon = format!(
+                                        "{}/file_browser/{}.png?v=5",
+                                        GITHUB_ASSETS_URL, default_icon
+                                    );
+                                }
+                                if tooltip.is_empty() {
+                                    tooltip = default_tooltip.to_string();
+                                }
+                            } else {
+                                if icon.is_empty() {
+                                    return false;
+                                }
+                                if tooltip.is_empty() {
+                                    tooltip = name;
+                                }
+                            }
+                        }
+
+                        (details, icon, tooltip)
+                    }
+                    Some(AssetType::PluginManager) => {
+                        let name = ptr_to_string(name);
+                        let details =
+                            config.plugin_manager_text.replace("{}", &name);
+
+                        if icon.is_empty() || tooltip.is_empty() {
+                            if let Some((default_icon, default_tooltip)) =
+                                mappings::plugin_manager::get(&filetype)
+                            {
+                                if icon.is_empty() {
+                                    icon = format!(
+                                        "{}/plugin_manager/{}.png?v=5",
+                                        GITHUB_ASSETS_URL, default_icon
+                                    )
+                                }
+                                if tooltip.is_empty() {
+                                    tooltip = default_tooltip.to_string()
+                                }
+                            } else {
+                                if icon.is_empty() {
+                                    return false;
+                                }
+                                if tooltip.is_empty() {
+                                    tooltip = name;
+                                }
+                            }
+                        }
+
+                        (details, icon, tooltip)
+                    }
+                    None => return false,
+                };
+
+            let activity = build_activity(
+                config,
+                details,
+                large_image,
+                large_text,
+                problem_count,
+                START_TIME.as_ref(),
+                config.swap_fields,
+            );
 
             match config
                 .rich_client
@@ -291,7 +409,7 @@ pub extern "C" fn update_time() {
 }
 
 #[no_mangle]
-pub extern "C" fn update_workspace(value: *const c_char) -> *const c_char {
+pub extern "C" fn update_workspace(value: *mut c_char) -> *const c_char {
     unsafe {
         let mut ws = String::new();
         if let Some(config) = CONFIG.as_mut() {

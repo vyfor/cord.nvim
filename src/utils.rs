@@ -7,7 +7,10 @@ use std::{
 
 use crate::{
     mappings::{get_by_filetype, Filetype},
-    rpc::activity::ActivityButton,
+    rpc::{
+        activity::{ActivityAssets, ActivityButton},
+        packet::Activity,
+    },
     Config,
 };
 
@@ -20,9 +23,14 @@ pub fn ptr_to_string(ptr: *const c_char) -> String {
     if ptr.is_null() {
         return String::new();
     }
-    let c_str = unsafe { CStr::from_ptr(ptr) };
 
-    c_str.to_string_lossy().into_owned()
+    let string: String;
+    unsafe {
+        let c_str = CStr::from_ptr(ptr);
+        string = c_str.to_string_lossy().to_string();
+    }
+
+    string
 }
 
 #[inline(always)]
@@ -94,6 +102,49 @@ pub fn validate_buttons(
 }
 
 #[inline(always)]
+pub fn build_activity(
+    config: &Config,
+    details: String,
+    large_image: String,
+    large_text: String,
+    problem_count: i32,
+    timestamp: Option<&u128>,
+    swap_fields: bool,
+) -> Activity {
+    let (state, details) = if swap_fields {
+        (
+            Some(details),
+            get_presence_state(&config, &config.workspace, problem_count),
+        )
+    } else {
+        (
+            get_presence_state(&config, &config.workspace, problem_count),
+            Some(details),
+        )
+    };
+
+    Activity {
+        state: state,
+        details: details,
+        assets: Some(ActivityAssets {
+            large_image: Some(large_image),
+            large_text: Some(
+                large_text
+                    .len()
+                    .lt(&2)
+                    .then(|| format!("{:<2}", large_text))
+                    .unwrap_or(large_text),
+            ),
+            small_image: Some(config.editor_image.clone()),
+            small_text: (!config.editor_tooltip.is_empty())
+                .then(|| config.editor_tooltip.clone()),
+        }),
+        timestamp: timestamp.copied(),
+        buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
+    }
+}
+
+#[inline(always)]
 pub fn build_presence(
     config: &Config,
     filename: &str,
@@ -119,6 +170,7 @@ pub fn build_presence(
         }
     }
 }
+
 #[inline(always)]
 pub fn get_presence_state(
     config: &Config,
@@ -143,22 +195,20 @@ pub fn get_presence_state(
 #[inline(always)]
 fn language_presence(
     config: &Config,
-    filename: &str,
+    mut filename: &str,
     filetype: &str,
     is_read_only: bool,
     cursor_position: Option<&str>,
     icon: &str,
     tooltip: &str,
 ) -> (String, String, String) {
+    if filename.is_empty() && filetype.is_empty() {
+        filename = "a new file";
+    }
     let details = if is_read_only {
         config.viewing_text.replace("{}", filename)
     } else {
         config.editing_text.replace("{}", filename)
-    };
-    let details = if filename.is_empty() && filetype.is_empty() {
-        "Editing a new file".to_string()
-    } else {
-        details
     };
     let presence_details = cursor_position
         .map_or(details.clone(), |pos| format!("{}:{}", details, pos));

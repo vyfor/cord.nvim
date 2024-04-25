@@ -46,8 +46,9 @@ cord.config = {
     {
       label = 'View Repository',
       url = 'git',
-    }
-  }
+    },
+  },
+  assets = {},
 }
 
 local discord
@@ -146,7 +147,29 @@ local function update_presence(config, initial)
       discord.update_time()
     end
     local cursor_pos = config.display.show_cursor_position and (current_presence.cursor_line .. ':' .. current_presence.cursor_col) or nil
-    local success = discord.update_presence(current_presence.name, current_presence.type, current_presence.readonly, cursor_pos, problem_count)
+    local icon, name = utils.get_icon(config, current_presence.name, current_presence.type)
+    local success
+    if icon then
+      success = discord.update_presence_with_assets(
+        current_presence.name,
+        current_presence.type,
+        icon.name or name,
+        icon.icon,
+        icon.tooltip,
+        icon.asset_type or 0,
+        current_presence.readonly,
+        cursor_pos,
+        problem_count
+      )
+    else
+      success = discord.update_presence(
+        current_presence.name,
+        current_presence.type,
+        current_presence.readonly,
+        cursor_pos,
+        problem_count
+      )
+    end
     if success then
       last_presence = current_presence
       if is_blacklisted == nil then
