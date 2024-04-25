@@ -50,7 +50,7 @@ local function init_discord(ffi)
       const char* plugin_manager_text,
       const char* workspace_text,
       const char* initial_path,
-      Buttons* buttons,
+      const Buttons* buttons,
       const bool swap
     );
     const bool update_presence(
