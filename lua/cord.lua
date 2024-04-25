@@ -154,7 +154,7 @@ local function update_presence(config, initial)
         current_presence.name,
         current_presence.type,
         icon.name or name,
-        icon.icon,
+        type(icon) == 'string' and icon or icon.icon,
         icon.tooltip,
         icon.asset_type or 0,
         current_presence.readonly,
