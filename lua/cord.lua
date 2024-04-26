@@ -140,6 +140,14 @@ local function update_presence(config, initial)
     problem_count = problem_count
   }
 
+  if current_presence.type == '' then
+    if current_presence.name == '' then
+      current_presence.type = 'Cord.new'
+    else
+      current_presence.type = 'Cord.unknown'
+    end
+  end
+
   if should_update_presence(current_presence) then
     force_idle = false
     last_updated = os.clock()
@@ -148,18 +156,11 @@ local function update_presence(config, initial)
     end
     local cursor_pos = config.display.show_cursor_position and (current_presence.cursor_line .. ':' .. current_presence.cursor_col) or nil
     
-    if current_presence.type == '' then
-      if current_presence.name == '' then
-        current_presence.type = 'Cord.new'
-      else
-        current_presence.type = 'Cord.unknown'
-      end
-    end
     local icon, name = utils.get_icon(config, current_presence.name, current_presence.type)
     local success
     if icon then
       success = discord.update_presence_with_assets(
-        current_presence.name,
+        current_presence.name or nil,
         current_presence.type,
         icon.name or name,
         type(icon) == 'string' and icon or icon.icon,
