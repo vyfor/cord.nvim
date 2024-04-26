@@ -105,8 +105,18 @@ require('cord').setup({
     --   url = 'https://github.com/vyfor/cord.nvim',
     -- }
   },
+  assets = {
+    -- lazy = {                                 -- Vim filetype or file name or file extension = table or string (see wiki)*
+    --   name = 'Lazy',                         -- Optional override for the icon name, redundant for language types
+    --   icon = 'https://example.com/lazy.png', -- Rich Presence asset name or URL
+    --   tooltip = 'lazy.nvim',
+    --   type = 2,                              -- 0 = language, 1 = file browser, 2 = plugin manager; defaults to language
+    -- },
+    -- ['Cargo.toml'] = 'crates',
+  },
 })
 ```
+> \* - [Add or change file icons](https://github.com/vyfor/cord.nvim/wiki/Add-or-change-file-icons)
 
 ### ⌨️ User commands
 - `:CordConnect`        - Initialize presence client internally and connect to Discord
