@@ -179,7 +179,7 @@ pub extern "C" fn update_presence(
 
                 (
                     config.idle_text.clone(),
-                    format!("{}/editor/idle.png?v=5", GITHUB_ASSETS_URL),
+                    Some(format!("{}/editor/idle.png?v=5", GITHUB_ASSETS_URL)),
                     config.idle_tooltip.clone(),
                 )
             } else {
@@ -231,7 +231,9 @@ pub extern "C" fn update_presence_with_assets(
         }
 
         CONFIG.as_mut().map_or(false, |config| {
+            let filename = ptr_to_string(filename);
             let filetype = ptr_to_string(filetype);
+            let name = ptr_to_string(name);
             let mut icon = ptr_to_string(icon);
             let mut tooltip = ptr_to_string(tooltip);
             let cursor_position = if !cursor_position.is_null() {
@@ -243,19 +245,19 @@ pub extern "C" fn update_presence_with_assets(
             let (details, large_image, large_text) =
                 match AssetType::from(asset_type) {
                     Some(AssetType::Language) => {
-                        let filename = if !filename.is_null() {
-                            ptr_to_string(filename)
+                        let filename = if !filename.is_empty() {
+                            &filename
                         } else {
-                            if !name.is_null() {
-                                ptr_to_string(name)
+                            if !name.is_empty() && name != "Cord.new" {
+                                &name
                             } else {
-                                String::from("a new file")
+                                "a new file"
                             }
                         };
                         let details = if is_read_only {
-                            config.viewing_text.replace("{}", &filename)
+                            config.viewing_text.replace("{}", filename)
                         } else {
-                            config.editing_text.replace("{}", &filename)
+                            config.editing_text.replace("{}", filename)
                         };
                         let details = cursor_position
                             .map_or(details.clone(), |pos| {
@@ -264,7 +266,7 @@ pub extern "C" fn update_presence_with_assets(
 
                         if icon.is_empty() || tooltip.is_empty() {
                             if let Some((default_icon, default_tooltip)) =
-                                mappings::language::get(&filetype, &filename)
+                                mappings::language::get(&filetype, filename)
                             {
                                 if icon.is_empty() {
                                     icon = format!(
@@ -280,7 +282,7 @@ pub extern "C" fn update_presence_with_assets(
                                     return false;
                                 }
                                 if tooltip.is_empty() {
-                                    tooltip = ptr_to_string(name);
+                                    tooltip = name;
                                 }
                             }
                         }
@@ -288,7 +290,6 @@ pub extern "C" fn update_presence_with_assets(
                         (details, icon, tooltip)
                     }
                     Some(AssetType::FileBrowser) => {
-                        let name = ptr_to_string(name);
                         let details =
                             config.file_browser_text.replace("{}", &name);
 
@@ -318,7 +319,6 @@ pub extern "C" fn update_presence_with_assets(
                         (details, icon, tooltip)
                     }
                     Some(AssetType::PluginManager) => {
-                        let name = ptr_to_string(name);
                         let details =
                             config.plugin_manager_text.replace("{}", &name);
 
@@ -353,7 +353,7 @@ pub extern "C" fn update_presence_with_assets(
             let activity = build_activity(
                 config,
                 details,
-                large_image,
+                Some(large_image),
                 large_text,
                 problem_count,
                 START_TIME.as_ref(),
