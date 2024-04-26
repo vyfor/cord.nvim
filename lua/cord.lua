@@ -147,6 +147,14 @@ local function update_presence(config, initial)
       discord.update_time()
     end
     local cursor_pos = config.display.show_cursor_position and (current_presence.cursor_line .. ':' .. current_presence.cursor_col) or nil
+    
+    if current_presence.type == '' then
+      if current_presence.name == '' then
+        current_presence.type = 'Cord.new'
+      else
+        current_presence.type = 'Cord.unknown'
+      end
+    end
     local icon, name = utils.get_icon(config, current_presence.name, current_presence.type)
     local success
     if icon then
@@ -156,7 +164,7 @@ local function update_presence(config, initial)
         icon.name or name,
         type(icon) == 'string' and icon or icon.icon,
         icon.tooltip,
-        icon.asset_type or 0,
+        icon.type or 0,
         current_presence.readonly,
         cursor_pos,
         problem_count

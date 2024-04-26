@@ -2,10 +2,7 @@ pub mod file_browser;
 pub mod language;
 pub mod plugin_manager;
 
-pub fn get_by_filetype<'a>(
-    filetype: &'a str,
-    filename: &'a str,
-) -> Filetype<'a> {
+pub fn get_by_filetype<'a>(filetype: &'a str, filename: &str) -> Filetype<'a> {
     if let Some(language) = language::get(filetype, filename) {
         return Filetype::Language(language.0, language.1);
     }

@@ -156,7 +156,6 @@ pub fn build_presence(
         Filetype::Language(icon, tooltip) => language_presence(
             config,
             filename,
-            filetype,
             is_read_only,
             cursor_position,
             icon,
@@ -196,13 +195,12 @@ pub fn get_presence_state(
 fn language_presence(
     config: &Config,
     mut filename: &str,
-    filetype: &str,
     is_read_only: bool,
     cursor_position: Option<&str>,
     icon: &str,
     tooltip: &str,
 ) -> (String, String, String) {
-    if filename.is_empty() && filetype.is_empty() {
+    if filename.is_empty() {
         filename = "a new file";
     }
     let details = if is_read_only {
@@ -212,15 +210,8 @@ fn language_presence(
     };
     let presence_details = cursor_position
         .map_or(details.clone(), |pos| format!("{}:{}", details, pos));
-    let presence_large_image = format!(
-        "{}/language/{}.png?v=5",
-        GITHUB_ASSETS_URL,
-        if filename.is_empty() && filetype.is_empty() {
-            "text"
-        } else {
-            icon
-        }
-    );
+    let presence_large_image =
+        format!("{}/language/{}.png?v=5", GITHUB_ASSETS_URL, icon);
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)

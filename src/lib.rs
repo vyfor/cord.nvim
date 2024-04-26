@@ -171,26 +171,26 @@ pub extern "C" fn update_presence(
                 None
             };
 
-            let (details, large_image, large_text) =
-                if filetype.as_str() == "Cord.idle" {
-                    if config.idle_text.is_empty() {
-                        return false;
-                    }
+            let (details, large_image, large_text) = if filetype == "Cord.idle"
+            {
+                if config.idle_text.is_empty() {
+                    return false;
+                }
 
-                    (
-                        config.idle_text.clone(),
-                        format!("{}/editor/idle.png?v=5", GITHUB_ASSETS_URL),
-                        config.idle_tooltip.clone(),
-                    )
-                } else {
-                    build_presence(
-                        &config,
-                        &filename,
-                        &filetype,
-                        is_read_only,
-                        cursor_position.as_deref(),
-                    )
-                };
+                (
+                    config.idle_text.clone(),
+                    format!("{}/editor/idle.png?v=5", GITHUB_ASSETS_URL),
+                    config.idle_tooltip.clone(),
+                )
+            } else {
+                build_presence(
+                    &config,
+                    &filename,
+                    &filetype,
+                    is_read_only,
+                    cursor_position.as_deref(),
+                )
+            };
 
             let activity = build_activity(
                 config,
@@ -243,7 +243,15 @@ pub extern "C" fn update_presence_with_assets(
             let (details, large_image, large_text) =
                 match AssetType::from(asset_type) {
                     Some(AssetType::Language) => {
-                        let filename = ptr_to_string(filename);
+                        let filename = if !filename.is_null() {
+                            ptr_to_string(filename)
+                        } else {
+                            if !name.is_null() {
+                                ptr_to_string(name)
+                            } else {
+                                String::from("a new file")
+                            }
+                        };
                         let details = if is_read_only {
                             config.viewing_text.replace("{}", &filename)
                         } else {
