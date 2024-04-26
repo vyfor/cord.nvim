@@ -116,7 +116,7 @@ require('cord').setup({
   },
 })
 ```
-> \* - [Add or change file icons](https://github.com/vyfor/cord.nvim/wiki/Add-or-change-file-icons)
+> \* [Wiki: Add or change file icons](https://github.com/vyfor/cord.nvim/wiki/Add-or-change-file-icons)
 
 ### ⌨️ User commands
 - `:CordConnect`        - Initialize presence client internally and connect to Discord
