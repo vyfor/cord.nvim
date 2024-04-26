@@ -41,24 +41,35 @@ local function init_discord(ffi)
     void init(
       const char* client,
       const char* image,
-      const char* editorTooltip,
-      const char* idleText,
-      const char* idleTooltip,
-      const char* viewingText,
-      const char* editingText,
-      const char* fileBrowserText,
-      const char* pluginManagerText,
-      const char* workspaceText,
-      const char* initialPath,
+      const char* editor_tooltip,
+      const char* idle_text,
+      const char* idle_tooltip,
+      const char* viewing_text,
+      const char* editing_text,
+      const char* file_browser_text,
+      const char* plugin_manager_text,
+      const char* workspace_text,
+      const char* initial_path,
       const Buttons* buttons,
       const bool swap
     );
     const bool update_presence(
       const char* filename,
       const char* filetype,
-      bool isReadOnly,
-      const char* cursorPosition,
-      int problemCount
+      bool is_read_only,
+      const char* cursor_position,
+      int problem_count
+    );
+    const bool update_presence_with_assets(
+      const char* filename,
+      const char* filetype,
+      const char* name,
+      const char* icon,
+      const char* tooltip,
+      int asset_type,
+      bool is_read_only,
+      const char* cursor_position,
+      int problem_count
     );
     void clear_presence();
     void disconnect();
@@ -103,9 +114,43 @@ local function array_contains(arr, val)
     return false
 end
 
+local function get_file_extension(filename)
+    for i = #filename, 1, -1 do
+        if filename:sub(i, i) == '.' then
+            return filename:sub(i)
+        end
+    end
+
+    return filename
+end
+
+local function get_icon(config, filename, filetype)
+  if not config.assets then
+    return
+  end
+
+  local icon = config.assets[filetype]
+  if icon then
+    return icon, filetype
+  end
+
+  icon = config.assets[filename]
+  if icon then
+    return icon, filename
+  end
+
+  local extension = get_file_extension(filename)
+  icon = config.assets[extension]
+  if icon then
+    return icon, extension
+  end
+end
+
+
 return {
   init_discord = init_discord,
   validate_severity = validate_severity,
   get_problem_count = get_problem_count,
-  array_contains = array_contains
+  array_contains = array_contains,
+  get_icon = get_icon
 }
