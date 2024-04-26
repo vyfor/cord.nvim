@@ -160,7 +160,7 @@ local function update_presence(config, initial)
     local success
     if icon then
       success = discord.update_presence_with_assets(
-        current_presence.name or nil,
+        current_presence.name,
         current_presence.type,
         icon.name or name,
         type(icon) == 'string' and icon or icon.icon,
