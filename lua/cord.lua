@@ -40,7 +40,7 @@ cord.config = {
     editing = 'Editing {}',
     file_browser = 'Browsing files in {}',
     plugin_manager = 'Managing plugins in {}',
-    lsp_manager = 'Configuring LSP servers in {}',
+    lsp_manager = 'Configuring LSP in {}',
     workspace = 'In {}',
   },
   buttons = {
