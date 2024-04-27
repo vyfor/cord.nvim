@@ -108,14 +108,18 @@ pub extern "C" fn init(
         let workspace_text = ptr_to_string(workspace_text);
         let workspace = find_workspace(&ptr_to_string(initial_path));
 
-        let buttons = &*buttons_ptr;
-        let buttons = validate_buttons(
-            ptr_to_string(buttons.first_label),
-            ptr_to_string(buttons.first_url),
-            ptr_to_string(buttons.second_label),
-            ptr_to_string(buttons.second_url),
-            workspace.to_str().unwrap(),
-        );
+        let buttons = if buttons_ptr.is_null() {
+            Vec::new()
+        } else {
+            let buttons = &*buttons_ptr;
+            validate_buttons(
+                ptr_to_string(buttons.first_label),
+                ptr_to_string(buttons.first_url),
+                ptr_to_string(buttons.second_label),
+                ptr_to_string(buttons.second_url),
+                workspace.to_str().unwrap(),
+            )
+        };
 
         std::thread::spawn(move || {
             if let Ok(mut client) = RichClient::connect(client_id) {

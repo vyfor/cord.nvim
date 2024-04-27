@@ -75,13 +75,13 @@ local function connect(config)
     config.text.plugin_manager,
     config.text.workspace,
     vim.fn.getcwd(),
-    ffi.new(
+    config.display.show_repository and ffi.new(
       'Buttons',
       (config.buttons[1] and config.buttons[1].label) or '',
       (config.buttons[1] and config.buttons[1].url) or '',
       (config.buttons[2] and config.buttons[2].label) or '',
       (config.buttons[2] and config.buttons[2].url) or ''
-    ),
+    ) or nil,
     config.display.swap_fields
   )
 end
