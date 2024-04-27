@@ -1,5 +1,6 @@
 pub mod file_browser;
 pub mod language;
+pub mod lsp_manager;
 pub mod plugin_manager;
 
 pub fn get_by_filetype<'a>(filetype: &'a str, filename: &str) -> Filetype<'a> {
@@ -12,6 +13,9 @@ pub fn get_by_filetype<'a>(filetype: &'a str, filename: &str) -> Filetype<'a> {
     if let Some(plugin_manager) = plugin_manager::get(filetype) {
         return Filetype::PluginManager(plugin_manager.0, plugin_manager.1);
     }
+    if let Some(lsp_manager) = lsp_manager::get(filetype) {
+        return Filetype::LSP(lsp_manager.0, lsp_manager.1);
+    }
     Filetype::Language("text", filetype)
 }
 
@@ -19,4 +23,5 @@ pub enum Filetype<'a> {
     Language(&'a str, &'a str),
     FileBrowser(&'a str, &'a str),
     PluginManager(&'a str, &'a str),
+    LSP(&'a str, &'a str),
 }
