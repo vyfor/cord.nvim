@@ -13,8 +13,8 @@ use std::{
 };
 use types::AssetType;
 use utils::{
-    build_activity, build_presence, find_workspace, ptr_to_string,
-    validate_buttons, GITHUB_ASSETS_URL,
+    build_activity, build_presence, find_workspace, get_asset, ptr_to_string,
+    validate_buttons,
 };
 
 use crate::{
@@ -74,26 +74,15 @@ pub extern "C" fn init(
         }
 
         let (client_id, client_image) = match ptr_to_string(client).as_str() {
-            "vim" => (
-                1219918645770059796,
-                format!("{}/editor/vim.png", GITHUB_ASSETS_URL),
-            ),
-            "neovim" => (
-                1219918880005165137,
-                format!("{}/editor/neovim.png", GITHUB_ASSETS_URL),
-            ),
-            "lunarvim" => (
-                1220295374087000104,
-                format!("{}/editor/lunarvim.png", GITHUB_ASSETS_URL),
-            ),
-            "nvchad" => (
-                1220296082861326378,
-                format!("{}/editor/nvchad.png", GITHUB_ASSETS_URL),
-            ),
-            "astronvim" => (
-                1230866983977746532,
-                format!("{}/editor/astronvim.png", GITHUB_ASSETS_URL),
-            ),
+            "vim" => (1219918645770059796, get_asset("editor", "vim")),
+            "neovim" => (1219918880005165137, get_asset("editor", "neovim")),
+            "lunarvim" => {
+                (1220295374087000104, get_asset("editor", "lunarvim"))
+            }
+            "nvchad" => (1220296082861326378, get_asset("editor", "nvchad")),
+            "astronvim" => {
+                (1230866983977746532, get_asset("editor", "astronvim"))
+            }
             id => (
                 id.parse::<u64>().expect("Invalid client ID"),
                 ptr_to_string(image),
@@ -187,7 +176,7 @@ pub extern "C" fn update_presence(
 
                 (
                     config.idle_text.clone(),
-                    Some(format!("{}/editor/idle.png?v=5", GITHUB_ASSETS_URL)),
+                    Some(get_asset("editor", "idle")),
                     config.idle_tooltip.clone(),
                 )
             } else {
@@ -277,10 +266,7 @@ pub extern "C" fn update_presence_with_assets(
                                 mappings::language::get(&filetype, filename)
                             {
                                 if icon.is_empty() {
-                                    icon = format!(
-                                        "{}/language/{}.png?v=5",
-                                        GITHUB_ASSETS_URL, default_icon
-                                    );
+                                    icon = get_asset("language", default_icon);
                                 }
                                 if tooltip.is_empty() {
                                     tooltip = default_tooltip.to_string();
@@ -306,10 +292,8 @@ pub extern "C" fn update_presence_with_assets(
                                 mappings::file_browser::get(&filetype)
                             {
                                 if icon.is_empty() {
-                                    icon = format!(
-                                        "{}/file_browser/{}.png?v=5",
-                                        GITHUB_ASSETS_URL, default_icon
-                                    );
+                                    icon =
+                                        get_asset("file_browser", default_icon);
                                 }
                                 if tooltip.is_empty() {
                                     tooltip = default_tooltip.to_string();
@@ -335,13 +319,13 @@ pub extern "C" fn update_presence_with_assets(
                                 mappings::plugin_manager::get(&filetype)
                             {
                                 if icon.is_empty() {
-                                    icon = format!(
-                                        "{}/plugin_manager/{}.png?v=5",
-                                        GITHUB_ASSETS_URL, default_icon
-                                    )
+                                    icon = get_asset(
+                                        "plugin_manager",
+                                        default_icon,
+                                    );
                                 }
                                 if tooltip.is_empty() {
-                                    tooltip = default_tooltip.to_string()
+                                    tooltip = default_tooltip.to_string();
                                 }
                             } else {
                                 if icon.is_empty() {
@@ -364,13 +348,11 @@ pub extern "C" fn update_presence_with_assets(
                                 mappings::lsp_manager::get(&filetype)
                             {
                                 if icon.is_empty() {
-                                    icon = format!(
-                                        "{}/lsp/{}.png?v=5",
-                                        GITHUB_ASSETS_URL, default_icon
-                                    )
+                                    icon =
+                                        get_asset("lsp_manager", default_icon);
                                 }
                                 if tooltip.is_empty() {
-                                    tooltip = default_tooltip.to_string()
+                                    tooltip = default_tooltip.to_string();
                                 }
                             } else {
                                 if icon.is_empty() {

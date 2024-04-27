@@ -16,6 +16,7 @@ use crate::{
 
 pub const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
+const ASSETS_VERSION: &str = "6";
 const VCS_MARKERS: [&str; 3] = [".git", ".svn", ".hg"];
 
 #[inline(always)]
@@ -31,6 +32,14 @@ pub fn ptr_to_string(ptr: *const c_char) -> String {
     }
 
     string
+}
+
+#[inline(always)]
+pub fn get_asset(path: &str, file: &str) -> String {
+    format!(
+        "{}/{}/{}.png?v={}",
+        GITHUB_ASSETS_URL, path, file, ASSETS_VERSION
+    )
 }
 
 #[inline(always)]
@@ -226,7 +235,7 @@ fn language_presence(
     let presence_large_image = if filetype == "Cord.new" {
         None
     } else {
-        Some(format!("{}/language/{}.png?v=5", GITHUB_ASSETS_URL, icon))
+        Some(get_asset("language", icon))
     };
     let presence_large_text = tooltip.to_string();
 
@@ -240,8 +249,7 @@ fn file_browser_presence(
     icon: &str,
 ) -> (String, String, String) {
     let presence_details = config.file_browser_text.replace("{}", tooltip);
-    let presence_large_image =
-        format!("{}/file_browser/{}.png?v=5", GITHUB_ASSETS_URL, icon);
+    let presence_large_image = get_asset("file_browser", icon);
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
@@ -254,8 +262,7 @@ fn plugin_manager_presence(
     icon: &str,
 ) -> (String, String, String) {
     let presence_details = config.plugin_manager_text.replace("{}", tooltip);
-    let presence_large_image =
-        format!("{}/plugin_manager/{}.png?v=5", GITHUB_ASSETS_URL, icon);
+    let presence_large_image = get_asset("plugin_manager", icon);
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
@@ -268,8 +275,7 @@ fn lsp_manager_presence(
     icon: &str,
 ) -> (String, String, String) {
     let presence_details = config.lsp_manager_text.replace("{}", tooltip);
-    let presence_large_image =
-        format!("{}/lsp_manager/{}.png?v=5", GITHUB_ASSETS_URL, icon);
+    let presence_large_image = get_asset("lsp_manager", icon);
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
