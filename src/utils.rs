@@ -174,6 +174,11 @@ pub fn build_presence(
                 plugin_manager_presence(config, tooltip, icon);
             (details, Some(icon), tooltip)
         }
+        Filetype::LSP(icon, tooltip) => {
+            let (details, icon, tooltip) =
+                lsp_manager_presence(config, tooltip, icon);
+            (details, Some(icon), tooltip)
+        }
     }
 }
 
@@ -251,6 +256,20 @@ fn plugin_manager_presence(
     let presence_details = config.plugin_manager_text.replace("{}", tooltip);
     let presence_large_image =
         format!("{}/plugin_manager/{}.png?v=5", GITHUB_ASSETS_URL, icon);
+    let presence_large_text = tooltip.to_string();
+
+    (presence_details, presence_large_image, presence_large_text)
+}
+
+#[inline(always)]
+fn lsp_manager_presence(
+    config: &Config,
+    tooltip: &str,
+    icon: &str,
+) -> (String, String, String) {
+    let presence_details = config.lsp_manager_text.replace("{}", tooltip);
+    let presence_large_image =
+        format!("{}/lsp_manager/{}.png?v=5", GITHUB_ASSETS_URL, icon);
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)

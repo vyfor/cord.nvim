@@ -2,6 +2,7 @@ pub enum AssetType {
     Language,
     FileBrowser,
     PluginManager,
+    LSP,
 }
 
 impl AssetType {
@@ -11,6 +12,7 @@ impl AssetType {
             0 => Some(AssetType::Language),
             1 => Some(AssetType::FileBrowser),
             2 => Some(AssetType::PluginManager),
+            3 => Some(AssetType::LSP),
             _ => None,
         }
     }

@@ -93,6 +93,7 @@ require('cord').setup({
     editing = 'Editing {}',                     -- Text to display when editing a file
     file_browser = 'Browsing files in {}',      -- Text to display when browsing files (Empty string to disable)
     plugin_manager = 'Managing plugins in {}',  -- Text to display when managing plugins (Empty string to disable)
+    lsp_manager = 'Configuring LSP servers in {}', -- Text to display when managing LSP servers (Empty string to disable)
     workspace = 'In {}',                        -- Text to display when in a workspace (Empty string to disable)
   },
   buttons = {
@@ -105,12 +106,12 @@ require('cord').setup({
     --   url = 'https://github.com/vyfor/cord.nvim',
     -- }
   },
-  assets = {
+  assets = {                                    -- Custom file icons
     -- lazy = {                                 -- Vim filetype or file name or file extension = table or string (see wiki)*
     --   name = 'Lazy',                         -- Optional override for the icon name, redundant for language types
     --   icon = 'https://example.com/lazy.png', -- Rich Presence asset name or URL
     --   tooltip = 'lazy.nvim',
-    --   type = 2,                              -- 0 = language, 1 = file browser, 2 = plugin manager; defaults to language
+    --   type = 2,                              -- 0 = language, 1 = file browser, 2 = plugin manager, 3 = lsp manager; defaults to language
     -- },
     -- ['Cargo.toml'] = 'crates',
   },

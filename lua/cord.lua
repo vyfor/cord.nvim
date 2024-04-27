@@ -40,6 +40,7 @@ cord.config = {
     editing = 'Editing {}',
     file_browser = 'Browsing files in {}',
     plugin_manager = 'Managing plugins in {}',
+    lsp_manager = 'Configuring LSP servers in {}',
     workspace = 'In {}',
   },
   buttons = {
@@ -73,6 +74,7 @@ local function connect(config)
     config.text.editing,
     config.text.file_browser,
     config.text.plugin_manager,
+    config.text.lsp_manager,
     config.text.workspace,
     vim.fn.getcwd(),
     config.display.show_repository and ffi.new(

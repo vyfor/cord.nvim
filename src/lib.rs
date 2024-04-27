@@ -36,6 +36,7 @@ struct Config {
     editing_text: String,
     file_browser_text: String,
     plugin_manager_text: String,
+    lsp_manager_text: String,
     workspace_text: String,
     workspace: String,
     buttons: Vec<ActivityButton>,
@@ -61,6 +62,7 @@ pub extern "C" fn init(
     editing_text: *const c_char,
     file_browser_text: *const c_char,
     plugin_manager_text: *const c_char,
+    lsp_manager_text: *const c_char,
     workspace_text: *const c_char,
     initial_path: *const c_char,
     buttons_ptr: *const Buttons,
@@ -105,6 +107,7 @@ pub extern "C" fn init(
         let editing_text = ptr_to_string(editing_text);
         let file_browser_text = ptr_to_string(file_browser_text);
         let plugin_manager_text = ptr_to_string(plugin_manager_text);
+        let lsp_manager_text = ptr_to_string(lsp_manager_text);
         let workspace_text = ptr_to_string(workspace_text);
         let workspace = find_workspace(&ptr_to_string(initial_path));
 
@@ -138,6 +141,7 @@ pub extern "C" fn init(
                     editing_text: editing_text,
                     file_browser_text: file_browser_text,
                     plugin_manager_text: plugin_manager_text,
+                    lsp_manager_text: lsp_manager_text,
                     workspace_text: workspace_text,
                     workspace: workspace
                         .file_name()
@@ -333,6 +337,35 @@ pub extern "C" fn update_presence_with_assets(
                                 if icon.is_empty() {
                                     icon = format!(
                                         "{}/plugin_manager/{}.png?v=5",
+                                        GITHUB_ASSETS_URL, default_icon
+                                    )
+                                }
+                                if tooltip.is_empty() {
+                                    tooltip = default_tooltip.to_string()
+                                }
+                            } else {
+                                if icon.is_empty() {
+                                    return false;
+                                }
+                                if tooltip.is_empty() {
+                                    tooltip = name;
+                                }
+                            }
+                        }
+
+                        (details, icon, tooltip)
+                    }
+                    Some(AssetType::LSP) => {
+                        let details =
+                            config.lsp_manager_text.replace("{}", &name);
+
+                        if icon.is_empty() || tooltip.is_empty() {
+                            if let Some((default_icon, default_tooltip)) =
+                                mappings::lsp_manager::get(&filetype)
+                            {
+                                if icon.is_empty() {
+                                    icon = format!(
+                                        "{}/lsp/{}.png?v=5",
                                         GITHUB_ASSETS_URL, default_icon
                                     )
                                 }
