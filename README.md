@@ -72,7 +72,7 @@ require('cord').setup({
   display = {
     show_time = true,                           -- Display start timestamp
     show_repository = true,                     -- Display 'View repository' button linked to repository url, if any
-    show_cursor_position = true,                -- Display line and column number of cursor's position
+    show_cursor_position = false,               -- Display line and column number of cursor's position
     swap_fields = false,                        -- If enabled, workspace is displayed first
     workspace_blacklist = {},                   -- List of workspace names to hide
   },
@@ -83,7 +83,7 @@ require('cord').setup({
   },
   idle = {
     show_idle = true,                           -- Enable idle status
-    timeout = 300000,                           -- Timeout in milliseconds after which the idle status is set, 0 to display immediately
+    timeout = 1800000,                          -- Timeout in milliseconds after which the idle status is set, 0 to display immediately
     disable_on_focus = true,                    -- Do not display idle status when neovim is focused
     text = 'Idle',                              -- Text to display when idle
     tooltip = '💤',                             -- Text to display when hovering over the idle image
@@ -98,11 +98,11 @@ require('cord').setup({
   },
   buttons = {
     {
-      label = 'View repository',                -- Text displayed on the button
+      label = 'View Repository',                -- Text displayed on the button
       url = 'git',                              -- URL where the button leads to ('git' = Git repository URL)
     },
     -- {
-    --   label = 'View plugin',
+    --   label = 'View Plugin',
     --   url = 'https://github.com/vyfor/cord.nvim',
     -- }
   },
