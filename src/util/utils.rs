@@ -77,7 +77,7 @@ pub fn validate_buttons(
     let mut buttons = Vec::with_capacity(2);
 
     if first_url == "git" || second_url == "git" {
-        if let Some(repository) = find_repository(workspace) {
+        if let Some(repository) = find_git_repository(workspace) {
             if first_url == "git" {
                 first_url = repository.clone();
             }
@@ -282,7 +282,7 @@ fn lsp_manager_presence(
 }
 
 #[inline(always)]
-fn find_repository(workspace_path: &str) -> Option<String> {
+fn find_git_repository(workspace_path: &str) -> Option<String> {
     let config_path = format!("{}/{}", workspace_path, ".git/config");
 
     let file = match File::open(config_path) {
@@ -291,22 +291,33 @@ fn find_repository(workspace_path: &str) -> Option<String> {
     };
     let reader = BufReader::new(file);
 
-    let mut repo_url = String::new();
-
     for line in reader.lines() {
         let line = match line {
             Ok(line) => line,
             Err(_) => continue,
         };
-        if line.trim_start().starts_with("url = ") {
-            repo_url = line[7..].trim().to_string();
+
+        if let Some(repo_url) = line.trim().strip_prefix("url = ") {
+            if repo_url.starts_with("http") {
+                return Some(
+                    repo_url
+                        .strip_suffix(".git")
+                        .map(|url| url.to_string())
+                        .unwrap_or_else(|| repo_url.to_string()),
+                );
+            } else if let Some((_protocol, repo_url)) = repo_url.split_once('@')
+            {
+                return Some(format!(
+                    "https://{}",
+                    repo_url
+                        .replacen(':', "/", 1)
+                        .strip_suffix(".git")
+                        .unwrap_or(repo_url)
+                ));
+            }
             break;
         }
     }
 
-    if repo_url.is_empty() {
-        None
-    } else {
-        Some(repo_url)
-    }
+    None
 }

@@ -2,8 +2,7 @@ mod ipc;
 mod json;
 mod mappings;
 mod rpc;
-mod types;
-mod utils;
+mod util;
 
 use rpc::activity::ActivityButton;
 use std::{
@@ -11,8 +10,8 @@ use std::{
     ptr::null,
     time::UNIX_EPOCH,
 };
-use types::AssetType;
-use utils::{
+use util::types::AssetType;
+use util::utils::{
     build_activity, build_presence, find_workspace, get_asset, ptr_to_string,
     validate_buttons,
 };
