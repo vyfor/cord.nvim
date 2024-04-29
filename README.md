@@ -1,8 +1,13 @@
-# 🧩 **Cord**
-
-### 🚀 **Cord** is a Discord Rich Presence plugin designed for Neovim, written in Rust.
-
-![cord_banner](https://github.com/vyfor/cord.nvim/assets/92883017/6ff91794-7264-485e-b82b-87926d7d5013)
+<div align="center">
+  <h1>🧩 <strong>Cord</strong></h1>
+  <div>
+    <a href="https://github.com/vyfor/cord.nvim/stargazers"><img src="https://img.shields.io/github/stars/vyfor/cord.nvim?style=for-the-badge" alt="Stargazers"></a>
+    <a href="https://github.com/vyfor/cord.nvim/blob/master/LICENSE"><img src="https://img.shields.io/github/license/vyfor/cord.nvim?style=for-the-badge" alt="Apache-2.0 License"></a>
+    <a href="https://github.com/vyfor/cord.nvim/forks"><img src="https://img.shields.io/github/forks/vyfor/cord.nvim?style=for-the-badge" alt="Forks"></a>
+  </div>
+  <h3>🚀 <strong>Cord</strong> is a Discord Rich Presence plugin designed for Neovim, written in Rust.</h3>
+  <img src="https://github.com/vyfor/cord.nvim/assets/92883017/6ff91794-7264-485e-b82b-87926d7d5013" alt="Cord Banner">
+</div>
 
 ## 💎 Features
 - Lightweight and dependency-free
@@ -132,16 +137,3 @@ require('cord').setup({
 
 ## 🌱 Contributing
 This project is in beta. Feel free to open an issue or pull request for missing icons or features. You can also contact me on Discord **[vyfor](https://discord.com/users/446729269872427018)** if you have any questions.
-
-## ❓ FAQ
-### Why Rust?
-> This plugin was initially written in Kotlin. Kotlin/Native, despite compiling to native code, still relies on the JVM for its compiler which is inconvenient, and aside from that, compile times are quite slow.
-
-### Why was Lua not considered?
-> The internal code needs to run on a separate thread due to Discord's ratelimit enforcement between connections. Implementing multithreading is much simpler in Rust compared to Lua. Although, a considerable part of the codebase still relies on Lua code.
-
-### Why does Cord use a timer-based approach?
-> Certain plugins often tend to break the order of events. And data such as cursor's current position needs to be fetched quite frequently and using autocommands for this task would stress the CPU. Thus, it was decided to use a timer. Regardless of that, Cord continues to rely on autocommands for aspects less prone to change, such as workspace or Git repository.
-
-### Dependency-free?
-> Every aspect, including FFI, JSON serialization and pipe connection, is implemented from scratch to avoid reliance on external crates and prevent any increase in compile times. Serialization is mainly hard-coded to focus on performance, even if the difference is negligible. 🤫
