@@ -50,29 +50,44 @@ pub struct Buttons {
     pub second_url: *const c_char,
 }
 
+#[repr(C)]
+pub struct InitArgs {
+    pub client: *const c_char,
+    pub image: *const c_char,
+    pub editor_tooltip: *const c_char,
+    pub idle_text: *const c_char,
+    pub idle_tooltip: *const c_char,
+    pub viewing_text: *const c_char,
+    pub editing_text: *const c_char,
+    pub file_browser_text: *const c_char,
+    pub plugin_manager_text: *const c_char,
+    pub lsp_manager_text: *const c_char,
+    pub workspace_text: *const c_char,
+    pub initial_path: *const c_char,
+    pub swap_fields: bool,
+}
+
+#[repr(C)]
+pub struct PresenceArgs {
+    pub filename: *const c_char,
+    pub filetype: *const c_char,
+    pub cursor_position: *const c_char,
+    pub problem_count: i32,
+    pub is_read_only: bool,
+}
+
 #[no_mangle]
-pub extern "C" fn init(
-    client: *const c_char,
-    image: *const c_char,
-    editor_tooltip: *const c_char,
-    idle_text: *const c_char,
-    idle_tooltip: *const c_char,
-    viewing_text: *const c_char,
-    editing_text: *const c_char,
-    file_browser_text: *const c_char,
-    plugin_manager_text: *const c_char,
-    lsp_manager_text: *const c_char,
-    workspace_text: *const c_char,
-    initial_path: *const c_char,
-    buttons_ptr: *const Buttons,
-    swap_fields: bool,
-) {
+pub extern "C" fn init(args_ptr: *const InitArgs, buttons_ptr: *const Buttons) {
     unsafe {
         if INITIALIZED {
             return;
         }
 
-        let (client_id, client_image) = match ptr_to_string(client).as_str() {
+        let args = &*args_ptr;
+
+        let (client_id, client_image) = match ptr_to_string(args.client)
+            .as_str()
+        {
             "vim" => (1219918645770059796, get_asset("editor", "vim")),
             "neovim" => (1219918880005165137, get_asset("editor", "neovim")),
             "lunarvim" => {
@@ -84,20 +99,21 @@ pub extern "C" fn init(
             }
             id => (
                 id.parse::<u64>().expect("Invalid client ID"),
-                ptr_to_string(image),
+                ptr_to_string(args.image),
             ),
         };
 
-        let editor_tooltip = ptr_to_string(editor_tooltip);
-        let idle_text = ptr_to_string(idle_text);
-        let idle_tooltip = ptr_to_string(idle_tooltip);
-        let viewing_text = ptr_to_string(viewing_text);
-        let editing_text = ptr_to_string(editing_text);
-        let file_browser_text = ptr_to_string(file_browser_text);
-        let plugin_manager_text = ptr_to_string(plugin_manager_text);
-        let lsp_manager_text = ptr_to_string(lsp_manager_text);
-        let workspace_text = ptr_to_string(workspace_text);
-        let workspace = find_workspace(&ptr_to_string(initial_path));
+        let editor_tooltip = ptr_to_string(args.editor_tooltip);
+        let idle_text = ptr_to_string(args.idle_text);
+        let idle_tooltip = ptr_to_string(args.idle_tooltip);
+        let viewing_text = ptr_to_string(args.viewing_text);
+        let editing_text = ptr_to_string(args.editing_text);
+        let file_browser_text = ptr_to_string(args.file_browser_text);
+        let plugin_manager_text = ptr_to_string(args.plugin_manager_text);
+        let lsp_manager_text = ptr_to_string(args.lsp_manager_text);
+        let workspace_text = ptr_to_string(args.workspace_text);
+        let swap_fields = args.swap_fields;
+        let workspace = find_workspace(&ptr_to_string(args.initial_path));
 
         let buttons = if buttons_ptr.is_null() {
             Vec::new()
@@ -146,23 +162,18 @@ pub extern "C" fn init(
 }
 
 #[no_mangle]
-pub extern "C" fn update_presence(
-    filename: *const c_char,
-    filetype: *const c_char,
-    is_read_only: bool,
-    cursor_position: *const c_char,
-    problem_count: i32,
-) -> bool {
+pub extern "C" fn update_presence(args_ptr: *const PresenceArgs) -> bool {
     unsafe {
         if !INITIALIZED {
             return false;
         }
 
         CONFIG.as_mut().map_or(false, |config| {
-            let filename = ptr_to_string(filename);
-            let filetype = ptr_to_string(filetype);
-            let cursor_position = if !cursor_position.is_null() {
-                Some(ptr_to_string(cursor_position))
+            let args = &*args_ptr;
+            let filename = ptr_to_string(args.filename);
+            let filetype = ptr_to_string(args.filetype);
+            let cursor_position = if !args.cursor_position.is_null() {
+                Some(ptr_to_string(args.cursor_position))
             } else {
                 None
             };
@@ -183,7 +194,7 @@ pub extern "C" fn update_presence(
                     &config,
                     &filename,
                     &filetype,
-                    is_read_only,
+                    args.is_read_only,
                     cursor_position.as_deref(),
                 )
             };
@@ -193,7 +204,7 @@ pub extern "C" fn update_presence(
                 details,
                 large_image,
                 large_text,
-                problem_count,
+                args.problem_count,
                 START_TIME.as_ref(),
                 config.swap_fields,
             );
@@ -211,15 +222,11 @@ pub extern "C" fn update_presence(
 
 #[no_mangle]
 pub extern "C" fn update_presence_with_assets(
-    filename: *const c_char,
-    filetype: *const c_char,
     name: *const c_char,
     icon: *const c_char,
     tooltip: *const c_char,
     asset_type: i32,
-    is_read_only: bool,
-    cursor_position: *const c_char,
-    problem_count: i32,
+    args_ptr: *const PresenceArgs,
 ) -> bool {
     unsafe {
         if !INITIALIZED {
@@ -227,13 +234,14 @@ pub extern "C" fn update_presence_with_assets(
         }
 
         CONFIG.as_mut().map_or(false, |config| {
-            let filename = ptr_to_string(filename);
-            let filetype = ptr_to_string(filetype);
+            let args = &*args_ptr;
+            let filename = ptr_to_string(args.filename);
+            let filetype = ptr_to_string(args.filetype);
             let name = ptr_to_string(name);
             let mut icon = ptr_to_string(icon);
             let mut tooltip = ptr_to_string(tooltip);
-            let cursor_position = if !cursor_position.is_null() {
-                Some(ptr_to_string(cursor_position))
+            let cursor_position = if !args.cursor_position.is_null() {
+                Some(ptr_to_string(args.cursor_position))
             } else {
                 None
             };
@@ -250,7 +258,7 @@ pub extern "C" fn update_presence_with_assets(
                                 "a new file"
                             }
                         };
-                        let details = if is_read_only {
+                        let details = if args.is_read_only {
                             config.viewing_text.replace("{}", filename)
                         } else {
                             config.editing_text.replace("{}", filename)
@@ -373,7 +381,7 @@ pub extern "C" fn update_presence_with_assets(
                 details,
                 Some(large_image),
                 large_text,
-                problem_count,
+                args.problem_count,
                 START_TIME.as_ref(),
                 config.swap_fields,
             );
