@@ -115,8 +115,8 @@ local function update_idle_presence(config)
         'PresenceArgs',
         '',
         'Cord.idle',
-        0,
         nil,
+        0,
         false
       )
     )
@@ -136,8 +136,8 @@ local function update_idle_presence(config)
         'PresenceArgs',
         '',
         'Cord.idle',
-        0,
         nil,
+        0,
         false
       )
     )
