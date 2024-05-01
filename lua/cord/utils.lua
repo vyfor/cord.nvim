@@ -33,44 +33,46 @@ local function init_discord(ffi)
 
   ffi.cdef[[
     typedef struct {
+      const char* client;
+      const char* image;
+      const char* editor_tooltip;
+      const char* idle_text;
+      const char* idle_tooltip;
+      const char* viewing_text;
+      const char* editing_text;
+      const char* file_browser_text;
+      const char* plugin_manager_text;
+      const char* lsp_manager_text;
+      const char* workspace_text;
+      const char* initial_path;
+      const bool swap;
+    } InitArgs;
+    typedef struct {
+      const char* filename;
+      const char* filetype;
+      const char* cursor_position;
+      int problem_count;
+      bool is_read_only;
+    } PresenceArgs;
+    typedef struct {
       const char* first_label;
       const char* first_url;
       const char* second_label;
       const char* second_url;
     } Buttons;
     void init(
-      const char* client,
-      const char* image,
-      const char* editor_tooltip,
-      const char* idle_text,
-      const char* idle_tooltip,
-      const char* viewing_text,
-      const char* editing_text,
-      const char* file_browser_text,
-      const char* plugin_manager_text,
-      const char* lsp_manager_text,
-      const char* workspace_text,
-      const char* initial_path,
-      const Buttons* buttons,
-      const bool swap
+      const InitArgs* args,
+      const Buttons* buttons
     );
     const bool update_presence(
-      const char* filename,
-      const char* filetype,
-      bool is_read_only,
-      const char* cursor_position,
-      int problem_count
+      const PresenceArgs* args
     );
     const bool update_presence_with_assets(
-      const char* filename,
-      const char* filetype,
       const char* name,
       const char* icon,
       const char* tooltip,
       int asset_type,
-      bool is_read_only,
-      const char* cursor_position,
-      int problem_count
+      const InitArgs* args
     );
     void clear_presence();
     void disconnect();

@@ -65,26 +65,28 @@ local is_blacklisted
 
 local function connect(config)
   discord.init(
-    config.editor.client,
-    config.editor.image,
-    config.editor.tooltip,
-    config.idle.text,
-    config.idle.tooltip,
-    config.text.viewing,
-    config.text.editing,
-    config.text.file_browser,
-    config.text.plugin_manager,
-    config.text.lsp_manager,
-    config.text.workspace,
-    vim.fn.getcwd(),
+    ffi.new('InitArgs',
+      config.editor.client,
+      config.editor.image,
+      config.editor.tooltip,
+      config.idle.text,
+      config.idle.tooltip,
+      config.text.viewing,
+      config.text.editing,
+      config.text.file_browser,
+      config.text.plugin_manager,
+      config.text.lsp_manager,
+      config.text.workspace,
+      vim.fn.getcwd(),
+      config.display.swap_fields
+    ),
     config.display.show_repository and ffi.new(
       'Buttons',
       (config.buttons[1] and config.buttons[1].label) or '',
       (config.buttons[1] and config.buttons[1].url) or '',
       (config.buttons[2] and config.buttons[2].label) or '',
       (config.buttons[2] and config.buttons[2].url) or ''
-    ) or nil,
-    config.display.swap_fields
+    ) or nil
   )
 end
 
@@ -108,7 +110,16 @@ local function update_idle_presence(config)
     if config.timer.reset_on_idle then
       discord.update_time()
     end
-    discord.update_presence('', 'Cord.idle', false, nil, 0)
+    discord.update_presence(
+      ffi.new(
+        'PresenceArgs',
+        '',
+        'Cord.idle',
+        0,
+        nil,
+        false
+      )
+    )
     return true
   end
 
@@ -120,7 +131,16 @@ local function update_idle_presence(config)
     if config.display.show_time and config.timer.reset_on_idle then
       discord.update_time()
     end
-    discord.update_presence('', 'Cord.idle', false, nil, 0)
+    discord.update_presence(
+      ffi.new(
+        'PresenceArgs',
+        '',
+        'Cord.idle',
+        0,
+        nil,
+        false
+      )
+    )
     return true
   end
   return false
@@ -162,23 +182,29 @@ local function update_presence(config, initial)
     local success
     if icon then
       success = discord.update_presence_with_assets(
-        current_presence.name,
-        current_presence.type,
         icon.name or name,
         type(icon) == 'string' and icon or icon.icon,
         icon.tooltip,
         icon.type or 0,
-        current_presence.readonly,
-        cursor_pos,
-        problem_count
+        ffi.new(
+          'PresenceArgs',
+          current_presence.name,
+          current_presence.type,
+          cursor_pos,
+          problem_count,
+          current_presence.readonly
+        )
       )
     else
       success = discord.update_presence(
-        current_presence.name,
-        current_presence.type,
-        current_presence.readonly,
-        cursor_pos,
-        problem_count
+        ffi.new(
+          'PresenceArgs',
+          current_presence.name,
+          current_presence.type,
+          cursor_pos,
+          problem_count,
+          current_presence.readonly
+        )
       )
     end
     if success then
