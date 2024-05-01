@@ -29,7 +29,8 @@ cord.config = {
     scope = 'workspace',
   },
   idle = {
-    show_idle = true,
+    enable = true,
+    show_status = true,
     timeout = 1800000,
     disable_on_focus = true,
     text = 'Idle',
@@ -110,20 +111,24 @@ local function update_idle_presence(config)
     if config.timer.reset_on_idle then
       discord.update_time()
     end
-    discord.update_presence(
-      ffi.new(
-        'PresenceArgs',
-        '',
-        'Cord.idle',
-        nil,
-        0,
-        false
+    if config.idle.show_status then
+      discord.update_presence(
+        ffi.new(
+          'PresenceArgs',
+          '',
+          'Cord.idle',
+          nil,
+          0,
+          false
+        )
       )
-    )
+    else
+      discord.clear_presence()
+    end
     return true
   end
 
-  if config.idle.show_idle and (config.idle.timeout == 0 or (os.clock() - last_updated) * 1000 >= config.idle.timeout) then
+  if config.idle.enable and (config.idle.timeout == 0 or (os.clock() - last_updated) * 1000 >= config.idle.timeout) then
     if config.idle.disable_on_focus and is_focused then
       return false
     end
@@ -131,16 +136,20 @@ local function update_idle_presence(config)
     if config.display.show_time and config.timer.reset_on_idle then
       discord.update_time()
     end
-    discord.update_presence(
-      ffi.new(
-        'PresenceArgs',
-        '',
-        'Cord.idle',
-        nil,
-        0,
-        false
+    if config.idle.show_status then
+      discord.update_presence(
+        ffi.new(
+          'PresenceArgs',
+          '',
+          'Cord.idle',
+          nil,
+          0,
+          false
+        )
       )
-    )
+    else
+      discord.clear_presence()
+    end
     return true
   end
   return false
