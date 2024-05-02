@@ -113,6 +113,7 @@ pub fn validate_buttons(
 #[inline(always)]
 pub fn build_activity(
     config: &Config,
+    filetype: &str,
     details: String,
     large_image: Option<String>,
     large_text: String,
@@ -120,16 +121,20 @@ pub fn build_activity(
     timestamp: Option<&u128>,
     swap_fields: bool,
 ) -> Activity {
-    let (state, details) = if swap_fields {
-        (
-            Some(details),
-            get_presence_state(&config, &config.workspace, problem_count),
-        )
+    let (state, details) = if filetype == "Cord.idle" {
+        (Some(details), None)
     } else {
-        (
-            get_presence_state(&config, &config.workspace, problem_count),
-            Some(details),
-        )
+        if swap_fields {
+            (
+                Some(details),
+                get_presence_state(&config, &config.workspace, problem_count),
+            )
+        } else {
+            (
+                get_presence_state(&config, &config.workspace, problem_count),
+                Some(details),
+            )
+        }
     };
 
     Activity {

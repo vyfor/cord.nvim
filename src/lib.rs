@@ -201,6 +201,7 @@ pub extern "C" fn update_presence(args_ptr: *const PresenceArgs) -> bool {
 
             let activity = build_activity(
                 config,
+                &filetype,
                 details,
                 large_image,
                 large_text,
@@ -378,6 +379,7 @@ pub extern "C" fn update_presence_with_assets(
 
             let activity = build_activity(
                 config,
+                &filetype,
                 details,
                 Some(large_image),
                 large_text,
