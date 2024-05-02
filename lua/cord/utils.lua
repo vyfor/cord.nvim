@@ -72,7 +72,7 @@ local function init_discord(ffi)
       const char* icon,
       const char* tooltip,
       int asset_type,
-      const InitArgs* args
+      const PresenceArgs* args
     );
     void clear_presence();
     void disconnect();
