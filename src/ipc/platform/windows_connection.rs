@@ -63,9 +63,7 @@ impl Connection for RichClient {
     }
 
     fn close(&mut self) -> io::Result<()> {
-        if let Some(mut pipe) = self.pipe.take() {
-            pipe.write_all(&utils::encode(2, 0))?;
-        }
+        self.pipe = None;
 
         Ok(())
     }
