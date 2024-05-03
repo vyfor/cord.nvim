@@ -186,7 +186,7 @@ local function update_presence(config, initial)
       discord.update_time()
     end
     local cursor_pos = config.display.show_cursor_position and (current_presence.cursor_line .. ':' .. current_presence.cursor_col) or nil
-    
+
     local icon, name = utils.get_icon(config, current_presence.name, current_presence.type)
     local success
     if icon then
