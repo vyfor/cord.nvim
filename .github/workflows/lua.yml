@@ -1,29 +1,38 @@
-name: Lua
+name: Lua lint and format
 
 on:
   push:
     branches: [ "master" ]
     paths:
       - "lua/**"
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - "lua/**"
 
 jobs:
-  stylua:
+  lint-and-format:
     runs-on: ubuntu-latest
+    if: "${{ github.event.head_commit.message != 'style(stylua): format Lua code' }}"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Format Lua
+      - name: Lint Lua
+        uses: lunarmodules/luacheck@v1
+      
+      - name: Format Lua if needed
         uses: JohnnyMorganz/stylua-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
           args: lua --color always
 
-      - name: Push changes
+      - name: Apply changes
         run: |
           git config --global user.name "vyfor"
           git config --global user.email "92883017+vyfor@users.noreply.github.com"
           git add -A
-          git commit -m "style: format Lua code" || echo "No changes to commit"
+          git commit -m "style(stylua): format Lua code" || echo "No changes to commit"
           git push
