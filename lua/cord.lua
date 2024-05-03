@@ -277,17 +277,14 @@ function cord.setup(userConfig)
 end
 
 function cord.setup_autocmds(config)
-  vim.api.nvim_create_autocmd(
-    'DirChanged',
-    {
-      callback = function()
-        is_blacklisted = utils.array_contains(
-          config.display.workspace_blacklist,
-          ffi.string(discord.update_workspace(vim.fn.getcwd()))
-        )
-      end,
-    }
-  )
+  vim.api.nvim_create_autocmd('DirChanged', {
+    callback = function()
+      is_blacklisted = utils.array_contains(
+        config.display.workspace_blacklist,
+        ffi.string(discord.update_workspace(vim.fn.getcwd()))
+      )
+    end,
+  })
   vim.api.nvim_create_autocmd('FocusGained', {
     callback = function()
       is_focused = true

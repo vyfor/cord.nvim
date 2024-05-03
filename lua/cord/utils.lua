@@ -20,7 +20,7 @@ local function init_discord(ffi)
   elseif os_name == 'Darwin' then
     cord_file = '/cord.dylib'
   else
-    vim.api.nvim_err_writeln('[cord.nvim] Unable to identify OS type')
+    vim.api.nvim_err_writeln '[cord.nvim] Unable to identify OS type'
   end
 
   local path = debug.getinfo(2, 'S').source:sub(2, -14)
@@ -31,7 +31,7 @@ local function init_discord(ffi)
     move_file(old_path, new_path) -- move file as to avoid file access errors when updating
   end
 
-  ffi.cdef[[
+  ffi.cdef [[
     typedef struct {
       const char* client;
       const char* image;
@@ -86,8 +86,12 @@ end
 
 local function validate_severity(config)
   config.lsp.severity = tonumber(config.lsp.severity)
-  if config.lsp.severity == nil or config.lsp.severity < 1 or config.lsp.severity > 4 then
-    vim.api.nvim_err_writeln('[cord.nvim] config.lsp.severity value must be a number between 1 and 4')
+  if
+    config.lsp.severity == nil
+    or config.lsp.severity < 1
+    or config.lsp.severity > 4
+  then
+    vim.api.nvim_err_writeln '[cord.nvim] config.lsp.severity value must be a number between 1 and 4'
     return false
   end
   return true
@@ -95,65 +99,55 @@ end
 
 local function get_problem_count(config)
   if config.lsp.show_problem_count then
-    local bufnr = config.lsp.scope == 'buffer' and vim.api.nvim_get_current_buf() or nil
+    local bufnr = config.lsp.scope == 'buffer'
+        and vim.api.nvim_get_current_buf()
+      or nil
     if bufnr == nil and config.lsp.scope ~= 'workspace' then
-      vim.api.nvim_err_writeln('[cord.nvim] config.lsp.scope value must be either workspace or buffer')
+      vim.api.nvim_err_writeln '[cord.nvim] config.lsp.scope value must be either workspace or buffer'
     end
-    return #vim.diagnostic.get(bufnr, { severity = { min = config.lsp.severity } })
+    return #vim.diagnostic.get(
+      bufnr,
+      { severity = { min = config.lsp.severity } }
+    )
   end
 end
 
 local function array_contains(arr, val)
-    if arr == nil or val == nil then
-        return false
-    end
+  if arr == nil or val == nil then return false end
 
-    for _, value in ipairs(arr) do
-        if value == val then
-            return true
-        end
-    end
+  for _, value in ipairs(arr) do
+    if value == val then return true end
+  end
 
-    return false
+  return false
 end
 
 local function get_file_extension(filename)
-    for i = #filename, 1, -1 do
-        if filename:sub(i, i) == '.' then
-            return filename:sub(i)
-        end
-    end
+  for i = #filename, 1, -1 do
+    if filename:sub(i, i) == '.' then return filename:sub(i) end
+  end
 
-    return filename
+  return filename
 end
 
 local function get_icon(config, filename, filetype)
-  if not config.assets then
-    return
-  end
+  if not config.assets then return end
 
   local icon = config.assets[filetype]
-  if icon then
-    return icon, filetype
-  end
+  if icon then return icon, filetype end
 
   icon = config.assets[filename]
-  if icon then
-    return icon, filename
-  end
+  if icon then return icon, filename end
 
   local extension = get_file_extension(filename)
   icon = config.assets[extension]
-  if icon then
-    return icon, extension
-  end
+  if icon then return icon, extension end
 end
-
 
 return {
   init_discord = init_discord,
   validate_severity = validate_severity,
   get_problem_count = get_problem_count,
   array_contains = array_contains,
-  get_icon = get_icon
+  get_icon = get_icon,
 }
