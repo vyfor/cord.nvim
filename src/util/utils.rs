@@ -36,10 +36,7 @@ pub fn ptr_to_string(ptr: *const c_char) -> String {
 
 #[inline(always)]
 pub fn get_asset(path: &str, file: &str) -> String {
-    format!(
-        "{}/{}/{}.png?v={}",
-        GITHUB_ASSETS_URL, path, file, ASSETS_VERSION
-    )
+    format!("{GITHUB_ASSETS_URL}/{path}/{file}.png?v={ASSETS_VERSION}")
 }
 
 #[inline(always)]
@@ -205,9 +202,8 @@ pub fn get_presence_state(
     if !cwd.is_empty() && !config.workspace_text.is_empty() {
         Some(if problem_count != -1 {
             format!(
-                "{} - {} problems",
+                "{} - {problem_count} problems",
                 config.workspace_text.replace("{}", cwd),
-                problem_count
             )
         } else {
             config.workspace_text.replace("{}", cwd)
@@ -236,7 +232,7 @@ fn language_presence(
         config.editing_text.replace("{}", filename)
     };
     let presence_details = cursor_position
-        .map_or(details.clone(), |pos| format!("{}:{}", details, pos));
+        .map_or(details.clone(), |pos| format!("{details}:{pos}"));
     let presence_large_image = if filetype == "Cord.new" {
         None
     } else {
@@ -288,7 +284,7 @@ fn lsp_manager_presence(
 
 #[inline(always)]
 fn find_git_repository(workspace_path: &str) -> Option<String> {
-    let config_path = format!("{}/{}", workspace_path, ".git/config");
+    let config_path = format!("{workspace_path}/.git/config");
 
     let file = match File::open(config_path) {
         Ok(file) => file,

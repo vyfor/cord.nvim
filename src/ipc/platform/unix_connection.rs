@@ -14,7 +14,7 @@ impl Connection for RichClient {
             .or_else(|_| var("TEMP"))
             .unwrap_or_else(|_| "/tmp".to_string());
         for i in 0..10 {
-            match UnixStream::connect(format!("{}/discord-ipc-{}", path, i)) {
+            match UnixStream::connect(format!("{path}/discord-ipc-{i}")) {
                 Ok(pipe) => {
                     return Ok(RichClient {
                         client_id: client_id,

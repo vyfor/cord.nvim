@@ -13,7 +13,7 @@ impl Connection for RichClient {
                 .read(true)
                 .write(true)
                 .access_mode(0x3)
-                .open(format!("\\\\.\\pipe\\discord-ipc-{}", i))
+                .open(format!("\\\\.\\pipe\\discord-ipc-{i}"))
             {
                 Ok(pipe) => {
                     return Ok(RichClient {

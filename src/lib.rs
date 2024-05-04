@@ -266,7 +266,7 @@ pub extern "C" fn update_presence_with_assets(
                         };
                         let details = cursor_position
                             .map_or(details.clone(), |pos| {
-                                format!("{}:{}", details, pos)
+                                format!("{details}:{pos}")
                             });
 
                         if icon.is_empty() || tooltip.is_empty() {
