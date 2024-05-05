@@ -173,6 +173,7 @@ local function update_presence(config, initial)
       discord.update_time()
     end
     local cursor_pos = config.display.show_cursor_position
+        and (current_presence.cursor_line ~= 1 or current_presence.cursor_col ~= 1)
         and (current_presence.cursor_line .. ':' .. current_presence.cursor_col)
       or nil
 
