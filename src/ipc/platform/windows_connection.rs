@@ -17,7 +17,7 @@ impl Connection for RichClient {
             {
                 Ok(pipe) => {
                     return Ok(RichClient {
-                        client_id: client_id,
+                        client_id,
                         pipe: Some(pipe),
                         last_activity: None,
                     })

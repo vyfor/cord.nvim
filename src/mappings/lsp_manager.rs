@@ -1,4 +1,4 @@
-pub fn get<'a>(filetype: &'a str) -> Option<(&'a str, &'a str)> {
+pub fn get(filetype: &str) -> Option<(&str, &str)> {
     let lsp_manager = match filetype {
         "lspinfo" => ("default", "lspconfig"),
         "mason" => ("default", "Mason"),

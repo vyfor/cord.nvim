@@ -12,23 +12,11 @@ pub struct ActivityButton {
     pub url: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Activity {
     pub details: Option<String>,
     pub state: Option<String>,
     pub assets: Option<ActivityAssets>,
     pub buttons: Option<Vec<ActivityButton>>,
     pub timestamp: Option<u128>,
-}
-
-impl Default for Activity {
-    fn default() -> Self {
-        Activity {
-            details: None,
-            state: None,
-            assets: None,
-            buttons: None,
-            timestamp: None,
-        }
-    }
 }

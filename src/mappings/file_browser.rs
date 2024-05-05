@@ -1,4 +1,4 @@
-pub fn get<'a>(filetype: &'a str) -> Option<(&'a str, &'a str)> {
+pub fn get(filetype: &str) -> Option<(&str, &str)> {
     let file_browser = match filetype {
         "netrw" => ("default", "Netrw"),
         "TelescopePrompt" => ("telescope", "Telescope"),

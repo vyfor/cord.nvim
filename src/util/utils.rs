@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_arguments)]
+
 use std::{
     ffi::{c_char, CStr},
     fs::File,
@@ -120,23 +122,21 @@ pub fn build_activity(
 ) -> Activity {
     let (state, details) = if filetype == "Cord.idle" {
         (Some(details), None)
+    } else if swap_fields {
+        (
+            Some(details),
+            get_presence_state(config, &config.workspace, problem_count),
+        )
     } else {
-        if swap_fields {
-            (
-                Some(details),
-                get_presence_state(&config, &config.workspace, problem_count),
-            )
-        } else {
-            (
-                get_presence_state(&config, &config.workspace, problem_count),
-                Some(details),
-            )
-        }
+        (
+            get_presence_state(config, &config.workspace, problem_count),
+            Some(details),
+        )
     };
 
     Activity {
-        state: state,
-        details: details,
+        state,
+        details,
         assets: Some(ActivityAssets {
             small_image: (large_image.is_some())
                 .then(|| config.editor_image.clone()),
@@ -185,7 +185,7 @@ pub fn build_presence(
                 plugin_manager_presence(config, tooltip, icon);
             (details, Some(icon), tooltip)
         }
-        Filetype::LSP(icon, tooltip) => {
+        Filetype::Lsp(icon, tooltip) => {
             let (details, icon, tooltip) =
                 lsp_manager_presence(config, tooltip, icon);
             (details, Some(icon), tooltip)
