@@ -15,7 +15,7 @@
 - Blazingly fast startup due to non-blocking, asynchronous nature
 - Highly [configurable](#-configuration) in Lua
 - Offers more than 60 icons for languages and components
-- Automatically detects working directory and repository based on Git
+- Automatically detects working directory and repository based on VCS
 - Identifies problems across active buffers
 - Supports configurable idle status detection
 - Provides [user commands](#%EF%B8%8F-user-commands) for managing the presence
