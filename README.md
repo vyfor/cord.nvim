@@ -12,7 +12,7 @@
 ## 💎 Features
 - Lightweight and dependency-free
 - Cross-platform support (Windows, Linux, macOS)
-- Blazingly fast startup due to non-blocking, asynchronous nature
+- Blazingly fast startup due to asynchronous nature
 - Highly [configurable](#-configuration) in Lua
 - Offers more than 60 icons for languages and components
 - Automatically detects working directory and repository based on VCS
@@ -105,7 +105,7 @@ require('cord').setup({
   buttons = {
     {
       label = 'View Repository',                -- Text displayed on the button
-      url = 'git',                              -- URL where the button leads to ('git' = Git repository URL)
+      url = 'git',                              -- URL where the button leads to ('git' = automatically fetch Git repository URL)
     },
     -- {
     --   label = 'View Plugin',
@@ -116,7 +116,7 @@ require('cord').setup({
     -- lazy = {                                 -- Vim filetype or file name or file extension = table or string (see wiki)*
     --   name = 'Lazy',                         -- Optional override for the icon name, redundant for language types
     --   icon = 'https://example.com/lazy.png', -- Rich Presence asset name or URL
-    --   tooltip = 'lazy.nvim',
+    --   tooltip = 'lazy.nvim',                 -- Text to display when hovering over the icon
     --   type = 2,                              -- 0 = language, 1 = file browser, 2 = plugin manager, 3 = lsp manager; defaults to language
     -- },
     -- ['Cargo.toml'] = 'crates',
