@@ -33,7 +33,8 @@
   {
     'vyfor/cord.nvim',
     build = './build',
-    event = 'VeryLazy'
+    event = 'VeryLazy',
+    opts = {},
   }
   ```
 </details>
@@ -44,7 +45,7 @@
   ```lua
   {
     'vyfor/cord.nvim',
-    run = './build'
+    run = './build',
   }
   ```
 </details>
