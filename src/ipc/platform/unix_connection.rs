@@ -8,24 +8,33 @@ use crate::rpc::packet::Packet;
 
 impl Connection for RichClient {
     fn connect(client_id: u64) -> Result<Self, Box<dyn std::error::Error>> {
-        let path = var("XDG_RUNTIME_DIR")
-            .or_else(|_| var("TMPDIR"))
-            .or_else(|_| var("TMP"))
-            .or_else(|_| var("TEMP"))
-            .unwrap_or_else(|_| "/tmp".to_string());
-        for i in 0..10 {
-            match UnixStream::connect(format!("{path}/discord-ipc-{i}")) {
-                Ok(pipe) => {
-                    return Ok(RichClient {
-                        client_id: client_id,
-                        pipe: Some(pipe),
-                        last_activity: None,
-                    })
+        let dirs = ["XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"]
+            .iter()
+            .filter_map(|&dir| var(dir).ok())
+            .chain(vec!["/tmp".to_string()])
+            .flat_map(|base| {
+                vec![
+                    base.to_string(),
+                    format!("{}/app/com.discordapp.Discord", base),
+                    format!("{}/snap.discord", base),
+                ]
+            });
+
+        for dir in dirs {
+            for i in 0..10 {
+                match UnixStream::connect(format!("{dir}/discord-ipc-{i}")) {
+                    Ok(pipe) => {
+                        return Ok(RichClient {
+                            client_id: client_id,
+                            pipe: Some(pipe),
+                            last_activity: None,
+                        })
+                    }
+                    Err(e) => match e.kind() {
+                        io::ErrorKind::NotFound => continue,
+                        _ => return Err(e.into()),
+                    },
                 }
-                Err(e) => match e.kind() {
-                    io::ErrorKind::NotFound => continue,
-                    _ => return Err(e.into()),
-                },
             }
         }
 
@@ -63,7 +72,7 @@ impl Connection for RichClient {
     }
 
     fn close(&mut self) -> io::Result<()> {
-        if let Some(mut pipe) = self.pipe.take() {
+        if let Some(pipe) = self.pipe.take() {
             pipe.shutdown(std::net::Shutdown::Both)?;
         }
 
