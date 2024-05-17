@@ -11,9 +11,9 @@ impl Connection for RichClient {
         let dirs = ["XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"]
             .iter()
             .filter_map(|&dir| var(dir).ok())
-            .chain(vec!["/tmp".to_string()])
+            .chain(["/tmp".to_string()])
             .flat_map(|base| {
-                vec![
+                [
                     base.to_string(),
                     format!("{}/app/com.discordapp.Discord", base),
                     format!("{}/snap.discord", base),
