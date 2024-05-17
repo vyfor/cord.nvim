@@ -12,7 +12,7 @@
 ## 💎 Features
 - Lightweight and dependency-free
 - Cross-platform support (Windows, Linux, macOS)
-- Blazingly fast startup due to asynchronous nature
+- Blazingly fast startup with minimal overhead due to asynchronous nature
 - Highly [configurable](#-configuration) in Lua
 - Offers more than 60 icons for languages and components
 - Automatically detects working directory and repository based on VCS
