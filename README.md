@@ -52,7 +52,7 @@
 
 <details>
   <summary>other</summary>
-  <p>Same steps apply to other plugin managers. Just make sure to add/run this build command:</p>
+  <p>Same steps apply to other plugin managers. Just make sure to add or run this build command:</p>
 
   ```sh
   ./build
