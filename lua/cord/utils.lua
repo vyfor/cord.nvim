@@ -76,6 +76,7 @@ local function init_discord(ffi)
     );
     void clear_presence();
     void disconnect();
+    void set_workspace(const char* workspace);
     const char* update_workspace(const char* workspace);
     void update_time();
     const char* get_workspace();

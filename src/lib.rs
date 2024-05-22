@@ -417,6 +417,13 @@ pub unsafe extern "C" fn update_time() {
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn set_workspace(value: *mut c_char) {
+    if let Some(config) = CONFIG.as_mut() {
+        config.workspace = ptr_to_string(value);
+    }
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn update_workspace(value: *mut c_char) -> *const c_char {
     let mut ws = String::new();
     if let Some(config) = CONFIG.as_mut() {
