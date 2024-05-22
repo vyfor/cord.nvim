@@ -130,15 +130,16 @@ require('cord').setup({
 > \* [Wiki: Add or change file icons](https://github.com/vyfor/cord.nvim/wiki/Add-or-change-file-icons)
 
 ### ⌨️ User commands
-- `:CordConnect`        - Initialize presence client internally and connect to Discord
-- `:CordReconnect`      - Reconnect to Discord
-- `:CordDisconnect`     - Disconnect from Discord
-- `:CordTogglePresence` - Toggle presence
-- `:CordShowPresence`   - Show presence
-- `:CordHidePresence`   - Hide presence
-- `:CordToggleIdle`     - Toggle idle status
-- `:CordIdle`           - Show idle status
-- `:CordUnidle`         - Hide idle status and reset the timeout
+- `:CordConnect`          - Initialize presence client internally and connect to Discord
+- `:CordReconnect`        - Reconnect to Discord
+- `:CordDisconnect`       - Disconnect from Discord
+- `:CordTogglePresence`   - Toggle presence
+- `:CordShowPresence`     - Show presence
+- `:CordHidePresence`     - Hide presence
+- `:CordToggleIdle`       - Toggle idle status
+- `:CordIdle`             - Show idle status
+- `:CordUnidle`           - Hide idle status and reset the timeout
+- `:CordWorkspace <name>` - Change the name of the workspace (visually)
 
 ## 🌱 Contributing
 This project is in beta. Feel free to open an issue or pull request for missing icons or features. You can also contact me on Discord (**[vyfor](https://discord.com/users/446729269872427018)**) if you have any questions.
