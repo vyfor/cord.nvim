@@ -366,6 +366,11 @@ function cord.setup_usercmds(config)
     last_updated = os.clock()
     last_presence = nil
   end, {})
+
+  vim.api.nvim_create_user_command('CordWorkspace', function(args)
+    discord.set_workspace(args.args)
+    last_presence = nil
+  end, { nargs = 1 })
 end
 
 return cord
