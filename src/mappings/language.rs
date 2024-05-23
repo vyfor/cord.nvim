@@ -46,7 +46,13 @@ pub fn get<'a>(
         "tex" | "texmf" | "plaintex" => ("latex", "LaTeX"),
         "lisp" => ("lisp", "Lisp"),
         "lua" => ("lua", "Lua"),
-        "markdown" => ("markdown", "Markdown"),
+        "markdown" => {
+            if filename.to_lowercase() == "license.md" {
+                ("license", "License file")
+            } else {
+                ("markdown", "Markdown")
+            }
+        }
         "nim" => ("nim", "Nim"),
         "nix" => ("nix", "Nix"),
         "ocaml" => ("ocaml", "OCaml"),
@@ -64,7 +70,8 @@ pub fn get<'a>(
         "svelte" => ("svelte", "Svelte"),
         "swift" => ("swift", "Swift"),
         "text" => {
-            if filename.to_lowercase() == "license" {
+            let filename = filename.to_lowercase();
+            if filename == "license" || filename == "license.txt" {
                 ("license", "License file")
             } else {
                 ("text", "Plain Text")
@@ -94,7 +101,7 @@ pub fn get<'a>(
         "zsh" => ("shell", "Zsh"),
         _ => match filename.to_lowercase().rsplit_once('.') {
             Some((_, extension)) => match extension {
-                "gml" => ("gml", "Game Maker Language"),
+                "gml" => ("gml", "GameMaker Language"),
                 "pcss" | "postcss" => ("postcss", "PostCSS"),
                 _ => return None,
             },
