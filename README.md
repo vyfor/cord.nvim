@@ -22,7 +22,7 @@
 - Is written in native code and uses Lua FFI for integration
 
 ## 🔌 Requirements
-- **Neovim compiled with LuaJIT**
+- **Neovim >= 0.5.0 (compiled with LuaJIT)**
 - **[Rust compiler](https://www.rust-lang.org/tools/install)**
 
 ## 📦 Installation
