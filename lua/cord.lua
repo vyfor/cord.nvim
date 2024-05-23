@@ -257,6 +257,14 @@ local function start_timer(config)
 end
 
 function cord.setup(userConfig)
+  if vim.fn.has 'nvim-0.5' ~= 1 then
+    vim.notify(
+      '[cord.nvim] Cord requires Neovim 0.5 or higher',
+      vim.log.levels.ERROR
+    )
+    return
+  end
+
   if vim.g.cord_initialized == nil then
     local config = vim.tbl_deep_extend('force', cord.config, userConfig or {})
     config.timer.interval = math.max(config.timer.interval, 500)
@@ -268,10 +276,10 @@ function cord.setup(userConfig)
       start_timer(config)
     end
 
-    vim.api.nvim_create_autocmd(
-      'ExitPre',
-      { callback = function() discord.disconnect() end }
-    )
+    vim.cmd [[
+      autocmd! ExitPre * lua require('cord').disconnect()
+    ]]
+
     if config.usercmds then cord.setup_usercmds(config) end
 
     vim.g.cord_initialized = true
@@ -279,49 +287,56 @@ function cord.setup(userConfig)
 end
 
 function cord.setup_autocmds(config)
-  vim.api.nvim_create_autocmd('DirChanged', {
-    callback = function()
-      is_blacklisted = utils.array_contains(
-        config.display.workspace_blacklist,
-        ffi.string(discord.update_workspace(vim.fn.getcwd()))
-      )
-    end,
-  })
-  vim.api.nvim_create_autocmd('FocusGained', {
-    callback = function()
-      is_focused = true
-      last_presence = nil
-    end,
-  })
-  vim.api.nvim_create_autocmd(
-    'FocusLost',
-    { callback = function() is_focused = false end }
-  )
+  vim.cmd [[
+    autocmd! DirChanged * lua require('cord').on_dir_changed()
+    autocmd! FocusGained * lua require('cord').on_focus_gained()
+    autocmd! FocusLost * lua require('cord').on_focus_lost()
+  ]]
+
+  function cord.on_dir_changed()
+    is_blacklisted = utils.array_contains(
+      config.display.workspace_blacklist,
+      ffi.string(discord.update_workspace(vim.fn.getcwd()))
+    )
+  end
+
+  function cord.on_focus_gained()
+    is_focused = true
+    last_presence = nil
+  end
+
+  function cord.on_focus_lost() is_focused = false end
 end
 
 function cord.setup_usercmds(config)
-  vim.api.nvim_create_user_command('CordConnect', function()
+  vim.cmd [[
+    command! CordConnect lua require('cord').connect()
+    command! CordReconnect lua require('cord').reconnect()
+    command! CordDisconnect lua require('cord').disconnect()
+    command! CordTogglePresence lua require('cord').toggle_presence()
+    command! CordShowPresence lua require('cord').show_presence()
+    command! CordHidePresence lua require('cord').hide_presence()
+    command! CordToggleIdle lua require('cord').toggle_idle()
+    command! CordIdle lua require('cord').idle()
+    command! CordUnidle lua require('cord').unidle()
+    command! -nargs=1 CordWorkspace lua require('cord').set_workspace(<f-args>)
+  ]]
+
+  function cord.connect()
     connect(config)
     start_timer(config)
-  end, {})
+  end
 
-  vim.api.nvim_create_user_command('CordReconnect', function()
+  function cord.reconnect()
     timer:stop()
     discord.disconnect()
     last_presence = nil
     connect(config)
     start_timer(config)
     enabled = true
-  end, {})
+  end
 
-  vim.api.nvim_create_user_command('CordDisconnect', function()
-    timer:stop()
-    discord.disconnect()
-    enabled = false
-    last_presence = nil
-  end, {})
-
-  vim.api.nvim_create_user_command('CordTogglePresence', function()
+  function cord.toggle_presence()
     if enabled then
       timer:stop()
       discord.clear_presence()
@@ -331,21 +346,21 @@ function cord.setup_usercmds(config)
       start_timer(config)
       enabled = true
     end
-  end, {})
+  end
 
-  vim.api.nvim_create_user_command('CordShowPresence', function()
+  function cord.show_presence()
     start_timer(config)
     enabled = true
-  end, {})
+  end
 
-  vim.api.nvim_create_user_command('CordHidePresence', function()
+  function cord.hide_presence()
     timer:stop()
     discord.clear_presence()
     enabled = false
     last_presence = nil
-  end, {})
+  end
 
-  vim.api.nvim_create_user_command('CordToggleIdle', function()
+  function cord.toggle_idle()
     if last_presence['idle'] then
       force_idle = false
       last_updated = os.clock()
@@ -353,24 +368,27 @@ function cord.setup_usercmds(config)
     else
       force_idle = true
     end
-  end, {})
+  end
 
-  vim.api.nvim_create_user_command(
-    'CordIdle',
-    function() force_idle = true end,
-    {}
-  )
+  function cord.idle() force_idle = true end
 
-  vim.api.nvim_create_user_command('CordUnidle', function()
+  function cord.unidle()
     force_idle = false
     last_updated = os.clock()
     last_presence = nil
-  end, {})
+  end
 
-  vim.api.nvim_create_user_command('CordWorkspace', function(args)
-    discord.set_workspace(args.args)
+  function cord.set_workspace(workspace)
+    discord.set_workspace(workspace)
     last_presence = nil
-  end, { nargs = 1 })
+  end
+end
+
+function cord.disconnect()
+  timer:stop()
+  discord.disconnect()
+  enabled = false
+  last_presence = nil
 end
 
 return cord
