@@ -82,7 +82,13 @@ pub fn get<'a>(
         "v" => ("v", "V "),
         "vim" => ("vim", "VimL"),
         "vue" => ("vue", "Vue"),
-        "xml" => ("xml", "XML"),
+        "xml" => {
+            if filename == "pom.xml" {
+                ("maven", "Maven")
+            } else {
+                ("xml", "XML")
+            }
+        }
         "yaml" => ("yaml", "YAML"),
         "zig" => ("zig", "Zig"),
         "zsh" => ("shell", "Zsh"),
