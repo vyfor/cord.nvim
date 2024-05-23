@@ -36,6 +36,7 @@ pub fn get<'a>(
         "javascript" => ("javascript", "JavaScript"),
         "javascriptreact" => ("react", "JSX"),
         "json" => ("json", "JSON"),
+        "julia" => ("julia", "Julia"),
         "kotlin" => {
             if filename == "build.gradle.kts" {
                 ("gradle", "Gradle")
