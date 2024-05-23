@@ -85,6 +85,7 @@ pub fn get<'a>(
         "xml" => ("xml", "XML"),
         "yaml" => ("yaml", "YAML"),
         "zig" => ("zig", "Zig"),
+        "zsh" => ("shell", "Zsh"),
         _ => match filename.to_lowercase().rsplit_once('.') {
             Some((_, extension)) => match extension {
                 "gml" => ("gml", "Game Maker Language"),

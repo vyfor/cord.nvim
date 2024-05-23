@@ -28,6 +28,7 @@ static mut START_TIME: Option<u128> = None;
 static mut CONFIG: Option<Config> = None;
 
 struct Config {
+    is_custom_client: bool,
     rich_client: RichClient,
     editor_image: String,
     editor_tooltip: String,
@@ -89,16 +90,19 @@ pub unsafe extern "C" fn init(
 
     let args = &*args_ptr;
 
+    let mut is_custom_client = false;
     let (client_id, editor_image) = match ptr_to_string(args.client).as_str() {
         "vim" => (1219918645770059796, get_asset("editor", "vim")),
         "neovim" => (1219918880005165137, get_asset("editor", "neovim")),
         "lunarvim" => (1220295374087000104, get_asset("editor", "lunarvim")),
         "nvchad" => (1220296082861326378, get_asset("editor", "nvchad")),
         "astronvim" => (1230866983977746532, get_asset("editor", "astronvim")),
-        id => (
-            id.parse::<u64>().expect("Invalid client ID"),
-            ptr_to_string(args.image),
-        ),
+        id => {
+            let id = id.parse::<u64>().expect("Invalid client ID");
+            is_custom_client = true;
+
+            (id, ptr_to_string(args.image))
+        }
     };
 
     let editor_tooltip = ptr_to_string(args.editor_tooltip);
@@ -135,7 +139,9 @@ pub unsafe extern "C" fn init(
 
             let workspace =
                 workspace.file_name().unwrap().to_string_lossy().to_string();
+
             CONFIG = Some(Config {
+                is_custom_client,
                 rich_client,
                 editor_image,
                 editor_tooltip,
@@ -241,16 +247,16 @@ pub unsafe extern "C" fn update_presence_with_assets(
             match AssetType::from(asset_type) {
                 Some(AssetType::Language) => {
                     let filename = if !filename.is_empty() {
-                        &filename
+                        filename
                     } else if !name.is_empty() && name != "Cord.new" {
-                        &name
+                        name.clone()
                     } else {
-                        "a new file"
+                        "a new file".to_owned()
                     };
                     let details = if args.is_read_only {
-                        config.viewing_text.replace("{}", filename)
+                        config.viewing_text.replace("{}", &filename)
                     } else {
-                        config.editing_text.replace("{}", filename)
+                        config.editing_text.replace("{}", &filename)
                     };
                     let details = cursor_position
                         .map_or(details.clone(), |pos| {
@@ -258,9 +264,10 @@ pub unsafe extern "C" fn update_presence_with_assets(
                         });
 
                     if icon.is_empty() || tooltip.is_empty() {
-                        if let Some((default_icon, default_tooltip)) =
-                            mappings::language::get(&filetype, filename)
-                        {
+                        let option =
+                            mappings::language::get(&filetype, &filename);
+
+                        if let Some((default_icon, default_tooltip)) = option {
                             if icon.is_empty() {
                                 icon = get_asset("language", default_icon);
                             }
@@ -274,6 +281,18 @@ pub unsafe extern "C" fn update_presence_with_assets(
                             if tooltip.is_empty() {
                                 tooltip = name;
                             }
+                        }
+
+                        if !(config.is_custom_client
+                            || icon.is_empty()
+                            || icon.starts_with("http://")
+                            || icon.starts_with("https://"))
+                        {
+                            icon = mappings::language::get(&icon, &filename)
+                                .map(|(icon, _)| icon.to_owned())
+                                .unwrap_or_else(|| {
+                                    get_asset("language", &icon)
+                                });
                         }
                     }
 
