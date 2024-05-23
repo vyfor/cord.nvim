@@ -6,7 +6,7 @@
     <a href="https://github.com/vyfor/cord.nvim/forks"><img src="https://img.shields.io/github/forks/vyfor/cord.nvim?style=for-the-badge" alt="Forks"></a>
   </div>
   <h3>🚀 <strong>Cord</strong> is a Discord Rich Presence plugin designed for Neovim, written in Rust.</h3>
-  <img src="https://github.com/vyfor/cord.nvim/assets/92883017/6ff91794-7264-485e-b82b-87926d7d5013" alt="Cord Banner">
+  <img src="https://github.com/vyfor/cord.nvim/assets/92883017/d2e46243-2bef-4c73-bb3f-6d10edc2a2f4" alt="Cord Banner">
 </div>
 
 ## 💎 Features
