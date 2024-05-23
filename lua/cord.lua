@@ -257,6 +257,14 @@ local function start_timer(config)
 end
 
 function cord.setup(userConfig)
+  if vim.fn.has 'nvim-0.5' ~= 1 then
+    vim.notify(
+      '[cord.nvim] Cord requires Neovim 0.5 or higher',
+      vim.log.levels.ERROR
+    )
+    return
+  end
+
   if vim.g.cord_initialized == nil then
     local config = vim.tbl_deep_extend('force', cord.config, userConfig or {})
     config.timer.interval = math.max(config.timer.interval, 500)
