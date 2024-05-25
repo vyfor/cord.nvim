@@ -308,12 +308,10 @@ fn find_git_repository(workspace_path: &str) -> Option<String> {
                 );
             } else if let Some((_protocol, repo_url)) = repo_url.split_once('@')
             {
+                let repo_url = repo_url.replacen(':', "/", 1);
                 return Some(format!(
                     "https://{}",
-                    repo_url
-                        .replacen(':', "/", 1)
-                        .strip_suffix(".git")
-                        .unwrap_or(repo_url)
+                    repo_url.strip_suffix(".git").unwrap_or(&repo_url)
                 ));
             }
             break;
