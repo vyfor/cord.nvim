@@ -104,6 +104,7 @@ require('cord').setup({
     file_browser = 'Browsing files in {}',      -- Text to display when browsing files (Empty string to disable)
     plugin_manager = 'Managing plugins in {}',  -- Text to display when managing plugins (Empty string to disable)
     lsp_manager = 'Configuring LSP in {}',      -- Text to display when managing LSP servers (Empty string to disable)
+    vcs = 'Committing changes in {}',            -- Text to display when using Git or Git-related plugin (Empty string to disable)
     workspace = 'In {}',                        -- Text to display when in a workspace (Empty string to disable)
   },
   buttons = {

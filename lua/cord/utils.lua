@@ -43,6 +43,7 @@ local function init_discord(ffi)
       const char* file_browser_text;
       const char* plugin_manager_text;
       const char* lsp_manager_text;
+      const char* vcs_text;
       const char* workspace_text;
       const char* initial_path;
       const bool swap;
