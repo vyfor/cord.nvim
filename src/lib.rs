@@ -39,6 +39,7 @@ struct Config {
     file_browser_text: String,
     plugin_manager_text: String,
     lsp_manager_text: String,
+    vcs_text: String,
     workspace_text: String,
     workspace: String,
     buttons: Vec<ActivityButton>,
@@ -65,6 +66,7 @@ pub struct InitArgs {
     pub file_browser_text: *const c_char,
     pub plugin_manager_text: *const c_char,
     pub lsp_manager_text: *const c_char,
+    pub vcs_text: *const c_char,
     pub workspace_text: *const c_char,
     pub initial_path: *const c_char,
     pub swap_fields: bool,
@@ -113,6 +115,7 @@ pub unsafe extern "C" fn init(
     let file_browser_text = ptr_to_string(args.file_browser_text);
     let plugin_manager_text = ptr_to_string(args.plugin_manager_text);
     let lsp_manager_text = ptr_to_string(args.lsp_manager_text);
+    let vcs_text = ptr_to_string(args.vcs_text);
     let workspace_text = ptr_to_string(args.workspace_text);
     let swap_fields = args.swap_fields;
     let workspace = find_workspace(&ptr_to_string(args.initial_path));
@@ -152,6 +155,7 @@ pub unsafe extern "C" fn init(
                 file_browser_text,
                 plugin_manager_text,
                 lsp_manager_text,
+                vcs_text,
                 workspace_text,
                 workspace,
                 buttons,
@@ -359,6 +363,31 @@ pub unsafe extern "C" fn update_presence_with_assets(
                         {
                             if icon.is_empty() {
                                 icon = get_asset("lsp_manager", default_icon);
+                            }
+                            if tooltip.is_empty() {
+                                tooltip = default_tooltip.to_string();
+                            }
+                        } else {
+                            if icon.is_empty() {
+                                return false;
+                            }
+                            if tooltip.is_empty() {
+                                tooltip = name;
+                            }
+                        }
+                    }
+
+                    (details, icon, tooltip)
+                }
+                Some(AssetType::Vcs) => {
+                    let details = config.vcs_text.replace("{}", &name);
+
+                    if icon.is_empty() || tooltip.is_empty() {
+                        if let Some((default_icon, default_tooltip)) =
+                            mappings::vcs::get(&filetype)
+                        {
+                            if icon.is_empty() {
+                                icon = get_asset("vcs", default_icon);
                             }
                             if tooltip.is_empty() {
                                 tooltip = default_tooltip.to_string();

@@ -190,6 +190,10 @@ pub fn build_presence(
                 lsp_manager_presence(config, tooltip, icon);
             (details, Some(icon), tooltip)
         }
+        Filetype::Vcs(icon, tooltip) => {
+            let (details, icon, tooltip) = vcs_presence(config, tooltip, icon);
+            (details, Some(icon), tooltip)
+        }
     }
 }
 
@@ -277,6 +281,19 @@ fn lsp_manager_presence(
 ) -> (String, String, String) {
     let presence_details = config.lsp_manager_text.replace("{}", tooltip);
     let presence_large_image = get_asset("lsp_manager", icon);
+    let presence_large_text = tooltip.to_string();
+
+    (presence_details, presence_large_image, presence_large_text)
+}
+
+#[inline(always)]
+fn vcs_presence(
+    config: &Config,
+    tooltip: &str,
+    icon: &str,
+) -> (String, String, String) {
+    let presence_details = config.vcs_text.replace("{}", tooltip);
+    let presence_large_image = get_asset("vcs", icon);
     let presence_large_text = tooltip.to_string();
 
     (presence_details, presence_large_image, presence_large_text)
