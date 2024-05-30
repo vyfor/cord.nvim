@@ -21,7 +21,8 @@ pub fn get<'a>(
         "elixir" => ("elixir", "Elixir"),
         "erlang" => ("erlang", "Erlang"),
         "fsharp" => ("fsharp", "F#"),
-        "git" | "gitignore" => ("git", "Git"),
+        "git" | "gitattributes" | "gitconfig" | "gitignore"
+        | "gitsendemail" => ("git", "Git"),
         "go" => ("go", "Go"),
         "groovy" => {
             if filename == "build.gradle" {
