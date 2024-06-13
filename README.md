@@ -65,7 +65,7 @@
 ## 🔧 Configuration
 > Note: `setup()` has to be called to initialize the plugin.
 ```lua
-require('cord').setup({
+require('cord').setup {
   usercmds = true,                              -- Enable user commands
   timer = {
     interval = 1500,                            -- Interval between presence updates in milliseconds (min 500)
@@ -122,11 +122,68 @@ require('cord').setup({
     --   icon = 'https://example.com/lazy.png', -- Rich Presence asset name or URL
     --   tooltip = 'lazy.nvim',                 -- Text to display when hovering over the icon
     --   type = 2,                              -- 0 = language, 1 = file browser, 2 = plugin manager, 3 = lsp manager, 4 = vcs; defaults to language
-    -- },
-    -- ['Cargo.toml'] = 'crates',
+
+
   },
-})
+}
 ```
+
+<details>
+  <summary>hide comments</summary>
+
+  ```lua
+  {
+    usercmds = true,
+    timer = {
+      interval = 1500,
+      reset_on_idle = false,
+      reset_on_change = false,
+    },
+    editor = {
+      image = nil,
+      client = 'neovim',
+      tooltip = 'The Superior Text Editor',
+    },
+    display = {
+      show_time = true,
+      show_repository = true,
+      show_cursor_position = false,
+      swap_fields = false,
+      workspace_blacklist = {},
+    },
+    lsp = {
+      show_problem_count = false,
+      severity = 1,
+      scope = 'workspace',
+    },
+    idle = {
+      enable = true,
+      show_status = true,
+      timeout = 1800000,
+      disable_on_focus = true,
+      text = 'Idle',
+      tooltip = '💤',
+    },
+    text = {
+      viewing = 'Viewing {}',
+      editing = 'Editing {}',
+      file_browser = 'Browsing files in {}',
+      plugin_manager = 'Managing plugins in {}',
+      lsp_manager = 'Configuring LSP in {}',
+      vcs = 'Committing changes in {}',
+      workspace = 'In {}',
+    },
+    buttons = {
+      {
+        label = 'View Repository',
+        url = 'git',
+      },
+    },
+    assets = {},
+  }
+  ```
+</details>
+
 > \* [Wiki: Add or change file icons](https://github.com/vyfor/cord.nvim/wiki/Add-or-change-file-icons)
 
 ### ⌨️ User commands
