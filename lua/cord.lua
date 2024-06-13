@@ -201,6 +201,13 @@ local function update_presence(config)
         and (current_presence.cursor_line .. ':' .. current_presence.cursor_col)
       or nil
 
+    if current_presence.type == 'toggleterm' then
+      local type = current_presence.name:match ':(.-);#toggleterm'
+
+      current_presence.name = type or current_presence.name
+      current_presence.type = type or current_presence.type
+    end
+
     local icon, name =
       utils.get_icon(config, current_presence.name, current_presence.type)
 
