@@ -141,6 +141,7 @@ pub unsafe extern "C" fn init(
 
     let workspace =
         workspace.file_name().unwrap().to_string_lossy().to_string();
+    let ws = workspace.clone();
 
     let workspace_blacklist = if args.workspace_blacklist.is_null() {
         Vec::new()
@@ -154,10 +155,7 @@ pub unsafe extern "C" fn init(
         .map(|s| ptr_to_string(s.to_owned()))
         .collect::<Vec<String>>()
     };
-
-    if workspace_blacklist.contains(&workspace) {
-        return status::WORKSPACE_BLACKLISTED;
-    }
+    let ws_blacklist = workspace_blacklist.clone();
 
     std::thread::spawn(move || {
         if let Ok(mut rich_client) = RichClient::connect(client_id) {
@@ -188,6 +186,10 @@ pub unsafe extern "C" fn init(
             INITIALIZED = true;
         };
     });
+
+    if ws_blacklist.clone().contains(&ws) {
+        return status::WORKSPACE_BLACKLISTED;
+    }
 
     status::SUCCESS
 }

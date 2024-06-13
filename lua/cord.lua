@@ -286,7 +286,7 @@ function cord.setup(userConfig)
 
     vim.g.cord_initialized = true
 
-    if init(config) == 2 then return end
+    if init(config) == 3 then return end
     start_timer(config)
   end
 end
