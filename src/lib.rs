@@ -491,7 +491,7 @@ pub unsafe extern "C" fn update_time() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn update_workspace(value: *mut c_char) -> bool {
+pub unsafe extern "C" fn set_workspace(value: *mut c_char) -> bool {
     if let Some(config) = CONFIG.as_mut() {
         config.workspace = ptr_to_string(value);
 
@@ -500,6 +500,25 @@ pub unsafe extern "C" fn update_workspace(value: *mut c_char) -> bool {
         }
 
         return true;
+    }
+
+    true
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn update_workspace(value: *mut c_char) -> bool {
+    if let Some(config) = CONFIG.as_mut() {
+        if let Some(workspace) =
+            find_workspace(&ptr_to_string(value)).file_name()
+        {
+            config.workspace = workspace.to_string_lossy().to_string();
+
+            if config.workspace_blacklist.contains(&config.workspace) {
+                return false;
+            }
+
+            return true;
+        }
     }
 
     true

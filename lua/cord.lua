@@ -6,7 +6,6 @@ local utils = require 'cord.utils'
 cord.config = {
   usercmds = true,
   timer = {
-    enable = true,
     interval = 1500,
     reset_on_idle = false,
     reset_on_change = false,
@@ -71,7 +70,7 @@ local function init(config)
     config.display.workspace_blacklist
   )
 
-  discord.init(
+  return discord.init(
     ffi.new(
       'InitArgs',
       config.editor.client,
@@ -256,10 +255,12 @@ local function connect(config)
 end
 
 local function start_timer(config)
+  timer:stop()
   if not utils.validate_severity(config) then return end
   if config.display.show_time then discord.update_time() end
 
   timer:start(0, 1000, vim.schedule_wrap(function() connect(config) end))
+  enabled = true
 end
 
 function cord.setup(userConfig)
@@ -276,23 +277,21 @@ function cord.setup(userConfig)
     config.timer.interval = math.max(config.timer.interval, 500)
 
     discord = utils.init_discord(ffi)
-    init(config)
-    if config.timer.enable then
-      cord.setup_autocmds()
-      start_timer(config)
-    end
+    cord.setup_autocmds(config)
+    if config.usercmds then cord.setup_usercmds(config) end
 
     vim.cmd [[
       autocmd! ExitPre * lua require('cord').disconnect()
     ]]
 
-    if config.usercmds then cord.setup_usercmds(config) end
-
     vim.g.cord_initialized = true
+
+    if init(config) == 2 then return end
+    start_timer(config)
   end
 end
 
-function cord.setup_autocmds()
+function cord.setup_autocmds(config)
   vim.cmd [[
     autocmd! DirChanged * lua require('cord').on_dir_changed()
     autocmd! FocusGained * lua require('cord').on_focus_gained()
@@ -300,7 +299,14 @@ function cord.setup_autocmds()
   ]]
 
   function cord.on_dir_changed()
-    if not discord.update_workspace(vim.fn.getcwd()) then timer:stop() end
+    last_presence = nil
+    if not discord.update_workspace(vim.fn.getcwd()) then
+      timer:stop()
+      discord.clear_presence()
+      enabled = false
+    else
+      if not enabled then start_timer(config) end
+    end
   end
 
   function cord.on_focus_gained()
@@ -326,8 +332,9 @@ function cord.setup_usercmds(config)
   ]]
 
   function cord.connect()
-    init(config)
-    start_timer(config)
+    if discord.is_connected() or init(config) > 1 then return end
+
+    if not enabled then start_timer(config) end
   end
 
   function cord.reconnect()
@@ -335,8 +342,7 @@ function cord.setup_usercmds(config)
     discord.disconnect()
     last_presence = nil
     init(config)
-    start_timer(config)
-    enabled = true
+    if not enabled then start_timer(config) end
   end
 
   function cord.toggle_presence()
@@ -347,13 +353,11 @@ function cord.setup_usercmds(config)
       last_presence = nil
     else
       start_timer(config)
-      enabled = true
     end
   end
 
   function cord.show_presence()
-    start_timer(config)
-    enabled = true
+    if not enabled then start_timer(config) end
   end
 
   function cord.hide_presence()
@@ -382,8 +386,14 @@ function cord.setup_usercmds(config)
   end
 
   function cord.set_workspace(workspace)
-    if not discord.update_workspace(workspace) then timer:stop() end
     last_presence = nil
+    if not discord.set_workspace(workspace) then
+      timer:stop()
+      discord.clear_presence()
+      enabled = false
+    else
+      if not enabled then start_timer(config) end
+    end
   end
 end
 
