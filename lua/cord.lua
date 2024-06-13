@@ -266,7 +266,7 @@ local function connect(config)
   end
 
   connection_tries = connection_tries + 1
-  if connection_tries == 16 then
+  if connection_tries == 60 then
     vim.notify(
       '[cord.nvim] Failed to connect to Discord within 15 seconds, shutting down connection',
       vim.log.levels.WARN
