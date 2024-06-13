@@ -63,7 +63,6 @@ local force_idle = false
 local problem_count = -1
 local last_updated = os.clock()
 local last_presence
-local is_blacklisted
 
 local function init(config)
   local blacklist_len = #config.display.workspace_blacklist
@@ -279,7 +278,7 @@ function cord.setup(userConfig)
     discord = utils.init_discord(ffi)
     init(config)
     if config.timer.enable then
-      cord.setup_autocmds(config)
+      cord.setup_autocmds()
       start_timer(config)
     end
 
@@ -293,7 +292,7 @@ function cord.setup(userConfig)
   end
 end
 
-function cord.setup_autocmds(config)
+function cord.setup_autocmds()
   vim.cmd [[
     autocmd! DirChanged * lua require('cord').on_dir_changed()
     autocmd! FocusGained * lua require('cord').on_focus_gained()
