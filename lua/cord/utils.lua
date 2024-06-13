@@ -45,6 +45,8 @@ local function init_discord(ffi)
       const char* lsp_manager_text;
       const char* vcs_text;
       const char* workspace_text;
+      const char** workspace_blacklist;
+      const int workspace_blacklist_len;
       const char* initial_path;
       const bool swap;
     } InitArgs;
@@ -52,8 +54,8 @@ local function init_discord(ffi)
       const char* filename;
       const char* filetype;
       const char* cursor_position;
-      int problem_count;
-      bool is_read_only;
+      const int problem_count;
+      const bool is_read_only;
     } PresenceArgs;
     typedef struct {
       const char* first_label;
@@ -61,26 +63,25 @@ local function init_discord(ffi)
       const char* second_label;
       const char* second_url;
     } Buttons;
-    void init(
+    const bool is_connected();
+    const uint8_t init(
       const InitArgs* args,
       const Buttons* buttons
     );
-    const bool update_presence(
+    const uint8_t update_presence(
       const PresenceArgs* args
     );
-    const bool update_presence_with_assets(
+    const uint8_t update_presence_with_assets(
       const char* name,
       const char* icon,
       const char* tooltip,
-      int asset_type,
+      const int asset_type,
       const PresenceArgs* args
     );
     void clear_presence();
     void disconnect();
-    void set_workspace(const char* workspace);
-    const char* update_workspace(const char* workspace);
     void update_time();
-    const char* get_workspace();
+    const bool update_workspace(const char* workspace);
   ]]
 
   return ffi.load(new_path)
