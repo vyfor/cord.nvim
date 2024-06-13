@@ -122,8 +122,8 @@ require('cord').setup {
     --   icon = 'https://example.com/lazy.png', -- Rich Presence asset name or URL
     --   tooltip = 'lazy.nvim',                 -- Text to display when hovering over the icon
     --   type = 2,                              -- 0 = language, 1 = file browser, 2 = plugin manager, 3 = lsp manager, 4 = vcs; defaults to language
-
-
+    -- },
+    -- ['Cargo.toml'] = 'crates',
   },
 }
 ```
