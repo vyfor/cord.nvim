@@ -6,7 +6,6 @@ local utils = require 'cord.utils'
 cord.config = {
   usercmds = true,
   timer = {
-    enable = true,
     interval = 1500,
     reset_on_idle = false,
     reset_on_change = false,
@@ -63,10 +62,15 @@ local force_idle = false
 local problem_count = -1
 local last_updated = os.clock()
 local last_presence
-local is_blacklisted
 
-local function connect(config)
-  discord.init(
+local function init(config)
+  local blacklist_len = #config.display.workspace_blacklist
+  local blacklist_arr = ffi.new(
+    'const char*[' .. blacklist_len .. ']',
+    config.display.workspace_blacklist
+  )
+
+  return discord.init(
     ffi.new(
       'InitArgs',
       config.editor.client,
@@ -81,6 +85,8 @@ local function connect(config)
       config.text.lsp_manager,
       config.text.vcs,
       config.text.workspace,
+      blacklist_arr,
+      blacklist_len,
       vim.fn.getcwd(),
       config.display.swap_fields
     ),
@@ -113,9 +119,13 @@ local function update_idle_presence(config)
     last_presence['idle'] = true
     if config.timer.reset_on_idle then discord.update_time() end
     if config.idle.show_status then
-      discord.update_presence(
-        ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
-      )
+      if
+        discord.update_presence(
+          ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
+        ) > 1
+      then
+        timer:stop()
+      end
     else
       discord.clear_presence()
     end
@@ -146,9 +156,7 @@ local function update_idle_presence(config)
   return false
 end
 
-local function update_presence(config, initial)
-  if is_blacklisted then return end
-
+local function update_presence(config)
   local cursor = vim.api.nvim_win_get_cursor(0)
   problem_count = utils.get_problem_count(config) or -1
   local current_presence = {
@@ -182,9 +190,9 @@ local function update_presence(config, initial)
     local icon, name =
       utils.get_icon(config, current_presence.name, current_presence.type)
 
-    local success
+    local status
     if icon then
-      success = discord.update_presence_with_assets(
+      status = discord.update_presence_with_assets(
         icon.name or name,
         type(icon) == 'string' and icon or icon.icon,
         icon.tooltip,
@@ -199,7 +207,7 @@ local function update_presence(config, initial)
         )
       )
     else
-      success = discord.update_presence(
+      status = discord.update_presence(
         ffi.new(
           'PresenceArgs',
           current_presence.name,
@@ -210,52 +218,49 @@ local function update_presence(config, initial)
         )
       )
     end
-    if success then
+
+    if status == 0 then
       last_presence = current_presence
-      if is_blacklisted == nil then
-        is_blacklisted = utils.array_contains(
-          config.display.workspace_blacklist,
-          ffi.string(discord.update_workspace(vim.fn.getcwd()))
-        )
-      end
-      if initial then
-        timer:stop()
-        timer:start(
-          0,
-          config.timer.interval,
-          vim.schedule_wrap(function() update_presence(config, false) end)
-        )
-      end
     else
-      connection_tries = connection_tries + 1
-      if connection_tries == 16 then
-        vim.notify(
-          '[cord.nvim] Failed to connect to Discord within 15 seconds, shutting down connection',
-          vim.log.levels.WARN
-        )
-        connection_tries = 0
-        timer:stop()
-        discord.disconnect()
-        enabled = false
-        last_presence = nil
-      end
+      if status > 1 then timer:stop() end
     end
   elseif not update_idle_presence(config) then
     return
   end
 end
 
+local function connect(config)
+  if discord.is_connected() then
+    timer:stop()
+    timer:start(
+      0,
+      config.timer.interval,
+      vim.schedule_wrap(function() update_presence(config) end)
+    )
+    return
+  end
+
+  connection_tries = connection_tries + 1
+  if connection_tries == 16 then
+    vim.notify(
+      '[cord.nvim] Failed to connect to Discord within 15 seconds, shutting down connection',
+      vim.log.levels.WARN
+    )
+    connection_tries = 0
+    timer:stop()
+    discord.disconnect()
+    enabled = false
+    last_presence = nil
+  end
+end
+
 local function start_timer(config)
   timer:stop()
-
   if not utils.validate_severity(config) then return end
   if config.display.show_time then discord.update_time() end
 
-  timer:start(
-    0,
-    1000,
-    vim.schedule_wrap(function() update_presence(config, true) end)
-  )
+  timer:start(0, 1000, vim.schedule_wrap(function() connect(config) end))
+  enabled = true
 end
 
 function cord.setup(userConfig)
@@ -272,19 +277,17 @@ function cord.setup(userConfig)
     config.timer.interval = math.max(config.timer.interval, 500)
 
     discord = utils.init_discord(ffi)
-    connect(config)
-    if config.timer.enable then
-      cord.setup_autocmds(config)
-      start_timer(config)
-    end
+    cord.setup_autocmds(config)
+    if config.usercmds then cord.setup_usercmds(config) end
 
     vim.cmd [[
       autocmd! ExitPre * lua require('cord').disconnect()
     ]]
 
-    if config.usercmds then cord.setup_usercmds(config) end
-
     vim.g.cord_initialized = true
+
+    if init(config) == 2 then return end
+    start_timer(config)
   end
 end
 
@@ -296,10 +299,14 @@ function cord.setup_autocmds(config)
   ]]
 
   function cord.on_dir_changed()
-    is_blacklisted = utils.array_contains(
-      config.display.workspace_blacklist,
-      ffi.string(discord.update_workspace(vim.fn.getcwd()))
-    )
+    last_presence = nil
+    if not discord.update_workspace(vim.fn.getcwd()) then
+      timer:stop()
+      discord.clear_presence()
+      enabled = false
+    else
+      if not enabled then start_timer(config) end
+    end
   end
 
   function cord.on_focus_gained()
@@ -325,17 +332,17 @@ function cord.setup_usercmds(config)
   ]]
 
   function cord.connect()
-    connect(config)
-    start_timer(config)
+    if discord.is_connected() or init(config) > 1 then return end
+
+    if not enabled then start_timer(config) end
   end
 
   function cord.reconnect()
     timer:stop()
     discord.disconnect()
     last_presence = nil
-    connect(config)
-    start_timer(config)
-    enabled = true
+    init(config)
+    if not enabled then start_timer(config) end
   end
 
   function cord.toggle_presence()
@@ -346,13 +353,11 @@ function cord.setup_usercmds(config)
       last_presence = nil
     else
       start_timer(config)
-      enabled = true
     end
   end
 
   function cord.show_presence()
-    start_timer(config)
-    enabled = true
+    if not enabled then start_timer(config) end
   end
 
   function cord.hide_presence()
@@ -381,8 +386,14 @@ function cord.setup_usercmds(config)
   end
 
   function cord.set_workspace(workspace)
-    discord.set_workspace(workspace)
     last_presence = nil
+    if not discord.set_workspace(workspace) then
+      timer:stop()
+      discord.clear_presence()
+      enabled = false
+    else
+      if not enabled then start_timer(config) end
+    end
   end
 end
 

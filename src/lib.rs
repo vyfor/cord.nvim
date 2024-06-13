@@ -7,16 +7,12 @@ mod rpc;
 mod util;
 
 use rpc::activity::ActivityButton;
-use std::{
-    ffi::{c_char, CString},
-    ptr::null,
-    time::UNIX_EPOCH,
-};
-use util::types::AssetType;
+use std::{ffi::c_char, time::UNIX_EPOCH};
 use util::utils::{
     build_activity, build_presence, find_workspace, get_asset, ptr_to_string,
     validate_buttons,
 };
+use util::{status, types::AssetType};
 
 use crate::{
     ipc::client::{Connection, RichClient},
@@ -42,6 +38,7 @@ struct Config {
     vcs_text: String,
     workspace_text: String,
     workspace: String,
+    workspace_blacklist: Vec<String>,
     buttons: Vec<ActivityButton>,
     swap_fields: bool,
 }
@@ -68,6 +65,8 @@ pub struct InitArgs {
     pub lsp_manager_text: *const c_char,
     pub vcs_text: *const c_char,
     pub workspace_text: *const c_char,
+    pub workspace_blacklist: *const *const c_char,
+    pub workspace_blacklist_len: i32,
     pub initial_path: *const c_char,
     pub swap_fields: bool,
 }
@@ -82,12 +81,17 @@ pub struct PresenceArgs {
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn is_connected() -> bool {
+    INITIALIZED
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn init(
     args_ptr: *const InitArgs,
     buttons_ptr: *const Buttons,
-) {
+) -> u8 {
     if INITIALIZED {
-        return;
+        return status::UNINITIALIZED;
     }
 
     let args = &*args_ptr;
@@ -100,10 +104,12 @@ pub unsafe extern "C" fn init(
         "nvchad" => (1220296082861326378, get_asset("editor", "nvchad")),
         "astronvim" => (1230866983977746532, get_asset("editor", "astronvim")),
         id => {
-            let id = id.parse::<u64>().expect("Invalid client ID");
-            is_custom_client = true;
-
-            (id, ptr_to_string(args.image))
+            if let Ok(id) = id.parse::<u64>() {
+                is_custom_client = true;
+                (id, ptr_to_string(args.image))
+            } else {
+                return status::INVALID_CLIENT_ID;
+            }
         }
     };
 
@@ -133,15 +139,32 @@ pub unsafe extern "C" fn init(
         )
     };
 
+    let workspace =
+        workspace.file_name().unwrap().to_string_lossy().to_string();
+
+    let workspace_blacklist = if args.workspace_blacklist.is_null() {
+        Vec::new()
+    } else {
+        let workspace_blacklist = &*args.workspace_blacklist;
+        std::slice::from_raw_parts(
+            workspace_blacklist,
+            args.workspace_blacklist_len as usize,
+        )
+        .iter()
+        .map(|s| ptr_to_string(s.to_owned()))
+        .collect::<Vec<String>>()
+    };
+
+    if workspace_blacklist.contains(&workspace) {
+        return status::WORKSPACE_BLACKLISTED;
+    }
+
     std::thread::spawn(move || {
         if let Ok(mut rich_client) = RichClient::connect(client_id) {
             rich_client
                 .handshake()
                 .expect("Failed to handshake with Rich Client");
             rich_client.read().expect("Failed to read from Rich Client");
-
-            let workspace =
-                workspace.file_name().unwrap().to_string_lossy().to_string();
 
             CONFIG = Some(Config {
                 is_custom_client,
@@ -158,12 +181,15 @@ pub unsafe extern "C" fn init(
                 vcs_text,
                 workspace_text,
                 workspace,
+                workspace_blacklist,
                 buttons,
                 swap_fields,
             });
             INITIALIZED = true;
         };
     });
+
+    status::SUCCESS
 }
 
 #[no_mangle]
@@ -465,34 +491,35 @@ pub unsafe extern "C" fn update_time() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn set_workspace(value: *mut c_char) {
+pub unsafe extern "C" fn set_workspace(value: *mut c_char) -> bool {
     if let Some(config) = CONFIG.as_mut() {
         config.workspace = ptr_to_string(value);
+
+        if config.workspace_blacklist.contains(&config.workspace) {
+            return false;
+        }
+
+        return true;
     }
+
+    true
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn update_workspace(value: *mut c_char) -> *const c_char {
-    let mut ws = String::new();
+pub unsafe extern "C" fn update_workspace(value: *mut c_char) -> bool {
     if let Some(config) = CONFIG.as_mut() {
         if let Some(workspace) =
             find_workspace(&ptr_to_string(value)).file_name()
         {
-            let workspace = workspace.to_string_lossy().to_string();
-            ws = workspace.clone();
-            config.workspace = workspace;
+            config.workspace = workspace.to_string_lossy().to_string();
+
+            if config.workspace_blacklist.contains(&config.workspace) {
+                return false;
+            }
+
+            return true;
         }
     }
 
-    CString::new(ws).unwrap().into_raw() as *const c_char
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn get_workspace() -> *const c_char {
-    if let Some(config) = CONFIG.as_ref() {
-        CString::new(config.workspace.clone()).unwrap().into_raw()
-            as *const c_char
-    } else {
-        null()
-    }
+    true
 }
