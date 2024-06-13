@@ -139,11 +139,11 @@ local function update_idle_presence(config)
         ) > 1
       then
         timer:stop()
+        enabled = false
       end
     else
       discord.clear_presence()
     end
-    return true
   end
 
   if
@@ -159,15 +159,18 @@ local function update_idle_presence(config)
       discord.update_time()
     end
     if config.idle.show_status then
-      discord.update_presence(
-        ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
-      )
+      if
+        discord.update_presence(
+          ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
+        ) > 1
+      then
+        timer:stop()
+        enabled = false
+      end
     else
       discord.clear_presence()
     end
-    return true
   end
-  return false
 end
 
 local function update_presence(config)
@@ -240,13 +243,14 @@ local function update_presence(config)
       )
     end
 
-    if status == 0 then
-      last_presence = current_presence
-    else
-      if status > 1 then timer:stop() end
+    last_presence = current_presence
+
+    if status > 1 then
+      timer:stop()
+      enabled = false
     end
-  elseif not update_idle_presence(config) then
-    return
+  else
+    update_idle_presence(config)
   end
 end
 
