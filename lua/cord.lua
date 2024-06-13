@@ -70,6 +70,22 @@ local function init(config)
     config.display.workspace_blacklist
   )
 
+  local first_url = config.buttons[1] and config.buttons[1].url
+  local second_url = config.buttons[2] and config.buttons[2].url
+
+  if
+    not first_url or first_url == 'git' and not config.display.show_repository
+  then
+    first_url = ''
+  end
+
+  if
+    not second_url
+    or second_url == 'git' and not config.display.show_repository
+  then
+    second_url = ''
+  end
+
   return discord.init(
     ffi.new(
       'InitArgs',
@@ -90,15 +106,13 @@ local function init(config)
       vim.fn.getcwd(),
       config.display.swap_fields
     ),
-    config.display.show_repository
-        and ffi.new(
-          'Buttons',
-          (config.buttons[1] and config.buttons[1].label) or '',
-          (config.buttons[1] and config.buttons[1].url) or '',
-          (config.buttons[2] and config.buttons[2].label) or '',
-          (config.buttons[2] and config.buttons[2].url) or ''
-        )
-      or nil
+    ffi.new(
+      'Buttons',
+      (config.buttons[1] and config.buttons[1].label) or '',
+      first_url,
+      (config.buttons[2] and config.buttons[2].label) or '',
+      second_url
+    )
   )
 end
 
