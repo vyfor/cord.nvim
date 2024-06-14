@@ -62,10 +62,8 @@ impl Connection for RichClient {
             })
     }
 
-    fn close(&mut self) -> io::Result<()> {
+    fn close(&mut self) {
         self.pipe = None;
-
-        Ok(())
     }
 
     fn handshake(&mut self) -> io::Result<()> {

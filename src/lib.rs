@@ -7,6 +7,7 @@ mod rpc;
 mod util;
 
 use rpc::activity::ActivityButton;
+use std::sync::Mutex;
 use std::{ffi::c_char, time::UNIX_EPOCH};
 use util::utils::{
     build_activity, build_presence, find_workspace, get_asset, ptr_to_string,
@@ -19,6 +20,7 @@ use crate::{
     rpc::packet::Packet,
 };
 
+pub static LAST_ERROR: Mutex<Option<u8>> = Mutex::new(None);
 static mut INITIALIZED: bool = false;
 static mut START_TIME: Option<u128> = None;
 static mut CONFIG: Option<Config> = None;
@@ -80,6 +82,11 @@ pub struct PresenceArgs {
     pub cursor_position: *const c_char,
     pub problem_count: i32,
     pub is_read_only: bool,
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn get_last_error() -> u8 {
+    LAST_ERROR.lock().unwrap().unwrap_or(status::SUCCESS)
 }
 
 #[no_mangle]
@@ -162,10 +169,15 @@ pub unsafe extern "C" fn init(
 
     std::thread::spawn(move || {
         if let Ok(mut rich_client) = RichClient::connect(client_id) {
-            rich_client
-                .handshake()
-                .expect("Failed to handshake with Rich Client");
-            rich_client.read().expect("Failed to read from Rich Client");
+            if rich_client.handshake().is_err() {
+                LAST_ERROR.lock().unwrap().replace(status::HANDSHAKE_FAILED);
+                return;
+            }
+
+            if rich_client.read().is_err() {
+                LAST_ERROR.lock().unwrap().replace(status::READ_FAILED);
+                return;
+            }
 
             CONFIG = Some(Config {
                 is_custom_client,
@@ -460,17 +472,20 @@ pub unsafe extern "C" fn update_presence_with_assets(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn clear_presence() {
+pub unsafe extern "C" fn clear_presence() -> u8 {
     if !INITIALIZED {
-        return;
+        return status::UNINITIALIZED;
     }
 
     if let Some(config) = CONFIG.as_mut() {
-        config
-            .rich_client
-            .clear()
-            .expect("Failed to clear presence");
+        if config.rich_client.clear().is_err() {
+            return status::WRITE_FAILED;
+        } else {
+            return status::SUCCESS;
+        };
     }
+
+    status::UNINITIALIZED
 }
 
 #[no_mangle]
@@ -480,10 +495,7 @@ pub unsafe extern "C" fn disconnect() {
     }
 
     if let Some(mut config) = CONFIG.take() {
-        config
-            .rich_client
-            .close()
-            .expect("Failed to close connection");
+        config.rich_client.close();
         INITIALIZED = false;
     }
 }
