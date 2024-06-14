@@ -119,6 +119,7 @@ pub fn build_activity(
     problem_count: i32,
     timestamp: Option<&u128>,
     swap_fields: bool,
+    swap_icons: bool,
 ) -> Activity {
     let (state, details) = if filetype == "Cord.idle" {
         (Some(details), None)
@@ -134,16 +135,24 @@ pub fn build_activity(
         )
     };
 
+    let (large_image, small_image) = if large_image.is_some() {
+        if swap_icons {
+            (Some(config.editor_image.clone()), large_image)
+        } else {
+            (large_image, Some(config.editor_image.clone()))
+        }
+    } else {
+        (Some(config.editor_image.clone()), None)
+    };
+
     Activity {
         state,
         details,
         assets: Some(ActivityAssets {
-            small_image: (large_image.is_some())
-                .then(|| config.editor_image.clone()),
+            small_image,
             small_text: (!config.editor_tooltip.is_empty())
                 .then(|| config.editor_tooltip.clone()),
-            large_image: large_image
-                .or_else(|| Some(config.editor_image.clone())),
+            large_image,
             large_text: Some(
                 large_text
                     .len()

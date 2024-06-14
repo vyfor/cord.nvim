@@ -20,6 +20,7 @@ cord.config = {
     show_repository = true,
     show_cursor_position = false,
     swap_fields = false,
+    swap_icons = false,
     workspace_blacklist = {},
   },
   lsp = {
@@ -104,7 +105,8 @@ local function init(config)
       blacklist_arr,
       blacklist_len,
       vim.fn.getcwd(),
-      config.display.swap_fields
+      config.display.swap_fields,
+      config.display.swap_icons
     ),
     ffi.new(
       'Buttons',
