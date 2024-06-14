@@ -24,7 +24,7 @@ pub trait Connection {
         opcode: u32,
         data: Option<&[u8]>,
     ) -> std::io::Result<()>;
-    fn close(&mut self) -> std::io::Result<()>;
+    fn close(&mut self);
     fn handshake(&mut self) -> std::io::Result<()>;
     fn update(
         &mut self,

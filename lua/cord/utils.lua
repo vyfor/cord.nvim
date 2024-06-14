@@ -1,3 +1,5 @@
+local logger = require 'cord.log'
+
 local function file_exists(filename)
   local stat = vim.loop.fs_stat(filename)
   return stat and stat.type == 'file'
@@ -5,9 +7,7 @@ end
 
 local function move_file(src, dest)
   local result, err = os.rename(src, dest)
-  if not result then
-    vim.api.nvim_err_writeln('[cord.nvim] Error moving file: ' .. err)
-  end
+  if not result then logger.error('Error moving file: ' .. err) end
 end
 
 local function init_discord(ffi)
@@ -20,7 +20,8 @@ local function init_discord(ffi)
   elseif os_name == 'Darwin' then
     cord_file = '/cord.dylib'
   else
-    vim.api.nvim_err_writeln '[cord.nvim] Unable to identify OS type'
+    logger.error('Unable to identify OS type: ' .. os_name)
+    return
   end
 
   local path = debug.getinfo(2, 'S').source:sub(2, -14)
@@ -29,6 +30,15 @@ local function init_discord(ffi)
   if file_exists(old_path) then
     os.remove(new_path)
     move_file(old_path, new_path) -- move file as to avoid file access errors when updating
+  end
+
+  if not file_exists(new_path) then
+    logger.error(
+      'Could not find the compiled dynamic library at: '
+        .. new_path
+        .. '. Please re-run the build script'
+    )
+    return
   end
 
   ffi.cdef [[
@@ -64,6 +74,7 @@ local function init_discord(ffi)
       const char* second_label;
       const char* second_url;
     } Buttons;
+    const uint8_t get_last_error();
     const bool is_connected();
     const uint8_t init(
       const InitArgs* args,
@@ -79,7 +90,7 @@ local function init_discord(ffi)
       const int asset_type,
       const PresenceArgs* args
     );
-    void clear_presence();
+    const uint8_t clear_presence();
     void disconnect();
     void update_time();
     const bool set_workspace(const char* workspace);
@@ -96,7 +107,7 @@ local function validate_severity(config)
     or config.lsp.severity < 1
     or config.lsp.severity > 4
   then
-    vim.api.nvim_err_writeln '[cord.nvim] config.lsp.severity value must be a number between 1 and 4'
+    logger.error 'config.lsp.severity value must be a number between 1 and 4'
     return false
   end
   return true
@@ -108,7 +119,7 @@ local function get_problem_count(config)
         and vim.api.nvim_get_current_buf()
       or nil
     if bufnr == nil and config.lsp.scope ~= 'workspace' then
-      vim.api.nvim_err_writeln '[cord.nvim] config.lsp.scope value must be either workspace or buffer'
+      logger.error 'config.lsp.scope value must be set to either workspace or buffer'
     end
     return #vim.diagnostic.get(
       bufnr,

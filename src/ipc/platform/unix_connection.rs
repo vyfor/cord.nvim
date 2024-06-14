@@ -71,12 +71,10 @@ impl Connection for RichClient {
             })
     }
 
-    fn close(&mut self) -> io::Result<()> {
+    fn close(&mut self) {
         if let Some(pipe) = self.pipe.take() {
-            pipe.shutdown(std::net::Shutdown::Both)?;
+            let _ = pipe.shutdown(std::net::Shutdown::Both);
         }
-
-        Ok(())
     }
 
     fn handshake(&mut self) -> io::Result<()> {

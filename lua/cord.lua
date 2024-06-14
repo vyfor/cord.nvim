@@ -2,6 +2,7 @@ local cord = {}
 
 local ffi = require 'ffi'
 local utils = require 'cord.utils'
+local logger = require 'cord.log'
 
 cord.config = {
   usercmds = true,
@@ -135,13 +136,17 @@ local function update_idle_presence(config)
     last_presence['idle'] = true
     if config.timer.reset_on_idle then discord.update_time() end
     if config.idle.show_status then
-      if
-        discord.update_presence(
-          ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
-        ) > 1
-      then
+      local status = discord.update_presence(
+        ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
+      )
+      logger.log(status)
+      if status == 6 then
+        return
+      elseif status > 1 then
         timer:stop()
+        discord.disconnect()
         enabled = false
+        return
       end
     else
       discord.clear_presence()
@@ -161,13 +166,17 @@ local function update_idle_presence(config)
       discord.update_time()
     end
     if config.idle.show_status then
-      if
-        discord.update_presence(
-          ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
-        ) > 1
-      then
+      local status = discord.update_presence(
+        ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
+      )
+      logger.log(status)
+      if status == 6 then
+        return
+      elseif status > 1 then
         timer:stop()
+        discord.disconnect()
         enabled = false
+        return
       end
     else
       discord.clear_presence()
@@ -216,9 +225,9 @@ local function update_presence(config)
     local icon, name =
       utils.get_icon(config, current_presence.name, current_presence.type)
 
-    local status
+    local success
     if icon then
-      status = discord.update_presence_with_assets(
+      success = discord.update_presence_with_assets(
         icon.name or name,
         type(icon) == 'string' and icon or icon.icon,
         icon.tooltip,
@@ -233,7 +242,7 @@ local function update_presence(config)
         )
       )
     else
-      status = discord.update_presence(
+      success = discord.update_presence(
         ffi.new(
           'PresenceArgs',
           current_presence.name,
@@ -247,9 +256,10 @@ local function update_presence(config)
 
     last_presence = current_presence
 
-    if status > 1 then
+    if not success then
       timer:stop()
       enabled = false
+      logger.log(discord.get_last_error())
     end
   else
     update_idle_presence(config)
@@ -258,6 +268,7 @@ end
 
 local function connect(config)
   if discord.is_connected() then
+    logger.debug 'Established connection'
     timer:stop()
     timer:start(
       0,
@@ -267,12 +278,11 @@ local function connect(config)
     return
   end
 
+  if connection_tries == 0 then logger.debug 'Connecting to Discord...' end
+
   connection_tries = connection_tries + 1
   if connection_tries == 60 then
-    vim.notify(
-      '[cord.nvim] Failed to connect to Discord within 15 seconds, shutting down connection',
-      vim.log.levels.WARN
-    )
+    logger.warn 'Failed to connect to Discord within 15 seconds, shutting down connection'
     connection_tries = 0
     timer:stop()
     discord.disconnect()
@@ -292,10 +302,7 @@ end
 
 function cord.setup(userConfig)
   if vim.fn.has 'nvim-0.5' ~= 1 then
-    vim.notify(
-      '[cord.nvim] Cord requires Neovim 0.5 or higher',
-      vim.log.levels.ERROR
-    )
+    logger.error 'Cord requires Neovim 0.5 or higher'
     return
   end
 
@@ -304,6 +311,8 @@ function cord.setup(userConfig)
     config.timer.interval = math.max(config.timer.interval, 500)
 
     discord = utils.init_discord(ffi)
+    if not discord then return end
+
     cord.setup_autocmds(config)
     if config.usercmds then cord.setup_usercmds(config) end
 
@@ -313,7 +322,18 @@ function cord.setup(userConfig)
 
     vim.g.cord_initialized = true
 
-    if init(config) == 3 then return end
+    local status = init(config)
+    logger.log(status)
+    if status == 6 then
+      return
+    elseif status > 1 then
+      timer:stop()
+      discord.disconnect()
+      enabled = false
+      last_presence = nil
+      return
+    end
+
     start_timer(config)
   end
 end
@@ -359,7 +379,19 @@ function cord.setup_usercmds(config)
   ]]
 
   function cord.connect()
-    if discord.is_connected() or init(config) > 1 then return end
+    if discord.is_connected() then return end
+
+    local status = init(config)
+    logger.log(status)
+    if status == 6 then
+      return
+    elseif status > 1 then
+      timer:stop()
+      discord.disconnect()
+      enabled = false
+      last_presence = nil
+      return
+    end
 
     if not enabled then start_timer(config) end
   end
@@ -368,7 +400,19 @@ function cord.setup_usercmds(config)
     timer:stop()
     discord.disconnect()
     last_presence = nil
-    init(config)
+
+    local status = init(config)
+    logger.log(status)
+    if status == 6 then
+      return
+    elseif status > 1 then
+      timer:stop()
+      discord.disconnect()
+      enabled = false
+      last_presence = nil
+      return
+    end
+
     if not enabled then start_timer(config) end
   end
 
