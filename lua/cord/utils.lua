@@ -48,7 +48,8 @@ local function init_discord(ffi)
       const char** workspace_blacklist;
       const int workspace_blacklist_len;
       const char* initial_path;
-      const bool swap;
+      const bool swap_fields;
+      const bool swap_icons;
     } InitArgs;
     typedef struct {
       const char* filename;

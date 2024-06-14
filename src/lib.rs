@@ -41,6 +41,7 @@ struct Config {
     workspace_blacklist: Vec<String>,
     buttons: Vec<ActivityButton>,
     swap_fields: bool,
+    swap_icons: bool,
 }
 
 #[repr(C)]
@@ -69,6 +70,7 @@ pub struct InitArgs {
     pub workspace_blacklist_len: i32,
     pub initial_path: *const c_char,
     pub swap_fields: bool,
+    pub swap_icons: bool,
 }
 
 #[repr(C)]
@@ -124,6 +126,7 @@ pub unsafe extern "C" fn init(
     let vcs_text = ptr_to_string(args.vcs_text);
     let workspace_text = ptr_to_string(args.workspace_text);
     let swap_fields = args.swap_fields;
+    let swap_icons = args.swap_icons;
     let workspace = find_workspace(&ptr_to_string(args.initial_path));
 
     let buttons = if buttons_ptr.is_null() {
@@ -182,6 +185,7 @@ pub unsafe extern "C" fn init(
                 workspace_blacklist,
                 buttons,
                 swap_fields,
+                swap_icons,
             });
             INITIALIZED = true;
         };
@@ -241,6 +245,7 @@ pub unsafe extern "C" fn update_presence(
             args.problem_count,
             START_TIME.as_ref(),
             config.swap_fields,
+            config.swap_icons,
         );
 
         config
@@ -444,6 +449,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
             args.problem_count,
             START_TIME.as_ref(),
             config.swap_fields,
+            config.swap_icons,
         );
 
         config
