@@ -1,13 +1,33 @@
-local function info(msg) vim.notify('[cord.nvim] ' .. msg, vim.log.levels.INFO) end
+local log_level
 
-local function warn(msg) vim.notify('[cord.nvim] ' .. msg, vim.log.levels.WARN) end
+local function init(level)
+  log_level = vim.log.levels[string.upper(level)] or vim.log.levels.OFF
+
+  if log_level == vim.log.levels.OFF then log_level = -1 end
+end
+
+local function info(msg)
+  if vim.log.levels.INFO >= log_level then
+    vim.notify('[cord.nvim] ' .. msg, vim.log.levels.INFO)
+  end
+end
+
+local function warn(msg)
+  if vim.log.levels.WARN >= log_level then
+    vim.notify('[cord.nvim] ' .. msg, vim.log.levels.WARN)
+  end
+end
 
 local function error(msg)
-  vim.notify('[cord.nvim] ' .. msg, vim.log.levels.ERROR)
+  if vim.log.levels.ERROR >= log_level then
+    vim.notify('[cord.nvim] ' .. msg, vim.log.levels.ERROR)
+  end
 end
 
 local function debug(msg)
-  vim.notify('[cord.nvim] ' .. msg, vim.log.levels.DEBUG)
+  if vim.log.levels.DEBUG >= log_level then
+    vim.notify('[cord.nvim] ' .. msg, vim.log.levels.DEBUG)
+  end
 end
 
 local function log(status_code)
@@ -23,6 +43,7 @@ local function log(status_code)
 end
 
 return {
+  init = init,
   info = info,
   warn = warn,
   error = error,

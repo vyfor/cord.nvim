@@ -6,6 +6,7 @@ local logger = require 'cord.log'
 
 cord.config = {
   usercmds = true,
+  log_level = nil,
   timer = {
     interval = 1500,
     reset_on_idle = false,
@@ -309,6 +310,7 @@ function cord.setup(userConfig)
   if vim.g.cord_initialized == nil then
     local config = vim.tbl_deep_extend('force', cord.config, userConfig or {})
     config.timer.interval = math.max(config.timer.interval, 500)
+    logger.init(config.log_level)
 
     discord = utils.init_discord(ffi)
     if not discord then return end
