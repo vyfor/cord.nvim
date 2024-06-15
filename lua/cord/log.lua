@@ -1,9 +1,8 @@
 local log_level
 
 local function init(level)
-  log_level = vim.log.levels[string.upper(level)] or vim.log.levels.OFF
-
-  if log_level == vim.log.levels.OFF then log_level = -1 end
+  log_level = level and vim.log.levels[string.upper(level)]
+    or vim.log.levels.OFF
 end
 
 local function info(msg)
