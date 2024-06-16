@@ -318,30 +318,36 @@ fn find_git_repository(workspace_path: &str) -> Option<String> {
     };
     let reader = BufReader::new(file);
 
+    let mut prev_line = String::new();
     for line in reader.lines() {
         let line = match line {
             Ok(line) => line,
             Err(_) => continue,
         };
 
-        if let Some(repo_url) = line.trim().strip_prefix("url = ") {
-            if repo_url.starts_with("http") {
-                return Some(
-                    repo_url
-                        .strip_suffix(".git")
-                        .map(|url| url.to_string())
-                        .unwrap_or_else(|| repo_url.to_string()),
-                );
-            } else if let Some((_protocol, repo_url)) = repo_url.split_once('@')
-            {
-                let repo_url = repo_url.replacen(':', "/", 1);
-                return Some(format!(
-                    "https://{}",
-                    repo_url.strip_suffix(".git").unwrap_or(&repo_url)
-                ));
+        if !prev_line.is_empty() && prev_line.trim().starts_with("[remote") {
+            if let Some(repo_url) = line.trim().strip_prefix("url = ") {
+                if repo_url.starts_with("http") {
+                    return Some(
+                        repo_url
+                            .strip_suffix(".git")
+                            .map(|url| url.to_string())
+                            .unwrap_or_else(|| repo_url.to_string()),
+                    );
+                } else if let Some((_protocol, repo_url)) =
+                    repo_url.split_once('@')
+                {
+                    let repo_url = repo_url.replacen(':', "/", 1);
+                    return Some(format!(
+                        "https://{}",
+                        repo_url.strip_suffix(".git").unwrap_or(&repo_url)
+                    ));
+                }
+                break;
             }
-            break;
         }
+
+        prev_line = line;
     }
 
     None
