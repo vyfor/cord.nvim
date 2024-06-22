@@ -319,15 +319,23 @@ fn find_git_repository(workspace_path: &str) -> Option<String> {
     let reader = BufReader::new(file);
 
     let mut prev_line = String::new();
-    let mut remote_urls = Vec::new();
+    let mut remote_url = None;
     for line in reader.lines() {
         let line = match line {
             Ok(line) => line,
             Err(_) => continue,
         };
 
-        if !prev_line.is_empty() && prev_line.trim().starts_with("[remote") {
+        let trimmed = prev_line.trim_start();
+        if !prev_line.is_empty() && trimmed.starts_with("[remote") {
             if let Some(repo_url) = line.trim().strip_prefix("url = ") {
+                let is_origin =
+                    trimmed[8..].trim_start().starts_with("\"origin\"]");
+
+                if !is_origin && remote_url.is_some() {
+                    continue;
+                }
+
                 let formatted_url = if repo_url.starts_with("http") {
                     repo_url
                         .strip_suffix(".git")
@@ -345,10 +353,10 @@ fn find_git_repository(workspace_path: &str) -> Option<String> {
                     continue;
                 };
 
-                if prev_line.trim().starts_with("[remote \"origin\"]") {
+                if is_origin {
                     return Some(formatted_url);
-                } else {
-                    remote_urls.push(formatted_url);
+                } else if remote_url.is_none() {
+                    remote_url = Some(formatted_url);
                 }
             }
         }
@@ -356,5 +364,5 @@ fn find_git_repository(workspace_path: &str) -> Option<String> {
         prev_line = line;
     }
 
-    remote_urls.first().cloned().or(None)
+    remote_url
 }
