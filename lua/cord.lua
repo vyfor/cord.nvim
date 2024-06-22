@@ -53,7 +53,7 @@ cord.config = {
       url = 'git',
     },
   },
-  assets = {},
+  assets = nil,
 }
 
 local discord
