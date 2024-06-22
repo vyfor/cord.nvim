@@ -60,7 +60,9 @@
 </details>
 
 > [!NOTE] 
-> If you are on Windows Command Prompt, you may need to use a backslash as the path separator: `build = '.\\build'`
+> If you are on Windows Command Prompt, you may need to use a backslash as the path separator:
+> 
+> `build = '.\\build'`
 
 ## 🔧 Configuration
 > Note: `setup()` has to be called to initialize the plugin.
