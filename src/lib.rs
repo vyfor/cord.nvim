@@ -106,7 +106,7 @@ pub unsafe extern "C" fn init(
     let args = &*args_ptr;
 
     let mut is_custom_client = false;
-    let (client_id, editor_image) = match ptr_to_string(args.client).as_str() {
+    let (client_id, mut editor_image) = match ptr_to_string(args.client).as_str() {
         "vim" => (1219918645770059796, get_asset("editor", "vim")),
         "neovim" => (1219918880005165137, get_asset("editor", "neovim")),
         "lunarvim" => (1220295374087000104, get_asset("editor", "lunarvim")),
@@ -121,6 +121,10 @@ pub unsafe extern "C" fn init(
             }
         }
     };
+
+    if !is_custom_client && !args.image.is_null() {
+        editor_image = ptr_to_string(args.image);
+    }
 
     let editor_tooltip = ptr_to_string(args.editor_tooltip);
     let idle_text = ptr_to_string(args.idle_text);
