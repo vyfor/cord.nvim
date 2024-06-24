@@ -85,6 +85,7 @@ local function init_discord(ffi)
     );
     const uint8_t update_presence_with_assets(
       const char* name,
+      const char* default_name,
       const char* icon,
       const char* tooltip,
       const int asset_type,
@@ -149,7 +150,10 @@ end
 local function get_icon(config, filename, filetype)
   if not config.assets then return end
 
-  local icon = config.assets[filetype]
+  local icon = config.assets['Cord.override']
+  if icon then return icon, 'Cord.override' end
+
+  icon = config.assets[filetype]
   if icon then return icon, filetype end
 
   icon = config.assets[filename]
