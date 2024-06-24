@@ -6,6 +6,7 @@ mod mappings;
 mod rpc;
 mod util;
 
+use mappings::Filetype;
 use rpc::activity::ActivityButton;
 use std::sync::Mutex;
 use std::{ffi::c_char, time::UNIX_EPOCH};
@@ -106,7 +107,9 @@ pub unsafe extern "C" fn init(
     let args = &*args_ptr;
 
     let mut is_custom_client = false;
-    let (client_id, mut editor_image) = match ptr_to_string(args.client).as_str() {
+    let (client_id, mut editor_image) = match ptr_to_string(args.client)
+        .as_str()
+    {
         "vim" => (1219918645770059796, get_asset("editor", "vim")),
         "neovim" => (1219918880005165137, get_asset("editor", "neovim")),
         "lunarvim" => (1220295374087000104, get_asset("editor", "lunarvim")),
@@ -274,6 +277,7 @@ pub unsafe extern "C" fn update_presence(
 #[no_mangle]
 pub unsafe extern "C" fn update_presence_with_assets(
     name: *const c_char,
+    default_name: *const c_char,
     icon: *const c_char,
     tooltip: *const c_char,
     asset_type: i32,
@@ -288,6 +292,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
         let filename = ptr_to_string(args.filename);
         let filetype = ptr_to_string(args.filetype);
         let name = ptr_to_string(name);
+        let default_name = ptr_to_string(default_name);
         let mut icon = ptr_to_string(icon);
         let mut tooltip = ptr_to_string(tooltip);
         let cursor_position = if !args.cursor_position.is_null() {
@@ -296,165 +301,211 @@ pub unsafe extern "C" fn update_presence_with_assets(
             None
         };
 
-        let (details, large_image, large_text) =
-            match AssetType::from(asset_type) {
+        let ft = mappings::get_by_filetype_or_none(&filetype, &filename);
+
+        let (details, large_image, large_text) = match ft {
+            Some(Filetype::Language(default_icon, default_tooltip)) => {
+                let filename = if !filename.is_empty() {
+                    filename.clone()
+                } else if !name.is_empty() {
+                    name
+                } else if default_name == "Cord.new" {
+                    "a new file".to_owned()
+                } else {
+                    format!("{} file", filetype)
+                };
+                let mut details = if args.is_read_only {
+                    config.viewing_text.replace("{}", &filename)
+                } else {
+                    config.editing_text.replace("{}", &filename)
+                };
+                if let Some(pos) = cursor_position {
+                    details = format!("{details}:{pos}");
+                }
+
+                if icon.is_empty() {
+                    icon = get_asset("language", default_icon);
+                }
+                if tooltip.is_empty() {
+                    tooltip = default_tooltip.to_owned();
+                }
+
+                (details, icon, tooltip)
+            }
+            Some(Filetype::FileBrowser(default_icon, default_tooltip)) => {
+                if icon.is_empty() {
+                    icon = get_asset("file_browser", default_icon);
+                }
+                if tooltip.is_empty() {
+                    tooltip = default_tooltip.to_owned();
+                }
+                let name = if name.is_empty() {
+                    default_tooltip
+                } else {
+                    &name
+                };
+
+                (config.file_browser_text.replace("{}", name), icon, tooltip)
+            }
+            Some(Filetype::PluginManager(default_icon, default_tooltip)) => {
+                if icon.is_empty() {
+                    icon = get_asset("plugin_manager", default_icon);
+                }
+                if tooltip.is_empty() {
+                    tooltip = default_tooltip.to_owned();
+                }
+                let name = if name.is_empty() {
+                    default_tooltip
+                } else {
+                    &name
+                };
+
+                (
+                    config.plugin_manager_text.replace("{}", name),
+                    icon,
+                    tooltip,
+                )
+            }
+            Some(Filetype::Lsp(default_icon, default_tooltip)) => {
+                if icon.is_empty() {
+                    icon = get_asset("lsp", default_icon);
+                }
+                if tooltip.is_empty() {
+                    tooltip = default_tooltip.to_owned();
+                }
+                let name = if name.is_empty() {
+                    default_tooltip
+                } else {
+                    &name
+                };
+
+                (config.lsp_manager_text.replace("{}", name), icon, tooltip)
+            }
+            Some(Filetype::Vcs(default_icon, default_tooltip)) => {
+                if icon.is_empty() {
+                    icon = get_asset("vcs", default_icon);
+                }
+                if tooltip.is_empty() {
+                    tooltip = default_tooltip.to_owned();
+                }
+                let name = if name.is_empty() {
+                    default_tooltip
+                } else {
+                    &name
+                };
+
+                (config.vcs_text.replace("{}", name), icon, tooltip)
+            }
+            _ => match AssetType::from(asset_type) {
                 Some(AssetType::Language) => {
+                    if icon.is_empty() {
+                        icon = filetype.to_owned();
+                    }
+
                     let filename = if !filename.is_empty() {
-                        filename
-                    } else if !name.is_empty() && name != "Cord.new" {
+                        filename.clone()
+                    } else if !name.is_empty() {
                         name.clone()
-                    } else {
+                    } else if default_name == "Cord.new" {
                         "a new file".to_owned()
+                    } else {
+                        format!("{} file", filetype)
                     };
-                    let details = if args.is_read_only {
+                    let mut details = if args.is_read_only {
                         config.viewing_text.replace("{}", &filename)
                     } else {
                         config.editing_text.replace("{}", &filename)
                     };
-                    let details = cursor_position
-                        .map_or(details.clone(), |pos| {
-                            format!("{details}:{pos}")
-                        });
 
-                    if icon.is_empty() || tooltip.is_empty() {
-                        let option =
-                            mappings::language::get(&filetype, &filename);
+                    if let Some(pos) = cursor_position {
+                        details = format!("{details}:{pos}");
+                    }
 
-                        if let Some((default_icon, default_tooltip)) = option {
-                            if icon.is_empty() {
-                                icon = get_asset("language", default_icon);
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = default_tooltip.to_string();
-                            }
-                        } else {
-                            if icon.is_empty() {
-                                return false;
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = name;
-                            }
-                        }
-
-                        if !(config.is_custom_client
-                            || icon.is_empty()
-                            || icon.starts_with("http://")
-                            || icon.starts_with("https://"))
-                        {
-                            icon = mappings::language::get(&icon, &filename)
-                                .map(|(icon, _)| icon.to_owned())
-                                .unwrap_or_else(|| {
-                                    get_asset("language", &icon)
-                                });
-                        }
+                    if tooltip.is_empty() {
+                        tooltip = name;
                     }
 
                     (details, icon, tooltip)
                 }
                 Some(AssetType::FileBrowser) => {
-                    let details = config.file_browser_text.replace("{}", &name);
-
-                    if icon.is_empty() || tooltip.is_empty() {
-                        if let Some((default_icon, default_tooltip)) =
-                            mappings::file_browser::get(&filetype)
-                        {
-                            if icon.is_empty() {
-                                icon = get_asset("file_browser", default_icon);
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = default_tooltip.to_string();
-                            }
-                        } else {
-                            if icon.is_empty() {
-                                return false;
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = name;
-                            }
-                        }
+                    if icon.is_empty() {
+                        icon = filetype.clone();
                     }
+                    if tooltip.is_empty() {
+                        tooltip = name.clone();
+                    }
+                    let name = if name.is_empty() { &filetype } else { &name };
 
-                    (details, icon, tooltip)
+                    (
+                        config.file_browser_text.replace("{}", name),
+                        icon,
+                        tooltip,
+                    )
                 }
                 Some(AssetType::PluginManager) => {
-                    let details =
-                        config.plugin_manager_text.replace("{}", &name);
-
-                    if icon.is_empty() || tooltip.is_empty() {
-                        if let Some((default_icon, default_tooltip)) =
-                            mappings::plugin_manager::get(&filetype)
-                        {
-                            if icon.is_empty() {
-                                icon =
-                                    get_asset("plugin_manager", default_icon);
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = default_tooltip.to_string();
-                            }
-                        } else {
-                            if icon.is_empty() {
-                                return false;
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = name;
-                            }
-                        }
+                    if icon.is_empty() {
+                        icon = filetype.clone();
                     }
+                    if tooltip.is_empty() {
+                        tooltip = name.clone();
+                    }
+                    let name = if name.is_empty() { &filetype } else { &name };
 
-                    (details, icon, tooltip)
+                    (
+                        config.plugin_manager_text.replace("{}", name),
+                        icon,
+                        tooltip,
+                    )
                 }
                 Some(AssetType::Lsp) => {
-                    let details = config.lsp_manager_text.replace("{}", &name);
-
-                    if icon.is_empty() || tooltip.is_empty() {
-                        if let Some((default_icon, default_tooltip)) =
-                            mappings::lsp_manager::get(&filetype)
-                        {
-                            if icon.is_empty() {
-                                icon = get_asset("lsp_manager", default_icon);
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = default_tooltip.to_string();
-                            }
-                        } else {
-                            if icon.is_empty() {
-                                return false;
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = name;
-                            }
-                        }
+                    if icon.is_empty() {
+                        icon = filetype.clone();
                     }
+                    if tooltip.is_empty() {
+                        tooltip = name.clone();
+                    }
+                    let name = if name.is_empty() { &filetype } else { &name };
 
-                    (details, icon, tooltip)
+                    (config.lsp_manager_text.replace("{}", name), icon, tooltip)
                 }
                 Some(AssetType::Vcs) => {
-                    let details = config.vcs_text.replace("{}", &name);
-
-                    if icon.is_empty() || tooltip.is_empty() {
-                        if let Some((default_icon, default_tooltip)) =
-                            mappings::vcs::get(&filetype)
-                        {
-                            if icon.is_empty() {
-                                icon = get_asset("vcs", default_icon);
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = default_tooltip.to_string();
-                            }
-                        } else {
-                            if icon.is_empty() {
-                                return false;
-                            }
-                            if tooltip.is_empty() {
-                                tooltip = name;
-                            }
-                        }
+                    if icon.is_empty() {
+                        icon = filetype.clone();
                     }
+                    if tooltip.is_empty() {
+                        tooltip = name.clone();
+                    }
+                    let name = if name.is_empty() { &filetype } else { &name };
 
-                    (details, icon, tooltip)
+                    (config.vcs_text.replace("{}", name), icon, tooltip)
                 }
-                None => return false,
-            };
+                _ => {
+                    return false;
+                }
+            },
+        };
+
+        let large_image = if !(config.is_custom_client
+            || large_image.starts_with("http://")
+            || large_image.starts_with("https://"))
+        {
+            match mappings::get_by_filetype_or_none(&large_image, &filename) {
+                Some(Filetype::Language(icon, _)) => {
+                    get_asset("language", icon)
+                }
+                Some(Filetype::FileBrowser(icon, _)) => {
+                    get_asset("file_browser", icon)
+                }
+                Some(Filetype::PluginManager(icon, _)) => {
+                    get_asset("plugin_manager", icon)
+                }
+                Some(Filetype::Lsp(icon, _)) => get_asset("lsp", icon),
+                Some(Filetype::Vcs(icon, _)) => get_asset("vcs", icon),
+                _ => get_asset("language", &large_image),
+            }
+        } else {
+            large_image.to_owned()
+        };
 
         let activity = build_activity(
             config,
