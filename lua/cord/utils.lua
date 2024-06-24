@@ -150,10 +150,7 @@ end
 local function get_icon(config, filename, filetype)
   if not config.assets then return end
 
-  local icon = config.assets['Cord.override']
-  if icon then return icon, 'Cord.override' end
-
-  icon = config.assets[filetype]
+  local icon = config.assets[filetype]
   if icon then return icon, filetype end
 
   icon = config.assets[filename]
@@ -162,6 +159,9 @@ local function get_icon(config, filename, filetype)
   local extension = get_file_extension(filename)
   icon = config.assets[extension]
   if icon then return icon, extension end
+
+  icon = config.assets['Cord.override']
+  if icon then return icon, 'Cord.override' end
 end
 
 return {
