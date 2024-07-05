@@ -78,7 +78,7 @@ pub fn validate_buttons(
     if first_url == "git" || second_url == "git" {
         if let Some(repository) = find_git_repository(workspace) {
             if first_url == "git" {
-                first_url = repository.clone();
+                first_url.clone_from(&repository)
             }
             if second_url == "git" {
                 second_url = repository;

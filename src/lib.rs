@@ -331,7 +331,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
                     icon = get_asset("language", default_icon);
                 }
                 if tooltip.is_empty() {
-                    tooltip = default_tooltip.to_owned();
+                    default_tooltip.clone_into(&mut tooltip);
                 }
 
                 (details, icon, tooltip)
@@ -341,7 +341,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
                     icon = get_asset("file_browser", default_icon);
                 }
                 if tooltip.is_empty() {
-                    tooltip = default_tooltip.to_owned();
+                    default_tooltip.clone_into(&mut tooltip);
                 }
                 let name = if name.is_empty() {
                     default_tooltip
@@ -356,7 +356,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
                     icon = get_asset("plugin_manager", default_icon);
                 }
                 if tooltip.is_empty() {
-                    tooltip = default_tooltip.to_owned();
+                    default_tooltip.clone_into(&mut tooltip);
                 }
                 let name = if name.is_empty() {
                     default_tooltip
@@ -375,7 +375,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
                     icon = get_asset("lsp", default_icon);
                 }
                 if tooltip.is_empty() {
-                    tooltip = default_tooltip.to_owned();
+                    default_tooltip.clone_into(&mut tooltip);
                 }
                 let name = if name.is_empty() {
                     default_tooltip
@@ -390,7 +390,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
                     icon = get_asset("vcs", default_icon);
                 }
                 if tooltip.is_empty() {
-                    tooltip = default_tooltip.to_owned();
+                    default_tooltip.clone_into(&mut tooltip);
                 }
                 let name = if name.is_empty() {
                     default_tooltip
@@ -403,7 +403,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
             _ => match AssetType::from(asset_type) {
                 Some(AssetType::Language) => {
                     if icon.is_empty() {
-                        icon = filetype.to_owned();
+                        filetype.clone_into(&mut icon);
                     }
 
                     let filename = if !filename.is_empty() {
@@ -433,10 +433,10 @@ pub unsafe extern "C" fn update_presence_with_assets(
                 }
                 Some(AssetType::FileBrowser) => {
                     if icon.is_empty() {
-                        icon = filetype.clone();
+                        filetype.clone_into(&mut icon);
                     }
                     if tooltip.is_empty() {
-                        tooltip = name.clone();
+                        name.clone_into(&mut tooltip);
                     }
                     let name = if name.is_empty() { &filetype } else { &name };
 
@@ -448,10 +448,10 @@ pub unsafe extern "C" fn update_presence_with_assets(
                 }
                 Some(AssetType::PluginManager) => {
                     if icon.is_empty() {
-                        icon = filetype.clone();
+                        filetype.clone_into(&mut icon);
                     }
                     if tooltip.is_empty() {
-                        tooltip = name.clone();
+                        name.clone_into(&mut tooltip);
                     }
                     let name = if name.is_empty() { &filetype } else { &name };
 
@@ -463,10 +463,10 @@ pub unsafe extern "C" fn update_presence_with_assets(
                 }
                 Some(AssetType::Lsp) => {
                     if icon.is_empty() {
-                        icon = filetype.clone();
+                        filetype.clone_into(&mut icon);
                     }
                     if tooltip.is_empty() {
-                        tooltip = name.clone();
+                        name.clone_into(&mut tooltip);
                     }
                     let name = if name.is_empty() { &filetype } else { &name };
 
@@ -474,10 +474,10 @@ pub unsafe extern "C" fn update_presence_with_assets(
                 }
                 Some(AssetType::Vcs) => {
                     if icon.is_empty() {
-                        icon = filetype.clone();
+                        filetype.clone_into(&mut icon);
                     }
                     if tooltip.is_empty() {
-                        tooltip = name.clone();
+                        name.clone_into(&mut tooltip);
                     }
                     let name = if name.is_empty() { &filetype } else { &name };
 
