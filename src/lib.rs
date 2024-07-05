@@ -125,8 +125,12 @@ pub unsafe extern "C" fn init(
         }
     };
 
-    if !is_custom_client && !args.image.is_null() {
-        editor_image = ptr_to_string(args.image);
+    if !is_custom_client {
+        if !args.image.is_null() {
+            editor_image = ptr_to_string(args.image);
+        }
+    } else if args.image.is_null() {
+        editor_image = get_asset("editor", "neovim");
     }
 
     let editor_tooltip = ptr_to_string(args.editor_tooltip);
