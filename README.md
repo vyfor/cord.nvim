@@ -120,9 +120,9 @@ require('cord').setup {
     --   url = 'https://github.com/vyfor/cord.nvim',
     -- }
   },
-  assets = nil,                                 -- Custom file icons
+  assets = nil,                                 -- Custom file icons, see the wiki*
   -- {
-  --   lazy = {                                 -- Vim filetype or file name or file extension = table or string (see wiki)*
+  --   lazy = {                                 -- Vim filetype or file name or file extension = table or string
   --     name = 'Lazy',                         -- Optional override for the icon name, redundant for language types
   --     icon = 'https://example.com/lazy.png', -- Rich Presence asset name or URL
   --     tooltip = 'lazy.nvim',                 -- Text to display when hovering over the icon
