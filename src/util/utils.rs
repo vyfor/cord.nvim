@@ -135,31 +135,49 @@ pub fn build_activity(
         )
     };
 
-    let (large_image, small_image) = if large_image.is_some() {
-        if swap_icons {
-            (Some(config.editor_image.clone()), large_image)
+    let small_text = if !config.editor_tooltip.is_empty() {
+        if config.editor_tooltip.len() < 2 {
+            Some(format!("{:<2}", config.editor_tooltip))
         } else {
-            (large_image, Some(config.editor_image.clone()))
+            Some(config.editor_tooltip.clone())
         }
     } else {
-        (Some(config.editor_image.clone()), None)
+        None
     };
+    let large_text = if large_text.len() < 2 {
+        Some(format!("{:<2}", large_text))
+    } else {
+        Some(large_text)
+    };
+
+    let ((large_image, large_text), (small_image, small_text)) =
+        if large_image.is_some() {
+            if swap_icons {
+                (
+                    (Some(config.editor_image.clone()), small_text),
+                    (large_image, large_text),
+                )
+            } else {
+                (
+                    (large_image, large_text),
+                    (Some(config.editor_image.clone()), small_text),
+                )
+            }
+        } else {
+            (
+                (Some(config.editor_image.clone()), small_text),
+                (None, None),
+            )
+        };
 
     Activity {
         state,
         details,
         assets: Some(ActivityAssets {
             small_image,
-            small_text: (!config.editor_tooltip.is_empty())
-                .then(|| config.editor_tooltip.clone()),
+            small_text,
             large_image,
-            large_text: Some(
-                large_text
-                    .len()
-                    .lt(&2)
-                    .then(|| format!("{:<2}", large_text))
-                    .unwrap_or(large_text),
-            ),
+            large_text,
         }),
         timestamp: timestamp.copied(),
         buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
