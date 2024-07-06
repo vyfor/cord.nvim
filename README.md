@@ -32,7 +32,11 @@
   ```lua
   {
     'vyfor/cord.nvim',
-    build = './build',
+    build = if vim.fn.has("win32") == 1 then
+              return '.\\build'
+            else
+              return './build'
+            end,
     event = 'VeryLazy',
     opts = {},
   }
@@ -45,7 +49,11 @@
   ```lua
   {
     'vyfor/cord.nvim',
-    run = './build',
+    run = if vim.fn.has("win32") == 1 then
+              return '.\\build'
+            else
+              return './build'
+            end,
   }
   ```
 </details>
@@ -55,14 +63,9 @@
   <p>Same steps apply to other plugin managers. Just make sure to add or run this build command:</p>
 
   ```sh
-  ./build
+  ./build # or `.\\build` if you are on windows
   ```
 </details>
-
-> [!NOTE] 
-> If you are on a Windows Command Prompt, you may need to use a backslash as the path separator:
-> 
-> `build = '.\\build'`
 
 ## 🔧 Configuration
 > Note: `setup()` has to be called to initialize the plugin.
