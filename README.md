@@ -121,7 +121,7 @@ require('cord').setup {
     -- }
   },
   assets = nil,                                 -- Custom file icons, see the wiki*
-  -- {
+  -- assets = {
   --   lazy = {                                 -- Vim filetype or file name or file extension = table or string
   --     name = 'Lazy',                         -- Optional override for the icon name, redundant for language types
   --     icon = 'https://example.com/lazy.png', -- Rich Presence asset name or URL
