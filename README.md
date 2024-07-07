@@ -206,7 +206,7 @@ require('cord').setup {
 - `:CordWorkspace <name>` - Change the name of the workspace (visually)
 
 ## 🌱 Contributing
-This project is in beta. Feel free to open an issue or pull request for missing icons or features. You can also contact me on Discord (**[vyfor](https://discord.com/users/446729269872427018)**) if you have any questions.
+This project is in beta. Contributions of any kind are welcome, just make sure you read the [Contribution Guidelines](./.github/CONTRIBUTING.md) first. You can also contact me directly on Discord (**[vyfor](https://discord.com/users/446729269872427018)**) if you have any questions.
 
 [**❓ FAQ**](https://github.com/vyfor/cord.nvim/wiki/FAQ)
 
