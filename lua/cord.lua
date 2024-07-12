@@ -6,7 +6,7 @@ local logger = require 'cord.log'
 
 cord.config = {
   usercmds = true,
-  log_level = nil,
+  log_level = 'error',
   timer = {
     interval = 1500,
     reset_on_idle = false,

@@ -69,7 +69,7 @@
 ```lua
 require('cord').setup {
   usercmds = true,                              -- Enable user commands
-  log_level = nil,                              -- One of 'trace', 'debug', 'info', 'warn', 'error', 'off'
+  log_level = 'error',                          -- One of 'trace', 'debug', 'info', 'warn', 'error', 'off'
   timer = {
     interval = 1500,                            -- Interval between presence updates in milliseconds (min 500)
     reset_on_idle = false,                      -- Reset start timestamp on idle
@@ -139,7 +139,7 @@ require('cord').setup {
   ```lua
   {
     usercmds = true,
-    log_level = nil,
+    log_level = 'error',
     timer = {
       interval = 1500,
       reset_on_idle = false,
