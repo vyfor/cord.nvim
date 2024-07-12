@@ -284,7 +284,7 @@ local function connect(config)
 
   connection_tries = connection_tries + 1
   if connection_tries == 60 then
-    logger.warn 'Failed to connect to Discord within 15 seconds, shutting down connection'
+    logger.warn 'Failed to connect to Discord within 60 seconds, shutting down connection'
     connection_tries = 0
     timer:stop()
     discord.disconnect()
