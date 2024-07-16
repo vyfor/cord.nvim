@@ -45,6 +45,15 @@ struct Config {
     buttons: Vec<ActivityButton>,
     swap_fields: bool,
     swap_icons: bool,
+    init_buttons: InitButtons,
+}
+
+#[derive(Default)]
+struct InitButtons {
+    first_label: String,
+    first_url: String,
+    second_label: String,
+    second_url: String,
 }
 
 #[repr(C)]
@@ -147,16 +156,31 @@ pub unsafe extern "C" fn init(
     let swap_icons = args.swap_icons;
     let workspace = find_workspace(&ptr_to_string(args.initial_path));
 
-    let buttons = if buttons_ptr.is_null() {
-        Vec::new()
+    let (buttons, init_buttons) = if buttons_ptr.is_null() {
+        (Vec::new(), InitButtons::default())
     } else {
         let buttons = &*buttons_ptr;
-        validate_buttons(
+        let (first_label, first_url, second_label, second_url) = (
             ptr_to_string(buttons.first_label),
             ptr_to_string(buttons.first_url),
             ptr_to_string(buttons.second_label),
             ptr_to_string(buttons.second_url),
-            workspace.to_str().unwrap(),
+        );
+
+        (
+            validate_buttons(
+                first_label.clone(),
+                first_url.clone(),
+                second_label.clone(),
+                second_url.clone(),
+                workspace.to_str().unwrap(),
+            ),
+            InitButtons {
+                first_label,
+                first_url,
+                second_label,
+                second_url,
+            },
         )
     };
 
@@ -209,6 +233,7 @@ pub unsafe extern "C" fn init(
                 buttons,
                 swap_fields,
                 swap_icons,
+                init_buttons,
             });
             INITIALIZED = true;
         };
@@ -587,10 +612,17 @@ pub unsafe extern "C" fn set_workspace(value: *mut c_char) -> bool {
 #[no_mangle]
 pub unsafe extern "C" fn update_workspace(value: *mut c_char) -> bool {
     if let Some(config) = CONFIG.as_mut() {
-        if let Some(workspace) =
-            find_workspace(&ptr_to_string(value)).file_name()
-        {
-            config.workspace = workspace.to_string_lossy().to_string();
+        let workspace = find_workspace(&ptr_to_string(value));
+        if let Some(file_name) = workspace.file_name() {
+            config.workspace = file_name.to_string_lossy().to_string();
+
+            config.buttons = validate_buttons(
+                config.init_buttons.first_label.clone(),
+                config.init_buttons.first_url.clone(),
+                config.init_buttons.second_label.clone(),
+                config.init_buttons.second_url.clone(),
+                &workspace.to_string_lossy(),
+            );
 
             if config.workspace_blacklist.contains(&config.workspace) {
                 return false;
