@@ -6,7 +6,7 @@ First off, thank you for your interest in contributing to cord.nvim! We welcome 
 
 ### Reporting Bugs
 
-- Before submitting a bug report, please check the [existing issues](https://github.com/vyfor/cord.nvim/issues) to see if the problem has already been reported.
+- Before submitting a bug report, make sure to go through the [**🔧 Troubleshooting**](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting) section of the wiki, and check for [existing issues](https://github.com/vyfor/cord.nvim/issues) to see if the problem has already been reported.
 - If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/vyfor/cord.nvim/issues/new). Be sure to include a clear title and description, along with as much relevant information as possible.
 
 ### Suggesting Enhancements
