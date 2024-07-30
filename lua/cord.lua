@@ -34,7 +34,7 @@ cord.config = {
     enable = true,
     show_status = true,
     timeout = 300000,
-    disable_on_focus = true,
+    disable_on_focus = false,
     text = 'Idle',
     tooltip = '💤',
   },
