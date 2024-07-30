@@ -19,6 +19,8 @@ pub fn get<'a>(
         "dockerfile" => ("docker", "Docker"),
         "dosbatch" => ("shell", "Batch"),
         "elixir" => ("elixir", "Elixir"),
+        "eelixir" => ("elixir", "Embedded Elixir"),
+        "heex" => ("phoenix", "Phoenix"),
         "erlang" => ("erlang", "Erlang"),
         "fsharp" => ("fsharp", "F#"),
         "git" | "gitattributes" | "gitconfig" | "gitignore"
