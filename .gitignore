@@ -2,3 +2,4 @@
 /target
 /cord
 /cord.*
+.direnv/
