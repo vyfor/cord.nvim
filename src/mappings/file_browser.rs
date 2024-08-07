@@ -7,6 +7,7 @@ pub fn get(filetype: &str) -> Option<(&str, &str)> {
         "neo-tree" => ("default", "Neo-Tree"),
         "NvimTree" => ("default", "nvim-tree"),
         "minifiles" => ("default", "mini.files"),
+        "yazi" => ("default", "Yazi"),
         _ => return None,
     };
 
