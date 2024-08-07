@@ -3,6 +3,8 @@ use crate::rpc::packet::Packet;
 
 use std::fmt::{Error, Write};
 
+use super::utils::escape_json;
+
 impl Packet {
     pub fn new(pid: u32, activity: Option<Activity>) -> Packet {
         Packet { pid, activity }
@@ -36,11 +38,11 @@ impl Activity {
         }
 
         if let Some(details) = &self.details {
-            write!(json_str, ",\"details\":\"{}\"", details)?;
+            write!(json_str, ",\"details\":\"{}\"", escape_json(details))?;
         }
 
         if let Some(state) = &self.state {
-            write!(json_str, ",\"state\":\"{}\"", state)?;
+            write!(json_str, ",\"state\":\"{}\"", escape_json(state))?;
         }
 
         if let Some(assets) = &self.assets {
@@ -51,7 +53,11 @@ impl Activity {
             }
 
             if let Some(large_text) = &assets.large_text {
-                write!(json_str, "\"large_text\":\"{}\",", large_text)?;
+                write!(
+                    json_str,
+                    "\"large_text\":\"{}\",",
+                    escape_json(large_text)
+                )?;
             }
 
             if let Some(small_image) = &assets.small_image {
@@ -59,7 +65,11 @@ impl Activity {
             }
 
             if let Some(small_text) = &assets.small_text {
-                write!(json_str, "\"small_text\":\"{}\"", small_text)?;
+                write!(
+                    json_str,
+                    "\"small_text\":\"{}\"",
+                    escape_json(small_text)
+                )?;
             }
 
             if json_str.ends_with(',') {
@@ -79,7 +89,8 @@ impl Activity {
                 write!(
                     json_str,
                     "{{\"label\":\"{}\",\"url\":\"{}\"}}",
-                    button.label, button.url
+                    escape_json(&button.label),
+                    button.url
                 )?;
             }
 
