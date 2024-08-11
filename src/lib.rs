@@ -26,7 +26,7 @@ static mut INITIALIZED: bool = false;
 static mut START_TIME: Option<u128> = None;
 static mut CONFIG: Option<Config> = None;
 
-struct Config {
+pub struct Config {
     is_custom_client: bool,
     rich_client: RichClient,
     editor_image: String,
