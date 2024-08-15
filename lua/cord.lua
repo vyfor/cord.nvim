@@ -217,10 +217,13 @@ local function update_presence(config)
       or nil
 
     if current_presence.type == 'toggleterm' then
-      local type = current_presence.name:match ':(.-);#toggleterm'
+      local type = current_presence.name:match ':?%s-([^:]-)%s-&?::toggleterm'
+        or current_presence.name:match ':?%s-([^:]-)%s-&?#;toggleterm'
 
-      current_presence.name = type or current_presence.name
-      current_presence.type = type or current_presence.type
+      if type ~= nil and type ~= '' then
+        current_presence.name = type
+        current_presence.type = type
+      end
     end
 
     local icon, name =
