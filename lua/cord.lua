@@ -218,7 +218,7 @@ local function update_presence(config)
 
     if current_presence.type == 'toggleterm' then
       local type = current_presence.name:match ':?%s-([^:]-)%s-&?::toggleterm'
-        or current_presence.name:match ':?%s-([^:]-)%s-&?#;toggleterm'
+        or current_presence.name:match ':?%s-([^:]-)%s-&?;#toggleterm'
 
       if type ~= nil and type ~= '' then
         current_presence.name = type
