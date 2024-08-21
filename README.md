@@ -32,9 +32,9 @@
   ```lua
   {
     'vyfor/cord.nvim',
-    build = './build',
+    build = './build || .\\build',
     event = 'VeryLazy',
-    opts = {},
+    opts = {}, -- calls require('cord').setup()
   }
   ```
 </details>
@@ -45,24 +45,18 @@
   ```lua
   {
     'vyfor/cord.nvim',
-    run = './build',
+    run = './build || .\\build',
+    config = function()
+      require('cord').setup()
+    end,
   }
   ```
 </details>
 
 <details>
   <summary>other</summary>
-  <p>Same steps apply to other plugin managers. Just make sure to add or run this build command:</p>
-
-  ```sh
-  ./build
-  ```
+  <p>Same steps apply to other plugin managers. Just make sure to run <code>build.sh</code> or <code>build.bat</code> (depending on your OS) after the plugin is loaded</p>
 </details>
-
-> [!NOTE] 
-> If you are on a Windows Command Prompt, you may need to use a backslash as the path separator:
-> 
-> `build = '.\\build'`
 
 ## 🔧 Configuration
 > Note: `setup()` has to be called to initialize the plugin.
