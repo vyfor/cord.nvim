@@ -37,6 +37,16 @@
     opts = {}, -- calls require('cord').setup()
   }
   ```
+
+  If you are NixOS user, you can use this command instead:
+  ```lua
+  {
+    'vyfor/cord.nvim',
+    build = 'nix develop --command ./build',
+    event = 'VeryLazy',
+    opts = {}, -- calls require('cord').setup()
+  }
+  ```
 </details>
 
 <details>
@@ -46,6 +56,17 @@
   {
     'vyfor/cord.nvim',
     run = './build || .\\build',
+    config = function()
+      require('cord').setup()
+    end,
+  }
+  ```
+
+  If you are NixOS user, you can use this command instead:
+  ```lua
+  {
+    'vyfor/cord.nvim',
+    run = 'nix develop --command ./build',
     config = function()
       require('cord').setup()
     end,
