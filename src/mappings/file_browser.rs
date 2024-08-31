@@ -3,6 +3,7 @@ pub fn get(filetype: &str) -> Option<(&str, &str)> {
         "netrw" => ("default", "Netrw"),
         "TelescopePrompt" => ("telescope", "Telescope"),
         "dirvish" => ("default", "Dirvish"),
+        "fern" => ("default", "Fern"),
         "oil" => ("default", "Oil"),
         "neo-tree" => ("default", "Neo-Tree"),
         "NvimTree" => ("default", "nvim-tree"),
