@@ -80,7 +80,7 @@ require('cord').setup {
     show_cursor_position = false,               -- Display line and column number of cursor's position
     swap_fields = false,                        -- If enabled, workspace is displayed first
     swap_icons = false,                         -- If enabled, editor is displayed on the main image
-    workspace_blacklist = {},                   -- List of workspace names to hide
+    workspace_blacklist = {},                   -- List of workspace names that will hide rich presence
   },
   lsp = {
     show_problem_count = false,                 -- Display number of diagnostics problems
