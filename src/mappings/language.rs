@@ -65,6 +65,7 @@ pub fn get<'a>(
         "php" => ("php", "PHP"),
         "ps1" => ("powershell", "PowerShell"),
         "python" => ("python", "Python"),
+        "quarto" => ("quarto", "Quarto"),
         "r" => ("r", "R "),
         "ruby" => ("ruby", "Ruby"),
         "rust" => ("rust", "Rust"),
