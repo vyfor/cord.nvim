@@ -7,6 +7,7 @@ pub fn get<'a>(
         "Cord.unknown" => ("text", filetype),
         "autohotkey" => ("ahk", "AutoHotkey"),
         "asm" => ("assembly", "Assembly"),
+        "astro" => ("astro", "Astro"),
         "sh" => ("shell", "Shell script"),
         "c" => ("c", "C "),
         "clojure" => ("clojure", "Clojure"),
