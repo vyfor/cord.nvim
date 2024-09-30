@@ -1,10 +1,16 @@
+use std::ffi::c_void;
 use std::fs::OpenOptions;
 use std::io::{self, Read, Write};
 use std::os::windows::fs::OpenOptionsExt;
+use std::os::windows::io::AsRawHandle;
 
 use crate::ipc::client::{Connection, RichClient};
 use crate::ipc::utils;
 use crate::rpc::packet::Packet;
+
+extern "system" {
+    fn CloseHandle(hObject: *mut c_void) -> i32;
+}
 
 impl Connection for RichClient {
     fn connect(client_id: u64) -> Result<Self, Box<dyn std::error::Error>> {
@@ -63,7 +69,11 @@ impl Connection for RichClient {
     }
 
     fn close(&mut self) {
-        self.pipe = None;
+        if let Some(pipe) = self.pipe.take() {
+            unsafe {
+                CloseHandle(pipe.as_raw_handle());
+            }
+        }
     }
 
     fn handshake(&mut self) -> io::Result<()> {
