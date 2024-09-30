@@ -8,23 +8,29 @@ mod util;
 
 use mappings::Filetype;
 use rpc::activity::ActivityButton;
-use std::sync::Mutex;
 use std::{ffi::c_char, time::UNIX_EPOCH};
 use util::utils::{
     build_activity, build_presence, find_workspace, get_asset, ptr_to_string,
     validate_buttons,
 };
-use util::{status, types::AssetType};
+use util::{logger, types::AssetType};
 
 use crate::{
     ipc::client::{Connection, RichClient},
     rpc::packet::Packet,
 };
 
-pub static LAST_ERROR: Mutex<Option<u8>> = Mutex::new(None);
+type LogCallback = extern "C" fn(*const c_char, i32);
+type DisconnectCallback = extern "C" fn();
 static mut INITIALIZED: bool = false;
 static mut START_TIME: Option<u128> = None;
 static mut CONFIG: Option<Config> = None;
+static mut CALLBACKS: Option<LuaCallbacks> = None;
+
+struct LuaCallbacks {
+    log_callback: LogCallback,
+    disconnect_callback: DisconnectCallback,
+}
 
 pub struct Config {
     is_custom_client: bool,
@@ -65,6 +71,12 @@ pub struct Buttons {
 }
 
 #[repr(C)]
+pub struct Callbacks {
+    pub log_callback: LogCallback,
+    pub disconnect_callback: DisconnectCallback,
+}
+
+#[repr(C)]
 pub struct InitArgs {
     pub client: *const c_char,
     pub image: *const c_char,
@@ -83,6 +95,7 @@ pub struct InitArgs {
     pub initial_path: *const c_char,
     pub swap_fields: bool,
     pub swap_icons: bool,
+    pub log_level: u8,
 }
 
 #[repr(C)]
@@ -95,11 +108,6 @@ pub struct PresenceArgs {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn get_last_error() -> u8 {
-    LAST_ERROR.lock().unwrap().unwrap_or(status::SUCCESS)
-}
-
-#[no_mangle]
 pub unsafe extern "C" fn is_connected() -> bool {
     INITIALIZED
 }
@@ -108,12 +116,22 @@ pub unsafe extern "C" fn is_connected() -> bool {
 pub unsafe extern "C" fn init(
     args_ptr: *const InitArgs,
     buttons_ptr: *const Buttons,
-) -> u8 {
+    callbacks_ptr: *const Callbacks,
+) -> i8 {
     if INITIALIZED {
-        return status::UNINITIALIZED;
+        return 0;
     }
 
     let args = &*args_ptr;
+    let callbacks = &*callbacks_ptr;
+
+    logger::init(args.log_level);
+    if !callbacks_ptr.is_null() {
+        CALLBACKS = Some(LuaCallbacks {
+            log_callback: callbacks.log_callback,
+            disconnect_callback: callbacks.disconnect_callback,
+        });
+    }
 
     let mut is_custom_client = false;
     let (client_id, mut editor_image) = match ptr_to_string(args.client)
@@ -129,7 +147,8 @@ pub unsafe extern "C" fn init(
                 is_custom_client = true;
                 (id, ptr_to_string(args.image))
             } else {
-                return status::INVALID_CLIENT_ID;
+                logger::error("Invalid client ID");
+                return -1;
             }
         }
     };
@@ -204,15 +223,17 @@ pub unsafe extern "C" fn init(
 
     std::thread::spawn(move || {
         if let Ok(mut rich_client) = RichClient::connect(client_id) {
+            logger::debug("Awaiting connection");
             if rich_client.handshake().is_err() {
-                LAST_ERROR.lock().unwrap().replace(status::HANDSHAKE_FAILED);
+                logger::error("Failed to handshake with Discord");
                 return;
             }
 
             if rich_client.read().is_err() {
-                LAST_ERROR.lock().unwrap().replace(status::READ_FAILED);
+                logger::error("Failed to read from Discord");
                 return;
             }
+            logger::info("Connected to Discord");
 
             CONFIG = Some(Config {
                 is_custom_client,
@@ -236,14 +257,17 @@ pub unsafe extern "C" fn init(
                 init_buttons,
             });
             INITIALIZED = true;
+        } else {
+            logger::error("Failed to establish connection with Discord");
         };
     });
 
-    if ws_blacklist.clone().contains(&ws) {
-        return status::WORKSPACE_BLACKLISTED;
+    if ws_blacklist.contains(&ws) {
+        logger::warn("Workspace is blacklisted");
+        return 1;
     }
 
-    status::SUCCESS
+    0
 }
 
 #[no_mangle]
@@ -296,10 +320,17 @@ pub unsafe extern "C" fn update_presence(
             config.swap_icons,
         );
 
-        config
+        if config
             .rich_client
             .update(&Packet::new(std::process::id(), Some(activity)))
-            .is_ok()
+            .is_err()
+        {
+            cord_disconnect();
+            logger::error("Failed to update presence: write failed");
+            false
+        } else {
+            true
+        }
     })
 }
 
@@ -548,28 +579,31 @@ pub unsafe extern "C" fn update_presence_with_assets(
             config.swap_icons,
         );
 
-        config
+        if config
             .rich_client
             .update(&Packet::new(std::process::id(), Some(activity)))
-            .is_ok()
+            .is_err()
+        {
+            cord_disconnect();
+            logger::error("Failed to update presence: write failed");
+            false
+        } else {
+            true
+        }
     })
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn clear_presence() -> u8 {
+pub unsafe extern "C" fn clear_presence() {
     if !INITIALIZED {
-        return status::UNINITIALIZED;
+        return;
     }
 
     if let Some(config) = CONFIG.as_mut() {
         if config.rich_client.clear().is_err() {
-            return status::WRITE_FAILED;
-        } else {
-            return status::SUCCESS;
+            logger::error("Failed to clear presence: write failed");
         };
     }
-
-    status::UNINITIALIZED
 }
 
 #[no_mangle]
@@ -579,6 +613,7 @@ pub unsafe extern "C" fn disconnect() {
     }
 
     if let Some(mut config) = CONFIG.take() {
+        logger::info("Shutting down connection");
         config.rich_client.close();
         INITIALIZED = false;
     }
@@ -633,4 +668,12 @@ pub unsafe extern "C" fn update_workspace(value: *mut c_char) -> bool {
     }
 
     true
+}
+
+pub fn cord_disconnect() {
+    unsafe {
+        if let Some(callbacks) = CALLBACKS.as_ref() {
+            (callbacks.disconnect_callback)();
+        }
+    }
 }
