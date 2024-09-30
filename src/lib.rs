@@ -147,7 +147,7 @@ pub unsafe extern "C" fn init(
                 is_custom_client = true;
                 (id, ptr_to_string(args.image))
             } else {
-                logger::error("Invalid client ID");
+                error!("Invalid client ID provided");
                 return -1;
             }
         }
@@ -223,17 +223,17 @@ pub unsafe extern "C" fn init(
 
     std::thread::spawn(move || {
         if let Ok(mut rich_client) = RichClient::connect(client_id) {
-            logger::debug("Awaiting connection");
+            debug!("Awaiting connection...");
             if rich_client.handshake().is_err() {
-                logger::error("Failed to handshake with Discord");
+                error!("Failed to perform handshake with Discord");
                 return;
             }
 
             if rich_client.read().is_err() {
-                logger::error("Failed to read from Discord");
+                error!("Failed to read data from Discord");
                 return;
             }
-            logger::info("Connected to Discord");
+            info!("Connected to Discord");
 
             CONFIG = Some(Config {
                 is_custom_client,
@@ -258,12 +258,12 @@ pub unsafe extern "C" fn init(
             });
             INITIALIZED = true;
         } else {
-            logger::error("Failed to establish connection with Discord");
+            error!("Failed to establish connection with Discord. Is the Discord client running?");
         };
     });
 
     if ws_blacklist.contains(&ws) {
-        logger::warn("Workspace is blacklisted");
+        warning!("Workspace '{ws}' is found in the blacklist. Hiding presence");
         return 1;
     }
 
@@ -326,7 +326,7 @@ pub unsafe extern "C" fn update_presence(
             .is_err()
         {
             cord_disconnect();
-            logger::error("Failed to update presence: write failed");
+            error!("Failed to update rich presence: write operation failed");
             false
         } else {
             true
@@ -585,7 +585,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
             .is_err()
         {
             cord_disconnect();
-            logger::error("Failed to update presence: write failed");
+            error!("Failed to update rich presence: write operation failed");
             false
         } else {
             true
@@ -600,9 +600,9 @@ pub unsafe extern "C" fn clear_presence() {
     }
 
     if let Some(config) = CONFIG.as_mut() {
-        if config.rich_client.clear().is_err() {
-            logger::error("Failed to clear presence: write failed");
-        };
+        config.rich_client.clear().unwrap_or_else(|e| {
+            error!("Failed to clear rich presence: {e}");
+        });
     }
 }
 
@@ -613,7 +613,7 @@ pub unsafe extern "C" fn disconnect() {
     }
 
     if let Some(mut config) = CONFIG.take() {
-        logger::info("Shutting down connection");
+        info!("Shutting down connection");
         config.rich_client.close();
         INITIALIZED = false;
     }
@@ -627,6 +627,7 @@ pub unsafe extern "C" fn update_time() {
             .unwrap()
             .as_millis(),
     );
+    debug!("Set start time to {START_TIME:?}");
 }
 
 #[no_mangle]

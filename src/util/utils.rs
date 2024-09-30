@@ -8,6 +8,7 @@ use std::{
 };
 
 use crate::{
+    debug,
     mappings::{get_by_filetype, Filetype},
     rpc::{
         activity::{ActivityAssets, ActivityButton},
@@ -15,8 +16,6 @@ use crate::{
     },
     Config,
 };
-
-use super::logger;
 
 pub const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
@@ -80,7 +79,7 @@ pub fn validate_buttons(
 
     if first_url == "git" || second_url == "git" {
         if let Some(repository) = find_git_repository(workspace) {
-            logger::debug(&format!("Found Git repository: {repository} in `{workspace}`"));
+            debug!("Found Git repository: {repository} in `{workspace}`");
             if first_url == "git" {
                 first_url.clone_from(&repository)
             }
