@@ -8,6 +8,7 @@ use std::{
 };
 
 use crate::{
+    debug,
     mappings::{get_by_filetype, Filetype},
     rpc::{
         activity::{ActivityAssets, ActivityButton},
@@ -78,6 +79,7 @@ pub fn validate_buttons(
 
     if first_url == "git" || second_url == "git" {
         if let Some(repository) = find_git_repository(workspace) {
+            debug!("Found Git repository: {repository} in `{workspace}`");
             if first_url == "git" {
                 first_url.clone_from(&repository)
             }

@@ -72,6 +72,14 @@ impl Connection for RichClient {
     }
 
     fn close(&mut self) {
+        self.write(
+            2,
+            Some(
+                format!("{{'v': 1, 'client_id': {}}}", self.client_id)
+                    .as_bytes(),
+            ),
+        )
+        .unwrap();
         if let Some(pipe) = self.pipe.take() {
             let _ = pipe.shutdown(std::net::Shutdown::Both);
         }

@@ -29,7 +29,7 @@ local function init_discord(ffi)
   local new_path = path .. cord_file
   if file_exists(old_path) then
     os.remove(new_path)
-    move_file(old_path, new_path) -- move file as to avoid file access errors when updating
+    move_file(old_path, new_path) -- move file to avoid file access errors when updating
   end
 
   if not file_exists(new_path) then
@@ -60,6 +60,7 @@ local function init_discord(ffi)
       const char* initial_path;
       const bool swap_fields;
       const bool swap_icons;
+      const int log_level;
     } InitArgs;
     typedef struct {
       const char* filename;
@@ -74,16 +75,20 @@ local function init_discord(ffi)
       const char* second_label;
       const char* second_url;
     } Buttons;
-    const uint8_t get_last_error();
+    typedef struct {
+      void (*log_callback)(const char* message, int level);
+      void (*disconnect_callback)(void);
+    } Callbacks;
     const bool is_connected();
-    const uint8_t init(
+    const int init(
       const InitArgs* args,
-      const Buttons* buttons
+      const Buttons* buttons,
+      const Callbacks* callbacks
     );
-    const uint8_t update_presence(
+    const bool update_presence(
       const PresenceArgs* args
     );
-    const uint8_t update_presence_with_assets(
+    const bool update_presence_with_assets(
       const char* name,
       const char* default_name,
       const char* icon,
@@ -91,7 +96,7 @@ local function init_discord(ffi)
       const int asset_type,
       const PresenceArgs* args
     );
-    const uint8_t clear_presence();
+    void clear_presence();
     void disconnect();
     void update_time();
     const bool set_workspace(const char* workspace);

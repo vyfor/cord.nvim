@@ -3,6 +3,8 @@ local log_level
 local function init(level)
   log_level = level and vim.log.levels[string.upper(level)]
     or vim.log.levels.OFF
+
+  return log_level
 end
 
 local function info(msg)
@@ -29,16 +31,8 @@ local function debug(msg)
   end
 end
 
-local function log(status_code)
-  if status_code == 2 then return error 'Provided client ID is not valid' end
-
-  if status_code == 3 or status_code == 4 or status_code == 5 then
-    return error 'Internal error occurred. Client will be disconnected'
-  end
-
-  if status_code == 6 then
-    return info 'Current workspace is found in the blacklist. Presence will not be shown'
-  end
+local function log(level, message)
+  if level >= log_level then vim.notify('[cord.nvim] ' .. message, level) end
 end
 
 return {
