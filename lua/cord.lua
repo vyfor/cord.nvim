@@ -128,20 +128,24 @@ local function init(config)
 end
 
 local function should_update_presence(current_presence)
-  return not last_presence
-    or current_presence.cursor_line ~= last_presence.cursor_line
-    or current_presence.cursor_col ~= last_presence.cursor_col
-    or current_presence.name ~= last_presence.name
-    or current_presence.type ~= last_presence.type
-    or current_presence.readonly ~= last_presence.readonly
-    or current_presence.problem_count ~= last_presence.problem_count
+  local presence = last_presence
+  return not presence
+    or current_presence.cursor_line ~= presence.cursor_line
+    or current_presence.cursor_col ~= presence.cursor_col
+    or current_presence.name ~= presence.name
+    or current_presence.type ~= presence.type
+    or current_presence.readonly ~= presence.readonly
+    or current_presence.problem_count ~= presence.problem_count
 end
 
 local function update_idle_presence(config)
-  if last_presence and last_presence['idle'] then return false end
+  local presence = last_presence
+  if presence and presence['idle'] then return false end
 
   if force_idle then
-    last_presence['idle'] = true
+    last_presence = {
+      idle = true,
+    }
     if config.timer.reset_on_idle then discord.update_time() end
     if config.idle.show_status then
       discord.update_presence(
@@ -160,7 +164,9 @@ local function update_idle_presence(config)
     )
   then
     if config.idle.disable_on_focus and is_focused then return false end
-    last_presence['idle'] = true
+    last_presence = {
+      idle = true,
+    }
     if config.display.show_time and config.timer.reset_on_idle then
       discord.update_time()
     end
@@ -295,14 +301,14 @@ function cord.setup(userConfig)
 
     vim.g.cord_initialized = true
 
-    vim.defer_fn(function()
+    vim.schedule(function()
       if not callbacks then
         callbacks = {
           ffi.cast('void (*)(const char*, int)', function(message, level)
             local res, msg = pcall(ffi.string, message)
             if res then pcall(vim.notify, msg, level) end
           end),
-          ffi.cast('void (*)()', function() cord.cleanup() end),
+          ffi.cast('void (*)()', function() pcall(cord.cleanup) end),
         }
       end
 
@@ -315,7 +321,7 @@ function cord.setup(userConfig)
       end
 
       start_timer(config)
-    end, 100)
+    end)
   end
 end
 
