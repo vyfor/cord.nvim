@@ -5,5 +5,5 @@ if command -v nix >/dev/null 2>&1; then
     nix develop --command sh -c 'rustc --crate-type=cdylib -C opt-level=3 -C panic=abort -C lto=fat -o cord src/lib.rs'
 else
     echo "Nix not found. Make sure Rust and dependencies are installed manually." 
-rustc --crate-type=cdylib -C opt-level=3 -C panic=abort -C lto=fat -o cord src/lib.rs
-
+    rustc --crate-type=cdylib -C opt-level=3 -C panic=abort -C lto=fat -o cord src/lib.rs
+fi
