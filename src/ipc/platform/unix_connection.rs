@@ -24,11 +24,12 @@ impl Connection for RichClient {
             for i in 0..10 {
                 match UnixStream::connect(format!("{dir}/discord-ipc-{i}")) {
                     Ok(pipe) => {
+                        pipe.set_nonblocking(true)?;
                         return Ok(RichClient {
                             client_id: client_id,
                             pipe: Some(pipe),
                             last_activity: None,
-                        })
+                        });
                     }
                     Err(e) => match e.kind() {
                         io::ErrorKind::NotFound => continue,

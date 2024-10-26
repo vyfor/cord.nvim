@@ -221,46 +221,45 @@ pub unsafe extern "C" fn init(
     };
     let ws_blacklist = workspace_blacklist.clone();
 
-    std::thread::spawn(move || {
-        if let Ok(mut rich_client) = RichClient::connect(client_id) {
-            debug!("Awaiting connection...");
-            if rich_client.handshake().is_err() {
-                error!("Failed to perform handshake with Discord");
-                return;
-            }
+    if let Ok(mut rich_client) = RichClient::connect(client_id) {
+        debug!("Awaiting connection...");
+        if rich_client.handshake().is_err() {
+            error!("Failed to perform handshake with Discord");
+            return -1;
+        }
 
-            if rich_client.read().is_err() {
-                error!("Failed to read data from Discord");
-                return;
-            }
-            info!("Connected to Discord");
+        if rich_client.read().is_err() {
+            error!("Failed to read data from Discord");
+            return -1;
+        }
+        info!("Connected to Discord");
 
-            CONFIG = Some(Config {
-                is_custom_client,
-                rich_client,
-                editor_image,
-                editor_tooltip,
-                idle_text,
-                idle_tooltip,
-                viewing_text,
-                editing_text,
-                file_browser_text,
-                plugin_manager_text,
-                lsp_manager_text,
-                vcs_text,
-                workspace_text,
-                workspace,
-                workspace_blacklist,
-                buttons,
-                swap_fields,
-                swap_icons,
-                init_buttons,
-            });
-            INITIALIZED = true;
-        } else {
-            error!("Failed to establish connection with Discord. Is the Discord client running?");
-        };
-    });
+        CONFIG = Some(Config {
+            is_custom_client,
+            rich_client,
+            editor_image,
+            editor_tooltip,
+            idle_text,
+            idle_tooltip,
+            viewing_text,
+            editing_text,
+            file_browser_text,
+            plugin_manager_text,
+            lsp_manager_text,
+            vcs_text,
+            workspace_text,
+            workspace,
+            workspace_blacklist,
+            buttons,
+            swap_fields,
+            swap_icons,
+            init_buttons,
+        });
+        INITIALIZED = true;
+    } else {
+        error!("Failed to establish connection with Discord. Is the Discord client running?");
+        return -1;
+    };
 
     if ws_blacklist.contains(&ws) {
         warning!("Workspace '{ws}' is found in the blacklist. Hiding presence");

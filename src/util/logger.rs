@@ -1,4 +1,4 @@
-pub static mut LOG_LEVEL: u8 = 5;
+pub static mut LOG_LEVEL: u8 = 5; // OFF
 
 pub fn init(level: u8) {
     unsafe {

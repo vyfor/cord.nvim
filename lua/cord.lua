@@ -67,7 +67,6 @@ local last_presence
 local log_level
 local callbacks
 
--- Must be wrapped in vim.schedule
 local function init(config)
   local blacklist_len = #config.display.workspace_blacklist
   local blacklist_arr = ffi.new(
@@ -301,27 +300,25 @@ function cord.setup(userConfig)
 
     vim.g.cord_initialized = true
 
-    vim.schedule(function()
-      if not callbacks then
-        callbacks = {
-          ffi.cast('void (*)(const char*, int)', function(message, level)
-            local res, msg = pcall(ffi.string, message)
-            if res then pcall(vim.notify, msg, level) end
-          end),
-          ffi.cast('void (*)()', function() pcall(cord.cleanup) end),
-        }
-      end
+    if not callbacks then
+      callbacks = {
+        ffi.cast(
+          'void (*)(const char*, int)',
+          function(message, level) vim.notify(ffi.string(message), level) end
+        ),
+        ffi.cast('void (*)()', function() pcall(cord.cleanup) end),
+      }
+    end
 
-      local status = init(config)
-      if status < 0 then
-        return
-      elseif status > 0 then
-        cord.disconnect()
-        return
-      end
+    local status = init(config)
+    if status < 0 then
+      return
+    elseif status > 0 then
+      cord.disconnect()
+      return
+    end
 
-      start_timer(config)
-    end)
+    start_timer(config)
   end
 end
 
@@ -368,17 +365,15 @@ function cord.setup_usercmds(config)
   function cord.connect()
     if discord.is_connected() then return end
 
-    vim.defer_fn(function()
-      local status = init(config)
-      if status < 0 then
-        return
-      elseif status > 0 then
-        cord.disconnect()
-        return
-      end
+    local status = init(config)
+    if status < 0 then
+      return
+    elseif status > 0 then
+      cord.disconnect()
+      return
+    end
 
-      if not enabled then start_timer(config) end
-    end, 100)
+    if not enabled then start_timer(config) end
   end
 
   function cord.reconnect()

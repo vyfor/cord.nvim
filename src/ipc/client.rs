@@ -3,7 +3,7 @@ use crate::rpc::packet::Activity;
 #[cfg(target_os = "windows")]
 pub struct RichClient {
     pub client_id: u64,
-    pub pipe: Option<std::fs::File>,
+    pub pipe: Option<std::os::windows::io::RawHandle>,
     pub last_activity: Option<Activity>,
 }
 
