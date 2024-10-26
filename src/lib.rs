@@ -22,6 +22,7 @@ use crate::{
 
 type LogCallback = extern "C" fn(*const c_char, i32);
 type DisconnectCallback = extern "C" fn();
+static mut PID: u32 = 0;
 static mut INITIALIZED: bool = false;
 static mut START_TIME: Option<u128> = None;
 static mut CONFIG: Option<Config> = None;
@@ -233,6 +234,7 @@ pub unsafe extern "C" fn init(
             return -1;
         }
         info!("Connected to Discord");
+        PID = std::process::id();
 
         CONFIG = Some(Config {
             is_custom_client,
@@ -321,7 +323,7 @@ pub unsafe extern "C" fn update_presence(
 
         if config
             .rich_client
-            .update(&Packet::new(std::process::id(), Some(activity)))
+            .update(&Packet::new(PID, Some(activity)))
             .is_err()
         {
             cord_disconnect();
@@ -580,7 +582,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
 
         if config
             .rich_client
-            .update(&Packet::new(std::process::id(), Some(activity)))
+            .update(&Packet::new(PID, Some(activity)))
             .is_err()
         {
             cord_disconnect();

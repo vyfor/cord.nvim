@@ -6,6 +6,7 @@ use std::{io, ptr};
 use crate::ipc::client::{Connection, RichClient};
 use crate::ipc::utils;
 use crate::rpc::packet::Packet;
+use crate::PID;
 
 const FILE_GENERIC_READ: u32 = 0x80000000;
 const FILE_GENERIC_WRITE: u32 = 0x40000000;
@@ -217,7 +218,7 @@ impl Connection for RichClient {
             1,
             Some(
                 Packet {
-                    pid: std::process::id(),
+                    pid: unsafe { PID },
                     activity: None,
                 }
                 .to_json()

@@ -5,6 +5,7 @@ use std::os::unix::net::UnixStream;
 use crate::ipc::client::{Connection, RichClient};
 use crate::ipc::utils;
 use crate::rpc::packet::Packet;
+use crate::PID;
 
 impl Connection for RichClient {
     fn connect(client_id: u64) -> Result<Self, Box<dyn std::error::Error>> {
@@ -112,7 +113,7 @@ impl Connection for RichClient {
             1,
             Some(
                 Packet {
-                    pid: std::process::id(),
+                    pid: unsafe { PID },
                     activity: None,
                 }
                 .to_json()
