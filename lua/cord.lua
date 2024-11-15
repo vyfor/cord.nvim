@@ -64,7 +64,7 @@ local enabled = false
 local is_focused = true
 local force_idle = false
 local problem_count = -1
-local last_updated = uv.hrtime()
+local last_updated = uv.now()
 local last_presence
 
 local function init(config)
@@ -159,7 +159,7 @@ local function update_idle_presence(config)
     config.idle.enable
     and (
       config.idle.timeout == 0
-      or uv.hrtime() - last_updated >= config.idle.timeout
+      or uv.now() - last_updated >= config.idle.timeout
     )
   then
     if config.idle.disable_on_focus and is_focused then return false end
@@ -208,7 +208,7 @@ local function update_presence(config)
 
   if should_update_presence(current_presence) then
     force_idle = false
-    last_updated = uv.hrtime()
+    last_updated = uv.now()
     if config.display.show_time and config.timer.reset_on_change then
       discord.update_time()
     end
@@ -315,7 +315,6 @@ function cord.setup(userConfig)
   if vim.g.cord_initialized == nil then
     local config = vim.tbl_deep_extend('force', cord.config, userConfig or {})
     config.timer.interval = math.max(config.timer.interval, 500)
-    config.idle.timeout = config.idle.timeout * 1e6
     logger.init(config.log_level)
 
     discord = utils.init_discord(ffi)
@@ -449,7 +448,7 @@ function cord.setup_usercmds(config)
   function cord.toggle_idle()
     if last_presence['idle'] then
       force_idle = false
-      last_updated = uv.hrtime()
+      last_updated = uv.now()
       last_presence = nil
     else
       force_idle = true
@@ -460,7 +459,7 @@ function cord.setup_usercmds(config)
 
   function cord.unidle()
     force_idle = false
-    last_updated = uv.hrtime()
+    last_updated = uv.now()
     last_presence = nil
   end
 
