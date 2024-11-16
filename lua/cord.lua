@@ -66,6 +66,7 @@ local force_idle = false
 local problem_count = -1
 local last_updated = uv.now()
 local last_presence
+local cwd
 
 local function init(config)
   local blacklist_len = #config.display.workspace_blacklist
@@ -107,7 +108,7 @@ local function init(config)
       config.text.workspace,
       blacklist_arr,
       blacklist_len,
-      vim.fn.getcwd(),
+      vim.fn.expand '%:p:h',
       config.display.swap_fields,
       config.display.swap_icons
     ),
@@ -347,14 +348,19 @@ end
 
 function cord.setup_autocmds(config)
   vim.cmd [[
+    autocmd! BufReadPost * lua require('cord').on_dir_changed()
     autocmd! DirChanged * lua require('cord').on_dir_changed()
     autocmd! FocusGained * lua require('cord').on_focus_gained()
     autocmd! FocusLost * lua require('cord').on_focus_lost()
   ]]
 
   function cord.on_dir_changed()
+    local dir = vim.fn.expand '%:p:h'
+    if dir == cwd then return end
+
+    cwd = dir
     last_presence = nil
-    if not discord.update_workspace(vim.fn.getcwd()) then
+    if not discord.update_workspace(dir) then
       timer:stop()
       discord.clear_presence()
       enabled = false
