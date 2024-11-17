@@ -209,7 +209,13 @@ local function update_presence(config)
   if should_update_presence(current_presence) then
     force_idle = false
     last_updated = uv.now()
-    if config.display.show_time and config.timer.reset_on_change then
+    if
+      config.display.show_time
+      and (
+        config.timer.reset_on_change
+        or config.timer.reset_on_idle and last_presence and last_presence.idle
+      )
+    then
       discord.update_time()
     end
     local cursor_pos = config.display.show_cursor_position
