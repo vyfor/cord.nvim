@@ -108,6 +108,7 @@ pub fn get<'a>(
         _ => match filename.to_lowercase().rsplit_once('.') {
             Some((_, extension)) => match extension {
                 "gml" => ("gml", "GameMaker Language"),
+                "hx" | "hxml" => ("haxe", "Haxe"),
                 "pcss" | "postcss" => ("postcss", "PostCSS"),
                 _ => return None,
             },
