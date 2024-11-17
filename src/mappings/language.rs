@@ -4,7 +4,6 @@ pub fn get<'a>(
 ) -> Option<(&'a str, &'a str)> {
     let language = match filetype {
         "Cord.new" => ("text", "New file"),
-        "Cord.unknown" => ("text", filetype),
         "autohotkey" => ("ahk", "AutoHotkey"),
         "asm" => ("assembly", "Assembly"),
         "astro" => ("astro", "Astro"),
