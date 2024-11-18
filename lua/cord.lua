@@ -133,10 +133,12 @@ local function should_update_presence(current_presence)
 end
 
 local function update_idle_presence(config)
-  if last_presence['idle'] then return false end
+  if last_presence.idle then return false end
 
   if force_idle then
-    last_presence['idle'] = true
+    last_presence = last_presence or {}
+    last_presence.idle = true
+
     if config.timer.reset_on_idle then discord.update_time() end
     if config.idle.show_status then
       local status = discord.update_presence(
@@ -164,7 +166,10 @@ local function update_idle_presence(config)
     )
   then
     if config.idle.disable_on_focus and is_focused then return false end
-    last_presence['idle'] = true
+
+    last_presence = last_presence or {}
+    last_presence.idle = true
+
     if config.display.show_time and config.timer.reset_on_idle then
       discord.update_time()
     end
@@ -458,7 +463,7 @@ function cord.setup_usercmds(config)
   end
 
   function cord.toggle_idle()
-    if last_presence['idle'] then
+    if last_presence and last_presence.idle then
       force_idle = false
       last_updated = uv.now()
       last_presence = nil
