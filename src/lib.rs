@@ -331,6 +331,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
         };
 
         let ft = mappings::get_by_filetype_or_none(&filetype, &filename);
+        let asset_ty = AssetType::from(asset_type);
 
         let (details, large_image, large_text) = match ft {
             Some(Filetype::Language(default_icon, default_tooltip)) => {
@@ -425,7 +426,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
 
                 (config.vcs_text.replace("{}", name), icon, tooltip)
             }
-            _ => match AssetType::from(asset_type) {
+            _ => match asset_ty {
                 Some(AssetType::Language) => {
                     if icon.is_empty() {
                         filetype.clone_into(&mut icon);
@@ -530,7 +531,14 @@ pub unsafe extern "C" fn update_presence_with_assets(
                 }
                 Some(Filetype::Lsp(icon, _)) => get_asset("lsp", icon),
                 Some(Filetype::Vcs(icon, _)) => get_asset("vcs", icon),
-                _ => get_asset("language", &large_image),
+                _ => get_asset(match asset_ty {
+                    Some(AssetType::Language) => "language",
+                    Some(AssetType::FileBrowser) => "file_browser",
+                    Some(AssetType::PluginManager) => "plugin_manager",
+                    Some(AssetType::Lsp) => "lsp",
+                    Some(AssetType::Vcs) => "vcs",
+                    _ => "language",
+                }, &large_image),
             }
         } else {
             large_image.to_owned()
