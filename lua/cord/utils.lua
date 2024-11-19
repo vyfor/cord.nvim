@@ -1,5 +1,13 @@
 local logger = require 'cord.log'
 
+local icon_types = {
+  language = 0,
+  file_browser = 1,
+  plugin_manager = 2,
+  lsp_manager = 3,
+  vcs = 4,
+}
+
 local function file_exists(filename)
   local stat = vim.loop.fs_stat(filename)
   return stat and stat.type == 'file'
@@ -165,6 +173,7 @@ local function get_icon(config, filename, filetype)
 end
 
 return {
+  icon_types = icon_types,
   init_discord = init_discord,
   validate_severity = validate_severity,
   get_problem_count = get_problem_count,

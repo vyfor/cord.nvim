@@ -244,12 +244,24 @@ local function update_presence(config)
 
     local success
     if icon then
+      local asset_type = icon.type or 0
+      if type(asset_type) == 'string' then
+        local asset_type_int = utils.icon_types[asset_type]
+
+        if not asset_type_int then
+          logger.error('Unexpected asset type: \'' .. asset_type .. '\'')
+          return
+        end
+
+        asset_type = asset_type_int
+      end
+
       success = discord.update_presence_with_assets(
         icon.name or '',
         name,
         type(icon) == 'string' and icon or icon.icon,
         icon.tooltip,
-        icon.type or 0,
+        asset_type,
         ffi.new(
           'PresenceArgs',
           current_presence.name,
