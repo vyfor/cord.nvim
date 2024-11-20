@@ -1,5 +1,4 @@
-use crate::rpc::activity::Activity;
-use crate::rpc::packet::Packet;
+use crate::activity::types::{Activity, Packet};
 
 use std::fmt::{Error, Write};
 
@@ -45,31 +44,27 @@ impl Activity {
             write!(json_str, ",\"state\":\"{}\"", escape_json(state))?;
         }
 
-        if let Some(assets) = &self.assets {
+        if self.large_image.is_some()
+            || self.large_text.is_some()
+            || self.small_image.is_some()
+            || self.small_text.is_some()
+        {
             json_str.push_str(",\"assets\":{");
 
-            if let Some(large_image) = &assets.large_image {
+            if let Some(large_image) = &self.large_image {
                 write!(json_str, "\"large_image\":\"{}\",", large_image)?;
             }
 
-            if let Some(large_text) = &assets.large_text {
-                write!(
-                    json_str,
-                    "\"large_text\":\"{}\",",
-                    escape_json(large_text)
-                )?;
+            if let Some(large_text) = &self.large_text {
+                write!(json_str, "\"large_text\":\"{}\",", escape_json(large_text))?;
             }
 
-            if let Some(small_image) = &assets.small_image {
+            if let Some(small_image) = &self.small_image {
                 write!(json_str, "\"small_image\":\"{}\",", small_image)?;
             }
 
-            if let Some(small_text) = &assets.small_text {
-                write!(
-                    json_str,
-                    "\"small_text\":\"{}\"",
-                    escape_json(small_text)
-                )?;
+            if let Some(small_text) = &self.small_text {
+                write!(json_str, "\"small_text\":\"{}\"", escape_json(small_text))?;
             }
 
             if json_str.ends_with(',') {
