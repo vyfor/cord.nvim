@@ -1,4 +1,4 @@
-use crate::json::parser::Deserializable;
+use crate::json::deserialize::Deserializable;
 
 pub struct Packet {
     pub pid: u32,
@@ -25,7 +25,7 @@ pub struct ActivityButton {
 
 impl Deserializable for ActivityButton {
     fn deserialize(
-        input: &std::collections::HashMap<String, crate::json::parser::Value>,
+        input: &std::collections::HashMap<String, crate::json::deserialize::Value>,
     ) -> Result<Self, String> {
         let label = input
             .get("label")

@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::json::parser::{Deserializable, Json};
+use crate::json::deserialize::{Deserializable, Json};
 
 use super::types::{Connect, Disconnect};
 

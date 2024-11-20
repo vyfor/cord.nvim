@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    json::parser::{Deserializable, Value},
+    json::deserialize::{Deserializable, Value},
     types::Config,
 };
 
