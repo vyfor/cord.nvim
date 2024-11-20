@@ -23,7 +23,7 @@ local function init_discord(ffi)
   local os_name = vim.loop.os_uname().sysname
   if os_name:find('Windows', 1, true) == 1 then -- starts with 'Windows'
     cord_file = '/cord.dll'
-  elseif os_name == 'Linux' or os_name:match("BSD$") then
+  elseif os_name == 'Linux' or os_name:match 'BSD$' then
     cord_file = '/cord.so'
   elseif os_name == 'Darwin' then
     cord_file = '/cord.dylib'
