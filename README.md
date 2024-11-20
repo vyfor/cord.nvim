@@ -19,6 +19,7 @@
 - Identifies problems across active buffers
 - Supports configurable idle status detection
 - Provides [user commands](#%EF%B8%8F-user-commands) for managing the presence
+- Supports Flatpak and Snap installations on Linux
 - Is written in native code and uses Lua FFI for integration
 
 ## 🔌 Requirements
