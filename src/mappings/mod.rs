@@ -23,10 +23,7 @@ pub fn get_by_filetype<'a>(filetype: &'a str, filename: &str) -> Filetype<'a> {
     Filetype::Language("text", filetype)
 }
 
-pub fn get_by_filetype_or_none<'a>(
-    filetype: &'a str,
-    filename: &str,
-) -> Option<Filetype<'a>> {
+pub fn get_by_filetype_or_none<'a>(filetype: &'a str, filename: &str) -> Option<Filetype<'a>> {
     let mut ft = None;
     if let Some(language) = language::get(filetype, filename) {
         ft = Some(Filetype::Language(language.0, language.1));
@@ -47,6 +44,7 @@ pub fn get_by_filetype_or_none<'a>(
     ft
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Filetype<'a> {
     Language(&'a str, &'a str),
     FileBrowser(&'a str, &'a str),
