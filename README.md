@@ -14,7 +14,7 @@
 - Cross-platform support (Windows, Linux, macOS)
 - Blazingly fast startup with minimal overhead due to asynchronous nature
 - Highly [configurable](#-configuration) in Lua
-- Offers more than 60 icons for languages and components
+- Offers more than 70 icons for languages and components, each with custom design
 - Automatically detects working directory and repository based on VCS
 - Identifies problems across active buffers
 - Supports configurable idle status detection
