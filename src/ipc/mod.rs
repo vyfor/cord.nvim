@@ -1,3 +1,2 @@
-pub mod client;
-pub mod platform;
-mod utils;
+pub mod discord;
+pub mod pipe;
