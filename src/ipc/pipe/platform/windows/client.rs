@@ -46,7 +46,7 @@ impl PipeClientImpl for PipeClient {
                 let mut buf = [0u8; 4096];
                 loop {
                     match pipe.read(&mut buf) {
-                        Ok(n) if n == 0 => {
+                        Ok(0) => {
                             tx.send(local_event!(id, ClientDisconnected)).ok();
                             break;
                         }

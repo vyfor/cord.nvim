@@ -7,7 +7,7 @@ use crate::ipc::pipe::PipeClientImpl;
 use crate::local_event;
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
-use crate::messages::events::local::{ClientDisconnectedEvent, ErrorEvent};
+use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 
 pub struct PipeClient {
@@ -48,7 +48,7 @@ impl PipeClientImpl for PipeClient {
                 let mut buf = [0u8; 4096];
                 loop {
                     match read_pipe.read(&mut buf) {
-                        Ok(n) if n == 0 => {
+                        Ok(0) => {
                             tx.send(local_event!(id, ClientDisconnected)).ok();
                             break;
                         }

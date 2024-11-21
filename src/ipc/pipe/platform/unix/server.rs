@@ -95,7 +95,7 @@ impl PipeServerImpl for PipeServer {
         let mut failed_clients = Vec::new();
 
         for (client_id, client) in clients.iter_mut() {
-            if let Err(_) = client.write(data) {
+            if client.write(data).is_err() {
                 failed_clients.push(*client_id);
             }
         }
