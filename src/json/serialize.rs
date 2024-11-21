@@ -1,99 +1,174 @@
-use crate::presence::types::{Activity, Packet};
+#![allow(dead_code)]
 
-use std::fmt::{Error, Write};
+use super::Json;
 
-use super::utils::escape_json;
+#[repr(u8)]
+pub enum SValue<'a> {
+    Null = 0,
+    String(&'a str),
+    Number(f64),
+    Boolean(bool),
+    Array(Vec<SValue<'a>>),
+    Object(&'a dyn Serialize),
+}
 
-impl Packet {
-    pub fn new(pid: u32, activity: Option<Activity>) -> Packet {
-        Packet { pid, activity }
+pub type SerializeFn<'a> = fn(&'a str, SValue<'a>, &mut SerializeState) -> Result<(), String>;
+
+pub trait Serialize {
+    fn serialize<'a>(
+        &'a self,
+        f: SerializeFn<'a>,
+        state: &mut SerializeState,
+    ) -> Result<(), String>;
+}
+
+pub trait SerializeObj: Serialize + std::fmt::Debug {}
+impl<T: Serialize + std::fmt::Debug> SerializeObj for T {}
+
+pub struct SerializeState {
+    buf: String,
+    stack: Vec<usize>,
+}
+
+impl SerializeState {
+    fn new() -> Self {
+        Self {
+            buf: String::with_capacity(512),
+            stack: Vec::with_capacity(8),
+        }
     }
 
-    pub fn to_json(&self) -> Result<String, Error> {
-        let mut json_str = String::new();
+    fn push_scope(&mut self) {
+        self.stack.push(self.buf.len());
+    }
 
-        json_str.push_str("{\"cmd\":\"SET_ACTIVITY\"");
-        json_str.push_str(",\"nonce\":\"-\"");
-        json_str.push_str(",\"args\":{");
-
-        write!(&mut json_str, "\"pid\":{}", self.pid)?;
-        if let Some(activity) = &self.activity {
-            json_str.push_str(",\"activity\":");
-            activity.push_json(&mut json_str)?;
+    fn needs_comma(&self) -> bool {
+        if let Some(&last_pos) = self.stack.last() {
+            self.buf.len() > last_pos + 1
+        } else {
+            false
         }
-
-        json_str.push_str("}}");
-
-        Ok(json_str)
     }
 }
 
-impl Activity {
-    pub fn push_json(&self, json_str: &mut String) -> Result<(), Error> {
-        json_str.push_str("{\"type\":0");
+impl<'a> std::fmt::Debug for SValue<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SValue::String(s) => write!(f, "String({:?})", s),
+            SValue::Number(n) => write!(f, "Number({:?})", n),
+            SValue::Boolean(b) => write!(f, "Boolean({:?})", b),
+            SValue::Array(arr) => f.debug_tuple("Array").field(arr).finish(),
+            SValue::Object(_) => write!(f, "Object(function)"),
+            SValue::Null => write!(f, "Null"),
+        }
+    }
+}
 
-        if let Some(timestamp) = &self.timestamp {
-            write!(json_str, ",\"timestamps\":{{\"start\":{}}}", timestamp)?;
+impl Json {
+    pub fn serialize(value: &dyn Serialize) -> Result<String, String> {
+        let mut state = SerializeState::new();
+        state.buf.push('{');
+        state.push_scope();
+
+        fn write_kv(key: &str, value: &SValue, state: &mut SerializeState) -> Result<(), String> {
+            if state.needs_comma() {
+                state.buf.push(',');
+            }
+            state.buf.push('"');
+            escape_str_to_buf(key, &mut state.buf);
+            state.buf.push_str("\":");
+            write_value(value, state)
         }
 
-        if let Some(details) = &self.details {
-            write!(json_str, ",\"details\":\"{}\"", escape_json(details))?;
+        fn serialize_adapter(
+            key: &str,
+            value: SValue,
+            state: &mut SerializeState,
+        ) -> Result<(), String> {
+            write_kv(key, &value, state)
         }
 
-        if let Some(state) = &self.state {
-            write!(json_str, ",\"state\":\"{}\"", escape_json(state))?;
+        value.serialize(serialize_adapter, &mut state)?;
+        state.buf.push('}');
+        Ok(state.buf)
+    }
+}
+
+fn write_value(value: &SValue, state: &mut SerializeState) -> Result<(), String> {
+    match value {
+        SValue::String(s) => {
+            state.buf.push('"');
+            escape_str_to_buf(s, &mut state.buf);
+            state.buf.push('"');
+            Ok(())
         }
-
-        if self.large_image.is_some()
-            || self.large_text.is_some()
-            || self.small_image.is_some()
-            || self.small_text.is_some()
-        {
-            json_str.push_str(",\"assets\":{");
-
-            if let Some(large_image) = &self.large_image {
-                write!(json_str, "\"large_image\":\"{}\",", large_image)?;
-            }
-
-            if let Some(large_text) = &self.large_text {
-                write!(json_str, "\"large_text\":\"{}\",", escape_json(large_text))?;
-            }
-
-            if let Some(small_image) = &self.small_image {
-                write!(json_str, "\"small_image\":\"{}\",", small_image)?;
-            }
-
-            if let Some(small_text) = &self.small_text {
-                write!(json_str, "\"small_text\":\"{}\"", escape_json(small_text))?;
-            }
-
-            if json_str.ends_with(',') {
-                json_str.pop();
-            }
-
-            json_str.push('}');
+        SValue::Number(n) => {
+            use std::fmt::Write;
+            write!(state.buf, "{}", n).map_err(|e| e.to_string())
         }
+        SValue::Boolean(b) => {
+            state.buf.push_str(if *b { "true" } else { "false" });
+            Ok(())
+        }
+        SValue::Array(arr) => {
+            state.buf.push('[');
+            state.push_scope();
 
-        if let Some(buttons) = &self.buttons {
-            json_str.push_str(",\"buttons\":[");
-
-            for (index, button) in buttons.iter().enumerate() {
-                if index > 0 {
-                    json_str.push(',');
+            for item in arr {
+                if state.needs_comma() {
+                    state.buf.push(',');
                 }
-                write!(
-                    json_str,
-                    "{{\"label\":\"{}\",\"url\":\"{}\"}}",
-                    escape_json(&button.label),
-                    button.url
-                )?;
+                write_value(item, state)?;
             }
 
-            json_str.push(']');
+            state.stack.pop();
+            state.buf.push(']');
+            Ok(())
         }
+        SValue::Object(obj) => {
+            state.buf.push('{');
+            state.push_scope();
 
-        json_str.push('}');
+            obj.serialize(
+                |key, value, state| {
+                    if state.needs_comma() {
+                        state.buf.push(',');
+                    }
+                    state.buf.push('"');
+                    escape_str_to_buf(key, &mut state.buf);
+                    state.buf.push_str("\":");
+                    write_value(&value, state)
+                },
+                state,
+            )?;
 
-        Ok(())
+            state.stack.pop();
+            state.buf.push('}');
+            Ok(())
+        }
+        SValue::Null => {
+            state.buf.push_str("null");
+            Ok(())
+        }
+    }
+}
+
+#[inline]
+fn escape_str_to_buf(s: &str, buf: &mut String) {
+    for c in s.chars() {
+        match c {
+            '"' => buf.push_str("\\\""),
+            '\\' => buf.push_str("\\\\"),
+            '\n' => buf.push_str("\\n"),
+            '\r' => buf.push_str("\\r"),
+            '\t' => buf.push_str("\\t"),
+            c if c.is_control() => {
+                buf.push_str("\\u");
+                for byte in format!("{:04x}", c as u32).bytes() {
+                    buf.push(byte as char);
+                }
+            }
+            c => buf.push(c),
+        }
     }
 }

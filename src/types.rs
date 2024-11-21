@@ -1,7 +1,8 @@
 use std::{collections::HashMap, sync::LazyLock};
 
 use crate::{
-    json::deserialize::Deserializable, presence::types::ActivityButton,
+    json::deserialize::{DValue, Deserializable},
+    presence::types::ActivityButton,
     util::utils::find_git_repository,
 };
 
@@ -38,9 +39,7 @@ pub struct Config {
 }
 
 impl Deserializable for Config {
-    fn deserialize(
-        input: &HashMap<String, crate::json::deserialize::Value>,
-    ) -> Result<Self, String> {
+    fn deserialize(input: &HashMap<String, DValue>) -> Result<Self, String> {
         let log_level = input
             .get("log_level")
             .and_then(|v| v.as_number())

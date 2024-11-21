@@ -1,23 +1,13 @@
 use std::collections::HashMap;
 
+use super::Json;
+
 pub trait Deserializable: Sized {
-    fn deserialize(input: &HashMap<String, Value>) -> Result<Self, String>;
+    fn deserialize(input: &HashMap<String, DValue>) -> Result<Self, String>;
 }
-
-#[derive(Debug)]
-pub enum Value {
-    String(String),
-    Number(f64),
-    Boolean(bool),
-    Array(Vec<Value>),
-    Object(HashMap<String, Value>),
-    Null,
-}
-
-pub struct Json;
 
 impl Json {
-    pub fn deserialize(input: &str) -> Result<HashMap<String, Value>, String> {
+    pub fn deserialize(input: &str) -> Result<HashMap<String, DValue>, String> {
         let input = input.trim();
         if !input.starts_with('{') || !input.ends_with('}') {
             return Err(format!("Invalid JSON object: {}", input));
@@ -108,12 +98,12 @@ impl Json {
         Err("Unterminated string".to_string())
     }
 
-    fn parse_value(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<Value, String> {
+    fn parse_value(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
         while let Some(&c) = chars.peek() {
             match c {
                 '"' => {
                     chars.next();
-                    return Ok(Value::String(Self::parse_string(chars)?));
+                    return Ok(DValue::String(Self::parse_string(chars)?));
                 }
                 '[' => {
                     chars.next();
@@ -148,7 +138,7 @@ impl Json {
         Err("Unexpected end of input".to_string())
     }
 
-    fn parse_array(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<Value, String> {
+    fn parse_array(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
         let mut values = Vec::new();
         let mut expecting_value = true;
 
@@ -156,7 +146,7 @@ impl Json {
             match c {
                 ']' if !expecting_value => {
                     chars.next();
-                    return Ok(Value::Array(values));
+                    return Ok(DValue::Array(values));
                 }
                 ',' if !expecting_value => {
                     chars.next();
@@ -175,13 +165,15 @@ impl Json {
         Err("Unterminated array".to_string())
     }
 
-    fn parse_nested_map(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<Value, String> {
+    fn parse_nested_map(
+        chars: &mut std::iter::Peekable<std::str::Chars>,
+    ) -> Result<DValue, String> {
         let mut result = HashMap::new();
         while let Some(&c) = chars.peek() {
             match c {
                 '}' => {
                     chars.next();
-                    return Ok(Value::Object(result));
+                    return Ok(DValue::Object(result));
                 }
                 ',' => {
                     chars.next();
@@ -206,7 +198,7 @@ impl Json {
         Err("Unterminated map".to_string())
     }
 
-    fn parse_true(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<Value, String> {
+    fn parse_true(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
         let expected = ['r', 'u', 'e'];
         for expected_char in expected {
             match chars.next() {
@@ -214,10 +206,10 @@ impl Json {
                 _ => return Err("Invalid boolean 'true' value".to_string()),
             }
         }
-        Ok(Value::Boolean(true))
+        Ok(DValue::Boolean(true))
     }
 
-    fn parse_false(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<Value, String> {
+    fn parse_false(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
         let expected = ['a', 'l', 's', 'e'];
         for expected_char in expected {
             match chars.next() {
@@ -225,10 +217,10 @@ impl Json {
                 _ => return Err("Invalid boolean 'false' value".to_string()),
             }
         }
-        Ok(Value::Boolean(false))
+        Ok(DValue::Boolean(false))
     }
 
-    fn parse_null(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<Value, String> {
+    fn parse_null(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
         let expected = ['u', 'l', 'l'];
         for expected_char in expected {
             match chars.next() {
@@ -236,10 +228,10 @@ impl Json {
                 _ => return Err("Invalid null value".to_string()),
             }
         }
-        Ok(Value::Null)
+        Ok(DValue::Null)
     }
 
-    fn parse_number(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<Value, String> {
+    fn parse_number(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
         let mut number_str = String::new();
         let mut has_decimal = false;
 
@@ -264,14 +256,24 @@ impl Json {
 
         number_str
             .parse::<f64>()
-            .map(Value::Number)
+            .map(DValue::Number)
             .map_err(|e| format!("Failed to parse number: {}", e))
     }
 }
 
-impl Value {
+#[derive(Debug)]
+pub enum DValue {
+    String(String),
+    Number(f64),
+    Boolean(bool),
+    Array(Vec<DValue>),
+    Object(HashMap<String, DValue>),
+    Null,
+}
+
+impl DValue {
     pub fn as_str(&self) -> Option<&str> {
-        if let Value::String(s) = self {
+        if let DValue::String(s) = self {
             Some(s)
         } else {
             None
@@ -279,23 +281,23 @@ impl Value {
     }
 
     pub fn as_string(&self) -> Option<String> {
-        if let Value::String(s) = self {
+        if let DValue::String(s) = self {
             Some(s.clone())
         } else {
             None
         }
     }
 
-    pub fn as_array(&self) -> Option<&[Value]> {
-        if let Value::Array(arr) = self {
+    pub fn as_array(&self) -> Option<&[DValue]> {
+        if let DValue::Array(arr) = self {
             Some(arr)
         } else {
             None
         }
     }
 
-    pub fn as_map(&self) -> Option<&HashMap<String, Value>> {
-        if let Value::Object(map) = self {
+    pub fn as_map(&self) -> Option<&HashMap<String, DValue>> {
+        if let DValue::Object(map) = self {
             Some(map)
         } else {
             None
@@ -304,19 +306,19 @@ impl Value {
 
     pub fn as_number(&self) -> Option<f64> {
         match self {
-            Value::Number(n) => Some(*n),
+            DValue::Number(n) => Some(*n),
             _ => None,
         }
     }
 
     pub fn as_bool(&self) -> Option<bool> {
         match self {
-            Value::Boolean(b) => Some(*b),
+            DValue::Boolean(b) => Some(*b),
             _ => None,
         }
     }
 
     pub fn is_null(&self) -> bool {
-        matches!(self, Value::Null)
+        matches!(self, DValue::Null)
     }
 }

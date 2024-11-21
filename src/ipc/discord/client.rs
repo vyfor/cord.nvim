@@ -1,4 +1,7 @@
 use crate::ipc::discord::utils;
+use crate::json::serialize::SValue;
+use crate::json::serialize::Serialize;
+use crate::json::Json;
 use crate::presence::types::{Activity, Packet};
 use std::io::{self, Read, Write};
 
@@ -9,6 +12,7 @@ pub struct RichClient {
     #[cfg(not(target_os = "windows"))]
     pub pipe: Option<std::os::unix::net::UnixStream>,
     pub last_activity: Option<Activity>,
+    pub pid: u32,
 }
 
 pub trait Connection {
@@ -55,26 +59,25 @@ impl RichClient {
         )
     }
 
-    pub fn update(&self, packet: &Packet) -> io::Result<()> {
+    pub fn update(&self, packet: &Packet) -> Result<(), Box<dyn std::error::Error>> {
         if packet.activity != self.last_activity {
-            return self.write(1, Some(packet.to_json().unwrap().as_bytes()));
+            let encoded = Json::serialize(packet)?;
+
+            self.write(1, Some(encoded.as_bytes()))?;
         }
 
         Ok(())
     }
 
-    pub fn clear(&self) -> io::Result<()> {
-        self.write(
-            1,
-            Some(
-                Packet {
-                    pid: std::process::id(),
-                    activity: None,
-                }
-                .to_json()
-                .unwrap()
-                .as_bytes(),
-            ),
-        )
+    pub fn clear(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let packet = Packet {
+            pid: self.pid,
+            activity: None,
+        };
+        let encoded = Json::serialize(&packet)?;
+
+        self.write(1, Some(encoded.as_bytes()))?;
+
+        Ok(())
     }
 }
