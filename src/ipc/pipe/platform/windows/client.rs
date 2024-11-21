@@ -4,8 +4,8 @@ use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
-use crate::ipc::pipe::message::{ClientMessage, Event, LocalMessage, Message};
 use crate::ipc::pipe::PipeClientImpl;
+use crate::messages::message::{ClientMessage, Event, LocalMessage, Message};
 
 pub struct PipeClient {
     id: u32,

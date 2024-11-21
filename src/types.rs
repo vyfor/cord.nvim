@@ -17,7 +17,7 @@ pub static CLIENT_IDS: LazyLock<HashMap<&str, u64>> = LazyLock::new(|| {
 
 #[derive(Debug, Clone)]
 pub struct Config {
-    pub client: String,
+    pub log_level: u8,
     pub timestamp: Option<u128>,
     pub viewing_text: String,
     pub editing_text: String,
@@ -41,11 +41,10 @@ impl Deserializable for Config {
     fn deserialize(
         input: &HashMap<String, crate::json::deserialize::Value>,
     ) -> Result<Self, String> {
-        let client = input
-            .get("client")
-            .and_then(|v| v.as_str())
-            .ok_or("Missing or invalid 'client_id' field")?
-            .to_string();
+        let log_level = input
+            .get("log_level")
+            .and_then(|v| v.as_number())
+            .ok_or("Missing or invalid 'log_level' field")? as u8;
 
         let viewing_text = input
             .get("viewing_text")
@@ -155,7 +154,7 @@ impl Deserializable for Config {
         buttons = validate_buttons(buttons, &workspace);
 
         Ok(Config {
-            client,
+            log_level,
             viewing_text,
             editing_text,
             file_browser_text,

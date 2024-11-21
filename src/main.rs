@@ -2,16 +2,14 @@ use std::{env::args, sync::mpsc};
 
 use ipc::{
     discord::client::{Connection, RichClient},
-    pipe::{
-        message::{Event, LocalMessage, Message},
-        platform::server::PipeServer,
-        PipeServerImpl,
-    },
+    pipe::{platform::server::PipeServer, PipeServerImpl},
 };
+use messages::message::{Event, LocalMessage, Message};
 
 mod ipc;
 mod json;
 mod mappings;
+mod messages;
 mod presence;
 mod types;
 mod util;

@@ -1,9 +1,8 @@
-pub mod message;
 pub mod platform;
 
 use std::{io, sync::mpsc::Sender};
 
-use message::Message;
+use crate::messages::message::Message;
 
 pub trait PipeServerImpl {
     fn new(pipe_name: &str, tx: Sender<Message>) -> Self

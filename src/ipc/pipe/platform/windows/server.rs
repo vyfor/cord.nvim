@@ -7,8 +7,8 @@ use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 
-use crate::ipc::pipe::message::{Event, Message, LocalMessage};
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
+use crate::messages::message::{Event, LocalMessage, Message};
 
 use super::client::PipeClient;
 
