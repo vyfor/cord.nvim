@@ -2,5 +2,5 @@
 pub struct ResetTimestampEvent;
 
 impl ResetTimestampEvent {
-    pub fn on_timestamp_reset(self) {}
+    pub fn on_reset_timestamp(self) {}
 }
