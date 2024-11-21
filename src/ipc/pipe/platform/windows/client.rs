@@ -8,7 +8,7 @@ use crate::ipc::pipe::PipeClientImpl;
 use crate::local_event;
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
-use crate::messages::events::local::{ClientDisconnectedEvent, ErrorEvent};
+use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 
 pub struct PipeClient {

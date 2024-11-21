@@ -1,5 +1,4 @@
 use crate::ipc::discord::utils;
-use crate::json::serialize::SValue;
 use crate::json::serialize::Serialize;
 use crate::json::Json;
 use crate::presence::types::{Activity, Packet};
