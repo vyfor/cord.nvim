@@ -21,8 +21,8 @@ impl ServerEvent {
 
         if let Some((id, message)) = message {
             match id {
-                0 => pipe.broadcast(&message.as_bytes()),
-                _ => pipe.write_to(id, &message.as_bytes()),
+                0 => pipe.broadcast(message.as_bytes()),
+                _ => pipe.write_to(id, message.as_bytes()),
             }
             .ok();
         }

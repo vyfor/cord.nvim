@@ -61,7 +61,7 @@ impl Json {
                                 let mut hex = String::new();
                                 for _ in 0..4 {
                                     if let Some(&hex_char) = chars.peek() {
-                                        if hex_char.is_digit(16) {
+                                        if hex_char.is_ascii_hexdigit() {
                                             hex.push(hex_char);
                                             chars.next();
                                         } else {

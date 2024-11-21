@@ -24,8 +24,7 @@ impl Deserializable for ActivityContext {
         let custom_asset = input
             .get("custom_asset")
             .and_then(|v| v.as_map().map(CustomAssetContext::deserialize))
-            .map(|v| v.ok())
-            .flatten();
+            .and_then(|v| v.ok());
 
         Ok(ActivityContext {
             filename,

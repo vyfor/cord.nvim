@@ -23,7 +23,7 @@ impl Connection for RichClient {
                 }
                 Err(e) => match e.kind() {
                     io::ErrorKind::NotFound => continue,
-                    _ => return Err(e.into()),
+                    _ => return Err(e),
                 },
             }
         }

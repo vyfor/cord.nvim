@@ -81,23 +81,20 @@ impl PipeServerImpl for PipeServer {
             while running.load(Ordering::SeqCst) {
                 if let Ok(handle) = PipeServer::create_pipe_instance(&pipe_name) {
                     unsafe {
-                        match ConnectNamedPipe(handle, std::ptr::null_mut()) {
-                            0 => {
-                                let error = GetLastError();
-                                if error != ERROR_PIPE_CONNECTED {
-                                    CloseHandle(handle);
-                                    tx.send(local_event!(
-                                        0,
-                                        Error,
-                                        ErrorEvent::new(Box::new(io::Error::from_raw_os_error(
-                                            error as _
-                                        )))
-                                    ))
-                                    .ok();
-                                    continue;
-                                }
+                        if ConnectNamedPipe(handle, std::ptr::null_mut()) == 0 {
+                            let error = GetLastError();
+                            if error != ERROR_PIPE_CONNECTED {
+                                CloseHandle(handle);
+                                tx.send(local_event!(
+                                    0,
+                                    Error,
+                                    ErrorEvent::new(Box::new(io::Error::from_raw_os_error(
+                                        error as _
+                                    )))
+                                ))
+                                .ok();
+                                continue;
                             }
-                            _ => {}
                         }
 
                         let client_id = next_client_id.fetch_add(1, Ordering::SeqCst);

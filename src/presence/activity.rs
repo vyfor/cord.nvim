@@ -136,7 +136,7 @@ impl ActivityContext {
                 | Filetype::FileBrowser(_, tooltip)
                 | Filetype::PluginManager(_, tooltip)
                 | Filetype::Lsp(_, tooltip)
-                | Filetype::Vcs(_, tooltip) => &tooltip,
+                | Filetype::Vcs(_, tooltip) => tooltip,
             }
         } else {
             &self.filetype
