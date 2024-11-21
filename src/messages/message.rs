@@ -56,3 +56,24 @@ macro_rules! local_event {
         )
     };
 }
+
+#[macro_export]
+macro_rules! server_event {
+    ($id:expr, $type:ident, $args:expr) => {
+        $crate::messages::message::Message::new(
+            $id,
+            $crate::messages::events::event::Event::Server(
+                $crate::messages::events::server::ServerEvent::$type($args),
+            ),
+        )
+    };
+
+    ($id:expr, $type:ident) => {
+        $crate::messages::message::Message::new(
+            $id,
+            $crate::messages::events::event::Event::Server(
+                $crate::messages::events::server::ServerEvent::$type(Default::default()),
+            ),
+        )
+    };
+}
