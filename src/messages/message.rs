@@ -1,80 +1,58 @@
-use std::error::Error;
-
-use crate::{
-    json::deserialize::{Deserializable, Json},
-    presence::activity::ActivityContext,
-    types::Config,
-};
+use super::events::event::Event;
 
 #[derive(Debug)]
 pub struct Message {
     pub client_id: u32,
-    pub message: Event,
-}
-
-#[derive(Debug)]
-pub enum Event {
-    Client(ClientMessage),
-    Local(LocalMessage),
-}
-
-#[derive(Debug)]
-pub enum ClientMessage {
-    Connect,
-    Initialize(Config),
-    UpdateActivity(ActivityContext),
-    ClearActivity,
-    UpdateWorkspace(String),
-    ResetTimestamp,
-    Disconnect,
-}
-
-macro_rules! data {
-    ($map:expr) => {
-        $map.get("data")
-            .and_then(|v| v.as_map())
-            .ok_or("Missing or invalid 'data' field")?
-    };
-    ($map:expr, $expr:expr) => {
-        $map.get("data")
-            .and_then($expr)
-            .ok_or("Missing or invalid 'data' field")?
-    };
+    pub event: Event,
 }
 
 impl Message {
     pub fn new(client_id: u32, message: Event) -> Self {
-        Self { client_id, message }
+        Self {
+            client_id,
+            event: message,
+        }
     }
 }
 
-impl ClientMessage {
-    // { type: string, data: any }
-    pub fn deserialize(json: &str) -> Result<Self, String> {
-        let map = Json::deserialize(json)?;
+#[macro_export]
+macro_rules! client_event {
+    ($id:expr, $type:ident, $args:expr) => {
+        $crate::messages::message::Message::new(
+            $id,
+            $crate::messages::events::event::Event::Client(
+                $crate::messages::events::client::ClientEvent::$type($args),
+            ),
+        )
+    };
 
-        let ty = map
-            .get("type")
-            .and_then(|v| v.as_str())
-            .ok_or("Missing 'type' field")?;
-
-        Ok(match ty {
-            "connect" => ClientMessage::Connect,
-            "initialize" => ClientMessage::Initialize(Config::deserialize(data!(map))?),
-            "update_activity" => {
-                ClientMessage::UpdateActivity(ActivityContext::deserialize(data!(map))?)
-            }
-            "clear_activity" => ClientMessage::ClearActivity,
-            "update_workspace" => ClientMessage::UpdateWorkspace(data!(map, |v| v.as_string())),
-            "reset_timestamp" => ClientMessage::ResetTimestamp,
-            "disconnect" => ClientMessage::Disconnect,
-            _ => return Err(format!("Unknown message type: {}", ty)),
-        })
-    }
+    ($id:expr, $type:ident) => {
+        $crate::messages::message::Message::new(
+            $id,
+            $crate::messages::events::event::Event::Client(
+                $crate::messages::events::client::ClientEvent::$type(Default::default()),
+            ),
+        )
+    };
 }
 
-#[derive(Debug)]
-pub enum LocalMessage {
-    ClientDisconnected,
-    Error(Box<dyn Error + Send + Sync>),
+#[macro_export]
+macro_rules! local_event {
+    ($id:expr, $type:ident, $args:expr) => {
+        $crate::messages::message::Message::new(
+            $id,
+            $crate::messages::events::event::Event::Local(
+                $crate::messages::events::local::LocalEvent::$type($args),
+            ),
+        )
+    };
+
+    ($id:expr, $type:ident) => {
+        $crate::messages::message::Message::new(
+            $id,
+            $crate::messages::events::event::Event::Local(
+                $crate::messages::events::local::LocalEvent::$type(Default::default()),
+            ),
+        )
+    };
 }

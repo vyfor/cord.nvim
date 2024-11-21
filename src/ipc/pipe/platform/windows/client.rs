@@ -5,7 +5,11 @@ use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use crate::ipc::pipe::PipeClientImpl;
-use crate::messages::message::{ClientMessage, Event, LocalMessage, Message};
+use crate::local_event;
+use crate::messages::events::client::ClientEvent;
+use crate::messages::events::event::Event;
+use crate::messages::events::local::{ClientDisconnectedEvent, ErrorEvent};
+use crate::messages::message::Message;
 
 pub struct PipeClient {
     id: u32,
@@ -43,26 +47,19 @@ impl PipeClientImpl for PipeClient {
                 loop {
                     match pipe.read(&mut buf) {
                         Ok(n) if n == 0 => {
-                            tx.send(Message::new(
-                                id,
-                                Event::Local(LocalMessage::ClientDisconnected),
-                            ))
-                            .ok();
+                            tx.send(local_event!(id, ClientDisconnected)).ok();
                             break;
                         }
                         Ok(n) => {
                             if let Ok(message) =
-                                ClientMessage::deserialize(&String::from_utf8_lossy(&buf[..n]))
+                                ClientEvent::deserialize(&String::from_utf8_lossy(&buf[..n]))
                             {
                                 tx.send(Message::new(id, Event::Client(message))).ok();
                             }
                         }
                         Err(e) => {
-                            tx.send(Message::new(
-                                id,
-                                Event::Local(LocalMessage::Error(Box::new(e))),
-                            ))
-                            .ok();
+                            tx.send(local_event!(id, Error, ErrorEvent::new(Box::new(e))))
+                                .ok();
                             break;
                         }
                     }

@@ -8,7 +8,9 @@ use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
-use crate::messages::message::{Event, LocalMessage, Message};
+use crate::local_event;
+use crate::messages::events::local::ErrorEvent;
+use crate::messages::message::Message;
 
 use super::client::PipeClient;
 
@@ -84,11 +86,12 @@ impl PipeServerImpl for PipeServer {
                                 let error = GetLastError();
                                 if error != ERROR_PIPE_CONNECTED {
                                     CloseHandle(handle);
-                                    tx.send(Message::new(
+                                    tx.send(local_event!(
                                         0,
-                                        Event::Local(LocalMessage::Error(Box::new(
-                                            io::Error::from_raw_os_error(error as _),
-                                        ))),
+                                        Error,
+                                        ErrorEvent::new(Box::new(io::Error::from_raw_os_error(
+                                            error as _
+                                        )))
                                     ))
                                     .ok();
                                     continue;

@@ -4,7 +4,10 @@ use ipc::{
     discord::client::{Connection, RichClient},
     pipe::{platform::server::PipeServer, PipeServerImpl},
 };
-use messages::message::{Event, LocalMessage, Message};
+use messages::{
+    events::{event::Event, local::LocalEvent},
+    message::Message,
+};
 
 mod ipc;
 mod json;
@@ -22,15 +25,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     pipe.start()?;
 
     while let Ok(message) = rx.recv() {
-        match message.message {
+        match message.event {
             Event::Client(_client_message) => {}
             Event::Local(server_message) => match server_message {
-                LocalMessage::ClientDisconnected => {
+                LocalEvent::ClientDisconnected(_) => {
                     println!("Client {} disconnected", message.client_id);
                     break;
                 }
-                LocalMessage::Error(e) => {
-                    println!("Error: {}", e);
+                LocalEvent::Error(event) => {
+                    println!("Error: {}", event.error);
                     break;
                 }
             },
