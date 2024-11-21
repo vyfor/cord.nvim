@@ -7,7 +7,7 @@ use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 
-use crate::ipc::pipe::message::Message;
+use crate::ipc::pipe::message::{Event, Message, LocalMessage};
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 
 use super::client::PipeClient;
@@ -81,8 +81,16 @@ impl PipeServerImpl for PipeServer {
                     unsafe {
                         match ConnectNamedPipe(handle, std::ptr::null_mut()) {
                             0 => {
-                                if GetLastError() != ERROR_PIPE_CONNECTED {
+                                let error = GetLastError();
+                                if error != ERROR_PIPE_CONNECTED {
                                     CloseHandle(handle);
+                                    tx.send(Message::new(
+                                        0,
+                                        Event::Local(LocalMessage::Error(Box::new(
+                                            io::Error::from_raw_os_error(error as _),
+                                        ))),
+                                    ))
+                                    .ok();
                                     continue;
                                 }
                             }

@@ -3,7 +3,7 @@ use std::os::unix::net::UnixStream;
 use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
 
-use crate::ipc::pipe::message::{ClientMessage, Message, ServerMessage};
+use crate::ipc::pipe::message::{ClientMessage, Event, LocalMessage, Message};
 use crate::ipc::pipe::PipeClientImpl;
 
 pub struct PipeClient {
@@ -45,20 +45,26 @@ impl PipeClientImpl for PipeClient {
                 loop {
                     match read_pipe.read(&mut buf) {
                         Ok(n) if n == 0 => {
-                            tx.send(Message::Server(ServerMessage::ClientDisconnected(id)))
-                                .ok();
+                            tx.send(Message::new(
+                                id,
+                                Event::Local(LocalMessage::ClientDisconnected),
+                            ))
+                            .ok();
                             break;
                         }
                         Ok(n) => {
                             if let Ok(message) =
                                 ClientMessage::deserialize(&String::from_utf8_lossy(&buf[..n]))
                             {
-                                tx.send(Message::Client(message)).ok();
+                                tx.send(Message::new(id, Event::Client(message))).ok();
                             }
                         }
                         Err(e) => {
-                            tx.send(Message::Server(ServerMessage::Error(Box::new(e))))
-                                .ok();
+                            tx.send(Message::new(
+                                id,
+                                Event::Local(LocalMessage::Error(Box::new(e))),
+                            ))
+                            .ok();
                             break;
                         }
                     }

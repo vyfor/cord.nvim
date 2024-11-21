@@ -7,7 +7,7 @@ use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 
-use crate::ipc::pipe::message::{Message, ServerMessage};
+use crate::ipc::pipe::message::{Event, LocalMessage, Message};
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 
 use super::client::PipeClient;
@@ -64,8 +64,11 @@ impl PipeServerImpl for PipeServer {
                         clients.lock().unwrap().insert(client_id, client);
                     }
                     Err(e) => {
-                        tx.send(Message::Server(ServerMessage::Error(Box::new(e))))
-                            .ok();
+                        tx.send(Message::new(
+                            0,
+                            Event::Local(LocalMessage::Error(Box::new(e))),
+                        ))
+                        .ok();
                     }
                 }
             }

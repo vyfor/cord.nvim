@@ -1,7 +1,4 @@
-pub fn get<'a>(
-    filetype: &'a str,
-    filename: &str,
-) -> Option<(&'a str, &'a str)> {
+pub fn get<'a>(filetype: &str, filename: &str) -> Option<(&'a str, &'a str)> {
     let language = match filetype {
         "Cord.new" => ("text", "New file"),
         "autohotkey" => ("ahk", "AutoHotkey"),
@@ -23,8 +20,7 @@ pub fn get<'a>(
         "heex" => ("phoenix", "Phoenix"),
         "erlang" => ("erlang", "Erlang"),
         "fsharp" => ("fsharp", "F#"),
-        "git" | "gitattributes" | "gitconfig" | "gitignore"
-        | "gitsendemail" => ("git", "Git"),
+        "git" | "gitattributes" | "gitconfig" | "gitignore" | "gitsendemail" => ("git", "Git"),
         "go" => ("go", "Go"),
         "groovy" => {
             if filename == "build.gradle" {

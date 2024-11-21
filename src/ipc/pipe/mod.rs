@@ -1,6 +1,5 @@
 pub mod message;
 pub mod platform;
-pub mod types;
 
 use std::{io, sync::mpsc::Sender};
 

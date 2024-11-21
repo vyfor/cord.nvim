@@ -1,5 +1,5 @@
-use crate::activity::types::{Activity, Packet};
 use crate::ipc::discord::utils;
+use crate::presence::types::{Activity, Packet};
 use std::io::{self, Read, Write};
 
 pub struct RichClient {
