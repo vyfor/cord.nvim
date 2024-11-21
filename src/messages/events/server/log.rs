@@ -8,5 +8,7 @@ impl LogEvent {
         Self { message }
     }
 
-    pub fn on_log(self) {}
+    pub fn on_log(self) -> Option<(u32, String)> {
+        Some((0, self.message))
+    }
 }

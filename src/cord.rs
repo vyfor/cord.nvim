@@ -13,6 +13,7 @@ use crate::{
     },
     local_event,
     messages::{events::local::ErrorEvent, handler::MessageHandler, message::Message},
+    server_event,
     types::Config,
 };
 
@@ -43,7 +44,7 @@ impl Cord {
     pub fn run(&mut self) -> io::Result<()> {
         self.start_rpc()?;
         self.server.start()?;
-        self.message_handler.run();
+        self.message_handler.run(&self.server);
 
         Ok(())
     }
@@ -56,6 +57,8 @@ impl Cord {
             if let Err(e) = rich_client.read() {
                 tx.send(local_event!(0, Error, ErrorEvent::new(Box::new(e))))
                     .ok();
+            } else {
+                tx.send(server_event!(0, Ready)).ok();
             }
         });
 

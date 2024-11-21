@@ -1,5 +1,7 @@
 use std::sync::mpsc::Receiver;
 
+use crate::ipc::pipe::PipeServerImpl;
+
 use super::message::Message;
 
 pub struct MessageHandler {
@@ -11,9 +13,9 @@ impl MessageHandler {
         Self { rx }
     }
 
-    pub fn run(&mut self) {
+    pub fn run<T: PipeServerImpl>(&mut self, pipe: &T) {
         for msg in self.rx.iter() {
-            msg.event.on_event();
+            msg.event.on_event(pipe);
         }
     }
 }
