@@ -1,3 +1,4 @@
 pub mod deserialize;
-mod serialize;
-mod utils;
+pub mod serialize;
+
+pub struct Json;
