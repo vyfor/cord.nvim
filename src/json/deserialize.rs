@@ -278,6 +278,14 @@ impl Value {
         }
     }
 
+    pub fn as_string(&self) -> Option<String> {
+        if let Value::String(s) = self {
+            Some(s.clone())
+        } else {
+            None
+        }
+    }
+
     pub fn as_array(&self) -> Option<&[Value]> {
         if let Value::Array(arr) = self {
             Some(arr)

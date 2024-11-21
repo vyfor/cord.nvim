@@ -17,11 +17,11 @@ pub struct CustomAssetContext {
 }
 
 #[derive(Debug, Clone)]
-pub struct PresenceContext<'a> {
+pub struct ActivityContext {
     pub filename: String,
     pub filetype: String,
-    pub resolved_type: Option<Filetype<'a>>,
     pub custom_asset: Option<CustomAssetContext>,
+    pub resolved_type: Option<Filetype>,
 }
 
 impl CustomAssetContext {
@@ -35,17 +35,20 @@ impl CustomAssetContext {
     }
 }
 
-impl<'a> PresenceContext<'a> {
+impl ActivityContext {
     pub fn new(filename: String, filetype: String) -> Self {
-        Self {
+        let mut ctx = Self {
             filename,
             filetype,
             resolved_type: None,
             custom_asset: None,
-        }
+        };
+        ctx.resolve_filetype();
+
+        ctx
     }
 
-    pub fn resolve_filetype(&'a mut self) -> bool {
+    pub fn resolve_filetype(&mut self) -> bool {
         let filetype_str = self.filetype.as_str();
         let filename_str = self.filename.as_str();
 
@@ -63,7 +66,7 @@ impl<'a> PresenceContext<'a> {
         self.custom_asset = Some(custom);
     }
 
-    pub fn get_effective_name(&'a self) -> Cow<'a, str> {
+    pub fn get_effective_name(&self) -> Cow<str> {
         if let Some(custom) = &self.custom_asset {
             if !custom.name.is_empty() {
                 return Cow::Borrowed(custom.name.as_str());
@@ -120,7 +123,7 @@ impl<'a> PresenceContext<'a> {
         }
     }
 
-    pub fn get_effective_tooltip(&'a self) -> &'a str {
+    pub fn get_effective_tooltip(&self) -> &str {
         if let Some(custom) = &self.custom_asset {
             if !custom.tooltip.is_empty() {
                 return &custom.tooltip;
@@ -140,7 +143,7 @@ impl<'a> PresenceContext<'a> {
         }
     }
 
-    fn build_idle_presence(&'a self, config: &'a Config) -> Option<Activity> {
+    fn build_idle_activity(&self, config: &Config) -> Option<Activity> {
         let state = self.build_workspace_state(config, -1);
         let large_image = get_asset("editor", "idle");
 
@@ -158,7 +161,7 @@ impl<'a> PresenceContext<'a> {
 
     fn build_details(
         &self,
-        config: &'a Config,
+        config: &Config,
         is_read_only: bool,
         cursor_position: Option<&str>,
     ) -> String {
@@ -178,7 +181,7 @@ impl<'a> PresenceContext<'a> {
         details
     }
 
-    fn build_workspace_state(&self, config: &'a Config, problem_count: i32) -> Option<String> {
+    fn build_workspace_state(&self, config: &Config, problem_count: i32) -> Option<String> {
         if !config.workspace_text.is_empty() {
             Some(if problem_count != -1 {
                 let replaced = config.workspace_text.replace("{}", &config.workspace);
@@ -214,7 +217,7 @@ impl<'a> PresenceContext<'a> {
 
     fn swap_images(
         &self,
-        config: &'a Config,
+        config: &Config,
         large_image: Option<String>,
         large_text: Option<String>,
         swap: bool,
@@ -242,14 +245,14 @@ impl<'a> PresenceContext<'a> {
     }
 
     pub fn build(
-        &'a self,
-        config: &'a Config,
+        &self,
+        config: &Config,
         is_read_only: bool,
         cursor_position: Option<&str>,
         problem_count: i32,
     ) -> Option<Activity> {
         if self.filetype == "Cord.idle" {
-            return self.build_idle_presence(config);
+            return self.build_idle_activity(config);
         }
 
         let details = self.build_details(config, is_read_only, cursor_position);

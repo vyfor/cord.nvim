@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::LazyLock};
 
 use crate::{
-    activity::types::ActivityButton, json::deserialize::Deserializable,
+    json::deserialize::Deserializable, presence::types::ActivityButton,
     util::utils::find_git_repository,
 };
 

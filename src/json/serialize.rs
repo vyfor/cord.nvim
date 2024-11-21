@@ -1,4 +1,4 @@
-use crate::activity::types::{Activity, Packet};
+use crate::presence::types::{Activity, Packet};
 
 use std::fmt::{Error, Write};
 

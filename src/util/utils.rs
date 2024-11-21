@@ -6,7 +6,7 @@ use std::{
     path::PathBuf,
 };
 
-use crate::activity::types::ActivityButton;
+use crate::presence::types::ActivityButton;
 
 pub const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
