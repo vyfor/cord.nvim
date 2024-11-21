@@ -145,7 +145,7 @@ impl Json {
         Err("Unterminated string".to_string())
     }
 
-    fn parse_value<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+    fn parse_value(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
         let pos = Self::skip_whitespace(input, start);
         if pos >= input.len() {
             return Err("Unexpected end of input".to_string());
@@ -166,7 +166,7 @@ impl Json {
         }
     }
 
-    fn parse_array<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+    fn parse_array(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
         let mut pos = start;
         let mut values = Vec::new();
         let mut expecting_value = true;
@@ -195,7 +195,7 @@ impl Json {
         Err("Unterminated array".to_string())
     }
 
-    fn parse_object<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+    fn parse_object(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
         let mut pos = start;
         let mut map = HashMap::new();
         let mut expecting_key = true;
@@ -232,7 +232,7 @@ impl Json {
         Err("Unterminated object".to_string())
     }
 
-    fn parse_true<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+    fn parse_true(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
         if input.len() >= start + 4 && &input[start..start + 4] == b"true" {
             Ok((DValue::Bool(true), start + 4))
         } else {
@@ -248,7 +248,7 @@ impl Json {
         }
     }
 
-    fn parse_null<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+    fn parse_null(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
         if input.len() >= start + 4 && &input[start..start + 4] == b"null" {
             Ok((DValue::Null, start + 4))
         } else {
@@ -256,7 +256,7 @@ impl Json {
         }
     }
 
-    fn parse_number<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+    fn parse_number(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
         let mut pos = start;
         let mut num_str = Vec::new();
 
