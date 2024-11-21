@@ -1,309 +1,56 @@
 use std::collections::HashMap;
+use std::str::from_utf8_unchecked;
 
 use super::Json;
 
-pub trait Deserializable: Sized {
-    fn deserialize(input: &HashMap<String, DValue>) -> Result<Self, String>;
-}
-
-impl Json {
-    pub fn deserialize(input: &str) -> Result<HashMap<String, DValue>, String> {
-        let input = input.trim();
-        if !input.starts_with('{') || !input.ends_with('}') {
-            return Err(format!("Invalid JSON object: {}", input));
-        }
-
-        let mut result = HashMap::new();
-        let mut chars = input[1..input.len() - 1].chars().peekable();
-
-        while let Some(c) = chars.next() {
-            if c.is_whitespace() || c == ',' {
-                continue;
-            }
-
-            if c != '"' {
-                return Err(format!("Expected '\"', found '{}'", c));
-            }
-            let key = Self::parse_string(&mut chars)?;
-
-            if chars.next() != Some(':') {
-                return Err("Expected ':' after key".to_string());
-            }
-
-            let value = Self::parse_value(&mut chars)?;
-            result.insert(key, value);
-        }
-
-        Ok(result)
-    }
-
-    fn parse_string(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<String, String> {
-        let mut result = String::new();
-        while let Some(&c) = chars.peek() {
-            chars.next();
-            match c {
-                '"' => {
-                    return Ok(result);
-                }
-                '\\' => {
-                    if let Some(&next_char) = chars.peek() {
-                        match next_char {
-                            '"' => result.push('"'),
-                            '\\' => result.push('\\'),
-                            '/' => result.push('/'),
-                            'b' => result.push('\x08'),
-                            'f' => result.push('\x0C'),
-                            'n' => result.push('\n'),
-                            'r' => result.push('\r'),
-                            't' => result.push('\t'),
-                            'u' => {
-                                chars.next();
-                                let mut hex = String::new();
-                                for _ in 0..4 {
-                                    if let Some(&hex_char) = chars.peek() {
-                                        if hex_char.is_ascii_hexdigit() {
-                                            hex.push(hex_char);
-                                            chars.next();
-                                        } else {
-                                            return Err(
-                                                "Invalid Unicode escape sequence".to_string()
-                                            );
-                                        }
-                                    } else {
-                                        return Err(
-                                            "Incomplete Unicode escape sequence".to_string()
-                                        );
-                                    }
-                                }
-                                if let Ok(code_point) = u32::from_str_radix(&hex, 16) {
-                                    if let Some(ch) = char::from_u32(code_point) {
-                                        result.push(ch);
-                                    } else {
-                                        return Err("Invalid Unicode code point".to_string());
-                                    }
-                                } else {
-                                    return Err("Invalid Unicode escape sequence".to_string());
-                                }
-                            }
-                            _ => return Err(format!("Invalid escape sequence: \\{}", next_char)),
-                        }
-                        chars.next();
-                    } else {
-                        return Err("Incomplete escape sequence".to_string());
-                    }
-                }
-                _ => result.push(c),
-            }
-        }
-        Err("Unterminated string".to_string())
-    }
-
-    fn parse_value(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
-        while let Some(&c) = chars.peek() {
-            match c {
-                '"' => {
-                    chars.next();
-                    return Ok(DValue::String(Self::parse_string(chars)?));
-                }
-                '[' => {
-                    chars.next();
-                    return Self::parse_array(chars);
-                }
-                '{' => {
-                    chars.next();
-                    return Self::parse_nested_map(chars);
-                }
-                't' => {
-                    chars.next();
-                    return Self::parse_true(chars);
-                }
-                'f' => {
-                    chars.next();
-                    return Self::parse_false(chars);
-                }
-                'n' => {
-                    chars.next();
-                    return Self::parse_null(chars);
-                }
-                '-' | '0'..='9' => {
-                    return Self::parse_number(chars);
-                }
-                _ if c.is_whitespace() => {
-                    chars.next();
-                    continue;
-                }
-                _ => return Err(format!("Unexpected character: '{}'", c)),
-            }
-        }
-        Err("Unexpected end of input".to_string())
-    }
-
-    fn parse_array(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
-        let mut values = Vec::new();
-        let mut expecting_value = true;
-
-        while let Some(&c) = chars.peek() {
-            match c {
-                ']' if !expecting_value => {
-                    chars.next();
-                    return Ok(DValue::Array(values));
-                }
-                ',' if !expecting_value => {
-                    chars.next();
-                    expecting_value = true;
-                }
-                _ if c.is_whitespace() => {
-                    chars.next();
-                }
-                _ if expecting_value => {
-                    values.push(Self::parse_value(chars)?);
-                    expecting_value = false;
-                }
-                _ => return Err(format!("Unexpected character in array: '{}'", c)),
-            }
-        }
-        Err("Unterminated array".to_string())
-    }
-
-    fn parse_nested_map(
-        chars: &mut std::iter::Peekable<std::str::Chars>,
-    ) -> Result<DValue, String> {
-        let mut result = HashMap::new();
-        while let Some(&c) = chars.peek() {
-            match c {
-                '}' => {
-                    chars.next();
-                    return Ok(DValue::Object(result));
-                }
-                ',' => {
-                    chars.next();
-                }
-                '"' => {
-                    chars.next();
-                    let key = Self::parse_string(chars)?;
-
-                    if chars.next() != Some(':') {
-                        return Err("Expected ':' after key".to_string());
-                    }
-
-                    let value = Self::parse_value(chars)?;
-                    result.insert(key, value);
-                }
-                _ if c.is_whitespace() => {
-                    chars.next();
-                }
-                _ => return Err(format!("Unexpected character in map: '{}'", c)),
-            }
-        }
-        Err("Unterminated map".to_string())
-    }
-
-    fn parse_true(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
-        let expected = ['r', 'u', 'e'];
-        for expected_char in expected {
-            match chars.next() {
-                Some(c) if c == expected_char => continue,
-                _ => return Err("Invalid boolean 'true' value".to_string()),
-            }
-        }
-        Ok(DValue::Boolean(true))
-    }
-
-    fn parse_false(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
-        let expected = ['a', 'l', 's', 'e'];
-        for expected_char in expected {
-            match chars.next() {
-                Some(c) if c == expected_char => continue,
-                _ => return Err("Invalid boolean 'false' value".to_string()),
-            }
-        }
-        Ok(DValue::Boolean(false))
-    }
-
-    fn parse_null(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
-        let expected = ['u', 'l', 'l'];
-        for expected_char in expected {
-            match chars.next() {
-                Some(c) if c == expected_char => continue,
-                _ => return Err("Invalid null value".to_string()),
-            }
-        }
-        Ok(DValue::Null)
-    }
-
-    fn parse_number(chars: &mut std::iter::Peekable<std::str::Chars>) -> Result<DValue, String> {
-        let mut number_str = String::new();
-        let mut has_decimal = false;
-
-        if let Some(&'-') = chars.peek() {
-            number_str.push(chars.next().unwrap());
-        }
-
-        while let Some(&c) = chars.peek() {
-            match c {
-                '0'..='9' => {
-                    number_str.push(chars.next().unwrap());
-                }
-                '.' if !has_decimal => {
-                    has_decimal = true;
-                    number_str.push(chars.next().unwrap());
-                }
-                '.' => return Err("Invalid number format: multiple decimal points".to_string()),
-                _ if c.is_whitespace() || c == ',' || c == '}' || c == ']' => break,
-                _ => return Err(format!("Invalid number character: '{}'", c)),
-            }
-        }
-
-        number_str
-            .parse::<f64>()
-            .map(DValue::Number)
-            .map_err(|e| format!("Failed to parse number: {}", e))
-    }
+pub trait Deserialize: Sized {
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String>;
 }
 
 #[derive(Debug)]
-pub enum DValue {
-    String(String),
+pub enum DValue<'a> {
+    String(&'a str),
     Number(f64),
-    Boolean(bool),
-    Array(Vec<DValue>),
-    Object(HashMap<String, DValue>),
+    Bool(bool),
     Null,
+    Array(Vec<DValue<'a>>),
+    Object(HashMap<&'a str, DValue<'a>>),
 }
 
-impl DValue {
+impl<'a> DValue<'a> {
+    #[inline]
     pub fn as_str(&self) -> Option<&str> {
-        if let DValue::String(s) = self {
-            Some(s)
-        } else {
-            None
+        match self {
+            DValue::String(s) => Some(s),
+            _ => None,
         }
     }
 
+    #[inline]
     pub fn as_string(&self) -> Option<String> {
-        if let DValue::String(s) = self {
-            Some(s.clone())
-        } else {
-            None
+        match self {
+            DValue::String(s) => Some(s.to_string()),
+            _ => None,
         }
     }
 
+    #[inline]
     pub fn as_array(&self) -> Option<&[DValue]> {
-        if let DValue::Array(arr) = self {
-            Some(arr)
-        } else {
-            None
+        match self {
+            DValue::Array(arr) => Some(arr),
+            _ => None,
         }
     }
 
-    pub fn as_map(&self) -> Option<&HashMap<String, DValue>> {
-        if let DValue::Object(map) = self {
-            Some(map)
-        } else {
-            None
+    #[inline]
+    pub fn as_map(&self) -> Option<&HashMap<&str, DValue>> {
+        match self {
+            DValue::Object(map) => Some(map),
+            _ => None,
         }
     }
 
+    #[inline]
     pub fn as_number(&self) -> Option<f64> {
         match self {
             DValue::Number(n) => Some(*n),
@@ -311,14 +58,254 @@ impl DValue {
         }
     }
 
+    #[inline]
     pub fn as_bool(&self) -> Option<bool> {
         match self {
-            DValue::Boolean(b) => Some(*b),
+            DValue::Bool(b) => Some(*b),
             _ => None,
         }
     }
 
+    #[inline]
     pub fn is_null(&self) -> bool {
         matches!(self, DValue::Null)
+    }
+}
+
+impl Json {
+    pub fn deserialize(input: &str) -> Result<HashMap<&str, DValue>, String> {
+        let input = input.trim().as_bytes();
+        if input.is_empty() || input[0] != b'{' || input[input.len() - 1] != b'}' {
+            return Err("Invalid JSON object".to_string());
+        }
+
+        let mut result = HashMap::new();
+        let mut pos = 1;
+        let len = input.len() - 1;
+
+        while pos < len {
+            pos = Self::skip_whitespace(input, pos);
+            if pos >= len {
+                break;
+            }
+
+            if input[pos] != b'"' {
+                return Err(format!("Expected '\"', found '{}'", input[pos] as char));
+            }
+            let (key, new_pos) = Self::parse_string_slice(input, pos + 1)?;
+            pos = new_pos;
+
+            pos = Self::skip_whitespace(input, pos);
+            if pos >= len || input[pos] != b':' {
+                return Err("Expected ':'".to_string());
+            }
+            pos += 1;
+
+            let (value, new_pos) = Self::parse_value(input, pos)?;
+            pos = new_pos;
+
+            result.insert(key, value);
+
+            pos = Self::skip_whitespace(input, pos);
+            if pos >= len {
+                break;
+            }
+            if input[pos] == b',' {
+                pos += 1;
+            }
+        }
+
+        Ok(result)
+    }
+
+    #[inline]
+    fn skip_whitespace(input: &[u8], mut pos: usize) -> usize {
+        while pos < input.len() && input[pos].is_ascii_whitespace() {
+            pos += 1;
+        }
+        pos
+    }
+
+    fn parse_string_slice(input: &[u8], start: usize) -> Result<(&str, usize), String> {
+        let mut pos = start;
+        let mut escaped = false;
+
+        while pos < input.len() {
+            let c = input[pos];
+            if escaped {
+                escaped = false;
+            } else if c == b'\\' {
+                escaped = true;
+            } else if c == b'"' {
+                let slice = unsafe { from_utf8_unchecked(&input[start..pos]) };
+                return Ok((slice, pos + 1));
+            }
+            pos += 1;
+        }
+        Err("Unterminated string".to_string())
+    }
+
+    fn parse_value<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+        let pos = Self::skip_whitespace(input, start);
+        if pos >= input.len() {
+            return Err("Unexpected end of input".to_string());
+        }
+
+        match input[pos] {
+            b'"' => {
+                let (s, new_pos) = Self::parse_string_slice(input, pos + 1)?;
+                Ok((DValue::String(s), new_pos))
+            }
+            b'[' => Self::parse_array(input, pos + 1),
+            b'{' => Self::parse_object(input, pos + 1),
+            b't' => Self::parse_true(input, pos),
+            b'f' => Self::parse_false(input, pos),
+            b'n' => Self::parse_null(input, pos),
+            b'-' | b'0'..=b'9' => Self::parse_number(input, pos),
+            _ => Err(format!("Unexpected character: '{}'", input[pos] as char)),
+        }
+    }
+
+    fn parse_array<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+        let mut pos = start;
+        let mut values = Vec::new();
+        let mut expecting_value = true;
+
+        while pos < input.len() {
+            pos = Self::skip_whitespace(input, pos);
+            if pos >= input.len() {
+                return Err("Unterminated array".to_string());
+            }
+
+            match input[pos] {
+                b']' if !expecting_value => return Ok((DValue::Array(values), pos + 1)),
+                b',' if !expecting_value => {
+                    pos += 1;
+                    expecting_value = true;
+                }
+                _ if expecting_value => {
+                    let (value, new_pos) = Self::parse_value(input, pos)?;
+                    values.push(value);
+                    pos = new_pos;
+                    expecting_value = false;
+                }
+                _ => return Err("Invalid array format".to_string()),
+            }
+        }
+        Err("Unterminated array".to_string())
+    }
+
+    fn parse_object<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+        let mut pos = start;
+        let mut map = HashMap::new();
+        let mut expecting_key = true;
+
+        while pos < input.len() {
+            pos = Self::skip_whitespace(input, pos);
+            if pos >= input.len() {
+                return Err("Unterminated object".to_string());
+            }
+
+            match input[pos] {
+                b'}' if !expecting_key => return Ok((DValue::Object(map), pos + 1)),
+                b',' if !expecting_key => {
+                    pos += 1;
+                    expecting_key = true;
+                }
+                b'"' if expecting_key => {
+                    let (key, new_pos) = Self::parse_string_slice(input, pos + 1)?;
+                    pos = Self::skip_whitespace(input, new_pos);
+
+                    if pos >= input.len() || input[pos] != b':' {
+                        return Err("Expected ':'".to_string());
+                    }
+                    pos += 1;
+
+                    let (value, new_pos) = Self::parse_value(input, pos)?;
+                    map.insert(key, value);
+                    pos = new_pos;
+                    expecting_key = false;
+                }
+                _ => return Err("Invalid object format".to_string()),
+            }
+        }
+        Err("Unterminated object".to_string())
+    }
+
+    fn parse_true<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+        if input.len() >= start + 4 && &input[start..start + 4] == b"true" {
+            Ok((DValue::Bool(true), start + 4))
+        } else {
+            Err("Invalid 'true' value".to_string())
+        }
+    }
+
+    fn parse_false(input: &[u8], start: usize) -> Result<(DValue, usize), String> {
+        if input.len() >= start + 5 && &input[start..start + 5] == b"false" {
+            Ok((DValue::Bool(false), start + 5))
+        } else {
+            Err("Invalid 'false' value".to_string())
+        }
+    }
+
+    fn parse_null<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+        if input.len() >= start + 4 && &input[start..start + 4] == b"null" {
+            Ok((DValue::Null, start + 4))
+        } else {
+            Err("Invalid 'null' value".to_string())
+        }
+    }
+
+    fn parse_number<'a>(input: &'a [u8], start: usize) -> Result<(DValue<'a>, usize), String> {
+        let mut pos = start;
+        let mut num_str = Vec::new();
+
+        if input[pos] == b'-' {
+            num_str.push(b'-');
+            pos += 1;
+        }
+
+        while pos < input.len() && input[pos].is_ascii_digit() {
+            num_str.push(input[pos]);
+            pos += 1;
+        }
+
+        if pos < input.len() && input[pos] == b'.' {
+            num_str.push(b'.');
+            pos += 1;
+            let mut has_decimal = false;
+            while pos < input.len() && input[pos].is_ascii_digit() {
+                num_str.push(input[pos]);
+                has_decimal = true;
+                pos += 1;
+            }
+            if !has_decimal {
+                return Err("Invalid number format".to_string());
+            }
+        }
+
+        if pos < input.len() && (input[pos] == b'e' || input[pos] == b'E') {
+            num_str.push(b'e');
+            pos += 1;
+            if pos < input.len() && (input[pos] == b'+' || input[pos] == b'-') {
+                num_str.push(input[pos]);
+                pos += 1;
+            }
+            let mut has_exp = false;
+            while pos < input.len() && input[pos].is_ascii_digit() {
+                num_str.push(input[pos]);
+                has_exp = true;
+                pos += 1;
+            }
+            if !has_exp {
+                return Err("Invalid number format".to_string());
+            }
+        }
+
+        let num_str = unsafe { from_utf8_unchecked(&num_str) };
+        match num_str.parse::<f64>() {
+            Ok(num) => Ok((DValue::Number(num), pos)),
+            Err(_) => Err("Invalid number format".to_string()),
+        }
     }
 }

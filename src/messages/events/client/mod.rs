@@ -1,5 +1,5 @@
 use crate::{
-    json::{deserialize::Deserializable, Json},
+    json::{deserialize::Deserialize, Json},
     presence::activity::ActivityContext,
     types::Config,
 };

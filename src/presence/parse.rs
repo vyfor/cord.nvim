@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
 use crate::{
-    json::deserialize::{DValue, Deserializable},
+    json::deserialize::{DValue, Deserialize},
     util::types::AssetType,
 };
 
 use super::activity::{ActivityContext, CustomAssetContext};
 
-impl Deserializable for ActivityContext {
-    fn deserialize(input: &HashMap<String, DValue>) -> Result<Self, String> {
+impl Deserialize for ActivityContext {
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String> {
         let filename = input
             .get("filename")
             .and_then(|v| v.as_str())
@@ -35,8 +35,8 @@ impl Deserializable for ActivityContext {
     }
 }
 
-impl Deserializable for CustomAssetContext {
-    fn deserialize(input: &HashMap<String, DValue>) -> Result<Self, String> {
+impl Deserialize for CustomAssetContext {
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String> {
         let ty = input
             .get("type")
             .and_then(|v| v.as_str().map(AssetType::from))

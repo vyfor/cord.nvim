@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::json::{
-    deserialize::{DValue, Deserializable},
+    deserialize::{DValue, Deserialize},
     serialize::{SValue, Serialize, SerializeFn, SerializeState},
 };
 
@@ -99,8 +99,8 @@ impl Serialize for ActivityButton {
     }
 }
 
-impl Deserializable for ActivityButton {
-    fn deserialize(input: &HashMap<String, DValue>) -> Result<Self, String> {
+impl Deserialize for ActivityButton {
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String> {
         let label = input
             .get("label")
             .and_then(|v| v.as_str())
@@ -111,6 +111,7 @@ impl Deserializable for ActivityButton {
             .and_then(|v| v.as_str())
             .ok_or("Missing or invalid 'url' field")?
             .to_string();
+
         Ok(ActivityButton { label, url })
     }
 }
