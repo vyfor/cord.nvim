@@ -71,4 +71,16 @@ impl ClientEvent {
             _ => return Err(format!("Unknown message type: {}", ty)),
         })
     }
+
+    pub fn on_event(self) {
+        match self {
+            ClientEvent::Connect(event) => event.on_connect(),
+            ClientEvent::Initialize(event) => event.on_initialize(),
+            ClientEvent::UpdateActivity(event) => event.on_update_activity(),
+            ClientEvent::ClearActivity(event) => event.on_clear_activity(),
+            ClientEvent::UpdateWorkspace(event) => event.on_update_workspace(),
+            ClientEvent::ResetTimestamp(event) => event.on_reset_timestamp(),
+            ClientEvent::Disconnect(event) => event.on_disconnect(),
+        }
+    }
 }
