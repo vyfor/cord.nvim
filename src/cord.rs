@@ -26,10 +26,12 @@ pub struct Cord {
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
+    pub iterations: u32,
+    pub max_iterations: u32,
 }
 
 impl Cord {
-    pub fn new(pipe_name: &str, client_id: u64) -> crate::Result<Self> {
+    pub fn new(pipe_name: &str, client_id: u64, max_iterations: u32) -> crate::Result<Self> {
         let (tx, rx) = mpsc::channel::<Message>();
         let rich_client = Arc::new(RichClient::connect(client_id)?);
         let server = PipeServer::new(pipe_name, tx.clone());
@@ -40,6 +42,8 @@ impl Cord {
             pipe: server,
             tx,
             rx,
+            iterations: 0,
+            max_iterations,
         })
     }
 
@@ -52,11 +56,19 @@ impl Cord {
     }
 
     fn start_event_loop(&mut self) -> crate::Result<()> {
-        while let Ok(msg) = self.rx.recv() {
-            msg.event.on_event(&mut EventContext {
-                cord: self,
-                client_id: msg.client_id,
-            })?;
+        loop {
+            if let Ok(msg) = self.rx.recv_timeout(std::time::Duration::from_millis(1000)) {
+                self.iterations = 0;
+                msg.event.on_event(&mut EventContext {
+                    cord: self,
+                    client_id: msg.client_id,
+                })?;
+            } else if self.pipe.clients.read().unwrap().is_empty() {
+                self.iterations += 1;
+                if self.iterations >= self.max_iterations {
+                    break;
+                }
+            }
         }
 
         Ok(())

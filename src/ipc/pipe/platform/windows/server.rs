@@ -6,7 +6,7 @@ use std::io;
 use std::os::windows::io::FromRawHandle;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::mpsc::Sender;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, RwLock};
 use std::thread::JoinHandle;
 
 use super::{
@@ -24,9 +24,9 @@ use crate::messages::message::Message;
 use crate::{client_event, local_event};
 
 pub struct PipeServer {
+    pub clients: Arc<RwLock<HashMap<u32, PipeClient>>>,
     pipe_name: String,
     tx: Sender<Message>,
-    clients: Arc<Mutex<HashMap<u32, PipeClient>>>,
     next_client_id: Arc<AtomicU32>,
     running: Arc<AtomicBool>,
     thread_handle: Option<JoinHandle<()>>,
@@ -35,9 +35,9 @@ pub struct PipeServer {
 impl PipeServerImpl for PipeServer {
     fn new(pipe_name: &str, tx: Sender<Message>) -> Self {
         Self {
+            clients: Arc::new(RwLock::new(HashMap::new())),
             pipe_name: pipe_name.to_string(),
             tx,
-            clients: Arc::new(Mutex::new(HashMap::new())),
             next_client_id: Arc::new(AtomicU32::new(1)),
             running: Arc::new(AtomicBool::new(false)),
             thread_handle: None,
@@ -113,7 +113,7 @@ impl PipeServerImpl for PipeServer {
                         );
                         client.start_read_thread().ok();
                         tx.send(client_event!(client_id, Connect)).ok();
-                        clients.lock().unwrap().insert(client_id, client);
+                        clients.write().unwrap().insert(client_id, client);
 
                         CloseHandle(h_event);
                     }
@@ -129,11 +129,11 @@ impl PipeServerImpl for PipeServer {
         if let Some(handle) = self.thread_handle.take() {
             drop(handle);
         }
-        self.clients.lock().unwrap().clear();
+        self.clients.write().unwrap().clear();
     }
 
     fn broadcast(&self, data: &[u8]) -> io::Result<()> {
-        let mut clients = self.clients.lock().unwrap();
+        let mut clients = self.clients.write().unwrap();
         let mut failed_clients = Vec::new();
 
         for (client_id, client) in clients.iter_mut() {
@@ -151,7 +151,7 @@ impl PipeServerImpl for PipeServer {
 
     fn write_to(&self, client_id: u32, data: &[u8]) -> io::Result<()> {
         self.clients
-            .lock()
+            .write()
             .unwrap()
             .get_mut(&client_id)
             .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Client not found"))?
@@ -159,7 +159,7 @@ impl PipeServerImpl for PipeServer {
     }
 
     fn disconnect(&self, client_id: u32) -> io::Result<()> {
-        self.clients.lock().unwrap().remove(&client_id);
+        self.clients.write().unwrap().remove(&client_id);
         Ok(())
     }
 }
