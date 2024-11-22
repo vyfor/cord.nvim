@@ -10,9 +10,9 @@ use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 
 use super::{
-    client::PipeClient, CreateEventW, CreateNamedPipeW, Overlapped,
-    FILE_FLAG_OVERLAPPED, HANDLE, INVALID_HANDLE_VALUE, LPVOID, PIPE_ACCESS_DUPLEX,
-    PIPE_READMODE_MESSAGE, PIPE_TYPE_MESSAGE, PIPE_UNLIMITED_INSTANCES, WAIT_OBJECT_0,
+    client::PipeClient, CreateEventW, CreateNamedPipeW, Overlapped, FILE_FLAG_OVERLAPPED, HANDLE,
+    INVALID_HANDLE_VALUE, LPVOID, PIPE_ACCESS_DUPLEX, PIPE_READMODE_MESSAGE, PIPE_TYPE_MESSAGE,
+    PIPE_UNLIMITED_INSTANCES, WAIT_OBJECT_0,
 };
 use super::{
     CloseHandle, ConnectNamedPipe, GetLastError, WaitForSingleObject, ERROR_IO_PENDING,
@@ -158,7 +158,7 @@ impl PipeServerImpl for PipeServer {
             .write(data)
     }
 
-    fn disconnect(&mut self, client_id: u32) -> io::Result<()> {
+    fn disconnect(&self, client_id: u32) -> io::Result<()> {
         self.clients.lock().unwrap().remove(&client_id);
         Ok(())
     }

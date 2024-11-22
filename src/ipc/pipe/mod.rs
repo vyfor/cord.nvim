@@ -12,7 +12,7 @@ pub trait PipeServerImpl {
     fn stop(&mut self);
     fn broadcast(&self, data: &[u8]) -> io::Result<()>;
     fn write_to(&self, client_id: u32, data: &[u8]) -> io::Result<()>;
-    fn disconnect(&mut self, client_id: u32) -> io::Result<()>;
+    fn disconnect(&self, client_id: u32) -> io::Result<()>;
 }
 
 pub trait PipeClientImpl {

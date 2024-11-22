@@ -29,6 +29,18 @@ pub struct Overlapped {
     pub h_event: HANDLE,
 }
 
+impl Default for Overlapped {
+    fn default() -> Self {
+        Self {
+            internal: 0,
+            internal_high: 0,
+            offset: 0,
+            offset_high: 0,
+            h_event: unsafe { CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut()) },
+        }
+    }
+}
+
 extern "system" {
     pub fn CreateNamedPipeW(
         lpName: LPCWSTR,

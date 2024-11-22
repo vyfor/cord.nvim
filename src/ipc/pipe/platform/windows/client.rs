@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use super::{
-    CreateEventW, Overlapped, ReadFile, WaitForSingleObject, WriteFile, INFINITE, WAIT_OBJECT_0,
+    Overlapped, ReadFile, WaitForSingleObject, WriteFile, ERROR_IO_PENDING, INFINITE, WAIT_OBJECT_0,
 };
 use crate::ipc::pipe::PipeClientImpl;
 use crate::local_event;
@@ -38,13 +38,7 @@ impl PipeClientImpl for PipeClient {
         if let Some(pipe) = &self.pipe {
             let handle = pipe.as_raw_handle();
             unsafe {
-                let mut overlapped = Overlapped {
-                    internal: 0,
-                    internal_high: 0,
-                    offset: 0,
-                    offset_high: 0,
-                    h_event: CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut()),
-                };
+                let mut overlapped = Overlapped::default();
 
                 let mut bytes_written = 0;
                 let write_result = WriteFile(
@@ -57,7 +51,7 @@ impl PipeClientImpl for PipeClient {
 
                 if write_result == 0 {
                     let error = io::Error::last_os_error();
-                    if error.raw_os_error() != Some(997) {
+                    if error.raw_os_error() != Some(ERROR_IO_PENDING as i32) {
                         return Err(error);
                     }
                 }
@@ -85,14 +79,7 @@ impl PipeClientImpl for PipeClient {
 
                 loop {
                     unsafe {
-                        let mut overlapped = Overlapped {
-                            internal: 0,
-                            internal_high: 0,
-                            offset: 0,
-                            offset_high: 0,
-                            h_event: CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut()),
-                        };
-
+                        let mut overlapped = Overlapped::default();
                         let mut bytes_read = 0;
                         let read_result = ReadFile(
                             handle,
@@ -104,7 +91,7 @@ impl PipeClientImpl for PipeClient {
 
                         if read_result == 0 {
                             let error = io::Error::last_os_error();
-                            if error.raw_os_error() != Some(997) {
+                            if error.raw_os_error() != Some(ERROR_IO_PENDING as i32) {
                                 tx.send(local_event!(id, Error, ErrorEvent::new(Box::new(error))))
                                     .ok();
                                 break;

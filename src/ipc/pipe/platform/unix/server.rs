@@ -117,7 +117,7 @@ impl PipeServerImpl for PipeServer {
             .write(data)
     }
 
-    fn disconnect(&mut self, client_id: u32) -> io::Result<()> {
+    fn disconnect(&self, client_id: u32) -> io::Result<()> {
         self.clients.lock().unwrap().remove(&client_id);
         Ok(())
     }
