@@ -1,6 +1,4 @@
-use std::sync::Arc;
-
-use crate::ipc::{discord::client::RichClient, pipe::platform::server::PipeServer};
+use crate::cord::Cord;
 
 use super::{client::ClientEvent, local::LocalEvent, server::ServerEvent};
 
@@ -12,9 +10,8 @@ pub enum Event {
 }
 
 pub struct EventContext<'a> {
+    pub cord: &'a mut Cord,
     pub client_id: u32,
-    pub pipe: &'a PipeServer,
-    pub rich_client: Arc<RichClient>,
 }
 
 pub trait OnEvent {

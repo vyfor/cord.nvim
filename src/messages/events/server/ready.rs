@@ -15,8 +15,10 @@ pub struct ReadyEvent;
 
 impl OnEvent for ReadyEvent {
     fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
-        if !ctx.rich_client.is_ready.swap(true, Ordering::SeqCst) {
-            ctx.pipe.broadcast(Json::serialize(&self)?.as_bytes())?;
+        if !ctx.cord.rich_client.is_ready.swap(true, Ordering::SeqCst) {
+            ctx.cord
+                .pipe
+                .broadcast(Json::serialize(&self)?.as_bytes())?;
         }
 
         Ok(())

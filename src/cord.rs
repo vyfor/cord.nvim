@@ -1,9 +1,6 @@
-use std::{
-    io,
-    sync::{
-        mpsc::{self, Receiver, Sender},
-        Arc,
-    },
+use std::sync::{
+    mpsc::{self, Receiver, Sender},
+    Arc,
 };
 
 use crate::{
@@ -55,11 +52,10 @@ impl Cord {
     }
 
     fn start_event_loop(&mut self) -> crate::Result<()> {
-        for msg in self.rx.iter() {
+        while let Ok(msg) = self.rx.recv() {
             msg.event.on_event(&EventContext {
+                cord: self,
                 client_id: msg.client_id,
-                pipe: &self.pipe,
-                rich_client: self.rich_client.clone(),
             })?;
         }
 

@@ -14,8 +14,9 @@ use crate::{
 
 impl OnEvent for ConnectEvent {
     fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
-        if ctx.rich_client.is_ready.load(Ordering::SeqCst) {
-            ctx.pipe
+        if ctx.cord.rich_client.is_ready.load(Ordering::SeqCst) {
+            ctx.cord
+                .pipe
                 .write_to(ctx.client_id, Json::serialize(&ReadyEvent)?.as_bytes())?;
         }
 
