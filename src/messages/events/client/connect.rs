@@ -13,7 +13,7 @@ use crate::{
 };
 
 impl OnEvent for ConnectEvent {
-    fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         if ctx.cord.rich_client.is_ready.load(Ordering::SeqCst) {
             ctx.cord
                 .pipe

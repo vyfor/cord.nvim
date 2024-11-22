@@ -7,7 +7,9 @@ pub struct InitializeEvent {
 }
 
 impl OnEvent for InitializeEvent {
-    fn on_event(self, _ctx: &EventContext) -> crate::Result<()> {
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        ctx.cord.config = Some(self.config);
+
         Ok(())
     }
 }

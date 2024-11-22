@@ -13,7 +13,7 @@ pub enum ServerEvent {
 }
 
 impl OnEvent for ServerEvent {
-    fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         match self {
             Self::Ready(e) => e.on_event(ctx),
             Self::Log(e) => e.on_event(ctx),

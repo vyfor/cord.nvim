@@ -14,7 +14,7 @@ use crate::{
 pub struct ReadyEvent;
 
 impl OnEvent for ReadyEvent {
-    fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         if !ctx.cord.rich_client.is_ready.swap(true, Ordering::SeqCst) {
             ctx.cord
                 .pipe

@@ -15,11 +15,11 @@ pub struct EventContext<'a> {
 }
 
 pub trait OnEvent {
-    fn on_event(self, ctx: &EventContext) -> crate::Result<()>;
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()>;
 }
 
 impl OnEvent for Event {
-    fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         match self {
             Event::Client(e) => e.on_event(ctx),
             Event::Local(e) => e.on_event(ctx),

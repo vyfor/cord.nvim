@@ -53,7 +53,7 @@ impl Cord {
 
     fn start_event_loop(&mut self) -> crate::Result<()> {
         while let Ok(msg) = self.rx.recv() {
-            msg.event.on_event(&EventContext {
+            msg.event.on_event(&mut EventContext {
                 cord: self,
                 client_id: msg.client_id,
             })?;

@@ -13,7 +13,7 @@ pub enum LocalEvent {
 }
 
 impl OnEvent for LocalEvent {
-    fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         match self {
             Self::ClientDisconnected(e) => e.on_event(ctx),
             Self::Error(e) => e.on_event(ctx),

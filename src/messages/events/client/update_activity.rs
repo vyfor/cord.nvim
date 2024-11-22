@@ -13,7 +13,7 @@ impl UpdateActivityEvent {
 }
 
 impl OnEvent for UpdateActivityEvent {
-    fn on_event(self, _ctx: &EventContext) -> crate::Result<()> {
+    fn on_event(self, _ctx: &mut EventContext) -> crate::Result<()> {
         Ok(())
     }
 }
