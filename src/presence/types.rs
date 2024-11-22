@@ -10,6 +10,12 @@ pub struct Packet {
     pub activity: Option<Activity>,
 }
 
+impl Packet {
+    pub fn new(pid: u32, activity: Option<Activity>) -> Self {
+        Self { pid, activity }
+    }
+}
+
 impl Serialize for Packet {
     fn serialize<'a>(
         &'a self,
