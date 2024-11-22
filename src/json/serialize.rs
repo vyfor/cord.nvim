@@ -12,14 +12,11 @@ pub enum SValue<'a> {
     Object(&'a dyn Serialize),
 }
 
-pub type SerializeFn<'a> = fn(&'a str, SValue<'a>, &mut SerializeState) -> Result<(), String>;
+pub type SerializeFn<'a> = fn(&'a str, SValue<'a>, &mut SerializeState) -> crate::Result<()>;
 
 pub trait Serialize {
-    fn serialize<'a>(
-        &'a self,
-        f: SerializeFn<'a>,
-        state: &mut SerializeState,
-    ) -> Result<(), String>;
+    fn serialize<'a>(&'a self, f: SerializeFn<'a>, state: &mut SerializeState)
+        -> crate::Result<()>;
 }
 
 pub trait SerializeObj: Serialize + std::fmt::Debug {}
@@ -65,12 +62,12 @@ impl<'a> std::fmt::Debug for SValue<'a> {
 }
 
 impl Json {
-    pub fn serialize(value: &dyn Serialize) -> Result<String, String> {
+    pub fn serialize(value: &dyn Serialize) -> crate::Result<String> {
         let mut state = SerializeState::new();
         state.buf.push('{');
         state.push_scope();
 
-        fn write_kv(key: &str, value: &SValue, state: &mut SerializeState) -> Result<(), String> {
+        fn write_kv(key: &str, value: &SValue, state: &mut SerializeState) -> crate::Result<()> {
             if state.needs_comma() {
                 state.buf.push(',');
             }
@@ -84,7 +81,7 @@ impl Json {
             key: &str,
             value: SValue,
             state: &mut SerializeState,
-        ) -> Result<(), String> {
+        ) -> crate::Result<()> {
             write_kv(key, &value, state)
         }
 
@@ -94,7 +91,7 @@ impl Json {
     }
 }
 
-fn write_value(value: &SValue, state: &mut SerializeState) -> Result<(), String> {
+fn write_value(value: &SValue, state: &mut SerializeState) -> crate::Result<()> {
     match value {
         SValue::String(s) => {
             state.buf.push('"');
@@ -104,7 +101,8 @@ fn write_value(value: &SValue, state: &mut SerializeState) -> Result<(), String>
         }
         SValue::Number(n) => {
             use std::fmt::Write;
-            write!(state.buf, "{}", n).map_err(|e| e.to_string())
+            write!(state.buf, "{}", n).map_err(|e| e.to_string())?;
+            Ok(())
         }
         SValue::Boolean(b) => {
             state.buf.push_str(if *b { "true" } else { "false" });

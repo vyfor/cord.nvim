@@ -1,5 +1,6 @@
 use crate::{
     json::{deserialize::Deserialize, Json},
+    messages::events::event::{EventContext, OnEvent},
     presence::activity::ActivityContext,
     types::Config,
 };
@@ -71,16 +72,18 @@ impl ClientEvent {
             _ => return Err(format!("Unknown message type: {}", ty)),
         })
     }
+}
 
-    pub fn on_event(self) {
+impl OnEvent for ClientEvent {
+    fn on_event(self, ctx: &EventContext) {
         match self {
-            ClientEvent::Connect(event) => event.on_connect(),
-            ClientEvent::Initialize(event) => event.on_initialize(),
-            ClientEvent::UpdateActivity(event) => event.on_update_activity(),
-            ClientEvent::ClearActivity(event) => event.on_clear_activity(),
-            ClientEvent::UpdateWorkspace(event) => event.on_update_workspace(),
-            ClientEvent::ResetTimestamp(event) => event.on_reset_timestamp(),
-            ClientEvent::Disconnect(event) => event.on_disconnect(),
+            Self::Initialize(e) => e.on_event(ctx),
+            Self::Connect(e) => e.on_event(ctx),
+            Self::Disconnect(e) => e.on_event(ctx),
+            Self::UpdateActivity(e) => e.on_event(ctx),
+            Self::ClearActivity(e) => e.on_event(ctx),
+            Self::ResetTimestamp(e) => e.on_event(ctx),
+            Self::UpdateWorkspace(e) => e.on_event(ctx),
         }
     }
 }

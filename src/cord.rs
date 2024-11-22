@@ -1,7 +1,7 @@
 use std::{
     io,
     sync::{
-        mpsc::{self, Sender},
+        mpsc::{self, Receiver, Sender},
         Arc,
     },
 };
@@ -12,44 +12,58 @@ use crate::{
         pipe::{platform::server::PipeServer, PipeServerImpl},
     },
     local_event,
-    messages::{events::local::ErrorEvent, handler::MessageHandler, message::Message},
+    messages::{
+        events::{
+            event::{EventContext, OnEvent},
+            local::ErrorEvent,
+        },
+        message::Message,
+    },
     server_event,
     types::Config,
 };
 
 pub struct Cord {
     pub config: Option<Config>,
-    pub message_handler: MessageHandler,
     pub rich_client: Arc<RichClient>,
-    pub server: PipeServer,
+    pub pipe: PipeServer,
     pub tx: Sender<Message>,
+    pub rx: Receiver<Message>,
 }
 
 impl Cord {
-    pub fn new(pipe_name: &str, client_id: u64) -> io::Result<Self> {
+    pub fn new(pipe_name: &str, client_id: u64) -> crate::Result<Self> {
         let (tx, rx) = mpsc::channel::<Message>();
-        let message_handler = MessageHandler::new(rx);
         let rich_client = Arc::new(RichClient::connect(client_id)?);
         let server = PipeServer::new(pipe_name, tx.clone());
 
         Ok(Self {
             config: None,
-            message_handler,
             rich_client,
-            server,
+            pipe: server,
             tx,
+            rx,
         })
     }
 
-    pub fn run(&mut self) -> io::Result<()> {
+    pub fn run(&mut self) -> crate::Result<()> {
         self.start_rpc()?;
-        self.server.start()?;
-        self.message_handler.run(&self.server);
+        self.pipe.start()?;
+        self.start_event_loop();
 
         Ok(())
     }
 
-    fn start_rpc(&self) -> io::Result<()> {
+    fn start_event_loop(&mut self) {
+        for msg in self.rx.iter() {
+            msg.event.on_event(&EventContext {
+                pipe: &self.pipe,
+                rich_client: self.rich_client.clone(),
+            });
+        }
+    }
+
+    fn start_rpc(&self) -> crate::Result<()> {
         self.rich_client.handshake()?;
         let rich_client = self.rich_client.clone();
         let tx = self.tx.clone();

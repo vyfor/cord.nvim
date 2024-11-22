@@ -1,8 +1,13 @@
+use crate::messages::events::event::{EventContext, OnEvent};
 use crate::types::Config;
 
 #[derive(Debug)]
 pub struct InitializeEvent {
     pub config: Config,
+}
+
+impl OnEvent for InitializeEvent {
+    fn on_event(self, _ctx: &EventContext) {}
 }
 
 impl InitializeEvent {

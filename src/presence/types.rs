@@ -15,7 +15,7 @@ impl Serialize for Packet {
         &'a self,
         f: SerializeFn<'a>,
         state: &mut SerializeState,
-    ) -> Result<(), String> {
+    ) -> crate::Result<()> {
         f("pid", SValue::Number(self.pid as f64), state)?;
         if let Some(activity) = &self.activity {
             f("activity", SValue::Object(activity), state)?;
@@ -41,7 +41,7 @@ impl Serialize for Activity {
         &'a self,
         f: SerializeFn<'a>,
         state: &mut SerializeState,
-    ) -> Result<(), String> {
+    ) -> crate::Result<()> {
         if let Some(details) = &self.details {
             f("details", SValue::String(details), state)?;
         }
@@ -92,7 +92,7 @@ impl Serialize for ActivityButton {
         &'a self,
         f: SerializeFn<'a>,
         state: &mut SerializeState,
-    ) -> Result<(), String> {
+    ) -> crate::Result<()> {
         f("label", SValue::String(&self.label), state)?;
         f("url", SValue::String(&self.url), state)?;
         Ok(())

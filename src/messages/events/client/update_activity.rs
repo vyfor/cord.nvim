@@ -1,3 +1,4 @@
+use crate::messages::events::event::{EventContext, OnEvent};
 use crate::presence::activity::ActivityContext;
 
 #[derive(Debug)]
@@ -9,6 +10,8 @@ impl UpdateActivityEvent {
     pub fn new(context: ActivityContext) -> Self {
         Self { context }
     }
+}
 
-    pub fn on_update_activity(self) {}
+impl OnEvent for UpdateActivityEvent {
+    fn on_event(self, _ctx: &EventContext) {}
 }

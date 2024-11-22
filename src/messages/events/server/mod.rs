@@ -4,7 +4,7 @@ pub mod ready;
 pub use log::LogEvent;
 pub use ready::ReadyEvent;
 
-use crate::ipc::pipe::PipeServerImpl;
+use crate::messages::events::event::{EventContext, OnEvent};
 
 #[derive(Debug)]
 pub enum ServerEvent {
@@ -12,19 +12,11 @@ pub enum ServerEvent {
     Log(LogEvent),
 }
 
-impl ServerEvent {
-    pub fn on_event<T: PipeServerImpl>(self, pipe: &T) {
-        let message = match self {
-            ServerEvent::Ready(ready_event) => ready_event.on_ready(),
-            ServerEvent::Log(log_event) => log_event.on_log(),
-        };
-
-        if let Some((id, message)) = message {
-            match id {
-                0 => pipe.broadcast(message.as_bytes()),
-                _ => pipe.write_to(id, message.as_bytes()),
-            }
-            .ok();
+impl OnEvent for ServerEvent {
+    fn on_event(self, ctx: &EventContext) {
+        match self {
+            Self::Ready(e) => e.on_event(ctx),
+            Self::Log(e) => e.on_event(ctx),
         }
     }
 }

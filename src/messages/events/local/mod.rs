@@ -4,17 +4,19 @@ pub mod error;
 pub use client_disconnected::ClientDisconnectedEvent;
 pub use error::ErrorEvent;
 
+use super::event::{EventContext, OnEvent};
+
 #[derive(Debug)]
 pub enum LocalEvent {
     ClientDisconnected(ClientDisconnectedEvent),
     Error(ErrorEvent),
 }
 
-impl LocalEvent {
-    pub fn on_event(self) {
+impl OnEvent for LocalEvent {
+    fn on_event(self, ctx: &EventContext) {
         match self {
-            LocalEvent::ClientDisconnected(event) => event.on_client_disconnected(),
-            LocalEvent::Error(event) => event.on_error(),
+            Self::ClientDisconnected(e) => e.on_event(ctx),
+            Self::Error(e) => e.on_event(ctx),
         }
     }
 }

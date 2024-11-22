@@ -1,6 +1,8 @@
+use crate::messages::events::event::{EventContext, OnEvent};
+
 #[derive(Debug, Default)]
 pub struct ClientDisconnectedEvent;
 
-impl ClientDisconnectedEvent {
-    pub fn on_client_disconnected(self) {}
+impl OnEvent for ClientDisconnectedEvent {
+    fn on_event(self, _ctx: &EventContext) {}
 }
