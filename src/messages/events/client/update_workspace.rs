@@ -1,4 +1,10 @@
-use crate::messages::events::event::{EventContext, OnEvent};
+use std::borrow::Borrow;
+
+use crate::{
+    messages::events::event::{EventContext, OnEvent},
+    types,
+    util::utils,
+};
 
 #[derive(Debug)]
 pub struct UpdateWorkspaceEvent {
@@ -12,7 +18,19 @@ impl UpdateWorkspaceEvent {
 }
 
 impl OnEvent for UpdateWorkspaceEvent {
-    fn on_event(self, _ctx: &mut EventContext) -> crate::Result<()> {
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        if let Some(config) = &mut ctx.cord.config {
+            let workspace = utils::find_workspace(&self.workspace);
+            if let Some(filename) = workspace.file_name() {
+                let filename = filename.to_string_lossy();
+                config.workspace = filename.to_string();
+
+                types::validate_buttons(&mut config.buttons, filename.borrow());
+
+                // todo: check for workspace blacklist
+            }
+        }
+
         Ok(())
     }
 }

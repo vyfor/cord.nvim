@@ -4,7 +4,11 @@ use crate::messages::events::event::{EventContext, OnEvent};
 pub struct ResetTimestampEvent;
 
 impl OnEvent for ResetTimestampEvent {
-    fn on_event(self, _ctx: &mut EventContext) -> crate::Result<()> {
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        if let Some(config) = &mut ctx.cord.config {
+            config.timestamp = None;
+        }
+
         Ok(())
     }
 }
