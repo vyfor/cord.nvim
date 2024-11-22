@@ -17,7 +17,5 @@ use error::Result;
 fn main() -> Result<()> {
     let client_id = args().nth(1).ok_or("Missing client ID")?.parse::<u64>()?;
 
-    Cord::new("cord-ipc", client_id)?.run().unwrap();
-
-    Ok(())
+    Cord::new("cord-ipc", client_id)?.run()
 }
