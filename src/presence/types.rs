@@ -100,7 +100,7 @@ impl Serialize for ActivityButton {
 }
 
 impl Deserialize for ActivityButton {
-    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String> {
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> crate::Result<Self> {
         let label = input
             .get("label")
             .and_then(|v| v.as_str())

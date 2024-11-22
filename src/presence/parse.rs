@@ -8,7 +8,7 @@ use crate::{
 use super::activity::{ActivityContext, CustomAssetContext};
 
 impl Deserialize for ActivityContext {
-    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String> {
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> crate::Result<Self> {
         let filename = input
             .get("filename")
             .and_then(|v| v.as_str())
@@ -36,7 +36,7 @@ impl Deserialize for ActivityContext {
 }
 
 impl Deserialize for CustomAssetContext {
-    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String> {
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> crate::Result<Self> {
         let ty = input
             .get("type")
             .and_then(|v| v.as_str().map(AssetType::from))

@@ -51,7 +51,6 @@ impl Error for CordParseError {
         match self {
             CordParseError::ParseError(err) => Some(err),
             CordParseError::ParseIntError(err) => Some(err),
-            _ => None,
         }
     }
 }

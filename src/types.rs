@@ -39,7 +39,7 @@ pub struct Config {
 }
 
 impl Deserialize for Config {
-    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String> {
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> crate::Result<Self> {
         let log_level = input
             .get("log_level")
             .and_then(|v| v.as_number())
@@ -144,12 +144,8 @@ impl Deserialize for Config {
             .and_then(|v| v.as_array())
             .ok_or("Missing or invalid 'buttons' field")?
             .iter()
-            .map(|v| {
-                v.as_map()
-                    .ok_or("Invalid button entry".to_string())
-                    .and_then(ActivityButton::deserialize)
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+            .map(|v| ActivityButton::deserialize(v.as_map().ok_or("Invalid button entry")?))
+            .collect::<crate::Result<Vec<_>>>()?;
         buttons = validate_buttons(buttons, &workspace);
 
         Ok(Config {

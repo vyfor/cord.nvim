@@ -4,7 +4,7 @@ use std::str::from_utf8_unchecked;
 use super::Json;
 
 pub trait Deserialize: Sized {
-    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> Result<Self, String>;
+    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> crate::Result<Self>;
 }
 
 #[derive(Debug)]

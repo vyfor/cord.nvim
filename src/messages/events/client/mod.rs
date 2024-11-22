@@ -47,7 +47,7 @@ macro_rules! data {
 
 impl ClientEvent {
     // { type: string, data: any }
-    pub fn deserialize(json: &str) -> Result<Self, String> {
+    pub fn deserialize(json: &str) -> crate::Result<Self> {
         let map = Json::deserialize(json)?;
 
         let ty = map
@@ -69,7 +69,7 @@ impl ClientEvent {
             }
             "reset_timestamp" => Self::ResetTimestamp(ResetTimestampEvent),
             "disconnect" => Self::Disconnect(DisconnectEvent),
-            _ => return Err(format!("Unknown message type: {}", ty)),
+            _ => return Err(format!("Unknown message type: {}", ty).into()),
         })
     }
 }
