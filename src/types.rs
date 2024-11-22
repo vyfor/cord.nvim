@@ -19,7 +19,6 @@ pub static CLIENT_IDS: LazyLock<HashMap<&str, u64>> = LazyLock::new(|| {
 #[derive(Debug, Clone)]
 pub struct Config {
     pub log_level: u8,
-    pub timestamp: Option<u128>,
     pub viewing_text: String,
     pub editing_text: String,
     pub file_browser_text: String,
@@ -36,6 +35,7 @@ pub struct Config {
     pub swap_fields: bool,
     pub swap_icons: bool,
     pub buttons: Vec<ActivityButton>,
+    pub timestamp: Option<u128>,
 }
 
 impl Deserialize for Config {
@@ -146,7 +146,7 @@ impl Deserialize for Config {
             .iter()
             .map(|v| ActivityButton::deserialize(v.as_map().ok_or("Invalid button entry")?))
             .collect::<crate::Result<Vec<_>>>()?;
-        buttons = validate_buttons(buttons, &workspace);
+        validate_buttons(&mut buttons, &workspace);
 
         Ok(Config {
             log_level,
@@ -171,20 +171,19 @@ impl Deserialize for Config {
     }
 }
 
-pub fn validate_buttons(mut buttons: Vec<ActivityButton>, workspace: &str) -> Vec<ActivityButton> {
+pub fn validate_buttons(buttons: &mut Vec<ActivityButton>, workspace: &str) {
+    buttons.truncate(2);
+
     if buttons.iter().any(|b| b.url == "git") {
         if let Some(repository) = find_git_repository(workspace) {
-            for button in &mut buttons {
-                if button.url == "git" {
-                    button.url.clone_from(&repository);
-                }
-            }
+            buttons
+                .iter_mut()
+                .filter(|b| b.url == "git")
+                .for_each(|button| button.url = repository.clone());
         } else {
             buttons.retain(|b| b.url != "git");
         }
     }
 
     buttons.retain(|b| !b.label.is_empty() && !b.url.is_empty() && b.url.starts_with("http"));
-    buttons.truncate(2);
-    buttons
 }
