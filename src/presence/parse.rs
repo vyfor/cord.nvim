@@ -21,6 +21,31 @@ impl Deserialize for ActivityContext {
             .ok_or("Missing or invalid 'filetype' field")?
             .to_string();
 
+        let is_read_only = input
+            .get("is_read_only")
+            .and_then(|v| v.as_bool())
+            .ok_or("Missing or invalid 'is_read_only' field")?;
+
+        let mut cursor_position = None;
+        if let Some(cursor) = input.get("cursor_position") {
+            let array = cursor.as_array().ok_or("Invalid 'cursor_position' field")?;
+            let line = array
+                .first()
+                .and_then(|v| v.as_number())
+                .ok_or("Invalid 'cursor_position' field")? as i32;
+            let char = array
+                .get(1)
+                .and_then(|v| v.as_number())
+                .ok_or("Invalid 'cursor_position' field")? as i32;
+
+            cursor_position = Some((line, char));
+        }
+
+        let problem_count = input
+            .get("problem_count")
+            .and_then(|v| v.as_number())
+            .ok_or("Missing or invalid 'problem_count' field")? as i32;
+
         let custom_asset = input
             .get("custom_asset")
             .and_then(|v| v.as_map().map(CustomAssetContext::deserialize))
@@ -29,6 +54,9 @@ impl Deserialize for ActivityContext {
         Ok(ActivityContext {
             filename,
             filetype,
+            is_read_only,
+            cursor_position,
+            problem_count,
             custom_asset,
             resolved_type: None,
         })

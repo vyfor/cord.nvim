@@ -1,4 +1,7 @@
-use std::{borrow::Cow, ops::Deref};
+use std::{
+    borrow::{Borrow, Cow},
+    ops::Deref,
+};
 
 use crate::{
     mappings::Filetype,
@@ -20,6 +23,9 @@ pub struct CustomAssetContext {
 pub struct ActivityContext {
     pub filename: String,
     pub filetype: String,
+    pub is_read_only: bool,
+    pub cursor_position: Option<(i32, i32)>,
+    pub problem_count: i32,
     pub custom_asset: Option<CustomAssetContext>,
     pub resolved_type: Option<Filetype>,
 }
@@ -36,10 +42,19 @@ impl CustomAssetContext {
 }
 
 impl ActivityContext {
-    pub fn new(filename: String, filetype: String) -> Self {
+    pub fn new(
+        filename: String,
+        filetype: String,
+        is_read_only: bool,
+        cursor_position: Option<(i32, i32)>,
+        problem_count: i32,
+    ) -> Self {
         let mut ctx = Self {
             filename,
             filetype,
+            is_read_only,
+            cursor_position,
+            problem_count,
             resolved_type: None,
             custom_asset: None,
         };
@@ -143,11 +158,11 @@ impl ActivityContext {
         }
     }
 
-    fn build_idle_activity(&self, config: &Config) -> Option<Activity> {
+    fn build_idle_activity(&self, config: &Config) -> Activity {
         let state = self.build_workspace_state(config, -1);
         let large_image = get_asset("editor", "idle");
 
-        Some(Activity {
+        Activity {
             details: Some(config.idle_text.clone()),
             state,
             large_image: Some(large_image),
@@ -156,27 +171,40 @@ impl ActivityContext {
             small_text: None,
             timestamp: config.timestamp,
             buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
-        })
+        }
     }
 
-    fn build_details(
-        &self,
-        config: &Config,
-        is_read_only: bool,
-        cursor_position: Option<&str>,
-    ) -> String {
+    fn build_details(&self, config: &Config) -> String {
         let filename = self.get_effective_name();
         let filename = filename.deref();
 
-        let mut details = if is_read_only {
-            config.viewing_text.replace("{}", filename)
-        } else {
-            config.editing_text.replace("{}", filename)
-        };
+        let details = match self.resolved_type.as_ref().unwrap() {
+            Filetype::Language(_, _) => {
+                let mut details = if self.is_read_only {
+                    config.viewing_text.replace("{}", filename)
+                } else {
+                    config.editing_text.replace("{}", filename)
+                };
 
-        if let Some(pos) = cursor_position {
-            details = format!("{}:{}", details, pos);
-        }
+                if let Some((line, char)) = self.cursor_position {
+                    details = details + ":" + &line.to_string() + ":" + &char.to_string();
+                }
+
+                details
+            }
+            Filetype::FileBrowser(_, _) => config
+                .file_browser_text
+                .replace("{}", self.get_effective_name().borrow()),
+            Filetype::PluginManager(_, _) => config
+                .plugin_manager_text
+                .replace("{}", self.get_effective_name().borrow()),
+            Filetype::Lsp(_, _) => config
+                .lsp_manager_text
+                .replace("{}", self.get_effective_name().borrow()),
+            Filetype::Vcs(_, _) => config
+                .vcs_text
+                .replace("{}", self.get_effective_name().borrow()),
+        };
 
         details
     }
@@ -244,19 +272,13 @@ impl ActivityContext {
         }
     }
 
-    pub fn build(
-        &self,
-        config: &Config,
-        is_read_only: bool,
-        cursor_position: Option<&str>,
-        problem_count: i32,
-    ) -> Option<Activity> {
+    pub fn build(&self, config: &Config) -> Activity {
         if self.filetype == "Cord.idle" {
             return self.build_idle_activity(config);
         }
 
-        let details = self.build_details(config, is_read_only, cursor_position);
-        let state = self.build_workspace_state(config, problem_count);
+        let details = self.build_details(config);
+        let state = self.build_workspace_state(config, self.problem_count);
 
         let large_image = Some(self.get_effective_icon());
         let large_text = Some(self.get_effective_tooltip()).map(|s| s.to_owned());
@@ -265,7 +287,7 @@ impl ActivityContext {
             self.swap_images(config, large_image, large_text, config.swap_icons);
         let (details, state) = self.swap_fields(details, state, config.swap_fields);
 
-        Some(Activity {
+        Activity {
             details: Some(details),
             state: state.map(|s| s.to_owned()),
             large_image: large_image.map(|s| s.to_owned()),
@@ -274,6 +296,6 @@ impl ActivityContext {
             small_text,
             timestamp: config.timestamp,
             buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
-        })
+        }
     }
 }
