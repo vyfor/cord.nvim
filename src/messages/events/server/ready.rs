@@ -1,3 +1,5 @@
+use std::sync::atomic::Ordering;
+
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::EventContext;
 use crate::{
@@ -13,7 +15,9 @@ pub struct ReadyEvent;
 
 impl OnEvent for ReadyEvent {
     fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
-        ctx.pipe.broadcast(Json::serialize(&self)?.as_bytes())?;
+        if !ctx.rich_client.is_ready.swap(true, Ordering::SeqCst) {
+            ctx.pipe.broadcast(Json::serialize(&self)?.as_bytes())?;
+        }
 
         Ok(())
     }

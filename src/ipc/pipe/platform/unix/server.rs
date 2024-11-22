@@ -8,9 +8,9 @@ use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
-use crate::local_event;
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
+use crate::{client_event, local_event};
 
 use super::client::PipeClient;
 
@@ -62,6 +62,7 @@ impl PipeServerImpl for PipeServer {
                     Ok((stream, _)) => {
                         let client_id = next_client_id.fetch_add(1, Ordering::SeqCst);
                         let mut client = PipeClient::new(client_id, stream, tx.clone());
+                        tx.send(client_event!(0, Connect)).ok();
                         client.start_read_thread().ok();
                         clients.lock().unwrap().insert(client_id, client);
                     }

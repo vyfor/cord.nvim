@@ -49,18 +49,21 @@ impl Cord {
     pub fn run(&mut self) -> crate::Result<()> {
         self.start_rpc()?;
         self.pipe.start()?;
-        self.start_event_loop();
+        self.start_event_loop()?;
 
         Ok(())
     }
 
-    fn start_event_loop(&mut self) {
+    fn start_event_loop(&mut self) -> crate::Result<()> {
         for msg in self.rx.iter() {
             msg.event.on_event(&EventContext {
+                client_id: msg.client_id,
                 pipe: &self.pipe,
                 rich_client: self.rich_client.clone(),
-            });
+            })?;
         }
+
+        Ok(())
     }
 
     fn start_rpc(&self) -> crate::Result<()> {

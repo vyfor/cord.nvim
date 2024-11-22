@@ -9,43 +9,19 @@ use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 
+use super::{
+    client::PipeClient, CreateEventW, CreateNamedPipeW, Overlapped,
+    FILE_FLAG_OVERLAPPED, HANDLE, INVALID_HANDLE_VALUE, LPVOID, PIPE_ACCESS_DUPLEX,
+    PIPE_READMODE_MESSAGE, PIPE_TYPE_MESSAGE, PIPE_UNLIMITED_INSTANCES, WAIT_OBJECT_0,
+};
+use super::{
+    CloseHandle, ConnectNamedPipe, GetLastError, WaitForSingleObject, ERROR_IO_PENDING,
+    ERROR_PIPE_CONNECTED, INFINITE,
+};
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
-use crate::local_event;
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
-
-use super::client::PipeClient;
-
-type HANDLE = *mut std::ffi::c_void;
-type DWORD = u32;
-type BOOL = i32;
-type LPCWSTR = *const u16;
-type LPVOID = *mut std::ffi::c_void;
-
-const INVALID_HANDLE_VALUE: HANDLE = -1isize as HANDLE;
-const ERROR_PIPE_CONNECTED: DWORD = 535;
-const PIPE_ACCESS_DUPLEX: DWORD = 0x00000003;
-const PIPE_TYPE_MESSAGE: DWORD = 0x00000004;
-const PIPE_READMODE_MESSAGE: DWORD = 0x00000002;
-const PIPE_WAIT: DWORD = 0x00000000;
-const PIPE_UNLIMITED_INSTANCES: DWORD = 255;
-
-extern "system" {
-    fn CreateNamedPipeW(
-        lpName: LPCWSTR,
-        dwOpenMode: DWORD,
-        dwPipeMode: DWORD,
-        nMaxInstances: DWORD,
-        nOutBufferSize: DWORD,
-        nInBufferSize: DWORD,
-        nDefaultTimeOut: DWORD,
-        lpSecurityAttributes: LPVOID,
-    ) -> HANDLE;
-
-    fn ConnectNamedPipe(hNamedPipe: HANDLE, lpOverlapped: LPVOID) -> BOOL;
-    fn GetLastError() -> DWORD;
-    fn CloseHandle(hObject: HANDLE) -> BOOL;
-}
+use crate::{client_event, local_event};
 
 pub struct PipeServer {
     pipe_name: String,
@@ -83,10 +59,34 @@ impl PipeServerImpl for PipeServer {
             while running.load(Ordering::SeqCst) {
                 if let Ok(handle) = PipeServer::create_pipe_instance(&pipe_name) {
                     unsafe {
-                        if ConnectNamedPipe(handle, std::ptr::null_mut()) == 0 {
+                        let h_event =
+                            CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut());
+                        if h_event.is_null() {
+                            CloseHandle(handle);
+                            tx.send(local_event!(
+                                0,
+                                Error,
+                                ErrorEvent::new(Box::new(io::Error::last_os_error()))
+                            ))
+                            .ok();
+                            continue;
+                        }
+
+                        let mut overlapped = Overlapped {
+                            internal: 0,
+                            internal_high: 0,
+                            offset: 0,
+                            offset_high: 0,
+                            h_event,
+                        };
+
+                        let connect_result =
+                            ConnectNamedPipe(handle, &mut overlapped as *mut _ as LPVOID);
+                        if connect_result == 0 {
                             let error = GetLastError();
-                            if error != ERROR_PIPE_CONNECTED {
+                            if error != ERROR_IO_PENDING && error != ERROR_PIPE_CONNECTED {
                                 CloseHandle(handle);
+                                CloseHandle(h_event);
                                 tx.send(local_event!(
                                     0,
                                     Error,
@@ -99,6 +99,12 @@ impl PipeServerImpl for PipeServer {
                             }
                         }
 
+                        if WaitForSingleObject(overlapped.h_event, INFINITE) != WAIT_OBJECT_0 {
+                            CloseHandle(handle);
+                            CloseHandle(h_event);
+                            continue;
+                        }
+
                         let client_id = next_client_id.fetch_add(1, Ordering::SeqCst);
                         let mut client = PipeClient::new(
                             client_id,
@@ -106,7 +112,10 @@ impl PipeServerImpl for PipeServer {
                             tx.clone(),
                         );
                         client.start_read_thread().ok();
+                        tx.send(client_event!(client_id, Connect)).ok();
                         clients.lock().unwrap().insert(client_id, client);
+
+                        CloseHandle(h_event);
                     }
                 }
             }
@@ -165,8 +174,8 @@ impl PipeServer {
         let handle = unsafe {
             CreateNamedPipeW(
                 wide_name.as_ptr(),
-                PIPE_ACCESS_DUPLEX,
-                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+                PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
                 PIPE_UNLIMITED_INSTANCES,
                 1024 * 16,
                 1024 * 16,

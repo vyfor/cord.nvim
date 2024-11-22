@@ -2,6 +2,7 @@ use crate::ipc::discord::utils;
 use crate::json::Json;
 use crate::presence::types::{Activity, Packet};
 use std::io::{self, Read, Write};
+use std::sync::atomic::AtomicBool;
 
 pub struct RichClient {
     pub client_id: u64,
@@ -11,6 +12,7 @@ pub struct RichClient {
     pub pipe: Option<std::os::unix::net::UnixStream>,
     pub last_activity: Option<Activity>,
     pub pid: u32,
+    pub is_ready: AtomicBool,
 }
 
 pub trait Connection {

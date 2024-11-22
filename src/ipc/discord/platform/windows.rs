@@ -19,6 +19,7 @@ impl Connection for RichClient {
                         pipe: Some(pipe),
                         last_activity: None,
                         pid: std::process::id(),
+                        is_ready: false.into(),
                     })
                 }
                 Err(e) => match e.kind() {

@@ -1,9 +1,13 @@
 use std::fs::File;
-use std::io::{self, Read, Write};
+use std::io::{self};
+use std::os::windows::io::AsRawHandle;
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
+use super::{
+    CreateEventW, Overlapped, ReadFile, WaitForSingleObject, WriteFile, INFINITE, WAIT_OBJECT_0,
+};
 use crate::ipc::pipe::PipeClientImpl;
 use crate::local_event;
 use crate::messages::events::client::ClientEvent;
@@ -31,40 +35,106 @@ impl PipeClientImpl for PipeClient {
     }
 
     fn write(&mut self, data: &[u8]) -> io::Result<()> {
-        self.pipe.as_mut().map_or(
-            Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found")),
-            |pipe| pipe.write_all(data),
-        )
+        if let Some(pipe) = &self.pipe {
+            let handle = pipe.as_raw_handle();
+            unsafe {
+                let mut overlapped = Overlapped {
+                    internal: 0,
+                    internal_high: 0,
+                    offset: 0,
+                    offset_high: 0,
+                    h_event: CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut()),
+                };
+
+                let mut bytes_written = 0;
+                let write_result = WriteFile(
+                    handle,
+                    data.as_ptr(),
+                    data.len() as u32,
+                    &mut bytes_written,
+                    &mut overlapped,
+                );
+
+                if write_result == 0 {
+                    let error = io::Error::last_os_error();
+                    if error.raw_os_error() != Some(997) {
+                        return Err(error);
+                    }
+                }
+
+                if WaitForSingleObject(overlapped.h_event, INFINITE) != WAIT_OBJECT_0 {
+                    return Err(io::Error::last_os_error());
+                }
+
+                Ok(())
+            }
+        } else {
+            Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found"))
+        }
     }
 
     fn start_read_thread(&mut self) -> io::Result<()> {
-        if let Some(mut pipe) = self.pipe.take() {
+        if let Some(pipe) = self.pipe.as_ref() {
+            let pipe = pipe.clone();
             let tx = self.tx.clone();
             let id = self.id;
 
             let handle = std::thread::spawn(move || {
                 let mut buf = [0u8; 4096];
+                let handle = pipe.as_raw_handle();
+
                 loop {
-                    match pipe.read(&mut buf) {
-                        Ok(0) => {
+                    unsafe {
+                        let mut overlapped = Overlapped {
+                            internal: 0,
+                            internal_high: 0,
+                            offset: 0,
+                            offset_high: 0,
+                            h_event: CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut()),
+                        };
+
+                        let mut bytes_read = 0;
+                        let read_result = ReadFile(
+                            handle,
+                            buf.as_mut_ptr(),
+                            buf.len() as u32,
+                            &mut bytes_read,
+                            &mut overlapped,
+                        );
+
+                        if read_result == 0 {
+                            let error = io::Error::last_os_error();
+                            if error.raw_os_error() != Some(997) {
+                                tx.send(local_event!(id, Error, ErrorEvent::new(Box::new(error))))
+                                    .ok();
+                                break;
+                            }
+                        }
+
+                        if WaitForSingleObject(overlapped.h_event, INFINITE) != WAIT_OBJECT_0 {
+                            tx.send(local_event!(
+                                id,
+                                Error,
+                                ErrorEvent::new(Box::new(io::Error::last_os_error()))
+                            ))
+                            .ok();
+                            break;
+                        }
+
+                        if bytes_read == 0 {
                             tx.send(local_event!(id, ClientDisconnected)).ok();
                             break;
                         }
-                        Ok(n) => {
-                            if let Ok(message) =
-                                ClientEvent::deserialize(&String::from_utf8_lossy(&buf[..n]))
-                            {
-                                tx.send(Message::new(id, Event::Client(message))).ok();
-                            }
-                        }
-                        Err(e) => {
-                            tx.send(local_event!(id, Error, ErrorEvent::new(Box::new(e))))
-                                .ok();
-                            break;
+
+                        if let Ok(message) = ClientEvent::deserialize(&String::from_utf8_lossy(
+                            &buf[..bytes_read as usize],
+                        )) {
+                            tx.send(Message::new(id, Event::Client(message))).ok();
                         }
                     }
                 }
             });
+
             self.thread_handle = Some(handle);
             Ok(())
         } else {

@@ -12,6 +12,7 @@ pub enum Event {
 }
 
 pub struct EventContext<'a> {
+    pub client_id: u32,
     pub pipe: &'a PipeServer,
     pub rich_client: Arc<RichClient>,
 }
