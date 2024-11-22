@@ -1,11 +1,10 @@
-use std::fs::OpenOptions;
-use std::io;
 use std::os::windows::fs::OpenOptionsExt;
+use std::{fs::OpenOptions, io};
 
 use crate::ipc::discord::client::{Connection, RichClient};
 
 impl Connection for RichClient {
-    fn connect(client_id: u64) -> io::Result<Self> {
+    fn connect(client_id: u64) -> crate::Result<Self> {
         for i in 0..10 {
             match OpenOptions::new()
                 .read(true)
@@ -24,12 +23,12 @@ impl Connection for RichClient {
                 }
                 Err(e) => match e.kind() {
                     io::ErrorKind::NotFound => continue,
-                    _ => return Err(e),
+                    _ => return Err(e.into()),
                 },
             }
         }
 
-        Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found"))
+        Err("Pipe not found".into())
     }
 
     fn close(&mut self) {

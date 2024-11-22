@@ -6,7 +6,7 @@ use std::os::unix::net::UnixStream;
 use crate::ipc::discord::client::{Connection, RichClient};
 
 impl Connection for RichClient {
-    fn connect(client_id: u64) -> io::Result<Self> {
+    fn connect(client_id: u64) -> crate::Result<Self> {
         let dirs = ["XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"]
             .iter()
             .filter_map(|&dir| var(dir).ok())
@@ -33,13 +33,13 @@ impl Connection for RichClient {
                     }
                     Err(e) => match e.kind() {
                         io::ErrorKind::NotFound => continue,
-                        _ => return Err(e),
+                        _ => return Err(e.into()),
                     },
                 }
             }
         }
 
-        Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found"))
+        Err("Pipe not found".into())
     }
 
     fn close(&mut self) {

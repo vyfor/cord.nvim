@@ -1,7 +1,7 @@
 use crate::ipc::discord::utils;
 use crate::json::Json;
 use crate::presence::types::{Activity, Packet};
-use std::io::{self, Read, Write};
+use std::io::{Read, Write};
 use std::sync::atomic::AtomicBool;
 
 pub struct RichClient {
@@ -16,15 +16,15 @@ pub struct RichClient {
 }
 
 pub trait Connection {
-    fn connect(client_id: u64) -> io::Result<RichClient>;
+    fn connect(client_id: u64) -> crate::Result<RichClient>;
     fn close(&mut self);
 }
 
 impl RichClient {
-    pub fn write(&self, opcode: u32, data: Option<&[u8]>) -> io::Result<()> {
-        self.pipe.as_ref().map_or(
-            Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found")),
-            |mut pipe| {
+    pub fn write(&self, opcode: u32, data: Option<&[u8]>) -> crate::Result<()> {
+        self.pipe
+            .as_ref()
+            .map_or(Err("Pipe not found".into()), |mut pipe| {
                 let payload = match data {
                     Some(packet) => {
                         let mut payload = utils::encode(opcode, packet.len() as u32);
@@ -33,33 +33,33 @@ impl RichClient {
                     }
                     None => utils::encode(opcode, 0),
                 };
-                pipe.write_all(&payload)
-            },
-        )
+                pipe.write_all(&payload)?;
+
+                Ok(())
+            })
     }
 
-    pub fn read(&self) -> io::Result<Vec<u8>> {
-        self.pipe.as_ref().map_or(
-            Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found")),
-            |mut pipe| {
+    pub fn read(&self) -> crate::Result<Vec<u8>> {
+        self.pipe
+            .as_ref()
+            .map_or(Err("Pipe not found".into()), |mut pipe| {
                 let mut header = [0; 8];
                 pipe.read_exact(&mut header)?;
                 let size = utils::decode(&header) as usize;
                 let mut buffer = vec![0u8; size];
                 pipe.read_exact(&mut buffer)?;
                 Ok(buffer)
-            },
-        )
+            })
     }
 
-    pub fn handshake(&self) -> io::Result<()> {
+    pub fn handshake(&self) -> crate::Result<()> {
         self.write(
             0,
             Some(format!("{{\"v\": 1,\"client_id\":\"{}\"}}", self.client_id).as_bytes()),
         )
     }
 
-    pub fn update(&self, packet: &Packet) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn update(&self, packet: &Packet) -> crate::Result<()> {
         if packet.activity != self.last_activity {
             let encoded = Json::serialize(packet)?;
 
@@ -69,7 +69,7 @@ impl RichClient {
         Ok(())
     }
 
-    pub fn clear(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn clear(&self) -> crate::Result<()> {
         let packet = Packet {
             pid: self.pid,
             activity: None,
