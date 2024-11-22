@@ -4,5 +4,7 @@ use crate::messages::events::event::{EventContext, OnEvent};
 pub struct ResetTimestampEvent;
 
 impl OnEvent for ResetTimestampEvent {
-    fn on_event(self, _ctx: &EventContext) {}
+    fn on_event(self, _ctx: &EventContext) -> crate::Result<()> {
+        Ok(())
+    }
 }

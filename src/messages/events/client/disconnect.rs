@@ -8,5 +8,7 @@ impl DisconnectEvent {
 }
 
 impl OnEvent for DisconnectEvent {
-    fn on_event(self, _ctx: &EventContext) {}
+    fn on_event(self, _ctx: &EventContext) -> crate::Result<()> {
+        Ok(())
+    }
 }

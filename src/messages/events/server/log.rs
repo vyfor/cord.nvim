@@ -6,8 +6,9 @@ pub struct LogEvent {
 use crate::messages::events::event::{EventContext, OnEvent};
 
 impl OnEvent for LogEvent {
-    fn on_event(self, _ctx: &EventContext) {
+    fn on_event(self, _ctx: &EventContext) -> crate::Result<()> {
         println!("{}", self.message);
+        Ok(())
     }
 }
 

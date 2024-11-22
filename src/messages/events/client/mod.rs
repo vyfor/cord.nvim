@@ -75,7 +75,7 @@ impl ClientEvent {
 }
 
 impl OnEvent for ClientEvent {
-    fn on_event(self, ctx: &EventContext) {
+    fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
         match self {
             Self::Initialize(e) => e.on_event(ctx),
             Self::Connect(e) => e.on_event(ctx),

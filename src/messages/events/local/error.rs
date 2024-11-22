@@ -14,5 +14,7 @@ impl ErrorEvent {
 }
 
 impl OnEvent for ErrorEvent {
-    fn on_event(self, _ctx: &EventContext) {}
+    fn on_event(self, _ctx: &EventContext) -> crate::Result<()> {
+        Ok(())
+    }
 }

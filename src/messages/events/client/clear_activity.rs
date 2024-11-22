@@ -8,5 +8,7 @@ impl ClearActivityEvent {
 }
 
 impl OnEvent for ClearActivityEvent {
-    fn on_event(self, _ctx: &EventContext) {}
+    fn on_event(self, _ctx: &EventContext) -> crate::Result<()> {
+        Ok(())
+    }
 }

@@ -12,5 +12,7 @@ impl UpdateWorkspaceEvent {
 }
 
 impl OnEvent for UpdateWorkspaceEvent {
-    fn on_event(self, _ctx: &EventContext) {}
+    fn on_event(self, _ctx: &EventContext) -> crate::Result<()> {
+        Ok(())
+    }
 }

@@ -12,10 +12,10 @@ use crate::{
 pub struct ReadyEvent;
 
 impl OnEvent for ReadyEvent {
-    fn on_event(self, ctx: &EventContext) {
-        if let Ok(json) = Json::serialize(&self) {
-            let _ = ctx.pipe.broadcast(json.as_bytes());
-        }
+    fn on_event(self, ctx: &EventContext) -> crate::Result<()> {
+        ctx.pipe.broadcast(Json::serialize(&self)?.as_bytes())?;
+
+        Ok(())
     }
 }
 
