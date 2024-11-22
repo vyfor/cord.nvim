@@ -2,6 +2,7 @@ use crate::cord::Cord;
 
 use super::{client::ClientEvent, local::LocalEvent, server::ServerEvent};
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
 pub enum Event {
     Client(ClientEvent),
