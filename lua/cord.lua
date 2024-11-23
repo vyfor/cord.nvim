@@ -62,6 +62,7 @@ local connection_tries = 0
 local timer = uv.new_timer()
 local enabled = false
 local is_focused = true
+local is_idle = false
 local force_idle = false
 local problem_count = -1
 local last_updated = uv.now()
@@ -133,13 +134,14 @@ local function should_update_presence(current_presence)
 end
 
 local function update_idle_presence(config)
-  if last_presence.idle then return false end
+  if is_idle then return end
 
   if force_idle then
-    last_presence = last_presence or {}
-    last_presence.idle = true
+    is_idle = true
 
-    if config.timer.reset_on_idle then discord.update_time() end
+    if config.display.show_time and config.timer.reset_on_idle then
+      discord.update_time()
+    end
     if config.idle.show_status then
       local status = discord.update_presence(
         ffi.new('PresenceArgs', '', 'Cord.idle', nil, 0, false)
@@ -165,10 +167,9 @@ local function update_idle_presence(config)
       or uv.now() - last_updated >= config.idle.timeout
     )
   then
-    if config.idle.disable_on_focus and is_focused then return false end
+    if config.idle.disable_on_focus and is_focused then return end
 
-    last_presence = last_presence or {}
-    last_presence.idle = true
+    is_idle = true
 
     if config.display.show_time and config.timer.reset_on_idle then
       discord.update_time()
@@ -213,17 +214,19 @@ local function update_presence(config)
   end
 
   if should_update_presence(current_presence) then
-    force_idle = false
-    last_updated = uv.now()
     if
       config.display.show_time
       and (
         config.timer.reset_on_change
-        or config.timer.reset_on_idle and last_presence and last_presence.idle
+        or config.timer.reset_on_idle and is_idle
       )
     then
       discord.update_time()
     end
+
+    is_idle = false
+    force_idle = false
+    last_updated = uv.now()
     local cursor_pos = config.display.show_cursor_position
         and (current_presence.cursor_line ~= 1 or current_presence.cursor_col ~= 1)
         and (current_presence.cursor_line .. ':' .. current_presence.cursor_col)
@@ -475,7 +478,8 @@ function cord.setup_usercmds(config)
   end
 
   function cord.toggle_idle()
-    if last_presence and last_presence.idle then
+    if last_presence and is_idle then
+      is_idle = false
       force_idle = false
       last_updated = uv.now()
       last_presence = nil
@@ -487,6 +491,7 @@ function cord.setup_usercmds(config)
   function cord.idle() force_idle = true end
 
   function cord.unidle()
+    is_idle = false
     force_idle = false
     last_updated = uv.now()
     last_presence = nil
@@ -509,6 +514,9 @@ function cord.disconnect()
   discord.disconnect()
   enabled = false
   last_presence = nil
+  is_idle = false
+  force_idle = false
+  connection_tries = 0
 end
 
 return cord
