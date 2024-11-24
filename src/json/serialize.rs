@@ -1,18 +1,8 @@
 #![allow(dead_code)]
 
-use super::Json;
+use super::{value::ValueRef, Json};
 
-#[repr(u8)]
-pub enum SValue<'a> {
-    Null = 0,
-    String(&'a str),
-    Number(f64),
-    Boolean(bool),
-    Array(Vec<SValue<'a>>),
-    Object(&'a dyn Serialize),
-}
-
-pub type SerializeFn<'a> = fn(&'a str, SValue<'a>, &mut SerializeState) -> crate::Result<()>;
+pub type SerializeFn<'a> = fn(&'a str, ValueRef<'a>, &mut SerializeState) -> crate::Result<()>;
 
 pub trait Serialize {
     fn serialize<'a>(&'a self, f: SerializeFn<'a>, state: &mut SerializeState)
@@ -48,15 +38,15 @@ impl SerializeState {
     }
 }
 
-impl<'a> std::fmt::Debug for SValue<'a> {
+impl<'a> std::fmt::Debug for ValueRef<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SValue::String(s) => write!(f, "String({:?})", s),
-            SValue::Number(n) => write!(f, "Number({:?})", n),
-            SValue::Boolean(b) => write!(f, "Boolean({:?})", b),
-            SValue::Array(arr) => f.debug_tuple("Array").field(arr).finish(),
-            SValue::Object(_) => write!(f, "Object(function)"),
-            SValue::Null => write!(f, "Null"),
+            ValueRef::String(s) => write!(f, "String({:?})", s),
+            ValueRef::Number(n) => write!(f, "Number({:?})", n),
+            ValueRef::Boolean(b) => write!(f, "Boolean({:?})", b),
+            ValueRef::Array(arr) => f.debug_tuple("Array").field(arr).finish(),
+            ValueRef::Object(_) => write!(f, "Object(function)"),
+            ValueRef::Null => write!(f, "Null"),
         }
     }
 }
@@ -67,7 +57,7 @@ impl Json {
         state.buf.push('{');
         state.push_scope();
 
-        fn write_kv(key: &str, value: &SValue, state: &mut SerializeState) -> crate::Result<()> {
+        fn write_kv(key: &str, value: &ValueRef, state: &mut SerializeState) -> crate::Result<()> {
             if state.needs_comma() {
                 state.buf.push(',');
             }
@@ -79,7 +69,7 @@ impl Json {
 
         fn serialize_adapter(
             key: &str,
-            value: SValue,
+            value: ValueRef,
             state: &mut SerializeState,
         ) -> crate::Result<()> {
             write_kv(key, &value, state)
@@ -91,24 +81,24 @@ impl Json {
     }
 }
 
-fn write_value(value: &SValue, state: &mut SerializeState) -> crate::Result<()> {
+fn write_value(value: &ValueRef, state: &mut SerializeState) -> crate::Result<()> {
     match value {
-        SValue::String(s) => {
+        ValueRef::String(s) => {
             state.buf.push('"');
             escape_str_to_buf(s, &mut state.buf);
             state.buf.push('"');
             Ok(())
         }
-        SValue::Number(n) => {
+        ValueRef::Number(n) => {
             use std::fmt::Write;
             write!(state.buf, "{}", n).map_err(|e| e.to_string())?;
             Ok(())
         }
-        SValue::Boolean(b) => {
+        ValueRef::Boolean(b) => {
             state.buf.push_str(if *b { "true" } else { "false" });
             Ok(())
         }
-        SValue::Array(arr) => {
+        ValueRef::Array(arr) => {
             state.buf.push('[');
             state.push_scope();
 
@@ -123,7 +113,7 @@ fn write_value(value: &SValue, state: &mut SerializeState) -> crate::Result<()> 
             state.buf.push(']');
             Ok(())
         }
-        SValue::Object(obj) => {
+        ValueRef::Object(obj) => {
             state.buf.push('{');
             state.push_scope();
 
@@ -144,7 +134,7 @@ fn write_value(value: &SValue, state: &mut SerializeState) -> crate::Result<()> 
             state.buf.push('}');
             Ok(())
         }
-        SValue::Null => {
+        ValueRef::Null => {
             state.buf.push_str("null");
             Ok(())
         }

@@ -1,121 +1,26 @@
 use std::collections::HashMap;
 use std::str::from_utf8_unchecked;
 
-use super::Json;
+use super::{value::Value, Error, Json};
 
 pub trait Deserialize: Sized {
-    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> crate::Result<Self>;
+    fn deserialize<'a>(input: &HashMap<&'a str, Value<'a>>) -> crate::Result<Self>;
 }
 
-#[derive(Debug)]
-pub enum DValue<'a> {
-    String(&'a str),
-    Number(f64),
-    Bool(bool),
-    Null,
-    Array(Vec<DValue<'a>>),
-    Object(HashMap<&'a str, DValue<'a>>),
-}
 
-impl<'a> DValue<'a> {
-    #[inline]
-    pub fn as_str(&self) -> Option<&str> {
-        match self {
-            DValue::String(s) => Some(s),
-            _ => None,
-        }
-    }
-
-    #[inline]
-    pub fn as_string(&self) -> Option<String> {
-        match self {
-            DValue::String(s) => Some(s.to_string()),
-            _ => None,
-        }
-    }
-
-    #[inline]
-    pub fn as_array(&self) -> Option<&[DValue]> {
-        match self {
-            DValue::Array(arr) => Some(arr),
-            _ => None,
-        }
-    }
-
-    #[inline]
-    pub fn as_map(&self) -> Option<&HashMap<&str, DValue>> {
-        match self {
-            DValue::Object(map) => Some(map),
-            _ => None,
-        }
-    }
-
-    #[inline]
-    pub fn as_number(&self) -> Option<f64> {
-        match self {
-            DValue::Number(n) => Some(*n),
-            _ => None,
-        }
-    }
-
-    #[inline]
-    pub fn as_bool(&self) -> Option<bool> {
-        match self {
-            DValue::Bool(b) => Some(*b),
-            _ => None,
-        }
-    }
-
-    #[inline]
-    pub fn is_null(&self) -> bool {
-        matches!(self, DValue::Null)
-    }
-}
 
 impl Json {
-    pub fn deserialize(input: &str) -> Result<HashMap<&str, DValue>, String> {
+    pub fn deserialize(input: &str) -> crate::Result<HashMap<&str, Value>> {
         let input = input.trim().as_bytes();
         if input.is_empty() || input[0] != b'{' || input[input.len() - 1] != b'}' {
-            return Err("Invalid JSON object".to_string());
+            return Err(Error::InvalidSyntax("Invalid JSON object").into());
         }
 
-        let mut result = HashMap::new();
-        let mut pos = 1;
-        let len = input.len() - 1;
-
-        while pos < len {
-            pos = Self::skip_whitespace(input, pos);
-            if pos >= len {
-                break;
-            }
-
-            if input[pos] != b'"' {
-                return Err(format!("Expected '\"', found '{}'", input[pos] as char));
-            }
-            let (key, new_pos) = Self::parse_string_slice(input, pos + 1)?;
-            pos = new_pos;
-
-            pos = Self::skip_whitespace(input, pos);
-            if pos >= len || input[pos] != b':' {
-                return Err("Expected ':'".to_string());
-            }
-            pos += 1;
-
-            let (value, new_pos) = Self::parse_value(input, pos)?;
-            pos = new_pos;
-
-            result.insert(key, value);
-
-            pos = Self::skip_whitespace(input, pos);
-            if pos >= len {
-                break;
-            }
-            if input[pos] == b',' {
-                pos += 1;
-            }
+        let (value, _) = Self::parse_object(input, 1)?;
+        match value {
+            Value::Object(map) => Ok(map),
+            _ => Err(Error::InvalidSyntax("Expected object").into()),
         }
-
-        Ok(result)
     }
 
     #[inline]
@@ -126,35 +31,33 @@ impl Json {
         pos
     }
 
-    fn parse_string_slice(input: &[u8], start: usize) -> Result<(&str, usize), String> {
-        let mut pos = start;
-        let mut escaped = false;
-
+    fn parse_string_slice(input: &[u8], mut pos: usize) -> crate::Result<(&str, usize)> {
+        let start = pos;
         while pos < input.len() {
-            let c = input[pos];
-            if escaped {
-                escaped = false;
-            } else if c == b'\\' {
-                escaped = true;
-            } else if c == b'"' {
-                let slice = unsafe { from_utf8_unchecked(&input[start..pos]) };
-                return Ok((slice, pos + 1));
+            match input[pos] {
+                b'"' => {
+                    let s = unsafe { from_utf8_unchecked(&input[start..pos]) };
+                    return Ok((s, pos + 1));
+                }
+                b'\\' => {
+                    pos += 2;
+                }
+                _ => pos += 1,
             }
-            pos += 1;
         }
-        Err("Unterminated string".to_string())
+        Err(Error::UnexpectedEnd.into())
     }
 
-    fn parse_value(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
+    fn parse_value(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
         let pos = Self::skip_whitespace(input, start);
         if pos >= input.len() {
-            return Err("Unexpected end of input".to_string());
+            return Err(Error::UnexpectedEnd.into());
         }
 
         match input[pos] {
             b'"' => {
                 let (s, new_pos) = Self::parse_string_slice(input, pos + 1)?;
-                Ok((DValue::String(s), new_pos))
+                Ok((Value::String(s), new_pos))
             }
             b'[' => Self::parse_array(input, pos + 1),
             b'{' => Self::parse_object(input, pos + 1),
@@ -162,11 +65,11 @@ impl Json {
             b'f' => Self::parse_false(input, pos),
             b'n' => Self::parse_null(input, pos),
             b'-' | b'0'..=b'9' => Self::parse_number(input, pos),
-            _ => Err(format!("Unexpected character: '{}'", input[pos] as char)),
+            c => Err(Error::UnexpectedChar(c as char).into()),
         }
     }
 
-    fn parse_array(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
+    fn parse_array(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
         let mut pos = start;
         let mut values = Vec::new();
         let mut expecting_value = true;
@@ -174,11 +77,11 @@ impl Json {
         while pos < input.len() {
             pos = Self::skip_whitespace(input, pos);
             if pos >= input.len() {
-                return Err("Unterminated array".to_string());
+                return Err(Error::UnexpectedEnd.into());
             }
 
             match input[pos] {
-                b']' if !expecting_value => return Ok((DValue::Array(values), pos + 1)),
+                b']' if !expecting_value => return Ok((Value::Array(values), pos + 1)),
                 b',' if !expecting_value => {
                     pos += 1;
                     expecting_value = true;
@@ -189,13 +92,13 @@ impl Json {
                     pos = new_pos;
                     expecting_value = false;
                 }
-                _ => return Err("Invalid array format".to_string()),
+                c => return Err(Error::UnexpectedChar(c as char).into()),
             }
         }
-        Err("Unterminated array".to_string())
+        Err(Error::UnexpectedEnd.into())
     }
 
-    fn parse_object(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
+    fn parse_object(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
         let mut pos = start;
         let mut map = HashMap::new();
         let mut expecting_key = true;
@@ -203,11 +106,11 @@ impl Json {
         while pos < input.len() {
             pos = Self::skip_whitespace(input, pos);
             if pos >= input.len() {
-                return Err("Unterminated object".to_string());
+                return Err(Error::UnexpectedEnd.into());
             }
 
             match input[pos] {
-                b'}' if !expecting_key => return Ok((DValue::Object(map), pos + 1)),
+                b'}' if !expecting_key => return Ok((Value::Object(map), pos + 1)),
                 b',' if !expecting_key => {
                     pos += 1;
                     expecting_key = true;
@@ -215,48 +118,46 @@ impl Json {
                 b'"' if expecting_key => {
                     let (key, new_pos) = Self::parse_string_slice(input, pos + 1)?;
                     pos = Self::skip_whitespace(input, new_pos);
-
                     if pos >= input.len() || input[pos] != b':' {
-                        return Err("Expected ':'".to_string());
+                        return Err(Error::InvalidSyntax("Expected ':' after key").into());
                     }
-                    pos += 1;
-
+                    pos = Self::skip_whitespace(input, pos + 1);
                     let (value, new_pos) = Self::parse_value(input, pos)?;
                     map.insert(key, value);
                     pos = new_pos;
                     expecting_key = false;
                 }
-                _ => return Err("Invalid object format".to_string()),
+                c => return Err(Error::UnexpectedChar(c as char).into()),
             }
         }
-        Err("Unterminated object".to_string())
+        Err(Error::UnexpectedEnd.into())
     }
 
-    fn parse_true(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
+    fn parse_true(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
         if input.len() >= start + 4 && &input[start..start + 4] == b"true" {
-            Ok((DValue::Bool(true), start + 4))
+            Ok((Value::Bool(true), start + 4))
         } else {
-            Err("Invalid 'true' value".to_string())
+            Err(Error::InvalidSyntax("Invalid 'true' value").into())
         }
     }
 
-    fn parse_false(input: &[u8], start: usize) -> Result<(DValue, usize), String> {
+    fn parse_false(input: &[u8], start: usize) -> crate::Result<(Value, usize)> {
         if input.len() >= start + 5 && &input[start..start + 5] == b"false" {
-            Ok((DValue::Bool(false), start + 5))
+            Ok((Value::Bool(false), start + 5))
         } else {
-            Err("Invalid 'false' value".to_string())
+            Err(Error::InvalidSyntax("Invalid 'false' value").into())
         }
     }
 
-    fn parse_null(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
+    fn parse_null(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
         if input.len() >= start + 4 && &input[start..start + 4] == b"null" {
-            Ok((DValue::Null, start + 4))
+            Ok((Value::Null, start + 4))
         } else {
-            Err("Invalid 'null' value".to_string())
+            Err(Error::InvalidSyntax("Invalid 'null' value").into())
         }
     }
 
-    fn parse_number(input: &[u8], start: usize) -> Result<(DValue<'_>, usize), String> {
+    fn parse_number(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
         let mut pos = start;
         let mut num_str = Vec::new();
 
@@ -265,47 +166,42 @@ impl Json {
             pos += 1;
         }
 
-        while pos < input.len() && input[pos].is_ascii_digit() {
-            num_str.push(input[pos]);
-            pos += 1;
-        }
-
-        if pos < input.len() && input[pos] == b'.' {
-            num_str.push(b'.');
-            pos += 1;
-            let mut has_decimal = false;
-            while pos < input.len() && input[pos].is_ascii_digit() {
-                num_str.push(input[pos]);
-                has_decimal = true;
-                pos += 1;
-            }
-            if !has_decimal {
-                return Err("Invalid number format".to_string());
-            }
-        }
-
-        if pos < input.len() && (input[pos] == b'e' || input[pos] == b'E') {
-            num_str.push(b'e');
-            pos += 1;
-            if pos < input.len() && (input[pos] == b'+' || input[pos] == b'-') {
-                num_str.push(input[pos]);
-                pos += 1;
-            }
-            let mut has_exp = false;
-            while pos < input.len() && input[pos].is_ascii_digit() {
-                num_str.push(input[pos]);
-                has_exp = true;
-                pos += 1;
-            }
-            if !has_exp {
-                return Err("Invalid number format".to_string());
+        while pos < input.len() {
+            match input[pos] {
+                b'0'..=b'9' => {
+                    num_str.push(input[pos]);
+                    pos += 1;
+                }
+                b'.' => {
+                    if num_str.contains(&b'.') {
+                        return Err(Error::InvalidSyntax("Multiple decimal points").into());
+                    }
+                    num_str.push(b'.');
+                    pos += 1;
+                }
+                b'e' | b'E' => {
+                    num_str.push(b'e');
+                    pos += 1;
+                    if pos < input.len() && (input[pos] == b'+' || input[pos] == b'-') {
+                        num_str.push(input[pos]);
+                        pos += 1;
+                    }
+                }
+                _ if input[pos].is_ascii_whitespace()
+                    || input[pos] == b','
+                    || input[pos] == b'}'
+                    || input[pos] == b']' =>
+                {
+                    break;
+                }
+                c => return Err(Error::UnexpectedChar(c as char).into()),
             }
         }
 
         let num_str = unsafe { from_utf8_unchecked(&num_str) };
         match num_str.parse::<f64>() {
-            Ok(num) => Ok((DValue::Number(num), pos)),
-            Err(_) => Err("Invalid number format".to_string()),
+            Ok(num) => Ok((Value::Number(num), pos)),
+            Err(_) => Err(Error::InvalidSyntax("Invalid number format").into()),
         }
     }
 }
