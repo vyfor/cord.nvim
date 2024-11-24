@@ -4,10 +4,15 @@ use std::io;
 use std::num::ParseIntError;
 use std::string::ParseError;
 
+use crate::json;
+use crate::msgpack;
+
 #[derive(Debug)]
 pub enum CordError {
     Io(io::Error),
     Parse(CordParseError),
+    MsgPack(msgpack::Error),
+    Json(json::Error),
     Other(String),
 }
 
@@ -22,6 +27,8 @@ impl fmt::Display for CordError {
         match self {
             CordError::Io(err) => write!(f, "IO error: {}", err),
             CordError::Parse(err) => write!(f, "Parse error: {}", err),
+            CordError::MsgPack(err) => write!(f, "MsgPack error: {}", err),
+            CordError::Json(err) => write!(f, "JSON error: {}", err),
             CordError::Other(err) => write!(f, "Error: {}", err),
         }
     }
@@ -41,6 +48,8 @@ impl Error for CordError {
         match self {
             CordError::Io(err) => Some(err),
             CordError::Parse(err) => Some(err),
+            CordError::MsgPack(err) => Some(err),
+            CordError::Json(err) => Some(err),
             _ => None,
         }
     }
@@ -52,6 +61,18 @@ impl Error for CordParseError {
             CordParseError::ParseError(err) => Some(err),
             CordParseError::ParseIntError(err) => Some(err),
         }
+    }
+}
+
+impl From<msgpack::Error> for CordError {
+    fn from(err: msgpack::Error) -> Self {
+        CordError::MsgPack(err)
+    }
+}
+
+impl From<json::Error> for CordError {
+    fn from(err: json::Error) -> Self {
+        CordError::Json(err)
     }
 }
 
