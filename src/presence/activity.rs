@@ -24,7 +24,7 @@ pub struct ActivityContext {
     pub filename: String,
     pub filetype: String,
     pub is_read_only: bool,
-    pub cursor_position: Option<(i32, i32)>,
+    pub cursor_position: Option<(u32, u32)>,
     pub problem_count: i32,
     pub custom_asset: Option<CustomAssetContext>,
     pub resolved_type: Option<Filetype>,
@@ -46,7 +46,7 @@ impl ActivityContext {
         filename: String,
         filetype: String,
         is_read_only: bool,
-        cursor_position: Option<(i32, i32)>,
+        cursor_position: Option<(u32, u32)>,
         problem_count: i32,
     ) -> Self {
         let mut ctx = Self {

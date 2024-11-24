@@ -1,6 +1,6 @@
 use crate::{
-    json::{deserialize::Deserialize, Json},
     messages::events::event::{EventContext, OnEvent},
+    msgpack::{Deserialize, MsgPack},
     presence::activity::ActivityContext,
     types::Config,
 };
@@ -35,11 +35,11 @@ pub enum ClientEvent {
 macro_rules! data {
     ($map:expr) => {
         $map.get("data")
-            .and_then(|v| v.as_map())
+            .and_then(|v| v.as_bytes())
             .ok_or("Missing or invalid 'data' field")?
     };
     ($map:expr, $expr:expr) => {
-        $map.get("data")
+        $map.remove("data")
             .and_then($expr)
             .ok_or("Missing or invalid 'data' field")?
     };
@@ -47,8 +47,10 @@ macro_rules! data {
 
 impl ClientEvent {
     // { type: string, data: any }
-    pub fn deserialize(json: &str) -> crate::Result<Self> {
-        let map = Json::deserialize(json)?;
+    pub fn deserialize(json: &[u8]) -> crate::Result<Self> {
+        let mut map = MsgPack::deserialize(json)?
+            .take_map()
+            .ok_or("Invalid message")?;
 
         let ty = map
             .get("type")
@@ -65,7 +67,7 @@ impl ClientEvent {
             )),
             "clear_activity" => Self::ClearActivity(ClearActivityEvent),
             "update_workspace" => {
-                Self::UpdateWorkspace(UpdateWorkspaceEvent::new(data!(map, |v| v.as_string())))
+                Self::UpdateWorkspace(UpdateWorkspaceEvent::new(data!(map, |v| v.take_str())))
             }
             "reset_timestamp" => Self::ResetTimestamp(ResetTimestampEvent),
             "disconnect" => Self::Disconnect(DisconnectEvent),

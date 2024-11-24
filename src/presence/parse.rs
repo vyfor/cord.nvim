@@ -1,25 +1,25 @@
-use std::collections::HashMap;
-
 use crate::{
-    json::deserialize::{DValue, Deserialize},
+    msgpack::{Deserialize, MsgPack},
     util::types::AssetType,
 };
 
 use super::activity::{ActivityContext, CustomAssetContext};
 
 impl Deserialize for ActivityContext {
-    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> crate::Result<Self> {
+    fn deserialize<'a>(input: &[u8]) -> crate::Result<Self> {
+        let mut input = MsgPack::deserialize(input)?
+            .take_map()
+            .ok_or("Invalid activity context")?;
+
         let filename = input
-            .get("filename")
-            .and_then(|v| v.as_str())
-            .ok_or("Missing or invalid 'filename' field")?
-            .to_string();
+            .remove("filename")
+            .and_then(|v| v.take_str())
+            .ok_or("Missing or invalid 'filename' field")?;
 
         let filetype = input
-            .get("filetype")
-            .and_then(|v| v.as_str())
-            .ok_or("Missing or invalid 'filetype' field")?
-            .to_string();
+            .remove("filetype")
+            .and_then(|v| v.take_str())
+            .ok_or("Missing or invalid 'filetype' field")?;
 
         let is_read_only = input
             .get("is_read_only")
@@ -31,24 +31,24 @@ impl Deserialize for ActivityContext {
             let array = cursor.as_array().ok_or("Invalid 'cursor_position' field")?;
             let line = array
                 .first()
-                .and_then(|v| v.as_number())
-                .ok_or("Invalid 'cursor_position' field")? as i32;
+                .and_then(|v| v.as_uinteger())
+                .ok_or("Invalid 'cursor_position' field")? as u32;
             let char = array
                 .get(1)
-                .and_then(|v| v.as_number())
-                .ok_or("Invalid 'cursor_position' field")? as i32;
+                .and_then(|v| v.as_uinteger())
+                .ok_or("Invalid 'cursor_position' field")? as u32;
 
             cursor_position = Some((line, char));
         }
 
         let problem_count = input
             .get("problem_count")
-            .and_then(|v| v.as_number())
+            .and_then(|v| v.as_integer())
             .ok_or("Missing or invalid 'problem_count' field")? as i32;
 
         let custom_asset = input
             .get("custom_asset")
-            .and_then(|v| v.as_map().map(CustomAssetContext::deserialize))
+            .and_then(|v| v.as_bytes().map(CustomAssetContext::deserialize))
             .and_then(|v| v.ok());
 
         Ok(ActivityContext {
@@ -64,7 +64,11 @@ impl Deserialize for ActivityContext {
 }
 
 impl Deserialize for CustomAssetContext {
-    fn deserialize<'a>(input: &HashMap<&'a str, DValue<'a>>) -> crate::Result<Self> {
+    fn deserialize<'a>(input: &[u8]) -> crate::Result<Self> {
+        let mut input = MsgPack::deserialize(input)?
+            .take_map()
+            .ok_or("Invalid custom asset context")?;
+
         let ty = input
             .get("type")
             .and_then(|v| v.as_str().map(AssetType::from))
@@ -78,16 +82,14 @@ impl Deserialize for CustomAssetContext {
             .to_string();
 
         let icon = input
-            .get("icon")
-            .and_then(|v| v.as_str())
-            .ok_or("Missing or invalid 'icon' field")?
-            .to_string();
+            .remove("icon")
+            .and_then(|v| v.take_str())
+            .ok_or("Missing or invalid 'icon' field")?;
 
         let tooltip = input
-            .get("tooltip")
-            .and_then(|v| v.as_str())
-            .ok_or("Missing or invalid 'tooltip' field")?
-            .to_string();
+            .remove("tooltip")
+            .and_then(|v| v.take_str())
+            .ok_or("Missing or invalid 'tooltip' field")?;
 
         Ok(CustomAssetContext {
             ty,

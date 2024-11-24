@@ -3,10 +3,7 @@ use std::sync::atomic::Ordering;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::EventContext;
 use crate::{
-    json::{
-        serialize::{SValue, Serialize},
-        Json,
-    },
+    json::{serialize::Serialize, value::ValueRef, Json},
     messages::events::event::OnEvent,
 };
 
@@ -31,7 +28,7 @@ impl Serialize for ReadyEvent {
         f: crate::json::serialize::SerializeFn<'a>,
         state: &mut crate::json::serialize::SerializeState,
     ) -> crate::Result<()> {
-        f("type", SValue::String("ready"), state)?;
+        f("type", ValueRef::String("ready"), state)?;
 
         Ok(())
     }

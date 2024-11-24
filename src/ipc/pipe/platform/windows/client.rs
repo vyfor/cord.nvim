@@ -113,10 +113,13 @@ impl PipeClientImpl for PipeClient {
                             break;
                         }
 
-                        if let Ok(message) = ClientEvent::deserialize(&String::from_utf8_lossy(
-                            &buf[..bytes_read as usize],
-                        )) {
-                            tx.send(Message::new(id, Event::Client(message))).ok();
+                        match ClientEvent::deserialize(&buf[..bytes_read as usize]) {
+                            Ok(message) => {
+                                tx.send(Message::new(id, Event::Client(message))).ok();
+                            }
+                            Err(e) => {
+                                eprintln!("Failed to deserialize message: {:?}", e);
+                            }
                         }
                     }
                 }

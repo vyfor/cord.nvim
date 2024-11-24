@@ -52,13 +52,14 @@ impl PipeClientImpl for PipeClient {
                             tx.send(local_event!(id, ClientDisconnected)).ok();
                             break;
                         }
-                        Ok(n) => {
-                            if let Ok(message) =
-                                ClientEvent::deserialize(&String::from_utf8_lossy(&buf[..n]))
-                            {
+                        Ok(n) => match ClientEvent::deserialize(&buf[..n]) {
+                            Ok(message) => {
                                 tx.send(Message::new(id, Event::Client(message))).ok();
                             }
-                        }
+                            Err(e) => {
+                                eprintln!("Failed to deserialize message: {:?}", e);
+                            }
+                        },
                         Err(e) => {
                             tx.send(local_event!(id, Error, ErrorEvent::new(Box::new(e))))
                                 .ok();
