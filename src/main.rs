@@ -8,6 +8,7 @@ mod ipc;
 mod json;
 mod mappings;
 mod messages;
+mod msgpack;
 mod presence;
 mod types;
 mod util;
