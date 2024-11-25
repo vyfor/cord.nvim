@@ -100,7 +100,7 @@ impl Value {
     }
 
     #[inline]
-    pub fn take_str(self) -> Option<String> {
+    pub fn take_string(self) -> Option<String> {
         match self {
             Value::String(s) => Some(s),
             _ => None,
