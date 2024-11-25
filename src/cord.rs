@@ -1,6 +1,9 @@
-use std::sync::{
-    mpsc::{self, Receiver, Sender},
-    Arc,
+use std::{
+    sync::{
+        mpsc::{self, Receiver, Sender},
+        Arc,
+    },
+    time::Duration,
 };
 
 use crate::{
@@ -17,36 +20,34 @@ use crate::{
         message::Message,
     },
     server_event,
-    types::config::Config,
+    types::config::PluginConfig,
     util::logger::{LogLevel, Logger},
 };
 
 pub struct Cord {
-    pub config: Option<Config>,
+    pub config: Config,
+    pub plugin_config: Option<PluginConfig>,
     pub rich_client: Arc<RichClient>,
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
-    pub iterations: u32,
-    pub max_iterations: u32,
     pub logger: Logger,
 }
 
 impl Cord {
-    pub fn new(pipe_name: &str, client_id: u64, max_iterations: u32) -> crate::Result<Self> {
+    pub fn new(config: Config) -> crate::Result<Self> {
         let (tx, rx) = mpsc::channel::<Message>();
-        let rich_client = Arc::new(RichClient::connect(client_id)?);
-        let server = PipeServer::new(pipe_name, tx.clone());
+        let rich_client = Arc::new(RichClient::connect(config.client_id)?);
+        let server = PipeServer::new(&config.pipe_name, tx.clone());
         let logger = Logger::new(tx.clone(), LogLevel::Off);
 
         Ok(Self {
-            config: None,
+            config,
+            plugin_config: None,
             rich_client,
             pipe: server,
             tx,
             rx,
-            iterations: 0,
-            max_iterations,
             logger,
         })
     }
@@ -61,17 +62,16 @@ impl Cord {
 
     fn start_event_loop(&mut self) -> crate::Result<()> {
         loop {
-            if let Ok(msg) = self.rx.recv_timeout(std::time::Duration::from_millis(1000)) {
-                self.iterations = 0;
+            if let Ok(msg) = self
+                .rx
+                .recv_timeout(Duration::from_millis(self.config.timeout))
+            {
                 msg.event.on_event(&mut EventContext {
                     cord: self,
                     client_id: msg.client_id,
                 })?;
             } else if self.pipe.clients.read().unwrap().is_empty() {
-                self.iterations += 1;
-                if self.iterations >= self.max_iterations {
-                    break;
-                }
+                break;
             }
         }
 
@@ -101,5 +101,21 @@ impl Cord {
         }
 
         self.pipe.stop();
+    }
+}
+
+pub struct Config {
+    pub pipe_name: String,
+    pub client_id: u64,
+    pub timeout: u64,
+}
+
+impl Config {
+    pub fn new(pipe_name: String, client_id: u64, timeout: u64) -> Self {
+        Self {
+            pipe_name,
+            client_id,
+            timeout,
+        }
     }
 }

@@ -17,7 +17,7 @@ impl UpdateActivityEvent {
 
 impl OnEvent for UpdateActivityEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        if let Some(config) = &mut ctx.cord.config {
+        if let Some(config) = &mut ctx.cord.plugin_config {
             if !ctx.cord.rich_client.is_ready.load(Ordering::SeqCst) {
                 return Ok(());
             }

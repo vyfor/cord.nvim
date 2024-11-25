@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     mappings::Filetype,
-    types::config::Config,
+    types::config::PluginConfig,
     util::{types::AssetType, utils::get_asset},
 };
 
@@ -158,7 +158,7 @@ impl ActivityContext {
         }
     }
 
-    fn build_idle_activity(&self, config: &Config) -> Activity {
+    fn build_idle_activity(&self, config: &PluginConfig) -> Activity {
         let state = self.build_workspace_state(config, -1);
         let large_image = get_asset("editor", "idle");
 
@@ -174,7 +174,7 @@ impl ActivityContext {
         }
     }
 
-    fn build_details(&self, config: &Config) -> String {
+    fn build_details(&self, config: &PluginConfig) -> String {
         let filename = self.get_effective_name();
         let filename = filename.deref();
 
@@ -209,7 +209,7 @@ impl ActivityContext {
         details
     }
 
-    fn build_workspace_state(&self, config: &Config, problem_count: i32) -> Option<String> {
+    fn build_workspace_state(&self, config: &PluginConfig, problem_count: i32) -> Option<String> {
         if !config.workspace_text.is_empty() {
             Some(if problem_count != -1 {
                 let replaced = config.workspace_text.replace("{}", &config.workspace);
@@ -222,7 +222,7 @@ impl ActivityContext {
         }
     }
 
-    fn build_editor_text(&self, config: &Config) -> Option<String> {
+    fn build_editor_text(&self, config: &PluginConfig) -> Option<String> {
         if !config.editor_tooltip.is_empty() {
             Some(config.editor_tooltip.clone())
         } else {
@@ -245,7 +245,7 @@ impl ActivityContext {
 
     fn swap_images(
         &self,
-        config: &Config,
+        config: &PluginConfig,
         large_image: Option<String>,
         large_text: Option<String>,
         swap: bool,
@@ -272,7 +272,7 @@ impl ActivityContext {
         }
     }
 
-    pub fn build(&self, config: &Config) -> Activity {
+    pub fn build(&self, config: &PluginConfig) -> Activity {
         if self.filetype == "Cord.idle" {
             return self.build_idle_activity(config);
         }

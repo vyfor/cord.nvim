@@ -2,7 +2,7 @@ use crate::{
     messages::events::event::{EventContext, OnEvent},
     msgpack::{Deserialize, MsgPack},
     presence::activity::ActivityContext,
-    types::config::Config,
+    types::config::PluginConfig,
 };
 
 pub mod clear_activity;
@@ -59,7 +59,7 @@ impl ClientEvent {
         Ok(match ty {
             "connect" => Self::Connect(ConnectEvent),
             "initialize" => {
-                Self::Initialize(InitializeEvent::new(Config::deserialize(data!(map))?))
+                Self::Initialize(InitializeEvent::new(PluginConfig::deserialize(data!(map))?))
             }
             "update_activity" => Self::UpdateActivity(UpdateActivityEvent::new(
                 ActivityContext::deserialize(data!(map))?,

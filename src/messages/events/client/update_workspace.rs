@@ -19,7 +19,7 @@ impl UpdateWorkspaceEvent {
 
 impl OnEvent for UpdateWorkspaceEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        if let Some(config) = &mut ctx.cord.config {
+        if let Some(config) = &mut ctx.cord.plugin_config {
             let workspace = utils::find_workspace(&self.workspace);
             if let Some(filename) = workspace.file_name() {
                 let filename = filename.to_string_lossy();

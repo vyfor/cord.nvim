@@ -5,7 +5,7 @@ pub struct ResetTimestampEvent;
 
 impl OnEvent for ResetTimestampEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        if let Some(config) = &mut ctx.cord.config {
+        if let Some(config) = &mut ctx.cord.plugin_config {
             config.timestamp = None;
         }
 
