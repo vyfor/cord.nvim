@@ -259,12 +259,12 @@ impl ActivityContext {
             (
                 large_image,
                 large_text,
-                Some(config.editor_image.clone()),
+                config.editor_image.clone(),
                 self.build_editor_text(config),
             )
         } else {
             (
-                Some(config.editor_image.clone()),
+                config.editor_image.clone(),
                 self.build_editor_text(config),
                 large_image,
                 large_text,

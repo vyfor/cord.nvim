@@ -2,8 +2,11 @@ use crate::{
     get_field,
     msgpack::{deserialize::Deserialize, Value},
     presence::types::ActivityButton,
-    remove_field,
-    util::{logger::LogLevel, utils::find_git_repository},
+    remove_field, remove_field_or_none,
+    util::{
+        logger::LogLevel,
+        utils::{find_git_repository, get_asset},
+    },
 };
 
 #[derive(Debug)]
@@ -17,7 +20,7 @@ pub struct PluginConfig {
     pub vcs_text: String,
     pub workspace_text: String,
     pub workspace: String,
-    pub editor_image: String,
+    pub editor_image: Option<String>,
     pub editor_tooltip: String,
     pub idle_text: String,
     pub idle_tooltip: String,
@@ -43,7 +46,7 @@ impl Deserialize for PluginConfig {
         let vcs_text = remove_field!(input, "vcs_text", |v| v.take_string());
         let workspace_text = remove_field!(input, "workspace_text", |v| v.take_string());
         let workspace = remove_field!(input, "workspace", |v| v.take_string());
-        let editor_image = remove_field!(input, "editor_image", |v| v.take_string());
+        let editor_image = remove_field_or_none!(input, "editor_image", |v| v.take_string());
         let editor_tooltip = remove_field!(input, "editor_tooltip", |v| v.take_string());
         let idle_text = remove_field!(input, "idle_text", |v| v.take_string());
         let idle_tooltip = remove_field!(input, "idle_tooltip", |v| v.take_string());
@@ -107,4 +110,11 @@ pub fn validate_buttons(buttons: &mut Vec<ActivityButton>, workspace: &str) {
     }
 
     buttons.retain(|b| !b.label.is_empty() && !b.url.is_empty() && b.url.starts_with("http"));
+}
+pub fn validate_image(image: &mut Option<String>, is_custom_client: bool) -> String {
+    match (image.take(), is_custom_client) {
+        (Some(img), false) => img,
+        (Some(img), true) => img,
+        (None, _) => get_asset("editor", "neovim"),
+    }
 }
