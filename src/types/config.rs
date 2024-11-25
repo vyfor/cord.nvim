@@ -7,7 +7,7 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub struct Config {
+pub struct PluginConfig {
     pub log_level: LogLevel,
     pub viewing_text: String,
     pub editing_text: String,
@@ -28,7 +28,7 @@ pub struct Config {
     pub timestamp: Option<u128>,
 }
 
-impl Deserialize for Config {
+impl Deserialize for PluginConfig {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
         let mut input = input.take_map().ok_or("Invalid config")?;
 
@@ -69,7 +69,7 @@ impl Deserialize for Config {
 
         validate_buttons(&mut buttons, &workspace);
 
-        Ok(Config {
+        Ok(PluginConfig {
             log_level,
             viewing_text,
             editing_text,
