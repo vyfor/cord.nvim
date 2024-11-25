@@ -2,7 +2,7 @@ use crate::{
     messages::events::event::{EventContext, OnEvent},
     msgpack::{Deserialize, MsgPack},
     presence::activity::ActivityContext,
-    types::Config,
+    types::config::Config,
 };
 
 pub mod clear_activity;

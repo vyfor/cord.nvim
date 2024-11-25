@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     mappings::Filetype,
-    types::Config,
+    types::config::Config,
     util::{types::AssetType, utils::get_asset},
 };
 

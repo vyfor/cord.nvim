@@ -1,5 +1,5 @@
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::types::Config;
+use crate::types::config::Config;
 
 #[derive(Debug)]
 pub struct InitializeEvent {

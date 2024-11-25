@@ -17,7 +17,7 @@ use crate::{
         message::Message,
     },
     server_event,
-    types::Config,
+    types::config::Config,
     util::logger::{LogLevel, Logger},
 };
 

@@ -25,7 +25,7 @@ impl OnEvent for UpdateWorkspaceEvent {
                 let filename = filename.to_string_lossy();
                 config.workspace = filename.to_string();
 
-                types::validate_buttons(&mut config.buttons, filename.borrow());
+                types::config::validate_buttons(&mut config.buttons, filename.borrow());
 
                 // todo: check for workspace blacklist
             }
