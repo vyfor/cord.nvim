@@ -8,6 +8,7 @@ pub struct InitializeEvent {
 
 impl OnEvent for InitializeEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        ctx.cord.logger.set_level(self.config.log_level);
         ctx.cord.config = Some(self.config);
 
         Ok(())
