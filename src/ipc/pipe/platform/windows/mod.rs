@@ -16,9 +16,8 @@ pub const PIPE_ACCESS_DUPLEX: DWORD = 0x00000003;
 pub const FILE_FLAG_OVERLAPPED: DWORD = 0x40000000;
 pub const PIPE_TYPE_MESSAGE: DWORD = 0x00000004;
 pub const PIPE_READMODE_MESSAGE: DWORD = 0x00000002;
+pub const PIPE_WAIT: DWORD = 0x00000000;
 pub const PIPE_UNLIMITED_INSTANCES: DWORD = 255;
-pub const WAIT_OBJECT_0: DWORD = 0;
-pub const INFINITE: DWORD = 0xFFFFFFFF;
 
 #[repr(C)]
 pub struct Overlapped {
@@ -53,16 +52,19 @@ extern "system" {
         lpSecurityAttributes: LPVOID,
     ) -> HANDLE;
 
-    pub fn ConnectNamedPipe(hNamedPipe: HANDLE, lpOverlapped: LPVOID) -> BOOL;
+    pub fn ConnectNamedPipe(hNamedPipe: HANDLE, lpOverlapped: *mut Overlapped) -> BOOL;
+
     pub fn GetLastError() -> DWORD;
+
     pub fn CloseHandle(hObject: HANDLE) -> BOOL;
+
     pub fn CreateEventW(
         lpEventAttributes: LPVOID,
         bManualReset: BOOL,
         bInitialState: BOOL,
         lpName: LPCWSTR,
     ) -> HANDLE;
-    pub fn WaitForSingleObject(hHandle: HANDLE, dwMilliseconds: DWORD) -> DWORD;
+
     pub fn WriteFile(
         hFile: HANDLE,
         lpBuffer: *const u8,
@@ -70,11 +72,19 @@ extern "system" {
         lpNumberOfBytesWritten: *mut DWORD,
         lpOverlapped: *mut Overlapped,
     ) -> BOOL;
+
     pub fn ReadFile(
         hFile: HANDLE,
         lpBuffer: *mut u8,
         nNumberOfBytesToRead: DWORD,
         lpNumberOfBytesRead: *mut DWORD,
         lpOverlapped: *mut Overlapped,
+    ) -> BOOL;
+
+    pub fn GetOverlappedResult(
+        hFile: HANDLE,
+        lpOverlapped: *mut Overlapped,
+        lpNumberOfBytesTransferred: *mut DWORD,
+        bWait: BOOL,
     ) -> BOOL;
 }

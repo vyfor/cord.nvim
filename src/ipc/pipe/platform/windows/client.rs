@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use super::{
-    Overlapped, ReadFile, WaitForSingleObject, WriteFile, ERROR_IO_PENDING, INFINITE, WAIT_OBJECT_0,
+    GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING,
 };
 use crate::ipc::pipe::PipeClientImpl;
 use crate::local_event;
@@ -39,8 +39,8 @@ impl PipeClientImpl for PipeClient {
             let handle = pipe.as_raw_handle();
             unsafe {
                 let mut overlapped = Overlapped::default();
-
                 let mut bytes_written = 0;
+
                 let write_result = WriteFile(
                     handle,
                     data.as_ptr(),
@@ -56,7 +56,8 @@ impl PipeClientImpl for PipeClient {
                     }
                 }
 
-                if WaitForSingleObject(overlapped.h_event, INFINITE) != WAIT_OBJECT_0 {
+                let mut bytes_transferred = 0;
+                if GetOverlappedResult(handle, &mut overlapped, &mut bytes_transferred, 1) == 0 {
                     return Err(io::Error::last_os_error());
                 }
 
@@ -98,7 +99,13 @@ impl PipeClientImpl for PipeClient {
                             }
                         }
 
-                        if WaitForSingleObject(overlapped.h_event, INFINITE) != WAIT_OBJECT_0 {
+                        if GetOverlappedResult(
+                            pipe.as_raw_handle(),
+                            &mut overlapped,
+                            &mut bytes_read,
+                            1,
+                        ) == 0
+                        {
                             tx.send(local_event!(
                                 id,
                                 Error,

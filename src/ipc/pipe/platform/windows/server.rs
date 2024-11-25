@@ -11,12 +11,12 @@ use std::thread::JoinHandle;
 
 use super::{
     client::PipeClient, CreateEventW, CreateNamedPipeW, Overlapped, FILE_FLAG_OVERLAPPED, HANDLE,
-    INVALID_HANDLE_VALUE, LPVOID, PIPE_ACCESS_DUPLEX, PIPE_READMODE_MESSAGE, PIPE_TYPE_MESSAGE,
-    PIPE_UNLIMITED_INSTANCES, WAIT_OBJECT_0,
+    INVALID_HANDLE_VALUE, PIPE_ACCESS_DUPLEX, PIPE_READMODE_MESSAGE, PIPE_TYPE_MESSAGE,
+    PIPE_UNLIMITED_INSTANCES,
 };
 use super::{
-    CloseHandle, ConnectNamedPipe, GetLastError, WaitForSingleObject, ERROR_IO_PENDING,
-    ERROR_PIPE_CONNECTED, INFINITE,
+    CloseHandle, ConnectNamedPipe, GetLastError, GetOverlappedResult,
+    ERROR_IO_PENDING, ERROR_PIPE_CONNECTED, PIPE_WAIT,
 };
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 use crate::messages::events::local::ErrorEvent;
@@ -80,8 +80,7 @@ impl PipeServerImpl for PipeServer {
                             h_event,
                         };
 
-                        let connect_result =
-                            ConnectNamedPipe(handle, &mut overlapped as *mut _ as LPVOID);
+                        let connect_result = ConnectNamedPipe(handle, &mut overlapped);
                         if connect_result == 0 {
                             let error = GetLastError();
                             if error != ERROR_IO_PENDING && error != ERROR_PIPE_CONNECTED {
@@ -99,9 +98,19 @@ impl PipeServerImpl for PipeServer {
                             }
                         }
 
-                        if WaitForSingleObject(overlapped.h_event, INFINITE) != WAIT_OBJECT_0 {
+                        let mut bytes_transferred = 0;
+                        if GetOverlappedResult(handle, &mut overlapped, &mut bytes_transferred, 1)
+                            == 0
+                        {
+                            let error = GetLastError();
                             CloseHandle(handle);
                             CloseHandle(h_event);
+                            tx.send(local_event!(
+                                0,
+                                Error,
+                                ErrorEvent::new(Box::new(io::Error::from_raw_os_error(error as _)))
+                            ))
+                            .ok();
                             continue;
                         }
 
@@ -175,7 +184,7 @@ impl PipeServer {
             CreateNamedPipeW(
                 wide_name.as_ptr(),
                 PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
-                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
                 PIPE_UNLIMITED_INSTANCES,
                 1024 * 16,
                 1024 * 16,
