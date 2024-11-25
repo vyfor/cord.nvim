@@ -75,6 +75,7 @@ impl Cord {
             }
         }
 
+        self.cleanup();
         Ok(())
     }
 
@@ -92,5 +93,13 @@ impl Cord {
         });
 
         Ok(())
+    }
+
+    fn cleanup(&mut self) {
+        if let Some(client) = Arc::get_mut(&mut self.rich_client) {
+            client.close();
+        }
+
+        self.pipe.stop();
     }
 }
