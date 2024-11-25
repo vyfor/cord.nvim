@@ -1,10 +1,13 @@
 #![allow(clippy::too_many_arguments)]
 
 use std::{
+    env::args,
     fs::File,
     io::{BufRead, BufReader},
     path::PathBuf,
 };
+
+use crate::types::constants::CLIENT_IDS;
 
 pub const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
@@ -96,6 +99,15 @@ pub fn find_git_repository(workspace_path: &str) -> Option<String> {
     }
 
     remote_url
+}
+
+pub fn parse_client_id() -> (u64, bool) {
+    let client_id = args().nth(1).expect("Missing client ID");
+
+    match CLIENT_IDS.get(client_id.as_str()) {
+        Some(client_id) => (*client_id, false),
+        None => (client_id.parse().expect("Invalid client ID"), true),
+    }
 }
 
 #[macro_export]

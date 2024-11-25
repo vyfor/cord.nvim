@@ -1,5 +1,3 @@
-use std::env::args;
-
 use cord::{Config, Cord};
 
 mod cord;
@@ -14,9 +12,16 @@ mod types;
 mod util;
 
 use error::Result;
+use util::utils::parse_client_id;
 
 fn main() -> Result<()> {
-    let client_id = args().nth(1).ok_or("Missing client ID")?.parse::<u64>()?;
+    let (client_id, is_custom_client) = parse_client_id();
 
-    Cord::new(Config::new("cord-ipc".to_string(), client_id, 30000))?.run()
+    Cord::new(Config::new(
+        "cord-ipc".to_string(),
+        client_id,
+        is_custom_client,
+        30000,
+    ))?
+    .run()
 }

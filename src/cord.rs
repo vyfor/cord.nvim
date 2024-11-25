@@ -107,14 +107,16 @@ impl Cord {
 pub struct Config {
     pub pipe_name: String,
     pub client_id: u64,
+    pub is_custom_client: bool,
     pub timeout: u64,
 }
 
 impl Config {
-    pub fn new(pipe_name: String, client_id: u64, timeout: u64) -> Self {
+    pub fn new(pipe_name: String, client_id: u64, is_custom_client: bool, timeout: u64) -> Self {
         Self {
             pipe_name,
             client_id,
+            is_custom_client,
             timeout,
         }
     }
