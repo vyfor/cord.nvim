@@ -1,15 +1,13 @@
 use crate::{
-    msgpack::{Deserialize, MsgPack},
+    msgpack::{Deserialize, Value},
     util::types::AssetType,
 };
 
 use super::activity::{ActivityContext, CustomAssetContext};
 
 impl Deserialize for ActivityContext {
-    fn deserialize<'a>(input: &[u8]) -> crate::Result<Self> {
-        let mut input = MsgPack::deserialize(input)?
-            .take_map()
-            .ok_or("Invalid activity context")?;
+    fn deserialize<'a>(input: Value) -> crate::Result<Self> {
+        let mut input = input.take_map().ok_or("Invalid activity context")?;
 
         let filename = input
             .remove("filename")
@@ -47,8 +45,8 @@ impl Deserialize for ActivityContext {
             .ok_or("Missing or invalid 'problem_count' field")? as i32;
 
         let custom_asset = input
-            .get("custom_asset")
-            .and_then(|v| v.as_bytes().map(CustomAssetContext::deserialize))
+            .remove("custom_asset")
+            .map(CustomAssetContext::deserialize)
             .and_then(|v| v.ok());
 
         Ok(ActivityContext {
@@ -64,10 +62,8 @@ impl Deserialize for ActivityContext {
 }
 
 impl Deserialize for CustomAssetContext {
-    fn deserialize<'a>(input: &[u8]) -> crate::Result<Self> {
-        let mut input = MsgPack::deserialize(input)?
-            .take_map()
-            .ok_or("Invalid custom asset context")?;
+    fn deserialize<'a>(input: Value) -> crate::Result<Self> {
+        let mut input = input.take_map().ok_or("Invalid custom asset context")?;
 
         let ty = input
             .get("type")

@@ -1,9 +1,9 @@
 use std::{collections::HashMap, sync::LazyLock};
 
 use crate::{
-    msgpack::{deserialize::Deserialize, MsgPack},
+    msgpack::{deserialize::Deserialize, MsgPack, Value},
     presence::types::ActivityButton,
-    util::utils::find_git_repository,
+    util::{logger::LogLevel, utils::find_git_repository},
 };
 
 pub static CLIENT_IDS: LazyLock<HashMap<&str, u64>> = LazyLock::new(|| {
@@ -16,9 +16,9 @@ pub static CLIENT_IDS: LazyLock<HashMap<&str, u64>> = LazyLock::new(|| {
     ])
 });
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Config {
-    pub log_level: u8,
+    pub log_level: LogLevel,
     pub viewing_text: String,
     pub editing_text: String,
     pub file_browser_text: String,
@@ -39,15 +39,15 @@ pub struct Config {
 }
 
 impl Deserialize for Config {
-    fn deserialize<'a>(input: &[u8]) -> crate::Result<Self> {
-        let mut input = MsgPack::deserialize(input)?
-            .take_map()
-            .ok_or("Invalid config")?;
+    fn deserialize<'a>(input: Value) -> crate::Result<Self> {
+        let mut input = input.take_map().ok_or("Invalid config")?;
 
         let log_level = input
-            .remove("log_level")
+            .get("log_level")
             .and_then(|v| v.as_uinteger())
-            .ok_or("Missing or invalid 'log_level' field")? as u8;
+            .ok_or("Missing or invalid 'log_level' field")?
+            .try_into()
+            .map_err(|_| "Invalid log level")?;
 
         let viewing_text = input
             .remove("viewing_text")
@@ -148,7 +148,7 @@ impl Deserialize for Config {
             .and_then(|v| v.take_array())
             .ok_or("Missing or invalid 'buttons' field")?
             .into_iter()
-            .map(|v| ActivityButton::deserialize(v.as_bytes().ok_or("Invalid button")?))
+            .map(|v| ActivityButton::deserialize(v))
             .collect::<crate::Result<Vec<_>>>()?;
         validate_buttons(&mut buttons, &workspace);
 

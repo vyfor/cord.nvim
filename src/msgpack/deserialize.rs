@@ -8,7 +8,7 @@ use super::{
 use std::collections::HashMap;
 
 pub trait Deserialize: Sized {
-    fn deserialize(input: &[u8]) -> crate::Result<Self>;
+    fn deserialize(input: Value) -> crate::Result<Self>;
 }
 
 impl MsgPack {

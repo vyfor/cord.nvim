@@ -34,8 +34,7 @@ pub enum ClientEvent {
 
 macro_rules! data {
     ($map:expr) => {
-        $map.get("data")
-            .and_then(|v| v.as_bytes())
+        $map.remove("data")
             .ok_or("Missing or invalid 'data' field")?
     };
     ($map:expr, $expr:expr) => {

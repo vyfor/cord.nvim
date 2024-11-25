@@ -1,6 +1,6 @@
 use crate::{
     json,
-    msgpack::{self, MsgPack},
+    msgpack::{self, MsgPack, Value},
 };
 
 pub struct Packet {
@@ -108,10 +108,8 @@ impl json::Serialize for ActivityButton {
 }
 
 impl msgpack::Deserialize for ActivityButton {
-    fn deserialize<'a>(input: &[u8]) -> crate::Result<Self> {
-        let mut input = MsgPack::deserialize(input)?
-            .take_map()
-            .ok_or("Invalid activity button")?;
+    fn deserialize<'a>(input: Value) -> crate::Result<Self> {
+        let mut input = input.take_map().ok_or("Invalid activity button")?;
 
         let label = input
             .remove("label")
