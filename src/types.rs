@@ -69,10 +69,16 @@ impl Deserialize for Config {
             .collect::<Result<Vec<String>, _>>()?;
         let swap_fields = get_field!(input, "swap_fields", |v| v.as_bool());
         let swap_icons = get_field!(input, "swap_icons", |v| v.as_bool());
-        let mut buttons = remove_field!(input, "buttons", |v| v.take_array())
-            .into_iter()
-            .map(ActivityButton::deserialize)
-            .collect::<crate::Result<Vec<_>>>()?;
+        let mut buttons = input
+            .remove("buttons")
+            .and_then(|v| v.take_array())
+            .map(|arr| {
+                arr.into_iter()
+                    .filter_map(|button| ActivityButton::deserialize(button).ok())
+                    .collect()
+            })
+            .unwrap_or_default();
+
         validate_buttons(&mut buttons, &workspace);
 
         Ok(Config {
