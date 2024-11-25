@@ -1,6 +1,6 @@
 use crate::{
     json,
-    msgpack::{self, MsgPack, Value},
+    msgpack::{self, Value},
 };
 
 pub struct Packet {

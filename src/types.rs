@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::LazyLock};
 
 use crate::{
-    msgpack::{deserialize::Deserialize, MsgPack, Value},
+    msgpack::{deserialize::Deserialize, Value},
     presence::types::ActivityButton,
     util::{logger::LogLevel, utils::find_git_repository},
 };
@@ -148,7 +148,7 @@ impl Deserialize for Config {
             .and_then(|v| v.take_array())
             .ok_or("Missing or invalid 'buttons' field")?
             .into_iter()
-            .map(|v| ActivityButton::deserialize(v))
+            .map(ActivityButton::deserialize)
             .collect::<crate::Result<Vec<_>>>()?;
         validate_buttons(&mut buttons, &workspace);
 
