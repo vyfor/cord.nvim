@@ -1,8 +1,10 @@
 use std::{collections::HashMap, sync::LazyLock};
 
 use crate::{
+    get_field,
     msgpack::{deserialize::Deserialize, Value},
     presence::types::ActivityButton,
+    remove_field,
     util::{logger::LogLevel, utils::find_git_repository},
 };
 
@@ -42,111 +44,32 @@ impl Deserialize for Config {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
         let mut input = input.take_map().ok_or("Invalid config")?;
 
-        let log_level = input
-            .get("log_level")
-            .and_then(|v| v.as_uinteger())
-            .ok_or("Missing or invalid 'log_level' field")?
+        let log_level = get_field!(input, "log_level", |v| v.as_uinteger())
             .try_into()
             .map_err(|_| "Invalid log level")?;
-
-        let viewing_text = input
-            .remove("viewing_text")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'viewing_text' field")?
-            .to_string();
-
-        let editing_text = input
-            .remove("editing_text")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'editing_text' field")?
-            .to_string();
-
-        let file_browser_text = input
-            .remove("file_browser_text")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'file_browser_text' field")?
-            .to_string();
-
-        let plugin_manager_text = input
-            .remove("plugin_manager_text")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'plugin_manager_text' field")?
-            .to_string();
-
-        let lsp_manager_text = input
-            .remove("lsp_manager_text")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'lsp_manager_text' field")?
-            .to_string();
-
-        let vcs_text = input
-            .remove("vcs_text")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'vcs_text' field")?
-            .to_string();
-
-        let workspace_text = input
-            .remove("workspace_text")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'workspace_text' field")?
-            .to_string();
-
-        let workspace = input
-            .remove("workspace")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'workspace' field")?
-            .to_string();
-
-        let editor_image = input
-            .remove("editor_image")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'editor_image' field")?
-            .to_string();
-
-        let editor_tooltip = input
-            .remove("editor_tooltip")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'editor_tooltip' field")?
-            .to_string();
-
-        let idle_text = input
-            .remove("idle_text")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'idle_text' field")?
-            .to_string();
-
-        let idle_tooltip = input
-            .remove("idle_tooltip")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'idle_tooltip' field")?
-            .to_string();
-
-        let workspace_blacklist = input
-            .remove("workspace_blacklist")
-            .and_then(|v| v.take_array())
-            .ok_or("Missing or invalid 'workspace_blacklist' field")?
+        let viewing_text = remove_field!(input, "viewing_text", |v| v.take_string());
+        let editing_text = remove_field!(input, "editing_text", |v| v.take_string());
+        let file_browser_text = remove_field!(input, "file_browser_text", |v| v.take_string());
+        let plugin_manager_text = remove_field!(input, "plugin_manager_text", |v| v.take_string());
+        let lsp_manager_text = remove_field!(input, "lsp_manager_text", |v| v.take_string());
+        let vcs_text = remove_field!(input, "vcs_text", |v| v.take_string());
+        let workspace_text = remove_field!(input, "workspace_text", |v| v.take_string());
+        let workspace = remove_field!(input, "workspace", |v| v.take_string());
+        let editor_image = remove_field!(input, "editor_image", |v| v.take_string());
+        let editor_tooltip = remove_field!(input, "editor_tooltip", |v| v.take_string());
+        let idle_text = remove_field!(input, "idle_text", |v| v.take_string());
+        let idle_tooltip = remove_field!(input, "idle_tooltip", |v| v.take_string());
+        let workspace_blacklist = remove_field!(input, "workspace_blacklist", |v| v.take_array())
             .into_iter()
             .map(|v| {
-                v.take_str()
+                v.take_string()
                     .ok_or("Invalid workspace blacklist entry")
                     .map(String::from)
             })
             .collect::<Result<Vec<String>, _>>()?;
-
-        let swap_fields = input
-            .get("swap_fields")
-            .and_then(|v| v.as_bool())
-            .ok_or("Missing or invalid 'swap_fields' field")?;
-
-        let swap_icons = input
-            .get("swap_icons")
-            .and_then(|v| v.as_bool())
-            .ok_or("Missing or invalid 'swap_icons' field")?;
-
-        let mut buttons = input
-            .remove("buttons")
-            .and_then(|v| v.take_array())
-            .ok_or("Missing or invalid 'buttons' field")?
+        let swap_fields = get_field!(input, "swap_fields", |v| v.as_bool());
+        let swap_icons = get_field!(input, "swap_icons", |v| v.as_bool());
+        let mut buttons = remove_field!(input, "buttons", |v| v.take_array())
             .into_iter()
             .map(ActivityButton::deserialize)
             .collect::<crate::Result<Vec<_>>>()?;

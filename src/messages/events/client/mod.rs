@@ -66,7 +66,7 @@ impl ClientEvent {
             )),
             "clear_activity" => Self::ClearActivity(ClearActivityEvent),
             "update_workspace" => {
-                Self::UpdateWorkspace(UpdateWorkspaceEvent::new(data!(map, |v| v.take_str())))
+                Self::UpdateWorkspace(UpdateWorkspaceEvent::new(data!(map, |v| v.take_string())))
             }
             "reset_timestamp" => Self::ResetTimestamp(ResetTimestampEvent),
             "disconnect" => Self::Disconnect(DisconnectEvent),

@@ -1,6 +1,7 @@
 use crate::{
     json,
     msgpack::{self, Value},
+    remove_field,
 };
 
 pub struct Packet {
@@ -111,16 +112,8 @@ impl msgpack::Deserialize for ActivityButton {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
         let mut input = input.take_map().ok_or("Invalid activity button")?;
 
-        let label = input
-            .remove("label")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'label' field")?
-            .to_string();
-        let url = input
-            .remove("url")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'url' field")?
-            .to_string();
+        let label = remove_field!(input, "label", |v| v.take_string());
+        let url = remove_field!(input, "url", |v| v.take_string());
 
         Ok(ActivityButton { label, url })
     }

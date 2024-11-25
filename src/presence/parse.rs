@@ -1,5 +1,7 @@
 use crate::{
+    get_field,
     msgpack::{Deserialize, Value},
+    remove_field,
     util::types::AssetType,
 };
 
@@ -9,45 +11,25 @@ impl Deserialize for ActivityContext {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
         let mut input = input.take_map().ok_or("Invalid activity context")?;
 
-        let filename = input
-            .remove("filename")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'filename' field")?;
-
-        let filetype = input
-            .remove("filetype")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'filetype' field")?;
-
-        let is_read_only = input
-            .get("is_read_only")
-            .and_then(|v| v.as_bool())
-            .ok_or("Missing or invalid 'is_read_only' field")?;
-
-        let mut cursor_position = None;
-        if let Some(cursor) = input.get("cursor_position") {
-            let array = cursor.as_array().ok_or("Invalid 'cursor_position' field")?;
-            let line = array
-                .first()
-                .and_then(|v| v.as_uinteger())
-                .ok_or("Invalid 'cursor_position' field")? as u32;
-            let char = array
-                .get(1)
-                .and_then(|v| v.as_uinteger())
-                .ok_or("Invalid 'cursor_position' field")? as u32;
-
-            cursor_position = Some((line, char));
-        }
-
-        let problem_count = input
-            .get("problem_count")
-            .and_then(|v| v.as_integer())
-            .ok_or("Missing or invalid 'problem_count' field")? as i32;
-
+        let filename = remove_field!(input, "filename", |v| v.take_string());
+        let filetype = remove_field!(input, "filetype", |v| v.take_string());
+        let is_read_only = get_field!(input, "is_read_only", |v| v.as_bool());
+        let cursor_position = input
+            .get("cursor_position")
+            .and_then(|cursor| cursor.as_array())
+            .and_then(|array| {
+                array.first().and_then(|v| v.as_uinteger()).map(|line| {
+                    array
+                        .get(1)
+                        .and_then(|v| v.as_uinteger())
+                        .map(|char| (line as u32, char as u32))
+                })
+            })
+            .flatten();
+        let problem_count = get_field!(input, "problem_count", |v| v.as_integer()) as i32;
         let custom_asset = input
             .remove("custom_asset")
-            .map(CustomAssetContext::deserialize)
-            .and_then(|v| v.ok());
+            .and_then(|v| CustomAssetContext::deserialize(v).ok());
 
         Ok(ActivityContext {
             filename,
@@ -65,27 +47,10 @@ impl Deserialize for CustomAssetContext {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
         let mut input = input.take_map().ok_or("Invalid custom asset context")?;
 
-        let ty = input
-            .get("type")
-            .and_then(|v| v.as_str().map(AssetType::from))
-            .flatten()
-            .ok_or("Missing or invalid 'type' field")?;
-
-        let name = input
-            .get("name")
-            .and_then(|v| v.as_str())
-            .ok_or("Missing or invalid 'name' field")?
-            .to_string();
-
-        let icon = input
-            .remove("icon")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'icon' field")?;
-
-        let tooltip = input
-            .remove("tooltip")
-            .and_then(|v| v.take_str())
-            .ok_or("Missing or invalid 'tooltip' field")?;
+        let ty = get_field!(input, "type", |v| v.as_str().and_then(AssetType::from));
+        let name = remove_field!(input, "name", |v| v.take_string());
+        let icon = remove_field!(input, "icon", |v| v.take_string());
+        let tooltip = remove_field!(input, "tooltip", |v| v.take_string());
 
         Ok(CustomAssetContext {
             ty,
