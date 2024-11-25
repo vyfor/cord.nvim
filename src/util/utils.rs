@@ -6,7 +6,6 @@ use std::{
     path::PathBuf,
 };
 
-
 pub const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
 
@@ -97,4 +96,26 @@ pub fn find_git_repository(workspace_path: &str) -> Option<String> {
     }
 
     remote_url
+}
+
+#[macro_export]
+macro_rules! get_field {
+    ($map:expr, $field:expr, $expr:expr) => {
+        $map.get($field).and_then($expr).ok_or(concat!(
+            "Missing or invalid '",
+            $field,
+            "' field"
+        ))?
+    };
+}
+
+#[macro_export]
+macro_rules! remove_field {
+    ($map:expr, $field:expr, $expr:expr) => {
+        $map.remove($field).and_then($expr).ok_or(concat!(
+            "Missing or invalid '",
+            $field,
+            "' field"
+        ))?
+    };
 }
