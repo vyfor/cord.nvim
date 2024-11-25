@@ -18,6 +18,7 @@ use crate::{
     },
     server_event,
     types::Config,
+    util::logger::{LogLevel, Logger},
 };
 
 pub struct Cord {
@@ -28,6 +29,7 @@ pub struct Cord {
     pub rx: Receiver<Message>,
     pub iterations: u32,
     pub max_iterations: u32,
+    pub logger: Logger,
 }
 
 impl Cord {
@@ -35,6 +37,7 @@ impl Cord {
         let (tx, rx) = mpsc::channel::<Message>();
         let rich_client = Arc::new(RichClient::connect(client_id)?);
         let server = PipeServer::new(pipe_name, tx.clone());
+        let logger = Logger::new(tx.clone(), LogLevel::Off);
 
         Ok(Self {
             config: None,
@@ -44,6 +47,7 @@ impl Cord {
             rx,
             iterations: 0,
             max_iterations,
+            logger,
         })
     }
 
