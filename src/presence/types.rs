@@ -4,13 +4,13 @@ use crate::{
     remove_field,
 };
 
-pub struct Packet {
+pub struct Packet<'a> {
     pub pid: u32,
-    pub activity: Option<Activity>,
+    pub activity: Option<&'a Activity>,
 }
 
-impl Packet {
-    pub fn new(pid: u32, activity: Option<Activity>) -> Self {
+impl<'a> Packet<'a> {
+    pub fn new(pid: u32, activity: Option<&'a Activity>) -> Self {
         Self { pid, activity }
     }
 }
@@ -33,7 +33,7 @@ pub struct ActivityButton {
     pub url: String,
 }
 
-impl json::Serialize for Packet {
+impl json::Serialize for Packet<'_> {
     fn serialize<'a>(
         &'a self,
         f: json::SerializeFn<'a>,
@@ -41,7 +41,7 @@ impl json::Serialize for Packet {
     ) -> crate::Result<()> {
         f("pid", json::ValueRef::Number(self.pid as f64), state)?;
         if let Some(activity) = &self.activity {
-            f("activity", json::ValueRef::Object(activity), state)?;
+            f("activity", json::ValueRef::Object(*activity), state)?;
         }
         Ok(())
     }

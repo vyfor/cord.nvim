@@ -21,12 +21,16 @@ impl OnEvent for UpdateActivityEvent {
             return Ok(());
         }
 
-        if let Some(session) = ctx.cord.session_manager.get_session(ctx.client_id) {
+        if let Some(mut session) = ctx.cord.session_manager.get_session_mut(ctx.client_id) {
             if let Some(config) = session.get_config() {
-                ctx.cord.rich_client.update(&Packet::new(
-                    ctx.cord.rich_client.pid,
-                    Some(self.context.build(config)),
-                ))?;
+                let activity = self.context.build(config);
+                if Some(&activity) != session.last_activity.as_ref() {
+                    ctx.cord
+                        .rich_client
+                        .update(&Packet::new(ctx.cord.rich_client.pid, Some(&activity)))?;
+                }
+
+                session.last_activity = Some(activity);
             }
         }
 
