@@ -62,7 +62,7 @@ impl Session {
 
 pub struct SessionRef<'a>(RwLockReadGuard<'a, HashMap<u32, Session>>);
 
-impl<'a> std::ops::Deref for SessionRef<'a> {
+impl std::ops::Deref for SessionRef<'_> {
     type Target = Session;
 
     fn deref(&self) -> &Self::Target {
@@ -72,7 +72,7 @@ impl<'a> std::ops::Deref for SessionRef<'a> {
 
 pub struct SessionRefMut<'a>(RwLockWriteGuard<'a, HashMap<u32, Session>>);
 
-impl<'a> std::ops::Deref for SessionRefMut<'a> {
+impl std::ops::Deref for SessionRefMut<'_> {
     type Target = Session;
 
     fn deref(&self) -> &Self::Target {
@@ -80,7 +80,7 @@ impl<'a> std::ops::Deref for SessionRefMut<'a> {
     }
 }
 
-impl<'a> std::ops::DerefMut for SessionRefMut<'a> {
+impl std::ops::DerefMut for SessionRefMut<'_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.0.values_mut().next().unwrap()
     }
@@ -89,7 +89,6 @@ impl<'a> std::ops::DerefMut for SessionRefMut<'a> {
 #[derive(Default)]
 pub struct SessionManager {
     pub sessions: RwLock<HashMap<u32, Session>>,
-    default_config: Option<PluginConfig>,
 }
 
 impl SessionManager {
@@ -121,13 +120,5 @@ impl SessionManager {
         } else {
             None
         }
-    }
-
-    pub fn set_default_config(&mut self, config: PluginConfig) {
-        self.default_config = Some(config);
-    }
-
-    pub fn get_default_config(&self) -> Option<&PluginConfig> {
-        self.default_config.as_ref()
     }
 }
