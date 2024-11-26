@@ -9,17 +9,17 @@ use crate::{
     util::{types::AssetType, utils::get_asset},
 };
 
-use super::types::Activity;
+use super::types::{Activity, ActivityAssets};
 
 #[derive(Debug, Clone)]
 pub struct ActivityContext {
-    pub filename: String,
-    pub filetype: String,
-    pub is_read_only: bool,
-    pub cursor_position: Option<(u32, u32)>,
-    pub problem_count: i32,
-    pub custom_asset: Option<Asset>,
-    pub resolved_type: Option<Filetype>,
+    filename: String,
+    filetype: String,
+    is_read_only: bool,
+    cursor_position: Option<(u32, u32)>,
+    problem_count: i32,
+    custom_asset: Option<Asset>,
+    resolved_type: Option<Filetype>,
 }
 
 impl ActivityContext {
@@ -44,7 +44,7 @@ impl ActivityContext {
         ctx
     }
 
-    pub fn resolve_filetype(&mut self) -> bool {
+    fn resolve_filetype(&mut self) -> bool {
         let filetype_str = self.filetype.as_str();
         let filename_str = self.filename.as_str();
 
@@ -146,10 +146,12 @@ impl ActivityContext {
         Activity {
             details: Some(config.idle.text.clone()),
             state,
-            large_image: Some(large_image),
-            large_text: Some(config.idle.tooltip.clone()),
-            small_image: None,
-            small_text: None,
+            assets: Some(ActivityAssets {
+                large_image: Some(large_image),
+                large_text: Some(config.idle.tooltip.clone()),
+                small_image: None,
+                small_text: None,
+            }),
             timestamp: None, // todo
             buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
         }
@@ -275,10 +277,12 @@ impl ActivityContext {
         Activity {
             details: Some(details),
             state: state.map(|s| s.to_owned()),
-            large_image: large_image.map(|s| s.to_owned()),
-            large_text,
-            small_image,
-            small_text,
+            assets: Some(ActivityAssets {
+                large_image: large_image.map(|s| s.to_owned()),
+                large_text,
+                small_image,
+                small_text,
+            }),
             timestamp: None, // todo
             buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
         }

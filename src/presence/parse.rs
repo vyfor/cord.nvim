@@ -27,14 +27,13 @@ impl Deserialize for ActivityContext {
             .flatten();
         let problem_count = get_field!(input, "problem_count", |v| v.as_integer()) as i32;
 
-        Ok(ActivityContext {
+        // todo: custom assets
+        Ok(ActivityContext::new(
             filename,
             filetype,
             is_read_only,
             cursor_position,
             problem_count,
-            custom_asset: None, // todo
-            resolved_type: None,
-        })
+        ))
     }
 }
