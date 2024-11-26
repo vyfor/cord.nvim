@@ -16,7 +16,6 @@ impl Connection for RichClient {
                     return Ok(RichClient {
                         client_id,
                         pipe: Some(pipe),
-                        last_activity: None,
                         pid: std::process::id(),
                         is_ready: false.into(),
                     })

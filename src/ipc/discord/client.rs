@@ -1,6 +1,6 @@
 use crate::ipc::discord::utils;
 use crate::json::Json;
-use crate::presence::types::{Activity, Packet};
+use crate::presence::types::Packet;
 use std::io::{Read, Write};
 use std::sync::atomic::AtomicBool;
 
@@ -10,7 +10,6 @@ pub struct RichClient {
     pub pipe: Option<std::fs::File>,
     #[cfg(not(target_os = "windows"))]
     pub pipe: Option<std::os::unix::net::UnixStream>,
-    pub last_activity: Option<Activity>,
     pub pid: u32,
     pub is_ready: AtomicBool,
 }
@@ -60,11 +59,8 @@ impl RichClient {
     }
 
     pub fn update(&self, packet: &Packet) -> crate::Result<()> {
-        if packet.activity != self.last_activity {
-            let encoded = Json::serialize(packet)?;
-
-            self.write(1, Some(encoded.as_bytes()))?;
-        }
+        let encoded = Json::serialize(packet)?;
+        self.write(1, Some(encoded.as_bytes()))?;
 
         Ok(())
     }

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
+use crate::presence::types::Activity;
 use crate::types::config::PluginConfig;
 
 pub struct Session {
@@ -8,6 +9,7 @@ pub struct Session {
     pub id: u32,
     pub workspace: Option<String>,
     pub timestamp: Option<u64>,
+    pub last_activity: Option<Activity>,
     pub config: Option<PluginConfig>,
 }
 
@@ -17,6 +19,7 @@ impl Session {
             id,
             workspace: None,
             timestamp: None,
+            last_activity: None,
             config: None,
         }
     }
@@ -27,6 +30,10 @@ impl Session {
 
     pub fn set_timestamp(&mut self, timestamp: u64) {
         self.timestamp = Some(timestamp);
+    }
+
+    pub fn set_last_activity(&mut self, activity: Activity) {
+        self.last_activity = Some(activity);
     }
 
     pub fn set_config(&mut self, config: PluginConfig) {
