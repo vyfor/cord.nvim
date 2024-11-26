@@ -6,7 +6,7 @@ use crate::presence::types::Packet;
 
 #[derive(Debug)]
 pub struct UpdateActivityEvent {
-    pub context: ActivityContext,
+    context: ActivityContext,
 }
 
 impl UpdateActivityEvent {
@@ -17,14 +17,17 @@ impl UpdateActivityEvent {
 
 impl OnEvent for UpdateActivityEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        if let Some(config) = &mut ctx.cord.plugin_config {
-            if !ctx.cord.rich_client.is_ready.load(Ordering::SeqCst) {
-                return Ok(());
+        if !ctx.cord.rich_client.is_ready.load(Ordering::SeqCst) {
+            return Ok(());
+        }
+
+        if let Some(session) = ctx.cord.session_manager.get_session(ctx.client_id) {
+            if let Some(config) = session.get_config() {
+                ctx.cord.rich_client.update(&Packet::new(
+                    ctx.cord.rich_client.pid,
+                    Some(self.context.build(config)),
+                ))?;
             }
-            ctx.cord.rich_client.update(&Packet::new(
-                ctx.cord.rich_client.pid,
-                Some(self.context.build(config)),
-            ))?;
         }
 
         Ok(())

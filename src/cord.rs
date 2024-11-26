@@ -20,13 +20,13 @@ use crate::{
         message::Message,
     },
     server_event,
-    types::config::PluginConfig,
+    session::SessionManager,
     util::logger::{LogLevel, Logger},
 };
 
 pub struct Cord {
     pub config: Config,
-    pub plugin_config: Option<PluginConfig>,
+    pub session_manager: SessionManager,
     pub rich_client: Arc<RichClient>,
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
@@ -43,7 +43,7 @@ impl Cord {
 
         Ok(Self {
             config,
-            plugin_config: None,
+            session_manager: SessionManager::new(),
             rich_client,
             pipe: server,
             tx,

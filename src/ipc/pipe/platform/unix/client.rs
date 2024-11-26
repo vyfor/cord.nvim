@@ -3,11 +3,10 @@ use std::os::unix::net::UnixStream;
 use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
 
-use crate::ipc::pipe::PipeClientImpl;
+use crate::ipc::pipe::{report_error, PipeClientImpl};
 use crate::local_event;
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
-use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 
 pub struct PipeClient {
@@ -61,8 +60,7 @@ impl PipeClientImpl for PipeClient {
                             }
                         },
                         Err(e) => {
-                            tx.send(local_event!(id, Error, ErrorEvent::new(Box::new(e))))
-                                .ok();
+                            report_error(&tx, e);
                             break;
                         }
                     }

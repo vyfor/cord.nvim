@@ -5,14 +5,11 @@ use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
-use super::{
-    GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING,
-};
-use crate::ipc::pipe::PipeClientImpl;
+use super::{GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING};
+use crate::ipc::pipe::{report_error, PipeClientImpl};
 use crate::local_event;
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
-use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 
 pub struct PipeClient {
@@ -93,8 +90,7 @@ impl PipeClientImpl for PipeClient {
                         if read_result == 0 {
                             let error = io::Error::last_os_error();
                             if error.raw_os_error() != Some(ERROR_IO_PENDING as i32) {
-                                tx.send(local_event!(id, Error, ErrorEvent::new(Box::new(error))))
-                                    .ok();
+                                report_error(&tx, io::Error::last_os_error());
                                 break;
                             }
                         }
@@ -106,12 +102,7 @@ impl PipeClientImpl for PipeClient {
                             1,
                         ) == 0
                         {
-                            tx.send(local_event!(
-                                id,
-                                Error,
-                                ErrorEvent::new(Box::new(io::Error::last_os_error()))
-                            ))
-                            .ok();
+                            report_error(&tx, io::Error::last_os_error());
                             break;
                         }
 

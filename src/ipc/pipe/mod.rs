@@ -2,7 +2,10 @@ pub mod platform;
 
 use std::{io, sync::mpsc::Sender};
 
-use crate::messages::message::Message;
+use crate::{
+    local_event,
+    messages::{events::local::ErrorEvent, message::Message},
+};
 
 pub trait PipeServerImpl {
     fn new(pipe_name: &str, tx: Sender<Message>) -> Self
@@ -23,4 +26,9 @@ pub trait PipeClientImpl {
     fn start_read_thread(&mut self) -> io::Result<()>;
 
     type PipeType;
+}
+
+fn report_error(tx: &Sender<Message>, error: io::Error) {
+    tx.send(local_event!(0, Error, ErrorEvent::new(Box::new(error))))
+        .ok();
 }

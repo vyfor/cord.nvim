@@ -5,19 +5,11 @@ use std::{
 
 use crate::{
     mappings::Filetype,
-    types::config::PluginConfig,
+    types::config::{Asset, PluginConfig},
     util::{types::AssetType, utils::get_asset},
 };
 
 use super::types::Activity;
-
-#[derive(Debug, Clone)]
-pub struct CustomAssetContext {
-    pub ty: AssetType,
-    pub name: String,
-    pub icon: String,
-    pub tooltip: String,
-}
 
 #[derive(Debug, Clone)]
 pub struct ActivityContext {
@@ -26,19 +18,8 @@ pub struct ActivityContext {
     pub is_read_only: bool,
     pub cursor_position: Option<(u32, u32)>,
     pub problem_count: i32,
-    pub custom_asset: Option<CustomAssetContext>,
+    pub custom_asset: Option<Asset>,
     pub resolved_type: Option<Filetype>,
-}
-
-impl CustomAssetContext {
-    pub fn new(asset_type: AssetType, asset_name: String, icon: String, tooltip: String) -> Self {
-        Self {
-            ty: asset_type,
-            name: asset_name,
-            icon,
-            tooltip,
-        }
-    }
 }
 
 impl ActivityContext {
@@ -77,8 +58,8 @@ impl ActivityContext {
         true
     }
 
-    pub fn update_custom_asset(&mut self, custom: CustomAssetContext) {
-        self.custom_asset = Some(custom);
+    pub fn update_custom_asset(&mut self, asset: Asset) {
+        self.custom_asset = Some(asset);
     }
 
     pub fn get_effective_name(&self) -> Cow<str> {
@@ -163,13 +144,13 @@ impl ActivityContext {
         let large_image = get_asset("editor", "idle");
 
         Activity {
-            details: Some(config.idle_text.clone()),
+            details: Some(config.idle.text.clone()),
             state,
             large_image: Some(large_image),
-            large_text: Some(config.idle_tooltip.clone()),
+            large_text: Some(config.idle.tooltip.clone()),
             small_image: None,
             small_text: None,
-            timestamp: config.timestamp,
+            timestamp: None, // todo
             buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
         }
     }
@@ -181,9 +162,9 @@ impl ActivityContext {
         let details = match self.resolved_type.as_ref().unwrap() {
             Filetype::Language(_, _) => {
                 let mut details = if self.is_read_only {
-                    config.viewing_text.replace("{}", filename)
+                    config.text.viewing.replace("{}", filename)
                 } else {
-                    config.editing_text.replace("{}", filename)
+                    config.text.editing.replace("{}", filename)
                 };
 
                 if let Some((line, char)) = self.cursor_position {
@@ -193,16 +174,20 @@ impl ActivityContext {
                 details
             }
             Filetype::FileBrowser(_, _) => config
-                .file_browser_text
+                .text
+                .file_browser
                 .replace("{}", self.get_effective_name().borrow()),
             Filetype::PluginManager(_, _) => config
-                .plugin_manager_text
+                .text
+                .plugin_manager
                 .replace("{}", self.get_effective_name().borrow()),
             Filetype::Lsp(_, _) => config
-                .lsp_manager_text
+                .text
+                .lsp_manager
                 .replace("{}", self.get_effective_name().borrow()),
             Filetype::Vcs(_, _) => config
-                .vcs_text
+                .text
+                .vcs
                 .replace("{}", self.get_effective_name().borrow()),
         };
 
@@ -210,12 +195,12 @@ impl ActivityContext {
     }
 
     fn build_workspace_state(&self, config: &PluginConfig, problem_count: i32) -> Option<String> {
-        if !config.workspace_text.is_empty() {
+        if !config.text.workspace.is_empty() {
             Some(if problem_count != -1 {
-                let replaced = config.workspace_text.replace("{}", &config.workspace);
+                let replaced = config.text.workspace.replace("{}", ""); // todo
                 format!("{} - {} problems", replaced, problem_count)
             } else {
-                config.workspace_text.replace("{}", &config.workspace)
+                config.text.workspace.replace("{}", "") // todo
             })
         } else {
             None
@@ -223,8 +208,8 @@ impl ActivityContext {
     }
 
     fn build_editor_text(&self, config: &PluginConfig) -> Option<String> {
-        if !config.editor_tooltip.is_empty() {
-            Some(config.editor_tooltip.clone())
+        if !config.editor.tooltip.is_empty() {
+            Some(config.editor.tooltip.clone())
         } else {
             None
         }
@@ -259,12 +244,12 @@ impl ActivityContext {
             (
                 large_image,
                 large_text,
-                config.editor_image.clone(),
+                config.editor.image.clone(),
                 self.build_editor_text(config),
             )
         } else {
             (
-                config.editor_image.clone(),
+                config.editor.image.clone(),
                 self.build_editor_text(config),
                 large_image,
                 large_text,
@@ -284,8 +269,8 @@ impl ActivityContext {
         let large_text = Some(self.get_effective_tooltip()).map(|s| s.to_owned());
 
         let (small_image, small_text, large_image, large_text) =
-            self.swap_images(config, large_image, large_text, config.swap_icons);
-        let (details, state) = self.swap_fields(details, state, config.swap_fields);
+            self.swap_images(config, large_image, large_text, config.display.swap_images);
+        let (details, state) = self.swap_fields(details, state, config.display.swap_fields);
 
         Activity {
             details: Some(details),
@@ -294,7 +279,7 @@ impl ActivityContext {
             large_text,
             small_image,
             small_text,
-            timestamp: config.timestamp,
+            timestamp: None, // todo
             buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
         }
     }

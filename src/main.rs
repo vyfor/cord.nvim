@@ -8,6 +8,7 @@ mod mappings;
 mod messages;
 mod msgpack;
 mod presence;
+mod session;
 mod types;
 mod util;
 
