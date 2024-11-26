@@ -1,14 +1,16 @@
 pub mod platform;
 
 use std::{io, sync::mpsc::Sender};
+use std::sync::Arc;
 
 use crate::{
     local_event,
     messages::{events::local::ErrorEvent, message::Message},
+    session::SessionManager,
 };
 
 pub trait PipeServerImpl {
-    fn new(pipe_name: &str, tx: Sender<Message>) -> Self
+    fn new(pipe_name: &str, tx: Sender<Message>, session_manager: Arc<SessionManager>) -> Self
     where
         Self: Sized;
     fn start(&mut self) -> io::Result<()>;

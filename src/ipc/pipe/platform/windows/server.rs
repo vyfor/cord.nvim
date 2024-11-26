@@ -1,12 +1,11 @@
 #![allow(clippy::upper_case_acronyms)]
 
-use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::os::windows::io::FromRawHandle;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::mpsc::Sender;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use super::{
@@ -15,16 +14,17 @@ use super::{
     PIPE_UNLIMITED_INSTANCES,
 };
 use super::{
-    CloseHandle, ConnectNamedPipe, GetLastError, GetOverlappedResult,
-    ERROR_IO_PENDING, ERROR_PIPE_CONNECTED, PIPE_WAIT,
+    CloseHandle, ConnectNamedPipe, GetLastError, GetOverlappedResult, ERROR_IO_PENDING,
+    ERROR_PIPE_CONNECTED, PIPE_WAIT,
 };
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
+use crate::session::SessionManager;
 use crate::{client_event, local_event};
 
 pub struct PipeServer {
-    pub clients: Arc<RwLock<HashMap<u32, PipeClient>>>,
+    session_manager: Arc<SessionManager>,
     pipe_name: String,
     tx: Sender<Message>,
     next_client_id: Arc<AtomicU32>,
@@ -33,9 +33,9 @@ pub struct PipeServer {
 }
 
 impl PipeServerImpl for PipeServer {
-    fn new(pipe_name: &str, tx: Sender<Message>) -> Self {
+    fn new(pipe_name: &str, tx: Sender<Message>, session_manager: Arc<SessionManager>) -> Self {
         Self {
-            clients: Arc::new(RwLock::new(HashMap::new())),
+            session_manager,
             pipe_name: pipe_name.to_string(),
             tx,
             next_client_id: Arc::new(AtomicU32::new(1)),
@@ -50,7 +50,7 @@ impl PipeServerImpl for PipeServer {
         }
 
         let pipe_name = self.pipe_name.clone();
-        let clients = Arc::clone(&self.clients);
+        let session_manager = Arc::clone(&self.session_manager);
         let next_client_id = Arc::clone(&self.next_client_id);
         let running = Arc::clone(&self.running);
         let tx = self.tx.clone();
@@ -90,7 +90,7 @@ impl PipeServerImpl for PipeServer {
                                     0,
                                     Error,
                                     ErrorEvent::new(Box::new(io::Error::from_raw_os_error(
-                                        error as _
+                                        error as _,
                                     )))
                                 ))
                                 .ok();
@@ -121,8 +121,8 @@ impl PipeServerImpl for PipeServer {
                             tx.clone(),
                         );
                         client.start_read_thread().ok();
+                        session_manager.create_session(client_id, client);
                         tx.send(client_event!(client_id, Connect)).ok();
-                        clients.write().unwrap().insert(client_id, client);
 
                         CloseHandle(h_event);
                     }
@@ -138,37 +138,30 @@ impl PipeServerImpl for PipeServer {
         if let Some(handle) = self.thread_handle.take() {
             drop(handle);
         }
-        self.clients.write().unwrap().clear();
     }
 
     fn broadcast(&self, data: &[u8]) -> io::Result<()> {
-        let mut clients = self.clients.write().unwrap();
-        let mut failed_clients = Vec::new();
-
-        for (client_id, client) in clients.iter_mut() {
-            if client.write(data).is_err() {
-                failed_clients.push(*client_id);
+        let mut sessions = self.session_manager.sessions.write().unwrap();
+        for session in sessions.values_mut() {
+            if let Some(client) = session.get_pipe_client_mut() {
+                client.write(data)?;
             }
         }
-
-        for client_id in failed_clients {
-            clients.remove(&client_id);
-        }
-
         Ok(())
     }
 
     fn write_to(&self, client_id: u32, data: &[u8]) -> io::Result<()> {
-        self.clients
-            .write()
-            .unwrap()
-            .get_mut(&client_id)
-            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Client not found"))?
-            .write(data)
+        let mut sessions = self.session_manager.sessions.write().unwrap();
+        if let Some(session) = sessions.get_mut(&client_id) {
+            if let Some(client) = session.get_pipe_client_mut() {
+                return client.write(data);
+            }
+        }
+        Err(io::Error::new(io::ErrorKind::NotFound, "Client not found"))
     }
 
     fn disconnect(&self, client_id: u32) -> io::Result<()> {
-        self.clients.write().unwrap().remove(&client_id);
+        self.session_manager.remove_session(client_id);
         Ok(())
     }
 }

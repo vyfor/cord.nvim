@@ -20,13 +20,6 @@ impl OnEvent for InitializeEvent {
         );
         ctx.cord.logger.set_level(self.config.log_level);
 
-        if ctx.cord.session_manager.get_default_config().is_none() {
-            ctx.cord
-                .session_manager
-                .set_default_config(self.config.clone());
-        }
-
-        ctx.cord.session_manager.create_session(ctx.client_id);
         if let Some(mut session) = ctx.cord.session_manager.get_session_mut(ctx.client_id) {
             session.set_config(self.config);
         }

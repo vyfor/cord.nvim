@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
+use crate::ipc::pipe::platform::client::PipeClient;
 use crate::presence::types::Activity;
 use crate::types::config::PluginConfig;
 
@@ -11,6 +12,7 @@ pub struct Session {
     pub timestamp: Option<u64>,
     pub last_activity: Option<Activity>,
     pub config: Option<PluginConfig>,
+    pub pipe_client: Option<PipeClient>,
 }
 
 impl Session {
@@ -21,6 +23,7 @@ impl Session {
             timestamp: None,
             last_activity: None,
             config: None,
+            pipe_client: None,
         }
     }
 
@@ -40,8 +43,20 @@ impl Session {
         self.config = Some(config);
     }
 
+    pub fn set_pipe_client(&mut self, client: PipeClient) {
+        self.pipe_client = Some(client);
+    }
+
     pub fn get_config(&self) -> Option<&PluginConfig> {
         self.config.as_ref()
+    }
+
+    pub fn get_pipe_client(&self) -> Option<&PipeClient> {
+        self.pipe_client.as_ref()
+    }
+
+    pub fn get_pipe_client_mut(&mut self) -> Option<&mut PipeClient> {
+        self.pipe_client.as_mut()
     }
 }
 
@@ -73,14 +88,15 @@ impl<'a> std::ops::DerefMut for SessionRefMut<'a> {
 
 #[derive(Default)]
 pub struct SessionManager {
-    sessions: RwLock<HashMap<u32, Session>>,
+    pub sessions: RwLock<HashMap<u32, Session>>,
     default_config: Option<PluginConfig>,
 }
 
 impl SessionManager {
-    pub fn create_session(&self, id: u32) {
+    pub fn create_session(&self, id: u32, client: PipeClient) {
         let mut sessions = self.sessions.write().unwrap();
-        let session = Session::new(id);
+        let mut session = Session::new(id);
+        session.set_pipe_client(client);
         sessions.insert(id, session);
     }
 

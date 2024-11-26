@@ -29,7 +29,7 @@ use crate::{
 
 pub struct Cord {
     pub config: Config,
-    pub session_manager: SessionManager,
+    pub session_manager: Arc<SessionManager>,
     pub rich_client: Arc<RichClient>,
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
@@ -43,12 +43,12 @@ impl Cord {
         let lock = ServerLock::new()?;
 
         let (tx, rx) = mpsc::channel::<Message>();
-        let session_manager = SessionManager::default();
+        let session_manager = Arc::new(SessionManager::default());
         let rich_client = Arc::new(RichClient::connect(config.client_id)?);
-        let server = PipeServer::new(&config.pipe_name, tx.clone());
+        let server = PipeServer::new(&config.pipe_name, tx.clone(), Arc::clone(&session_manager));
         let logger = Logger::new(tx.clone(), LogLevel::Off);
 
-        Ok(Self {
+        Ok(Cord {
             config,
             session_manager,
             rich_client,
@@ -78,7 +78,7 @@ impl Cord {
                     cord: self,
                     client_id: msg.client_id,
                 })?;
-            } else if self.pipe.clients.read().unwrap().is_empty() {
+            } else if self.session_manager.sessions.read().unwrap().is_empty() {
                 break;
             }
         }
