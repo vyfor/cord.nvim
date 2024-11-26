@@ -86,6 +86,7 @@ impl json::Serialize for PacketArgs<'_> {
         if let Some(activity) = &self.activity {
             f("activity", json::ValueRef::Object(*activity), state)?;
         }
+
         Ok(())
     }
 }
@@ -145,6 +146,7 @@ impl json::Serialize for ActivityAssets {
         if let Some(small_text) = &self.small_text {
             f("small_text", json::ValueRef::String(small_text), state)?;
         }
+
         Ok(())
     }
 }
@@ -161,6 +163,7 @@ impl json::Serialize for ActivityTimestamps {
         if let Some(end) = self.end {
             f("end", json::ValueRef::Number(end as f64), state)?;
         }
+
         Ok(())
     }
 }
@@ -173,6 +176,7 @@ impl json::Serialize for ActivityButton {
     ) -> crate::Result<()> {
         f("label", json::ValueRef::String(&self.label), state)?;
         f("url", json::ValueRef::String(&self.url), state)?;
+
         Ok(())
     }
 }
