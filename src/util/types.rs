@@ -20,3 +20,18 @@ impl AssetType {
         }
     }
 }
+
+impl TryFrom<u64> for AssetType {
+    type Error = ();
+
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(AssetType::Language),
+            1 => Ok(AssetType::FileBrowser),
+            2 => Ok(AssetType::PluginManager),
+            3 => Ok(AssetType::LspManager),
+            4 => Ok(AssetType::Vcs),
+            _ => Err(()),
+        }
+    }
+}
