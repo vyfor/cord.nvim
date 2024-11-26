@@ -152,7 +152,7 @@ impl ActivityContext {
                 small_image: None,
                 small_text: None,
             }),
-            timestamp: None, // todo
+            timestamps: None, // todo
             buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
         }
     }
@@ -283,7 +283,7 @@ impl ActivityContext {
                 small_image,
                 small_text,
             }),
-            timestamp: None, // todo
+            timestamps: None, // todo
             buttons: (!config.buttons.is_empty()).then(|| config.buttons.clone()),
         }
     }

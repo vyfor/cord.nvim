@@ -38,8 +38,8 @@ pub struct Activity {
     pub details: Option<String>,
     pub state: Option<String>,
     pub assets: Option<ActivityAssets>,
+    pub timestamps: Option<ActivityTimestamps>,
     pub buttons: Option<Vec<ActivityButton>>,
-    pub timestamp: Option<u128>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -48,6 +48,12 @@ pub struct ActivityAssets {
     pub large_text: Option<String>,
     pub small_image: Option<String>,
     pub small_text: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ActivityTimestamps {
+    pub start: Option<u64>,
+    pub end: Option<u64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -99,6 +105,9 @@ impl json::Serialize for Activity {
         if let Some(assets) = &self.assets {
             f("assets", json::ValueRef::Object(assets), state)?;
         }
+        if let Some(timestamps) = &self.timestamps {
+            f("timestamps", json::ValueRef::Object(timestamps), state)?;
+        }
         if let Some(buttons) = &self.buttons {
             if !buttons.is_empty() {
                 f(
@@ -113,13 +122,7 @@ impl json::Serialize for Activity {
                 )?;
             }
         }
-        if let Some(timestamp) = &self.timestamp {
-            f(
-                "timestamp",
-                json::ValueRef::Number(*timestamp as f64),
-                state,
-            )?;
-        }
+
         Ok(())
     }
 }
@@ -141,6 +144,22 @@ impl json::Serialize for ActivityAssets {
         }
         if let Some(small_text) = &self.small_text {
             f("small_text", json::ValueRef::String(small_text), state)?;
+        }
+        Ok(())
+    }
+}
+
+impl json::Serialize for ActivityTimestamps {
+    fn serialize<'a>(
+        &'a self,
+        f: json::SerializeFn<'a>,
+        state: &mut json::SerializeState,
+    ) -> crate::Result<()> {
+        if let Some(start) = self.start {
+            f("start", json::ValueRef::Number(start as f64), state)?;
+        }
+        if let Some(end) = self.end {
+            f("end", json::ValueRef::Number(end as f64), state)?;
         }
         Ok(())
     }
