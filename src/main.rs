@@ -1,3 +1,5 @@
+#![feature(file_lock)]
+
 mod cli;
 mod cord;
 mod error;

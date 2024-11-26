@@ -21,7 +21,10 @@ use crate::{
     },
     server_event,
     session::SessionManager,
-    util::logger::{LogLevel, Logger},
+    util::{
+        lockfile::ServerLock,
+        logger::{LogLevel, Logger},
+    },
 };
 
 pub struct Cord {
@@ -32,10 +35,13 @@ pub struct Cord {
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
     pub logger: Logger,
+    _lock: ServerLock,
 }
 
 impl Cord {
     pub fn new(config: Config) -> crate::Result<Self> {
+        let lock = ServerLock::new()?;
+
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = SessionManager::default();
         let rich_client = Arc::new(RichClient::connect(config.client_id)?);
@@ -50,6 +56,7 @@ impl Cord {
             tx,
             rx,
             logger,
+            _lock: lock,
         })
     }
 
