@@ -228,7 +228,7 @@ impl ActivityContext {
         }
     }
 
-    fn swap_images(
+    fn swap_icons(
         &self,
         config: &PluginConfig,
         large_image: Option<String>,
@@ -269,7 +269,7 @@ impl ActivityContext {
         let large_text = Some(self.get_effective_tooltip()).map(|s| s.to_owned());
 
         let (small_image, small_text, large_image, large_text) =
-            self.swap_images(config, large_image, large_text, config.display.swap_images);
+            self.swap_icons(config, large_image, large_text, config.display.swap_icons);
         let (details, state) = self.swap_fields(details, state, config.display.swap_fields);
 
         Activity {

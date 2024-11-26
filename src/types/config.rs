@@ -36,7 +36,7 @@ pub struct DisplayConfig {
     pub show_repository: bool,
     pub show_cursor_position: bool,
     pub swap_fields: bool,
-    pub swap_images: bool,
+    pub swap_icons: bool,
     pub workspace_blacklist: Vec<String>,
 }
 
@@ -135,14 +135,14 @@ impl Deserialize for DisplayConfig {
         let show_repository = get_field!(input, "show_repository", |v| v.as_bool());
         let show_cursor_position = get_field!(input, "show_cursor_position", |v| v.as_bool());
         let swap_fields = get_field!(input, "swap_fields", |v| v.as_bool());
-        let swap_images = get_field!(input, "swap_images", |v| v.as_bool());
+        let swap_icons = get_field!(input, "swap_icons", |v| v.as_bool());
 
         Ok(DisplayConfig {
             show_time,
             show_repository,
             show_cursor_position,
             swap_fields,
-            swap_images,
+            swap_icons,
             workspace_blacklist: Vec::new(),
         })
     }
