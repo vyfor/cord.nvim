@@ -1,5 +1,6 @@
 use std::sync::atomic::Ordering;
 
+use crate::json::Json;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::presence::activity::ActivityContext;
 use crate::presence::types::Packet;
@@ -28,9 +29,8 @@ impl OnEvent for UpdateActivityEvent {
                     ctx.cord
                         .rich_client
                         .update(&Packet::new(ctx.cord.rich_client.pid, Some(&activity)))?;
+                    session.last_activity = Some(activity);
                 }
-
-                session.last_activity = Some(activity);
             }
         }
 
