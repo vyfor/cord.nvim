@@ -66,10 +66,7 @@ impl RichClient {
     }
 
     pub fn clear(&self) -> crate::Result<()> {
-        let packet = Packet {
-            pid: self.pid,
-            activity: None,
-        };
+        let packet = Packet::empty();
         let encoded = Json::serialize(&packet)?;
 
         self.write(1, Some(encoded.as_bytes()))?;
