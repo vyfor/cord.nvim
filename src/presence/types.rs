@@ -5,13 +5,31 @@ use crate::{
 };
 
 pub struct Packet<'a> {
+    pub cmd: &'a str,
+    pub args: PacketArgs<'a>,
+}
+
+pub struct PacketArgs<'a> {
     pub pid: u32,
     pub activity: Option<&'a Activity>,
 }
 
 impl<'a> Packet<'a> {
     pub fn new(pid: u32, activity: Option<&'a Activity>) -> Self {
-        Self { pid, activity }
+        Self {
+            cmd: "SET_ACTIVITY",
+            args: PacketArgs { pid, activity },
+        }
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            cmd: "SET_ACTIVITY",
+            args: PacketArgs {
+                pid: 0,
+                activity: None,
+            },
+        }
     }
 }
 
@@ -19,12 +37,17 @@ impl<'a> Packet<'a> {
 pub struct Activity {
     pub details: Option<String>,
     pub state: Option<String>,
+    pub assets: Option<ActivityAssets>,
+    pub buttons: Option<Vec<ActivityButton>>,
+    pub timestamp: Option<u128>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ActivityAssets {
     pub large_image: Option<String>,
     pub large_text: Option<String>,
     pub small_image: Option<String>,
     pub small_text: Option<String>,
-    pub buttons: Option<Vec<ActivityButton>>,
-    pub timestamp: Option<u128>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,6 +57,20 @@ pub struct ActivityButton {
 }
 
 impl json::Serialize for Packet<'_> {
+    fn serialize<'a>(
+        &'a self,
+        f: json::SerializeFn<'a>,
+        state: &mut json::SerializeState,
+    ) -> crate::Result<()> {
+        f("cmd", json::ValueRef::String(self.cmd), state)?;
+        f("args", json::ValueRef::Object(&self.args), state)?;
+        f("nonce", json::ValueRef::String("-"), state)?;
+
+        Ok(())
+    }
+}
+
+impl json::Serialize for PacketArgs<'_> {
     fn serialize<'a>(
         &'a self,
         f: json::SerializeFn<'a>,
@@ -59,17 +96,8 @@ impl json::Serialize for Activity {
         if let Some(state_str) = &self.state {
             f("state", json::ValueRef::String(state_str), state)?;
         }
-        if let Some(large_image) = &self.large_image {
-            f("large_image", json::ValueRef::String(large_image), state)?;
-        }
-        if let Some(large_text) = &self.large_text {
-            f("large_text", json::ValueRef::String(large_text), state)?;
-        }
-        if let Some(small_image) = &self.small_image {
-            f("small_image", json::ValueRef::String(small_image), state)?;
-        }
-        if let Some(small_text) = &self.small_text {
-            f("small_text", json::ValueRef::String(small_text), state)?;
+        if let Some(assets) = &self.assets {
+            f("assets", json::ValueRef::Object(assets), state)?;
         }
         if let Some(buttons) = &self.buttons {
             if !buttons.is_empty() {
@@ -91,6 +119,28 @@ impl json::Serialize for Activity {
                 json::ValueRef::Number(*timestamp as f64),
                 state,
             )?;
+        }
+        Ok(())
+    }
+}
+
+impl json::Serialize for ActivityAssets {
+    fn serialize<'a>(
+        &'a self,
+        f: json::SerializeFn<'a>,
+        state: &mut json::SerializeState,
+    ) -> crate::Result<()> {
+        if let Some(large_image) = &self.large_image {
+            f("large_image", json::ValueRef::String(large_image), state)?;
+        }
+        if let Some(large_text) = &self.large_text {
+            f("large_text", json::ValueRef::String(large_text), state)?;
+        }
+        if let Some(small_image) = &self.small_image {
+            f("small_image", json::ValueRef::String(small_image), state)?;
+        }
+        if let Some(small_text) = &self.small_text {
+            f("small_text", json::ValueRef::String(small_text), state)?;
         }
         Ok(())
     }
