@@ -22,4 +22,6 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Build
-      run: cargo build --verbose
+      run: |
+        rustup default nightly
+        cargo build --verbose
