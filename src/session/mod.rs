@@ -71,19 +71,13 @@ impl<'a> std::ops::DerefMut for SessionRefMut<'a> {
     }
 }
 
+#[derive(Default)]
 pub struct SessionManager {
     sessions: RwLock<HashMap<u32, Session>>,
     default_config: Option<PluginConfig>,
 }
 
 impl SessionManager {
-    pub fn new() -> Self {
-        Self {
-            sessions: RwLock::new(HashMap::new()),
-            default_config: None,
-        }
-    }
-
     pub fn create_session(&self, id: u32) {
         let mut sessions = self.sessions.write().unwrap();
         let session = Session::new(id);

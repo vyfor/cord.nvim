@@ -37,13 +37,14 @@ pub struct Cord {
 impl Cord {
     pub fn new(config: Config) -> crate::Result<Self> {
         let (tx, rx) = mpsc::channel::<Message>();
+        let session_manager = SessionManager::default();
         let rich_client = Arc::new(RichClient::connect(config.client_id)?);
         let server = PipeServer::new(&config.pipe_name, tx.clone());
         let logger = Logger::new(tx.clone(), LogLevel::Off);
 
         Ok(Self {
             config,
-            session_manager: SessionManager::new(),
+            session_manager,
             rich_client,
             pipe: server,
             tx,
