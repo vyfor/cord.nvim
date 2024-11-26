@@ -1,5 +1,3 @@
-use cord::{Config, Cord};
-
 mod cord;
 mod error;
 mod ipc;
@@ -12,6 +10,7 @@ mod session;
 mod types;
 mod util;
 
+use cord::{Config, Cord};
 use error::Result;
 use util::utils::parse_client_id;
 
