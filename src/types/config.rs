@@ -229,10 +229,10 @@ pub fn validate_buttons(buttons: &mut Vec<ActivityButton>, workspace: &str) {
 
     buttons.retain(|b| !b.label.is_empty() && !b.url.is_empty() && b.url.starts_with("http"));
 }
-pub fn validate_image(image: &mut Option<String>, is_custom_client: bool) -> String {
-    match (image.take(), is_custom_client) {
+pub fn validate_image(image: &mut Option<String>, is_custom_client: bool) {
+    *image = Some(match (image.take(), is_custom_client) {
         (Some(img), false) => img,
         (Some(img), true) => img,
         (None, _) => get_asset("editor", "neovim"),
-    }
+    });
 }
