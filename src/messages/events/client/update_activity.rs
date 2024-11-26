@@ -1,6 +1,5 @@
 use std::sync::atomic::Ordering;
 
-use crate::json::Json;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::presence::activity::ActivityContext;
 use crate::presence::types::Packet;
