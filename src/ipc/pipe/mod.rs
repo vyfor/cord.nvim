@@ -1,7 +1,7 @@
 pub mod platform;
 
-use std::{io, sync::mpsc::Sender};
 use std::sync::Arc;
+use std::{io, sync::mpsc::Sender};
 
 use crate::{
     local_event,
@@ -31,6 +31,11 @@ pub trait PipeClientImpl {
 }
 
 fn report_error(tx: &Sender<Message>, error: io::Error) {
+    if error.kind() == io::ErrorKind::BrokenPipe {
+        tx.send(local_event!(0, ClientDisconnected)).ok();
+        return;
+    }
+
     tx.send(local_event!(0, Error, ErrorEvent::new(Box::new(error))))
         .ok();
 }
