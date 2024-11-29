@@ -1,5 +1,7 @@
 use std::env;
 
+use super::error::CliError;
+
 const DEFAULT_TIMEOUT: u64 = 60000;
 const DEFAULT_PIPE_NAME: &str = "cord-ipc";
 
@@ -26,7 +28,7 @@ impl Args {
                         pipe_name = Some(args[i + 1].clone());
                         i += 2;
                     } else {
-                        return Err("Missing value for pipe-name".into());
+                        return Err(CliError::Missing("--pipe-name").into());
                     }
                 }
                 "--client-id" | "-c" => {
@@ -34,29 +36,35 @@ impl Args {
                         client_id = Some(args[i + 1].clone());
                         i += 2;
                     } else {
-                        return Err("Missing value for client-id".into());
+                        return Err(CliError::Missing("--client-id").into());
                     }
                 }
                 "--timeout" | "-t" => {
                     if i + 1 < args.len() {
                         match args[i + 1].parse() {
                             Ok(t) if t > 0 => timeout = Some(t),
-                            _ => return Err("Timeout must be a positive number".into()),
+                            _ => {
+                                return Err(CliError::Invalid(
+                                    "--timeout",
+                                    "timeout must be greater than 0",
+                                )
+                                .into())
+                            }
                         }
                         i += 2;
                     } else {
-                        return Err("Missing value for timeout".into());
+                        return Err(CliError::Missing("--timeout").into());
                     }
                 }
                 other => {
-                    return Err(format!("Unknown argument: {}", other).into());
+                    return Err(CliError::Unknown(other.to_string()).into());
                 }
             }
         }
 
         Ok(Args {
             pipe_name: pipe_name.unwrap_or_else(|| DEFAULT_PIPE_NAME.to_string()),
-            client_id: client_id.ok_or("Missing client-id argument")?,
+            client_id: client_id.ok_or(CliError::Missing("--client-id"))?,
             timeout: timeout.unwrap_or(DEFAULT_TIMEOUT),
         })
     }
