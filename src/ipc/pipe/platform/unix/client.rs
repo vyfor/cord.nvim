@@ -3,8 +3,8 @@ use std::os::unix::net::UnixStream;
 use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
 
+use crate::client_event;
 use crate::ipc::pipe::{report_error, PipeClientImpl};
-use crate::local_event;
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
 use crate::messages::message::Message;
@@ -48,7 +48,7 @@ impl PipeClientImpl for PipeClient {
                 loop {
                     match read_pipe.read(&mut buf) {
                         Ok(0) => {
-                            tx.send(local_event!(id, ClientDisconnected)).ok();
+                            tx.send(client_event!(id, Disconnect)).ok();
                             break;
                         }
                         Ok(n) => match ClientEvent::deserialize(&buf[..n]) {
@@ -60,7 +60,7 @@ impl PipeClientImpl for PipeClient {
                             }
                         },
                         Err(e) => {
-                            report_error(&tx, e);
+                            report_error(id, &tx, e);
                             break;
                         }
                     }

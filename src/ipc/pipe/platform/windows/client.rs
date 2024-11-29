@@ -6,8 +6,8 @@ use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use super::{GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING};
+use crate::client_event;
 use crate::ipc::pipe::{report_error, PipeClientImpl};
-use crate::local_event;
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
 use crate::messages::message::Message;
@@ -90,7 +90,7 @@ impl PipeClientImpl for PipeClient {
                         if read_result == 0 {
                             let error = io::Error::last_os_error();
                             if error.raw_os_error() != Some(ERROR_IO_PENDING as i32) {
-                                report_error(&tx, io::Error::last_os_error());
+                                report_error(id, &tx, error);
                                 break;
                             }
                         }
@@ -102,12 +102,12 @@ impl PipeClientImpl for PipeClient {
                             1,
                         ) == 0
                         {
-                            report_error(&tx, io::Error::last_os_error());
+                            report_error(id, &tx, io::Error::last_os_error());
                             break;
                         }
 
                         if bytes_read == 0 {
-                            tx.send(local_event!(id, ClientDisconnected)).ok();
+                            tx.send(client_event!(id, Disconnect)).ok();
                             break;
                         }
 
