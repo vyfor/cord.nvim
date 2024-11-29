@@ -52,30 +52,3 @@ pub const FIXARRAY_SIZE_MASK: u8 = 0x0f;
 pub const FIXMAP_MASK: u8 = 0xf0;
 pub const FIXMAP_VALUE: u8 = 0x80;
 pub const FIXMAP_SIZE_MASK: u8 = 0x0f;
-
-#[derive(Debug)]
-pub enum Error {
-    InvalidUtf8,
-    InvalidLength,
-    InvalidMapKey,
-    UnexpectedByte(u8),
-}
-
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Error::InvalidUtf8 => write!(f, "invalid utf8"),
-            Error::InvalidLength => write!(f, "invalid length"),
-            Error::InvalidMapKey => write!(f, "map key must be string"),
-            Error::UnexpectedByte(b) => write!(f, "unexpected byte: {:#x}", b),
-        }
-    }
-}
-
-impl std::error::Error for Error {}
-
-impl From<std::string::FromUtf8Error> for Error {
-    fn from(_: std::string::FromUtf8Error) -> Self {
-        Error::InvalidUtf8
-    }
-}

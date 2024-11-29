@@ -1,9 +1,10 @@
 #![allow(dead_code)]
 
 use super::{
-    value::ValueRef, Error, MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_VALUE, FIXSTR_VALUE,
-    FLOAT64, INT64, NIL, STR16, STR32, TRUE, UINT16, UINT32, UINT64, UINT8,
+    value::ValueRef, MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_VALUE, FIXSTR_VALUE, FLOAT64,
+    INT64, NIL, STR16, STR32, TRUE, UINT16, UINT32, UINT64, UINT8,
 };
+use crate::protocol::error::ProtocolError;
 
 pub type SerializeFn<'a> = fn(&'a str, ValueRef<'a>, &mut SerializeState) -> crate::Result<()>;
 
@@ -106,7 +107,7 @@ impl MsgPack {
             }
             _ => {
                 if len > u32::MAX as usize {
-                    return Err(Error::InvalidLength.into());
+                    return Err(ProtocolError::InvalidLength.into());
                 }
                 state.write_u8(STR32);
                 state.write_u32(len as u32);
@@ -169,7 +170,7 @@ impl MsgPack {
                     }
                     _ => {
                         if len > u32::MAX as usize {
-                            return Err(Error::InvalidLength.into());
+                            return Err(ProtocolError::InvalidLength.into());
                         }
                         state.write_u8(ARRAY32);
                         state.write_u32(len as u32);

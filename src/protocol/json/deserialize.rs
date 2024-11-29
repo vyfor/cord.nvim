@@ -1,25 +1,24 @@
 use std::collections::HashMap;
 use std::str::from_utf8_unchecked;
 
-use super::{value::Value, Error, Json};
+use super::{value::Value, Json};
+use crate::protocol::error::ProtocolError;
 
 pub trait Deserialize: Sized {
     fn deserialize<'a>(input: &HashMap<&'a str, Value<'a>>) -> crate::Result<Self>;
 }
 
-
-
 impl Json {
     pub fn deserialize(input: &str) -> crate::Result<HashMap<&str, Value>> {
         let input = input.trim().as_bytes();
         if input.is_empty() || input[0] != b'{' || input[input.len() - 1] != b'}' {
-            return Err(Error::InvalidSyntax("Invalid JSON object").into());
+            return Err(ProtocolError::InvalidSyntax("Invalid JSON object").into());
         }
 
         let (value, _) = Self::parse_object(input, 1)?;
         match value {
             Value::Object(map) => Ok(map),
-            _ => Err(Error::InvalidSyntax("Expected object").into()),
+            _ => Err(ProtocolError::InvalidSyntax("Expected object").into()),
         }
     }
 
@@ -45,13 +44,13 @@ impl Json {
                 _ => pos += 1,
             }
         }
-        Err(Error::UnexpectedEnd.into())
+        Err(ProtocolError::UnexpectedEnd.into())
     }
 
     fn parse_value(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
         let pos = Self::skip_whitespace(input, start);
         if pos >= input.len() {
-            return Err(Error::UnexpectedEnd.into());
+            return Err(ProtocolError::UnexpectedEnd.into());
         }
 
         match input[pos] {
@@ -65,7 +64,7 @@ impl Json {
             b'f' => Self::parse_false(input, pos),
             b'n' => Self::parse_null(input, pos),
             b'-' | b'0'..=b'9' => Self::parse_number(input, pos),
-            c => Err(Error::UnexpectedChar(c as char).into()),
+            c => Err(ProtocolError::UnexpectedChar(c as char).into()),
         }
     }
 
@@ -77,7 +76,7 @@ impl Json {
         while pos < input.len() {
             pos = Self::skip_whitespace(input, pos);
             if pos >= input.len() {
-                return Err(Error::UnexpectedEnd.into());
+                return Err(ProtocolError::UnexpectedEnd.into());
             }
 
             match input[pos] {
@@ -92,10 +91,10 @@ impl Json {
                     pos = new_pos;
                     expecting_value = false;
                 }
-                c => return Err(Error::UnexpectedChar(c as char).into()),
+                c => return Err(ProtocolError::UnexpectedChar(c as char).into()),
             }
         }
-        Err(Error::UnexpectedEnd.into())
+        Err(ProtocolError::UnexpectedEnd.into())
     }
 
     fn parse_object(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
@@ -106,7 +105,7 @@ impl Json {
         while pos < input.len() {
             pos = Self::skip_whitespace(input, pos);
             if pos >= input.len() {
-                return Err(Error::UnexpectedEnd.into());
+                return Err(ProtocolError::UnexpectedEnd.into());
             }
 
             match input[pos] {
@@ -119,7 +118,7 @@ impl Json {
                     let (key, new_pos) = Self::parse_string_slice(input, pos + 1)?;
                     pos = Self::skip_whitespace(input, new_pos);
                     if pos >= input.len() || input[pos] != b':' {
-                        return Err(Error::InvalidSyntax("Expected ':' after key").into());
+                        return Err(ProtocolError::InvalidSyntax("Expected ':' after key").into());
                     }
                     pos = Self::skip_whitespace(input, pos + 1);
                     let (value, new_pos) = Self::parse_value(input, pos)?;
@@ -127,17 +126,17 @@ impl Json {
                     pos = new_pos;
                     expecting_key = false;
                 }
-                c => return Err(Error::UnexpectedChar(c as char).into()),
+                c => return Err(ProtocolError::UnexpectedChar(c as char).into()),
             }
         }
-        Err(Error::UnexpectedEnd.into())
+        Err(ProtocolError::UnexpectedEnd.into())
     }
 
     fn parse_true(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
         if input.len() >= start + 4 && &input[start..start + 4] == b"true" {
             Ok((Value::Bool(true), start + 4))
         } else {
-            Err(Error::InvalidSyntax("Invalid 'true' value").into())
+            Err(ProtocolError::InvalidSyntax("Invalid 'true' value").into())
         }
     }
 
@@ -145,7 +144,7 @@ impl Json {
         if input.len() >= start + 5 && &input[start..start + 5] == b"false" {
             Ok((Value::Bool(false), start + 5))
         } else {
-            Err(Error::InvalidSyntax("Invalid 'false' value").into())
+            Err(ProtocolError::InvalidSyntax("Invalid 'false' value").into())
         }
     }
 
@@ -153,7 +152,7 @@ impl Json {
         if input.len() >= start + 4 && &input[start..start + 4] == b"null" {
             Ok((Value::Null, start + 4))
         } else {
-            Err(Error::InvalidSyntax("Invalid 'null' value").into())
+            Err(ProtocolError::InvalidSyntax("Invalid 'null' value").into())
         }
     }
 
@@ -174,7 +173,7 @@ impl Json {
                 }
                 b'.' => {
                     if num_str.contains(&b'.') {
-                        return Err(Error::InvalidSyntax("Multiple decimal points").into());
+                        return Err(ProtocolError::InvalidSyntax("Multiple decimal points").into());
                     }
                     num_str.push(b'.');
                     pos += 1;
@@ -194,14 +193,14 @@ impl Json {
                 {
                     break;
                 }
-                c => return Err(Error::UnexpectedChar(c as char).into()),
+                c => return Err(ProtocolError::UnexpectedChar(c as char).into()),
             }
         }
 
         let num_str = unsafe { from_utf8_unchecked(&num_str) };
         match num_str.parse::<f64>() {
             Ok(num) => Ok((Value::Number(num), pos)),
-            Err(_) => Err(Error::InvalidSyntax("Invalid number format").into()),
+            Err(_) => Err(ProtocolError::InvalidSyntax("Invalid number format").into()),
         }
     }
 }
