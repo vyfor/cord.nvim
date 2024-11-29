@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
@@ -6,8 +8,6 @@ use crate::presence::types::Activity;
 use crate::types::config::PluginConfig;
 
 pub struct Session {
-    #[allow(dead_code)]
-    pub id: u32,
     pub workspace: Option<String>,
     pub timestamp: Option<u64>,
     pub last_activity: Option<Activity>,
@@ -16,9 +16,8 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new(id: u32) -> Self {
+    pub fn new() -> Self {
         Self {
-            id,
             workspace: None,
             timestamp: None,
             last_activity: None,
@@ -94,7 +93,7 @@ pub struct SessionManager {
 impl SessionManager {
     pub fn create_session(&self, id: u32, client: PipeClient) {
         let mut sessions = self.sessions.write().unwrap();
-        let mut session = Session::new(id);
+        let mut session = Session::new();
         session.set_pipe_client(client);
         sessions.insert(id, session);
     }

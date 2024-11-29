@@ -58,10 +58,6 @@ impl ActivityContext {
         true
     }
 
-    pub fn update_custom_asset(&mut self, asset: Asset) {
-        self.custom_asset = Some(asset);
-    }
-
     pub fn get_effective_name(&self) -> Cow<str> {
         if let Some(custom) = &self.custom_asset {
             if !custom.name.is_empty() {

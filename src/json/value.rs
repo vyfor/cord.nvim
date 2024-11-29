@@ -22,7 +22,7 @@ pub enum ValueRef<'a> {
     Object(&'a dyn Serialize),
 }
 
-impl<'a> Value<'a> {
+impl Value<'_> {
     #[inline]
     pub fn as_str(&self) -> Option<&str> {
         match self {

@@ -200,7 +200,7 @@ impl Deserialize for Asset {
         let name = remove_field!(input, "name", |v| v.take_string());
         let icon = remove_field!(input, "icon", |v| v.take_string());
         let tooltip = remove_field!(input, "tooltip", |v| v.take_string());
-        let ty = get_field!(input, "type", |v| v.as_uinteger())
+        let ty = get_field!(input, "type", |v| v.as_str())
             .try_into()
             .map_err(|_| "Invalid asset type")?;
 
