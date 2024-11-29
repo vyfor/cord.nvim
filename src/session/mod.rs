@@ -11,6 +11,7 @@ pub struct Session {
     pub workspace: Option<String>,
     pub timestamp: Option<u64>,
     pub last_activity: Option<Activity>,
+    pub last_updated: u128,
     pub config: Option<PluginConfig>,
     pub pipe_client: Option<PipeClient>,
 }
@@ -21,6 +22,7 @@ impl Session {
             workspace: None,
             timestamp: None,
             last_activity: None,
+            last_updated: 0,
             config: None,
             pipe_client: None,
         }
@@ -59,29 +61,35 @@ impl Session {
     }
 }
 
-pub struct SessionRef<'a>(RwLockReadGuard<'a, HashMap<u32, Session>>);
+pub struct SessionRef<'a> {
+    sessions: RwLockReadGuard<'a, HashMap<u32, Session>>,
+    id: u32,
+}
 
 impl std::ops::Deref for SessionRef<'_> {
     type Target = Session;
 
     fn deref(&self) -> &Self::Target {
-        self.0.values().next().unwrap()
+        self.sessions.get(&self.id).unwrap()
     }
 }
 
-pub struct SessionRefMut<'a>(RwLockWriteGuard<'a, HashMap<u32, Session>>);
+pub struct SessionRefMut<'a> {
+    sessions: RwLockWriteGuard<'a, HashMap<u32, Session>>,
+    id: u32,
+}
 
 impl std::ops::Deref for SessionRefMut<'_> {
     type Target = Session;
 
     fn deref(&self) -> &Self::Target {
-        self.0.values().next().unwrap()
+        self.sessions.get(&self.id).unwrap()
     }
 }
 
 impl std::ops::DerefMut for SessionRefMut<'_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.0.values_mut().next().unwrap()
+        self.sessions.get_mut(&self.id).unwrap()
     }
 }
 
@@ -106,7 +114,7 @@ impl SessionManager {
     pub fn get_session(&self, id: u32) -> Option<SessionRef<'_>> {
         let sessions = self.sessions.read().unwrap();
         if sessions.contains_key(&id) {
-            Some(SessionRef(sessions))
+            Some(SessionRef { sessions, id })
         } else {
             None
         }
@@ -115,7 +123,7 @@ impl SessionManager {
     pub fn get_session_mut(&self, id: u32) -> Option<SessionRefMut<'_>> {
         let sessions = self.sessions.write().unwrap();
         if sessions.contains_key(&id) {
-            Some(SessionRefMut(sessions))
+            Some(SessionRefMut { sessions, id })
         } else {
             None
         }
