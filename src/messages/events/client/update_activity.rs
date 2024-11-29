@@ -28,7 +28,11 @@ impl OnEvent for UpdateActivityEvent {
                     ctx.cord
                         .rich_client
                         .update(&Packet::new(ctx.cord.rich_client.pid, Some(&activity)))?;
-                    session.last_activity = Some(activity);
+                    session.set_last_activity(activity);
+                    session.last_updated = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap() // todo: reset all timestamps if this fails
+                        .as_micros();
                 }
             }
         }

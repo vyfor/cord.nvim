@@ -8,7 +8,9 @@ impl OnEvent for ClearActivityEvent {
         if let Some(mut session) = ctx.cord.session_manager.get_session_mut(ctx.client_id) {
             ctx.cord.rich_client.clear()?;
             session.last_activity = None;
+            session.last_updated = 0;
         }
+
         Ok(())
     }
 }
