@@ -9,7 +9,7 @@ use crate::{
         event::{EventContext, OnEvent},
         server::ReadyEvent,
     },
-    msgpack::MsgPack,
+    protocol::msgpack::MsgPack,
 };
 
 impl OnEvent for ConnectEvent {

@@ -2,11 +2,8 @@ use std::sync::atomic::Ordering;
 
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::EventContext;
-use crate::msgpack::MsgPack;
-use crate::{
-    messages::events::event::OnEvent,
-    msgpack::{serialize::Serialize, value::ValueRef},
-};
+use crate::protocol::msgpack::{MsgPack, serialize::Serialize, value::ValueRef};
+use crate::messages::events::event::OnEvent;
 
 #[derive(Debug, Default)]
 pub struct ReadyEvent;
@@ -24,8 +21,8 @@ impl OnEvent for ReadyEvent {
 impl Serialize for ReadyEvent {
     fn serialize<'a>(
         &'a self,
-        f: crate::msgpack::SerializeFn<'a>,
-        state: &mut crate::msgpack::SerializeState,
+        f: crate::protocol::msgpack::SerializeFn<'a>,
+        state: &mut crate::protocol::msgpack::SerializeState,
     ) -> crate::Result<()> {
         f("type", ValueRef::String("ready"), state)?;
 

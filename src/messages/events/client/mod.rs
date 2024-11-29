@@ -1,6 +1,6 @@
 use crate::{
     messages::events::event::{EventContext, OnEvent},
-    msgpack::{Deserialize, MsgPack},
+    protocol::msgpack::{Deserialize, MsgPack},
     presence::activity::ActivityContext,
     types::config::PluginConfig,
 };

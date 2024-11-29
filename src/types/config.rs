@@ -2,7 +2,7 @@
 
 use crate::{
     get_field,
-    msgpack::{deserialize::Deserialize, Value},
+    protocol::msgpack::{deserialize::Deserialize, Value},
     presence::types::ActivityButton,
     remove_field,
     util::{
@@ -229,6 +229,7 @@ pub fn validate_buttons(buttons: &mut Vec<ActivityButton>, workspace: &str) {
 
     buttons.retain(|b| !b.label.is_empty() && !b.url.is_empty() && b.url.starts_with("http"));
 }
+
 pub fn validate_image(image: &mut Option<String>, is_custom_client: bool) {
     *image = Some(match (image.take(), is_custom_client) {
         (Some(img), false) => img,

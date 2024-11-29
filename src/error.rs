@@ -4,105 +4,100 @@ use std::io;
 use std::num::ParseIntError;
 use std::string::ParseError;
 
-use crate::json;
-use crate::msgpack;
+use crate::cli::error::CliError;
+use crate::protocol::error::ProtocolError;
 
 #[derive(Debug)]
-pub enum CordError {
-    Io(io::Error),
-    Parse(CordParseError),
-    MsgPack(msgpack::Error),
-    Json(json::Error),
-    Other(String),
+pub enum CordErrorKind {
+    Io,
+    Parse,
+    Protocol,
+    Cli,
+    Other,
 }
 
 #[derive(Debug)]
-pub enum CordParseError {
-    ParseError(ParseError),
-    ParseIntError(ParseIntError),
+pub struct CordError {
+    kind: CordErrorKind,
+    source: Box<dyn Error + Send + Sync + 'static>,
+}
+
+impl CordError {
+    pub fn new<E>(kind: CordErrorKind, error: E) -> Self
+    where
+        E: Into<Box<dyn Error + Send + Sync + 'static>>,
+    {
+        Self {
+            kind,
+            source: error.into(),
+        }
+    }
+
+    pub fn kind(&self) -> &CordErrorKind {
+        &self.kind
+    }
 }
 
 impl fmt::Display for CordError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            CordError::Io(err) => write!(f, "IO error: {}", err),
-            CordError::Parse(err) => write!(f, "Parse error: {}", err),
-            CordError::MsgPack(err) => write!(f, "MsgPack error: {}", err),
-            CordError::Json(err) => write!(f, "JSON error: {}", err),
-            CordError::Other(err) => write!(f, "Error: {}", err),
-        }
-    }
-}
-
-impl fmt::Display for CordParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            CordParseError::ParseError(err) => write!(f, "Parse error: {}", err),
-            CordParseError::ParseIntError(err) => write!(f, "Parse int error: {}", err),
+        match self.kind {
+            CordErrorKind::Io => write!(f, "IO error: {}", self.source),
+            CordErrorKind::Parse => write!(f, "Parse error: {}", self.source),
+            CordErrorKind::Protocol => write!(f, "Protocol error: {}", self.source),
+            CordErrorKind::Cli => write!(f, "Cli error: {}", self.source),
+            CordErrorKind::Other => write!(f, "Error: {}", self.source),
         }
     }
 }
 
 impl Error for CordError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            CordError::Io(err) => Some(err),
-            CordError::Parse(err) => Some(err),
-            CordError::MsgPack(err) => Some(err),
-            CordError::Json(err) => Some(err),
-            _ => None,
-        }
-    }
-}
-
-impl Error for CordParseError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            CordParseError::ParseError(err) => Some(err),
-            CordParseError::ParseIntError(err) => Some(err),
-        }
-    }
-}
-
-impl From<msgpack::Error> for CordError {
-    fn from(err: msgpack::Error) -> Self {
-        CordError::MsgPack(err)
-    }
-}
-
-impl From<json::Error> for CordError {
-    fn from(err: json::Error) -> Self {
-        CordError::Json(err)
+        Some(&*self.source)
     }
 }
 
 impl From<io::Error> for CordError {
     fn from(err: io::Error) -> Self {
-        CordError::Io(err)
+        Self::new(CordErrorKind::Io, err)
     }
 }
 
 impl From<ParseError> for CordError {
     fn from(err: ParseError) -> Self {
-        CordError::Parse(CordParseError::ParseError(err))
+        Self::new(CordErrorKind::Parse, err)
     }
 }
 
 impl From<ParseIntError> for CordError {
     fn from(err: ParseIntError) -> Self {
-        CordError::Parse(CordParseError::ParseIntError(err))
+        Self::new(CordErrorKind::Parse, err)
     }
 }
 
-impl From<&str> for CordError {
-    fn from(err: &str) -> Self {
-        CordError::Other(err.to_string())
+impl From<ProtocolError> for CordError {
+    fn from(err: ProtocolError) -> Self {
+        Self::new(CordErrorKind::Protocol, err)
+    }
+}
+
+impl From<CliError> for CordError {
+    fn from(err: CliError) -> Self {
+        Self::new(CordErrorKind::Cli, err)
     }
 }
 
 impl From<String> for CordError {
     fn from(err: String) -> Self {
-        CordError::Other(err)
+        Self::new(
+            CordErrorKind::Other,
+            io::Error::new(io::ErrorKind::Other, err),
+        )
+    }
+}
+
+impl From<&str> for CordError {
+    fn from(err: &str) -> Self {
+        Self::from(err.to_string())
     }
 }
 

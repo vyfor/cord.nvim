@@ -1,6 +1,6 @@
 use crate::{
     get_field,
-    msgpack::{Deserialize, Value},
+    protocol::msgpack::{Deserialize, Value},
     remove_field,
 };
 

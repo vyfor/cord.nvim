@@ -1,6 +1,8 @@
 use crate::{
-    json,
-    msgpack::{self, Value},
+    protocol::{
+        json,
+        msgpack::{self, Value},
+    },
     remove_field,
 };
 

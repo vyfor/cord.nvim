@@ -6,7 +6,7 @@ pub struct LogEvent {
 use crate::{
     ipc::pipe::PipeServerImpl,
     messages::events::event::{EventContext, OnEvent},
-    msgpack::{MsgPack, Serialize, ValueRef},
+    protocol::msgpack::{MsgPack, Serialize, ValueRef},
 };
 
 impl OnEvent for LogEvent {
@@ -31,8 +31,8 @@ impl LogEvent {
 impl Serialize for LogEvent {
     fn serialize<'a>(
         &'a self,
-        f: crate::msgpack::SerializeFn<'a>,
-        state: &mut crate::msgpack::SerializeState,
+        f: crate::protocol::msgpack::SerializeFn<'a>,
+        state: &mut crate::protocol::msgpack::SerializeState,
     ) -> crate::Result<()> {
         f("type", ValueRef::String("log"), state)?;
         f("data", ValueRef::String(&self.message), state)?;
