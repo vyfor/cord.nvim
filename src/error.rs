@@ -40,13 +40,7 @@ impl CordError {
 
 impl fmt::Display for CordError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self.kind {
-            CordErrorKind::Io => write!(f, "IO error: {}", self.source),
-            CordErrorKind::Parse => write!(f, "Parse error: {}", self.source),
-            CordErrorKind::Protocol => write!(f, "Protocol error: {}", self.source),
-            CordErrorKind::Cli => write!(f, "Cli error: {}", self.source),
-            CordErrorKind::Other => write!(f, "Error: {}", self.source),
-        }
+        write!(f, "Kind: {:?}, Source: {:?}", self.kind, self.source)
     }
 }
 
