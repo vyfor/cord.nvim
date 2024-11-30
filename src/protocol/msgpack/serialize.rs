@@ -1,8 +1,9 @@
 #![allow(dead_code)]
 
 use super::{
-    value::ValueRef, MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_VALUE, FIXSTR_VALUE, FLOAT64,
-    INT64, NIL, STR16, STR32, TRUE, UINT16, UINT32, UINT64, UINT8,
+    value::ValueRef, MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_VALUE, FIXMAP_SIZE_MASK,
+    FIXMAP_VALUE, FIXSTR_VALUE, FLOAT64, INT64, MAP16, MAP32, NIL, STR16, STR32, TRUE, UINT16,
+    UINT32, UINT64, UINT8,
 };
 use crate::protocol::error::ProtocolError;
 
@@ -72,6 +73,7 @@ impl std::fmt::Debug for ValueRef<'_> {
             ValueRef::Boolean(b) => write!(f, "Boolean({:?})", b),
             ValueRef::Array(arr) => f.debug_tuple("Array").field(arr).finish(),
             ValueRef::Object(_) => write!(f, "Object(function)"),
+            ValueRef::Map(map) => f.debug_tuple("Map").field(map).finish(),
             ValueRef::Nil => write!(f, "Nil"),
         }
     }
@@ -184,6 +186,30 @@ impl MsgPack {
             ValueRef::Object(obj) => {
                 state.push_scope();
                 obj.serialize(|k, v, s| Self::write_kv(k, &v, s), state)?;
+                Ok(())
+            }
+            ValueRef::Map(map) => {
+                let len = map.len();
+                match len {
+                    0..=15 => {
+                        state.write_u8(FIXMAP_VALUE | (len as u8));
+                    }
+                    16..=65535 => {
+                        state.write_u8(MAP16);
+                        state.write_u16(len as u16);
+                    }
+                    _ => {
+                        if len > u32::MAX as usize {
+                            return Err(ProtocolError::InvalidLength.into());
+                        }
+                        state.write_u8(MAP32);
+                        state.write_u32(len as u32);
+                    }
+                }
+                for (k, v) in map {
+                    Self::write_str(k, state)?;
+                    Self::write_value(v, state)?;
+                }
                 Ok(())
             }
         }

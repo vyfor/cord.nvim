@@ -25,6 +25,7 @@ pub enum ValueRef<'a> {
     Boolean(bool),
     Array(Vec<ValueRef<'a>>),
     Object(&'a dyn Serialize),
+    Map(HashMap<&'a str, ValueRef<'a>>),
 }
 
 impl Value {
