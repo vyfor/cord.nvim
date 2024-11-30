@@ -32,7 +32,7 @@ impl Logger {
                 .send(server_event!(
                     client_id,
                     Log,
-                    LogEvent::new(message.into_owned())
+                    LogEvent::new(message.into_owned(), level)
                 ))
                 .ok();
         }

@@ -6,11 +6,13 @@ use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use super::{GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING};
-use crate::client_event;
 use crate::ipc::pipe::{report_error, PipeClientImpl};
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
+use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
+use crate::util::logger::LogLevel;
+use crate::{client_event, server_event};
 
 pub struct PipeClient {
     id: u32,
@@ -116,7 +118,12 @@ impl PipeClientImpl for PipeClient {
                                 tx.send(Message::new(id, Event::Client(message))).ok();
                             }
                             Err(e) => {
-                                eprintln!("Failed to deserialize message: {:?}", e);
+                                tx.send(server_event!(
+                                    id,
+                                    Log,
+                                    LogEvent::new(e.to_string(), LogLevel::Error)
+                                ))
+                                .ok();
                             }
                         }
                     }
