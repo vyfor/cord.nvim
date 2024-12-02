@@ -4,7 +4,22 @@ use super::{value::ValueRef, Json};
 
 pub type SerializeFn<'a> = fn(&'a str, ValueRef<'a>, &mut SerializeState) -> crate::Result<()>;
 
+/// Trait for serializing Rust types into JSON data.
+///
+/// This trait defines a method for converting a Rust data structure into
+/// a JSON representation. It requires implementing the `serialize` method
+/// that uses a `SerializeFn` and `SerializeState` to produce the JSON output.
 pub trait Serialize {
+    /// Serializes a Rust type into JSON data.
+    ///
+    /// # Arguments
+    ///
+    /// * `f` - A function for serializing key-value pairs.
+    /// * `state` - A mutable reference to the serialization state.
+    ///
+    /// # Returns
+    ///
+    /// A result indicating success or failure of the serialization process.
     fn serialize<'a>(&'a self, f: SerializeFn<'a>, state: &mut SerializeState)
         -> crate::Result<()>;
 }

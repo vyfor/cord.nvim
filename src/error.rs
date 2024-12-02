@@ -7,15 +7,25 @@ use std::string::ParseError;
 use crate::cli::error::CliError;
 use crate::protocol::error::ProtocolError;
 
+/// Enumerates error types: IO, parsing, protocol, CLI, and others.
 #[derive(Debug)]
 pub enum CordErrorKind {
+    /// Errors related to input/output operations.
     Io,
+    /// Errors related to parsing.
     Parse,
+    /// Errors related to protocol operations.
     Protocol,
+    /// Errors related to CLI operations.
     Cli,
+    /// Other unspecified errors.
     Other,
 }
 
+/// Represents detailed application errors.
+///
+/// The `CordError` struct encapsulates an error, providing detailed information
+/// about the error kind and its source.
 #[derive(Debug)]
 pub struct CordError {
     kind: CordErrorKind,
@@ -23,6 +33,7 @@ pub struct CordError {
 }
 
 impl CordError {
+    /// Creates a new `CordError` instance.
     pub fn new<E>(kind: CordErrorKind, error: E) -> Self
     where
         E: Into<Box<dyn Error + Send + Sync + 'static>>,
@@ -91,4 +102,5 @@ impl From<&str> for CordError {
     }
 }
 
+/// Alias for `std::result::Result<T, CordError>`.
 pub type Result<T> = std::result::Result<T, CordError>;

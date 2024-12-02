@@ -8,7 +8,21 @@ use super::{
 use crate::protocol::error::ProtocolError;
 use std::collections::HashMap;
 
+/// Trait for deserializing MsgPack data into Rust types.
+///
+/// This trait defines a method for converting a MsgPack representation into
+/// a Rust data structure. It requires implementing the `deserialize` method
+/// that takes a `Value` and returns the desired type.
 pub trait Deserialize: Sized {
+    /// Deserializes a MsgPack value into a Rust type.
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - A `Value` representing the MsgPack data.
+    ///
+    /// # Returns
+    ///
+    /// A result containing the deserialized Rust type or an error.
     fn deserialize(input: Value) -> crate::Result<Self>;
 }
 

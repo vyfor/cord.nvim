@@ -15,6 +15,10 @@ impl Message {
     }
 }
 
+/// Constructs a `Message` for client events.
+///
+/// This macro simplifies the creation of a `Message` by wrapping a `ClientEvent`.
+/// It accepts a client ID, event type, and optional arguments for the event.
 #[macro_export]
 macro_rules! client_event {
     ($id:expr, $type:ident, $args:expr) => {
@@ -36,6 +40,10 @@ macro_rules! client_event {
     };
 }
 
+/// Constructs a `Message` for local events.
+///
+/// This macro simplifies the creation of a `Message` by wrapping a `LocalEvent`.
+/// It accepts a client ID, event type, and optional arguments for the event.
 #[macro_export]
 macro_rules! local_event {
     ($id:expr, $type:ident, $args:expr) => {
@@ -57,6 +65,10 @@ macro_rules! local_event {
     };
 }
 
+/// Constructs a `Message` for server events.
+///
+/// This macro simplifies the creation of a `Message` by wrapping a `ServerEvent`.
+/// It accepts a client ID, event type, and optional arguments for the event.
 #[macro_export]
 macro_rules! server_event {
     ($id:expr, $type:ident, $args:expr) => {

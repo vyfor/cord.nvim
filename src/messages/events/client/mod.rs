@@ -26,6 +26,9 @@ pub enum ClientEvent {
     Disconnect(DisconnectEvent),
 }
 
+/// Extracts the 'data' field from a map and returns an error if it is missing or invalid.
+///
+/// This macro is useful for extracting and validating the 'data' field from a map-like structure.
 macro_rules! data {
     ($map:expr) => {
         $map.remove("data")

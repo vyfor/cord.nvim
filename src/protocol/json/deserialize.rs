@@ -4,7 +4,21 @@ use std::str::from_utf8_unchecked;
 use super::{value::Value, Json};
 use crate::protocol::error::ProtocolError;
 
+/// Trait for deserializing JSON data into Rust types.
+///
+/// This trait defines a method for converting a JSON representation into
+/// a Rust data structure. It requires implementing the `deserialize` method
+/// that takes a reference to a `HashMap` and returns the desired type.
 pub trait Deserialize: Sized {
+    /// Deserializes a JSON object into a Rust type.
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - A reference to a `HashMap` containing JSON key-value pairs.
+    ///
+    /// # Returns
+    ///
+    /// A result containing the deserialized Rust type or an error.
     fn deserialize<'a>(input: &HashMap<&'a str, Value<'a>>) -> crate::Result<Self>;
 }
 

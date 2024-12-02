@@ -4,6 +4,7 @@ use std::{fs::OpenOptions, io};
 use crate::ipc::discord::client::{Connection, RichClient};
 
 impl Connection for RichClient {
+    /// Pipe path can be under the directory `\\\\.\\pipe\\discord-ipc-{i}` where `i` is a number from 0 to 9.
     fn connect(client_id: u64) -> crate::Result<Self> {
         for i in 0..10 {
             match OpenOptions::new()
