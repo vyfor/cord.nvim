@@ -36,6 +36,12 @@ function ActivityManager:on_buf_enter()
   if new_workspace_dir ~= self.workspace_dir then
     self.workspace_dir = new_workspace_dir
     self.workspace_name = ws_utils.find(self.workspace_dir)
+    if self.config.hooks.on_workspace_change then
+      local opts = self.last_opts
+      opts.workspace_dir = self.workspace_dir
+      opts.workspace_name = self.workspace_name
+      self.config.hooks.on_workspace_change(opts)
+    end
   end
 
   self:queue_update()
