@@ -13,8 +13,12 @@ function IPC.new(config)
 end
 
 function IPC:connect(callback)
-  local path = utils.os_name == 'Windows' and '\\\\.\\pipe\\' or '/tmp/'
-  self.path = path .. (self.config.advanced.server.pipe_name or 'cord-ipc')
+  if self.config.advanced.server.pipe_path then
+    self.path = self.config.advanced.server.pipe_path
+  else
+    self.path = (utils.os_name == 'Windows' and '\\\\.\\pipe\\' or '/tmp/')
+      .. 'cord-ipc'
+  end
   local pipe = uv.new_pipe()
   self.pipe = pipe
 
@@ -34,39 +38,34 @@ function IPC:connect(callback)
 
           local stdout = uv.new_pipe()
           local stderr = uv.new_pipe()
-
-          local args = {}
-          if self.config.advanced.server.pipe_name then
-            table.insert(args, '-p')
-            table.insert(args, self.config.advanced.server.pipe_name)
-          end
-          table.insert(args, '-c')
-          table.insert(args, self.config.editor.client)
-          table.insert(args, '-t')
-          table.insert(args, tostring(self.config.advanced.server.timeout))
-
-          uv.spawn(
-            executable,
-            {
-              args = args,
-              stdio = { nil, stdout, stderr },
-              detached = true,
-              hide = true,
+          uv.spawn(executable, {
+            args = {
+              '-p',
+              self.path,
+              '-c',
+              self.config.editor.client,
+              '-t',
+              tostring(self.config.advanced.server.timeout),
             },
-            vim.schedule_wrap(function(code, _)
-              if code ~= 0 then
-                logger.error('Failed to start server: exit code ' .. code)
-                return
-              end
-            end)
-          )
+            stdio = { nil, stdout, stderr },
+            detached = true,
+            hide = true,
+          })
 
           stderr:read_start(vim.schedule_wrap(function(err, chunk)
             if err then
               logger.error('Failed to read stderr: ' .. err)
               return
             end
-            if chunk then logger.error('Server error: ' .. chunk) end
+            if chunk then
+              if chunk:match 'kind: AlreadyExists' then
+                self:connect(callback)
+                stderr:close()
+                stdout:close()
+                return
+              end
+              logger.error('Server error: ' .. chunk)
+            end
           end))
 
           stdout:read_start(vim.schedule_wrap(function(err, chunk)
