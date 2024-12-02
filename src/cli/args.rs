@@ -3,7 +3,10 @@ use std::env;
 use super::error::CliError;
 
 const DEFAULT_TIMEOUT: u64 = 60000;
-const DEFAULT_PIPE_NAME: &str = "cord-ipc";
+#[cfg(target_os = "windows")]
+const DEFAULT_PIPE_NAME: &str = "\\\\.\\pipe\\cord-ipc";
+#[cfg(target_os = "linux")]
+const DEFAULT_PIPE_NAME: &str = "/tmp/cord-ipc";
 
 #[derive(Debug)]
 pub struct Args {
