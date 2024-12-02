@@ -22,16 +22,14 @@ impl OnEvent for UpdateActivityEvent {
         }
 
         if let Some(mut session) = ctx.cord.session_manager.get_session_mut(ctx.client_id) {
-            if Some(&self.activity) != session.last_activity.as_ref() {
-                ctx.cord
-                    .rich_client
-                    .update(&Packet::new(ctx.cord.rich_client.pid, Some(&self.activity)))?;
-                session.set_last_activity(self.activity);
-                session.last_updated = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap() // todo: reset all timestamps if this fails
-                    .as_nanos();
-            }
+            ctx.cord
+                .rich_client
+                .update(&Packet::new(ctx.cord.rich_client.pid, Some(&self.activity)))?;
+            session.set_last_activity(self.activity);
+            session.last_updated = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap() // todo: reset all timestamps if this fails
+                .as_nanos();
         }
 
         Ok(())
