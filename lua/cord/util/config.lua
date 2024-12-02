@@ -64,6 +64,11 @@ M.values = {
   },
   advanced = {
     interval = 1000,
+    server = {
+      pipe_name = 'cord-ipc',
+      executable_path = 'target/release/cord.exe',
+      timeout = 60000,
+    },
   },
 }
 
