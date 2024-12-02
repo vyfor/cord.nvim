@@ -43,6 +43,10 @@ M.values = {
     editing = function(opts)
       return 'Editing '
         .. (opts.filename ~= '' and opts.filename or 'a new file')
+        .. ':'
+        .. opts.cursor_line
+        .. ':'
+        .. opts.cursor_char
     end,
     file_browser = function(opts) return 'Browsing files in ' .. opts.tooltip end,
     plugin_manager = function(opts)
@@ -63,12 +67,12 @@ M.values = {
     on_workspace_change = nil,
   },
   advanced = {
-    interval = 1000,
     server = {
-      pipe_name = nil,
+      pipe_path = nil,
       executable_path = 'target/release/cord.exe',
       timeout = 60000,
     },
+    cursor_update_mode = 'on_move',
   },
 }
 

@@ -31,19 +31,69 @@ function ActivityManager.new(opts)
   return self
 end
 
-function ActivityManager:run_event_loop()
-  self.last_updated = uv.now()
-  if self.config.timestamp.enable then self.timestamp = os.time() end
+function ActivityManager:on_buf_enter()
+  local new_workspace_dir = vim.fn.expand '%:p:h'
+  if new_workspace_dir ~= self.workspace_dir then
+    self.workspace_dir = new_workspace_dir
+    self.workspace_name = ws_utils.find(self.workspace_dir)
+  end
 
-  self.timer = uv.new_timer()
-  self.timer:start(
-    0,
-    self.config.advanced.interval,
-    vim.schedule_wrap(function() self:on_tick() end)
-  )
+  self:queue_update()
 end
 
-function ActivityManager:on_tick()
+function ActivityManager:on_focus_gained()
+  self.is_focused = true
+  self:queue_update()
+end
+
+function ActivityManager:on_focus_lost()
+  self.is_focused = false
+  self:queue_update()
+end
+
+function ActivityManager:on_dir_changed()
+  local new_workspace_dir = vim.fn.expand '%:p:h'
+  if new_workspace_dir ~= self.workspace_dir then
+    self.workspace_dir = new_workspace_dir
+    self.workspace_name = ws_utils.find(self.workspace_dir)
+    self:queue_update()
+  end
+end
+
+function ActivityManager:on_cursor_update() self:queue_update() end
+
+function ActivityManager:setup_autocmds()
+  vim.cmd [[
+    augroup CordActivityManager
+      autocmd BufEnter * lua require'cord'.manager:on_buf_enter()
+      autocmd FocusGained * lua require'cord'.manager:on_focus_gained()
+      autocmd FocusLost * lua require'cord'.manager:on_focus_lost()
+      autocmd DirChanged * lua require'cord'.manager:on_dir_changed()
+    augroup END
+  ]]
+
+  if self.config.advanced.cursor_update_mode == 'on_hold' then
+    vim.cmd [[
+      augroup CordActivityManager
+        autocmd CursorHold,CursorHoldI * lua require'cord'.manager:on_cursor_update()
+      augroup END
+    ]]
+  elseif self.config.advanced.cursor_update_mode == 'on_move' then
+    vim.cmd [[
+      augroup CordActivityManager
+        autocmd CursorMoved,CursorMovedI * lua require'cord'.manager:on_cursor_update()
+      augroup END
+    ]]
+  end
+
+  self:queue_update()
+end
+
+function ActivityManager:queue_update()
+  vim.schedule(function() self:process_update() end)
+end
+
+function ActivityManager:process_update()
   local cursor_position = vim.api.nvim_win_get_cursor(0)
   local buttons = config_utils:get_buttons()
 
@@ -65,8 +115,70 @@ function ActivityManager:on_tick()
 
   if self:should_update(opts) then
     self:update_activity(opts)
+  elseif not self.is_idle then
+    self:check_idle(opts)
+  end
+end
+
+function ActivityManager:should_update(opts)
+  local should_update = not self.last_opts
+    or opts.filename ~= self.last_opts.filename
+    or opts.filetype ~= self.last_opts.filetype
+    or opts.is_read_only ~= self.last_opts.is_read_only
+    or opts.cursor_line ~= self.last_opts.cursor_line
+    or opts.cursor_char ~= self.last_opts.cursor_char
+    or opts.is_focused ~= self.last_opts.is_focused
+
+  return should_update
+end
+
+function ActivityManager:run()
+  self.last_updated = uv.now()
+  if self.config.timestamp.enable then self.timestamp = os.time() end
+
+  if self.config.idle.enable then
+    self.idle_timer = uv.new_timer()
+    self.idle_timer:start(
+      0,
+      self.config.idle.timeout,
+      vim.schedule_wrap(function() self:check_idle() end)
+    )
+  end
+
+  self:setup_autocmds()
+  self:queue_update()
+end
+
+function ActivityManager:check_idle(opts)
+  if not self.config.idle.enable and not self.force_idle then return end
+  if self.is_idle then return end
+
+  local time_elapsed = uv.now() - self.last_updated
+  if
+    self.force_idle
+    or (
+      time_elapsed > self.config.idle.timeout
+      and (self.config.idle.ignore_focus or not self.is_focused)
+    )
+  then
+    self:update_idle_activity(opts or self.last_opts)
+  end
+end
+
+function ActivityManager:update_idle_activity(opts)
+  self.is_idle = true
+  self.last_updated = uv.now()
+
+  if self.config.idle.show_status then
+    local activity = activities.build_idle_activity(self.config, opts)
+    if self.config.hooks.on_idle then
+      self.config.hooks.on_idle(opts, activity)
+    end
+
+    self.tx:update_activity(activity)
   else
-    self:update_idle_activity(opts)
+    if self.config.hooks.on_idle then self.config.hooks.on_idle(opts) end
+    self.tx:clear_activity()
   end
 end
 
@@ -86,86 +198,32 @@ function ActivityManager:update_activity(opts)
   self.tx:update_activity(activity)
 end
 
-function ActivityManager:update_idle_activity(opts)
-  if self.is_idle then return end
+function ActivityManager:pause()
+  vim.cmd [[
+    augroup CordActivityManager
+      autocmd!
+    augroup END
+  ]]
+  if self.idle_timer then self.idle_timer:stop() end
+end
 
-  if
-    self.force_idle
-    or self.config.idle.enable
-      and uv.now() - self.last_updated > self.config.idle.timeout
-      and (self.config.idle.ignore_focus or not self.is_focused)
-  then
-    self.is_idle = true
-
-    if self.config.idle.show_status then
-      local activity = activities.build_idle_activity(self.config, opts)
-      if self.config.hooks.on_idle then
-        self.config.hooks.on_idle(opts, activity)
-      end
-
-      self.tx:update_activity(activity)
-    else
-      if self.config.hooks.on_idle then self.config.hooks.on_idle(opts) end
-
-      self.tx:clear_activity()
-    end
+function ActivityManager:resume()
+  self:setup_autocmds()
+  if self.idle_timer then
+    self.idle_timer:start(
+      0,
+      self.config.idle.timeout,
+      vim.schedule_wrap(function() self:check_idle() end)
+    )
   end
-end
-
-function ActivityManager:clear_activity()
-  self.last_opts = nil
-  self.last_updated = uv.now()
-  self.tx:clear_activity()
-end
-
-function ActivityManager:should_update(opts)
-  return not self.last_opts
-    or opts.filename ~= self.last_opts.filename
-    or opts.filetype ~= self.last_opts.filetype
-    or opts.is_read_only ~= self.last_opts.is_read_only
-    or opts.cursor_line ~= self.last_opts.cursor_line
-    or opts.cursor_char ~= self.last_opts.cursor_char
 end
 
 function ActivityManager:should_update_time()
   return self.config.display.show_time
     and (
-      self.config.timer.reset_on_change
-      or self.config.timer.reset_on_idle and self.is_idle
+      self.config.timestamp.reset_on_change
+      or self.config.timestamp.reset_on_idle and self.is_idle
     )
-end
-
-function ActivityManager:pause()
-  if self.timer then self.timer:stop() end
-end
-
-function ActivityManager:resume()
-  if self.timer then
-    self.timer:start(
-      0,
-      self.config.advanced.interval,
-      vim.schedule_wrap(function() self:on_tick() end)
-    )
-  end
-end
-
-function ActivityManager:setup_autocmds()
-  function ActivityManager:on_focus_gained() self.is_focused = true end
-  function ActivityManager:on_focus_lost() self.is_focused = false end
-  function ActivityManager:on_dir_changed()
-    local new_workspace_dir = vim.fn.expand '%:p:h'
-    if new_workspace_dir ~= self.workspace_dir then
-      self.workspace_dir = new_workspace_dir
-      self.workspace_name = ws_utils.find(self.workspace_dir)
-    end
-  end
-
-  vim.cmd [[
-    autocmd! FocusGained * lua self:on_focus_gained()
-    autocmd! FocusLost * lua self:on_focus_lost()
-    autocmd! BufReadPost * lua self:on_dir_changed()
-    autocmd! DirChanged * lua self:on_dir_changed()
-  ]]
 end
 
 return ActivityManager

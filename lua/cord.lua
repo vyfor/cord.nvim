@@ -25,8 +25,7 @@ function M.setup(opts)
       M.producer:initialize(config.values)
       M.manager =
         ActivityManager.new { tx = M.producer, config = config.values }
-
-      M.manager:run_event_loop()
+      M.manager:run()
     end)
 
     M.handler:run()
