@@ -1,3 +1,2 @@
 pub mod activity;
-pub mod parse;
-pub mod types;
+pub mod packet;

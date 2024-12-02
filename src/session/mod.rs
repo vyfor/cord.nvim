@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use crate::ipc::pipe::platform::client::PipeClient;
-use crate::presence::types::Activity;
+use crate::presence::activity::Activity;
 use crate::types::config::PluginConfig;
 
 pub struct Session {
@@ -50,6 +50,10 @@ impl Session {
 
     pub fn get_config(&self) -> Option<&PluginConfig> {
         self.config.as_ref()
+    }
+
+    pub fn get_config_mut(&mut self) -> Option<&mut PluginConfig> {
+        self.config.as_mut()
     }
 
     pub fn get_pipe_client(&self) -> Option<&PipeClient> {

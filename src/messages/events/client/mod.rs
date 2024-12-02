@@ -1,7 +1,7 @@
 use crate::{
     messages::events::event::{EventContext, OnEvent},
+    presence::activity::Activity,
     protocol::msgpack::{Deserialize, MsgPack},
-    presence::activity::ActivityContext,
     types::config::PluginConfig,
 };
 
@@ -9,17 +9,13 @@ pub mod clear_activity;
 pub mod connect;
 pub mod disconnect;
 pub mod initialize;
-pub mod set_timestamp;
 pub mod update_activity;
-pub mod update_workspace;
 
 pub use clear_activity::ClearActivityEvent;
 pub use connect::ConnectEvent;
 pub use disconnect::DisconnectEvent;
 pub use initialize::InitializeEvent;
-pub use set_timestamp::SetTimestampEvent;
 pub use update_activity::UpdateActivityEvent;
-pub use update_workspace::UpdateWorkspaceEvent;
 
 #[derive(Debug)]
 pub enum ClientEvent {
@@ -27,8 +23,6 @@ pub enum ClientEvent {
     Initialize(InitializeEvent),
     UpdateActivity(UpdateActivityEvent),
     ClearActivity(ClearActivityEvent),
-    UpdateWorkspace(UpdateWorkspaceEvent),
-    SetTimestamp(SetTimestampEvent),
     Disconnect(DisconnectEvent),
 }
 
@@ -61,14 +55,10 @@ impl ClientEvent {
             "initialize" => {
                 Self::Initialize(InitializeEvent::new(PluginConfig::deserialize(data!(map))?))
             }
-            "update_activity" => Self::UpdateActivity(UpdateActivityEvent::new(
-                ActivityContext::deserialize(data!(map))?,
-            )),
-            "clear_activity" => Self::ClearActivity(ClearActivityEvent),
-            "update_workspace" => {
-                Self::UpdateWorkspace(UpdateWorkspaceEvent::new(data!(map, |v| v.take_string())))
+            "update_activity" => {
+                Self::UpdateActivity(UpdateActivityEvent::new(Activity::deserialize(data!(map))?))
             }
-            "set_timestamp" => Self::SetTimestamp(SetTimestampEvent::new(data!(map).as_uinteger())),
+            "clear_activity" => Self::ClearActivity(ClearActivityEvent),
             "disconnect" => Self::Disconnect(DisconnectEvent),
             _ => return Err(format!("Unknown message type: {}", ty).into()),
         })
@@ -83,8 +73,6 @@ impl OnEvent for ClientEvent {
             Self::Disconnect(e) => e.on_event(ctx),
             Self::UpdateActivity(e) => e.on_event(ctx),
             Self::ClearActivity(e) => e.on_event(ctx),
-            Self::SetTimestamp(e) => e.on_event(ctx),
-            Self::UpdateWorkspace(e) => e.on_event(ctx),
         }
     }
 }

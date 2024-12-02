@@ -1,17 +1,17 @@
 use std::sync::atomic::Ordering;
 
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::presence::activity::ActivityContext;
-use crate::presence::types::Packet;
+use crate::presence::activity::Activity;
+use crate::presence::packet::Packet;
 
 #[derive(Debug)]
 pub struct UpdateActivityEvent {
-    context: ActivityContext,
+    activity: Activity,
 }
 
 impl UpdateActivityEvent {
-    pub fn new(context: ActivityContext) -> Self {
-        Self { context }
+    pub fn new(activity: Activity) -> Self {
+        Self { activity }
     }
 }
 
@@ -22,18 +22,15 @@ impl OnEvent for UpdateActivityEvent {
         }
 
         if let Some(mut session) = ctx.cord.session_manager.get_session_mut(ctx.client_id) {
-            if let Some(config) = session.get_config() {
-                let activity = self.context.build(config);
-                if Some(&activity) != session.last_activity.as_ref() {
-                    ctx.cord
-                        .rich_client
-                        .update(&Packet::new(ctx.cord.rich_client.pid, Some(&activity)))?;
-                    session.set_last_activity(activity);
-                    session.last_updated = std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap() // todo: reset all timestamps if this fails
-                        .as_micros();
-                }
+            if Some(&self.activity) != session.last_activity.as_ref() {
+                ctx.cord
+                    .rich_client
+                    .update(&Packet::new(ctx.cord.rich_client.pid, Some(&self.activity)))?;
+                session.set_last_activity(self.activity);
+                session.last_updated = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap() // todo: reset all timestamps if this fails
+                    .as_nanos();
             }
         }
 

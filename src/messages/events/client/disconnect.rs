@@ -1,6 +1,6 @@
 use crate::{
     messages::events::event::{EventContext, OnEvent},
-    presence::types::Packet,
+    presence::packet::Packet,
 };
 
 #[derive(Debug, Default)]

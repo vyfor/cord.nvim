@@ -8,7 +8,7 @@ const DEFAULT_PIPE_NAME: &str = "cord-ipc";
 #[derive(Debug)]
 pub struct Args {
     pub pipe_name: String,
-    pub client_id: String,
+    pub client_id: u64,
     pub timeout: u64,
 }
 
@@ -33,7 +33,16 @@ impl Args {
                 }
                 "--client-id" | "-c" => {
                     if i + 1 < args.len() {
-                        client_id = Some(args[i + 1].clone());
+                        match args[i + 1].parse() {
+                            Ok(id) if id > 0 => client_id = Some(id),
+                            _ => {
+                                return Err(CliError::Invalid(
+                                    "--client-id",
+                                    "client id must be greater than 0",
+                                )
+                                .into())
+                            }
+                        }
                         i += 2;
                     } else {
                         return Err(CliError::Missing("--client-id").into());

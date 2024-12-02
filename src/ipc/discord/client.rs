@@ -1,5 +1,5 @@
 use crate::ipc::discord::utils;
-use crate::presence::types::Packet;
+use crate::presence::packet::Packet;
 use crate::protocol::json::Json;
 use std::io::{Read, Write};
 use std::sync::atomic::AtomicBool;

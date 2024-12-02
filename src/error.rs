@@ -32,10 +32,6 @@ impl CordError {
             source: error.into(),
         }
     }
-
-    pub fn kind(&self) -> &CordErrorKind {
-        &self.kind
-    }
 }
 
 impl fmt::Display for CordError {
