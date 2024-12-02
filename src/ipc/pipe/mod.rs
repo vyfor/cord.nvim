@@ -18,6 +18,7 @@ pub trait PipeServerImpl {
     fn stop(&mut self);
     fn broadcast(&self, data: &[u8]) -> io::Result<()>;
     fn write_to(&self, client_id: u32, data: &[u8]) -> io::Result<()>;
+    #[allow(dead_code)]
     fn disconnect(&self, client_id: u32) -> io::Result<()>;
 }
 
