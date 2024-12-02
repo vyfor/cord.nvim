@@ -104,9 +104,11 @@ local function build_idle_activity(cfg, opts)
     large_image = cfg.editor.icon
     large_text = config.get(cfg.editor.tooltip, opts)
     small_image = config.get(cfg.idle.icon, opts)
+      or utils.get_asset('editor', 'idle')
     small_text = config.get(cfg.idle.tooltip, opts)
   else
     large_image = config.get(cfg.idle.icon, opts)
+      or utils.get_asset('editor', 'idle')
     large_text = config.get(cfg.idle.tooltip, opts)
     small_image = cfg.editor.icon
     small_text = config.get(cfg.editor.tooltip, opts)

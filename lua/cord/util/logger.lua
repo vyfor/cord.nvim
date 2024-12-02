@@ -1,5 +1,5 @@
 local levels = vim.log.levels
-local log_level
+local log_level = levels.ERROR
 
 local function set_level(level) log_level = level end
 

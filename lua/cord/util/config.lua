@@ -32,7 +32,7 @@ M.values = {
     ignore_focus = true,
     details = 'Idling',
     state = nil,
-    tooltip = 'Zzz',
+    tooltip = '💤',
     icon = nil,
   },
   text = {
@@ -54,28 +54,7 @@ M.values = {
     workspace = function(opts) return 'In ' .. opts.workspace_name end,
     dashboard = 'Home',
   },
-  buttons = {
-    {
-      label = 'View Repository',
-      url = 'git',
-    },
-    {
-      label = function(opts)
-        if opts.is_custom_client then
-          return 'This is a custom client'
-        else
-          return 'This is not a custom client'
-        end
-      end,
-      url = function(opts)
-        if opts.is_custom_client then
-          return 'https://github.com/Neovim/Neovim'
-        else
-          return 'https://github.com/Neovim/Neovim'
-        end
-      end,
-    },
-  },
+  buttons = nil,
   assets = nil,
   hooks = {
     on_ready = nil,
