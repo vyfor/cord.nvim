@@ -25,7 +25,6 @@ function IPC:connect(callback)
         else
           logger.error('Failed to connect to pipe: ' .. err)
         end
-        self:on_error(err)
         return
       end
 
@@ -42,7 +41,6 @@ function IPC:read_start(callback)
   self.pipe:read_start(vim.schedule_wrap(function(err, chunk)
     if err then
       logger.error('Read error: ' .. err)
-      self.on_error(err)
       return
     end
 
@@ -62,7 +60,6 @@ function IPC:write(data, callback)
     vim.schedule_wrap(function(err)
       if err then
         logger.error('Write error: ' .. err)
-        self:on_error(err)
         return
       end
 
