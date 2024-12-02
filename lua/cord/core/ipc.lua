@@ -27,18 +27,24 @@ function IPC:connect(callback)
     vim.schedule_wrap(function(err)
       if err then
         if err == 'ENOENT' then
-          local executable = self.config.advanced.server.executable_path
+          if self.config.advanced.server.executable_path then
+            self.executable = self.config.advanced.server.executable_path
+          else
+            self.executable = utils.os_name == 'Windows'
+                and 'target/release/cord.exe'
+              or 'target/release/cord'
+          end
 
-          if not utils.file_exists(executable) then
+          if not utils.file_exists(self.executable) then
             logger.error(
-              'Server executable not found at \'' .. executable .. '\''
+              'Server executable not found at \'' .. self.executable .. '\''
             )
             return
           end
 
           local stdout = uv.new_pipe()
           local stderr = uv.new_pipe()
-          uv.spawn(executable, {
+          uv.spawn(self.executable, {
             args = {
               '-p',
               self.path,

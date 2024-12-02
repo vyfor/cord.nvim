@@ -69,7 +69,7 @@ M.values = {
   advanced = {
     server = {
       pipe_path = nil,
-      executable_path = 'target/release/cord.exe',
+      executable_path = nil,
       timeout = 60000,
     },
     cursor_update_mode = 'on_move',
