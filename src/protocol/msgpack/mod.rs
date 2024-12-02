@@ -24,6 +24,7 @@ pub const INT32: u8 = 0xd2;
 pub const INT64: u8 = 0xd3;
 pub const FLOAT32: u8 = 0xca;
 pub const FLOAT64: u8 = 0xcb;
+pub const STR8: u8 = 0xd9;
 pub const STR16: u8 = 0xda;
 pub const STR32: u8 = 0xdb;
 pub const ARRAY16: u8 = 0xdc;

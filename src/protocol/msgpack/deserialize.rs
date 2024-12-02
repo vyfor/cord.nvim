@@ -2,8 +2,8 @@ use super::{
     value::Value, MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_MASK, FIXARRAY_SIZE_MASK,
     FIXARRAY_VALUE, FIXMAP_MASK, FIXMAP_SIZE_MASK, FIXMAP_VALUE, FIXSTR_MASK, FIXSTR_SIZE_MASK,
     FIXSTR_VALUE, FLOAT32, FLOAT64, INT16, INT32, INT64, INT8, MAP16, MAP32, NEGATIVE_FIXINT_MASK,
-    NEGATIVE_FIXINT_VALUE, NIL, POSITIVE_FIXINT_MASK, POSITIVE_FIXINT_VALUE, STR16, STR32, TRUE,
-    UINT16, UINT32, UINT64, UINT8,
+    NEGATIVE_FIXINT_VALUE, NIL, POSITIVE_FIXINT_MASK, POSITIVE_FIXINT_VALUE, STR16, STR32, STR8,
+    TRUE, UINT16, UINT32, UINT64, UINT8,
 };
 use crate::protocol::error::ProtocolError;
 use std::collections::HashMap;
@@ -45,6 +45,11 @@ impl MsgPack {
                 Self::parse_str(input, pos, len)
             }
 
+            STR8 => {
+                let len = input[*pos] as usize;
+                *pos += 1;
+                Self::parse_str(input, pos, len)
+            }
             STR16 => {
                 let len = Self::parse_u16(input, pos)? as usize;
                 Self::parse_str(input, pos, len)
