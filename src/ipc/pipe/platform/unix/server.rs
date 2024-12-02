@@ -46,7 +46,7 @@ impl PipeServerImpl for PipeServer {
             std::fs::remove_file(&self.pipe_name)?;
         }
 
-        let listener = UnixListener::bind(format!("/tmp/{}", self.pipe_name))?;
+        let listener = UnixListener::bind(&self.pipe_name)?;
         self.listener = Some(listener);
         self.running.store(true, Ordering::SeqCst);
 

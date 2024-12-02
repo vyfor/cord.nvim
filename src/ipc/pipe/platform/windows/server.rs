@@ -174,10 +174,7 @@ impl PipeServerImpl for PipeServer {
 
 impl PipeServer {
     fn create_pipe_instance(pipe_name: &str) -> io::Result<HANDLE> {
-        let wide_name: Vec<u16> = format!("\\\\.\\pipe\\{}", pipe_name)
-            .encode_utf16()
-            .chain(std::iter::once(0))
-            .collect();
+        let wide_name: Vec<u16> = pipe_name.encode_utf16().chain(std::iter::once(0)).collect();
 
         let handle = unsafe {
             CreateNamedPipeW(

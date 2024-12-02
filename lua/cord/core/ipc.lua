@@ -14,11 +14,12 @@ end
 
 function IPC:connect(callback)
   local path = utils.os_name == 'Windows' and '\\\\.\\pipe\\' or '/tmp/'
+  self.path = path .. (self.config.advanced.server.pipe_name or 'cord-ipc')
   local pipe = uv.new_pipe()
   self.pipe = pipe
 
   pipe:connect(
-    path .. self.config.advanced.server.pipe_name,
+    self.path,
     vim.schedule_wrap(function(err)
       if err then
         if err == 'ENOENT' then
@@ -34,17 +35,20 @@ function IPC:connect(callback)
           local stdout = uv.new_pipe()
           local stderr = uv.new_pipe()
 
+          local args = {}
+          if self.config.advanced.server.pipe_name then
+            table.insert(args, '-p')
+            table.insert(args, self.config.advanced.server.pipe_name)
+          end
+          table.insert(args, '-c')
+          table.insert(args, self.config.editor.client)
+          table.insert(args, '-t')
+          table.insert(args, tostring(self.config.advanced.server.timeout))
+
           uv.spawn(
             executable,
             {
-              args = {
-                '-p',
-                self.config.advanced.server.pipe_name,
-                '-c',
-                self.config.editor.client,
-                '-t',
-                tostring(self.config.advanced.server.timeout),
-              },
+              args = args,
               stdio = { nil, stdout, stderr },
               detached = true,
               hide = true,
@@ -84,9 +88,7 @@ function IPC:connect(callback)
         return
       end
 
-      logger.debug(
-        'Connected to pipe: ' .. self.config.advanced.server.pipe_name
-      )
+      logger.debug('Connected to pipe: ' .. self.path)
 
       if callback then callback() end
     end)
