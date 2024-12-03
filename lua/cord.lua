@@ -374,7 +374,7 @@ end
 
 function cord.setup_autocmds(config)
   vim.cmd [[
-    autocmd! BufReadPost * lua require('cord').on_dir_changed()
+    autocmd! BufEnter * lua require('cord').on_dir_changed()
     autocmd! DirChanged * lua require('cord').on_dir_changed()
     autocmd! FocusGained * lua require('cord').on_focus_gained()
     autocmd! FocusLost * lua require('cord').on_focus_lost()
