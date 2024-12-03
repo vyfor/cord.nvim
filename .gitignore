@@ -4,4 +4,3 @@
 /cord.*
 .direnv/
 *.a
-*.dll.a
