@@ -3,3 +3,4 @@
 /cord
 /cord.*
 .direnv/
+*.a
