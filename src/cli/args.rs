@@ -41,7 +41,7 @@ impl Args {
                             _ => {
                                 return Err(CliError::Invalid(
                                     "--client-id",
-                                    "client id must be greater than 0",
+                                    "client id is not a valid u64",
                                 )
                                 .into())
                             }
