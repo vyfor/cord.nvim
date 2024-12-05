@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::types::config::PluginConfig;
 
@@ -14,7 +16,9 @@ impl InitializeEvent {
 
 impl OnEvent for InitializeEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        ctx.cord.logger.set_level(self.config.log_level);
+        if let Some(logger) = Arc::get_mut(&mut ctx.cord.logger) {
+            logger.set_level(self.config.log_level);
+        }
 
         if let Some(mut session) =
             ctx.cord.session_manager.get_session_mut(ctx.client_id)

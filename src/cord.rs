@@ -30,7 +30,7 @@ pub struct Cord {
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
-    pub logger: Logger,
+    pub logger: Arc<Logger>,
     _lock: ServerLock,
 }
 
@@ -47,7 +47,7 @@ impl Cord {
             tx.clone(),
             Arc::clone(&session_manager),
         );
-        let logger = Logger::new(tx.clone(), LogLevel::Off);
+        let logger = Arc::new(Logger::new(tx.clone(), LogLevel::Off));
 
         Ok(Cord {
             config,
@@ -95,12 +95,25 @@ impl Cord {
         self.rich_client.handshake()?;
         let rich_client = self.rich_client.clone();
         let tx = self.tx.clone();
-        std::thread::spawn(move || {
-            if let Err(e) = rich_client.read() {
+        let logger = self.logger.clone();
+        std::thread::spawn(move || match rich_client.read() {
+            Ok(msg) => {
+                let msg = String::from_utf8_lossy(&msg);
+
+                if msg.contains("Invalid Client ID") {
+                    logger.log(
+                        LogLevel::Error,
+                        format!("Invalid client ID: {}", msg).into(),
+                        0,
+                    );
+                    tx.send(local_event!(0, Shutdown)).ok();
+                } else {
+                    tx.send(server_event!(0, Ready)).ok();
+                }
+            }
+            Err(e) => {
                 tx.send(local_event!(0, Error, ErrorEvent::new(Box::new(e))))
                     .ok();
-            } else {
-                tx.send(server_event!(0, Ready)).ok();
             }
         });
 
@@ -114,6 +127,12 @@ impl Cord {
         }
 
         self.pipe.stop();
+    }
+
+    /// Shuts down the application.
+    pub fn shutdown(&mut self) {
+        self.cleanup();
+        std::process::exit(0);
     }
 }
 
