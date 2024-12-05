@@ -31,70 +31,6 @@ function ActivityManager.new(opts)
   return self
 end
 
-function ActivityManager:on_buf_enter()
-  local new_workspace_dir = vim.fn.expand '%:p:h'
-  if new_workspace_dir ~= self.workspace_dir then
-    self.workspace_dir = new_workspace_dir
-    self.workspace_name = ws_utils.find(self.workspace_dir)
-    if self.config.hooks.on_workspace_change then
-      local opts = self.last_opts
-      opts.workspace_dir = self.workspace_dir
-      opts.workspace_name = self.workspace_name
-      self.config.hooks.on_workspace_change(opts)
-    end
-  end
-
-  self:queue_update()
-end
-
-function ActivityManager:on_focus_gained()
-  self.is_focused = true
-  self:queue_update()
-end
-
-function ActivityManager:on_focus_lost()
-  self.is_focused = false
-  self:queue_update()
-end
-
-function ActivityManager:on_dir_changed()
-  local new_workspace_dir = vim.fn.expand '%:p:h'
-  if new_workspace_dir ~= self.workspace_dir then
-    self.workspace_dir = new_workspace_dir
-    self.workspace_name = ws_utils.find(self.workspace_dir)
-    self:queue_update()
-  end
-end
-
-function ActivityManager:on_cursor_update() self:queue_update() end
-
-function ActivityManager:setup_autocmds()
-  vim.cmd [[
-    augroup CordActivityManager
-      autocmd BufEnter * lua require'cord'.manager:on_buf_enter()
-      autocmd FocusGained * lua require'cord'.manager:on_focus_gained()
-      autocmd FocusLost * lua require'cord'.manager:on_focus_lost()
-      autocmd DirChanged * lua require'cord'.manager:on_dir_changed()
-    augroup END
-  ]]
-
-  if self.config.advanced.cursor_update_mode == 'on_hold' then
-    vim.cmd [[
-      augroup CordActivityManager
-        autocmd CursorHold,CursorHoldI * lua require'cord'.manager:on_cursor_update()
-      augroup END
-    ]]
-  elseif self.config.advanced.cursor_update_mode == 'on_move' then
-    vim.cmd [[
-      augroup CordActivityManager
-        autocmd CursorMoved,CursorMovedI * lua require'cord'.manager:on_cursor_update()
-      augroup END
-    ]]
-  end
-
-  self:queue_update()
-end
-
 function ActivityManager:queue_update()
   vim.schedule(function() self:process_update() end)
 end
@@ -232,6 +168,70 @@ function ActivityManager:should_update_time()
       self.config.timestamp.reset_on_change
       or self.config.timestamp.reset_on_idle and self.is_idle
     )
+end
+
+function ActivityManager:on_buf_enter()
+  local new_workspace_dir = vim.fn.expand '%:p:h'
+  if new_workspace_dir ~= self.workspace_dir then
+    self.workspace_dir = new_workspace_dir
+    self.workspace_name = ws_utils.find(self.workspace_dir)
+    if self.config.hooks.on_workspace_change then
+      local opts = self.last_opts
+      opts.workspace_dir = self.workspace_dir
+      opts.workspace_name = self.workspace_name
+      self.config.hooks.on_workspace_change(opts)
+    end
+  end
+
+  self:queue_update()
+end
+
+function ActivityManager:on_focus_gained()
+  self.is_focused = true
+  self:queue_update()
+end
+
+function ActivityManager:on_focus_lost()
+  self.is_focused = false
+  self:queue_update()
+end
+
+function ActivityManager:on_dir_changed()
+  local new_workspace_dir = vim.fn.expand '%:p:h'
+  if new_workspace_dir ~= self.workspace_dir then
+    self.workspace_dir = new_workspace_dir
+    self.workspace_name = ws_utils.find(self.workspace_dir)
+    self:queue_update()
+  end
+end
+
+function ActivityManager:on_cursor_update() self:queue_update() end
+
+function ActivityManager:setup_autocmds()
+  vim.cmd [[
+    augroup CordActivityManager
+      autocmd BufEnter * lua require'cord'.manager:on_buf_enter()
+      autocmd FocusGained * lua require'cord'.manager:on_focus_gained()
+      autocmd FocusLost * lua require'cord'.manager:on_focus_lost()
+      autocmd DirChanged * lua require'cord'.manager:on_dir_changed()
+    augroup END
+  ]]
+
+  if self.config.advanced.cursor_update_mode == 'on_hold' then
+    vim.cmd [[
+      augroup CordActivityManager
+        autocmd CursorHold,CursorHoldI * lua require'cord'.manager:on_cursor_update()
+      augroup END
+    ]]
+  elseif self.config.advanced.cursor_update_mode == 'on_move' then
+    vim.cmd [[
+      augroup CordActivityManager
+        autocmd CursorMoved,CursorMovedI * lua require'cord'.manager:on_cursor_update()
+      augroup END
+    ]]
+  end
+
+  self:queue_update()
 end
 
 return ActivityManager
