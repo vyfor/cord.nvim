@@ -30,6 +30,7 @@ M.values = {
     timeout = 300000,
     show_status = true,
     ignore_focus = true,
+    smart_idle = true,
     details = 'Idling',
     state = nil,
     tooltip = '💤',

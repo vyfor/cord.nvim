@@ -127,7 +127,7 @@ local function build_idle_activity(cfg, opts)
       start = opts.timestamp,
     },
     buttons = opts.buttons,
-    is_idle = true,
+    is_idle = cfg.idle.smart_idle,
   }
 end
 
