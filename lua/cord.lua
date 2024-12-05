@@ -5,7 +5,7 @@ local logger = require 'cord.util.logger'
 local M = {}
 
 function M.setup(opts)
-  config:validate(opts or {})
+  if not config:validate(opts or {}) then return end
   logger.set_level(config.values.log_level)
 
   local client = ipc.new(config.values)
