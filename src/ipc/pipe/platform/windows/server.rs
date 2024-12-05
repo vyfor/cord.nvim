@@ -8,14 +8,13 @@ use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
+use super::client::PipeClient;
 use super::{
-    client::PipeClient, CreateEventW, CreateNamedPipeW, Overlapped, FILE_FLAG_OVERLAPPED, HANDLE,
-    INVALID_HANDLE_VALUE, PIPE_ACCESS_DUPLEX, PIPE_READMODE_MESSAGE, PIPE_TYPE_MESSAGE,
-    PIPE_UNLIMITED_INSTANCES,
-};
-use super::{
-    CloseHandle, ConnectNamedPipe, GetLastError, GetOverlappedResult, ERROR_IO_PENDING,
-    ERROR_PIPE_CONNECTED, PIPE_WAIT,
+    CloseHandle, ConnectNamedPipe, CreateEventW, CreateNamedPipeW,
+    GetLastError, GetOverlappedResult, Overlapped, ERROR_IO_PENDING,
+    ERROR_PIPE_CONNECTED, FILE_FLAG_OVERLAPPED, HANDLE, INVALID_HANDLE_VALUE,
+    PIPE_ACCESS_DUPLEX, PIPE_READMODE_MESSAGE, PIPE_TYPE_MESSAGE,
+    PIPE_UNLIMITED_INSTANCES, PIPE_WAIT,
 };
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 use crate::messages::events::local::ErrorEvent;
@@ -33,7 +32,11 @@ pub struct PipeServer {
 }
 
 impl PipeServerImpl for PipeServer {
-    fn new(pipe_name: &str, tx: Sender<Message>, session_manager: Arc<SessionManager>) -> Self {
+    fn new(
+        pipe_name: &str,
+        tx: Sender<Message>,
+        session_manager: Arc<SessionManager>,
+    ) -> Self {
         Self {
             session_manager,
             pipe_name: pipe_name.to_string(),
@@ -58,21 +61,28 @@ impl PipeServerImpl for PipeServer {
 
         self.thread_handle = Some(std::thread::spawn(move || {
             while running.load(Ordering::SeqCst) {
-                if let Ok(handle) = PipeServer::create_pipe_instance(&pipe_name) {
+                if let Ok(handle) = PipeServer::create_pipe_instance(&pipe_name)
+                {
                     if !notified.load(Ordering::SeqCst) {
                         println!("Ready");
                         notified.store(true, Ordering::SeqCst);
                     }
 
                     unsafe {
-                        let h_event =
-                            CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut());
+                        let h_event = CreateEventW(
+                            std::ptr::null_mut(),
+                            1,
+                            0,
+                            std::ptr::null_mut(),
+                        );
                         if h_event.is_null() {
                             CloseHandle(handle);
                             tx.send(local_event!(
                                 0,
                                 Error,
-                                ErrorEvent::new(Box::new(io::Error::last_os_error()))
+                                ErrorEvent::new(Box::new(
+                                    io::Error::last_os_error()
+                                ))
                             ))
                             .ok();
                             continue;
@@ -86,18 +96,23 @@ impl PipeServerImpl for PipeServer {
                             h_event,
                         };
 
-                        let connect_result = ConnectNamedPipe(handle, &mut overlapped);
+                        let connect_result =
+                            ConnectNamedPipe(handle, &mut overlapped);
                         if connect_result == 0 {
                             let error = GetLastError();
-                            if error != ERROR_IO_PENDING && error != ERROR_PIPE_CONNECTED {
+                            if error != ERROR_IO_PENDING
+                                && error != ERROR_PIPE_CONNECTED
+                            {
                                 CloseHandle(handle);
                                 CloseHandle(h_event);
                                 tx.send(local_event!(
                                     0,
                                     Error,
-                                    ErrorEvent::new(Box::new(io::Error::from_raw_os_error(
-                                        error as _,
-                                    )))
+                                    ErrorEvent::new(Box::new(
+                                        io::Error::from_raw_os_error(
+                                            error as _,
+                                        )
+                                    ))
                                 ))
                                 .ok();
                                 continue;
@@ -105,8 +120,12 @@ impl PipeServerImpl for PipeServer {
                         }
 
                         let mut bytes_transferred = 0;
-                        if GetOverlappedResult(handle, &mut overlapped, &mut bytes_transferred, 1)
-                            == 0
+                        if GetOverlappedResult(
+                            handle,
+                            &mut overlapped,
+                            &mut bytes_transferred,
+                            1,
+                        ) == 0
                         {
                             let error = GetLastError();
                             CloseHandle(handle);
@@ -114,13 +133,16 @@ impl PipeServerImpl for PipeServer {
                             tx.send(local_event!(
                                 0,
                                 Error,
-                                ErrorEvent::new(Box::new(io::Error::from_raw_os_error(error as _)))
+                                ErrorEvent::new(Box::new(
+                                    io::Error::from_raw_os_error(error as _)
+                                ))
                             ))
                             .ok();
                             continue;
                         }
 
-                        let client_id = next_client_id.fetch_add(1, Ordering::SeqCst);
+                        let client_id =
+                            next_client_id.fetch_add(1, Ordering::SeqCst);
                         let mut client = PipeClient::new(
                             client_id,
                             File::from_raw_handle(handle as _),
@@ -174,7 +196,8 @@ impl PipeServerImpl for PipeServer {
 
 impl PipeServer {
     fn create_pipe_instance(pipe_name: &str) -> io::Result<HANDLE> {
-        let wide_name: Vec<u16> = pipe_name.encode_utf16().chain(std::iter::once(0)).collect();
+        let wide_name: Vec<u16> =
+            pipe_name.encode_utf16().chain(std::iter::once(0)).collect();
 
         let handle = unsafe {
             CreateNamedPipeW(

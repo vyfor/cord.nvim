@@ -1,8 +1,10 @@
 #![allow(dead_code)]
 
-use super::{value::ValueRef, Json};
+use super::value::ValueRef;
+use super::Json;
 
-pub type SerializeFn<'a> = fn(&'a str, ValueRef<'a>, &mut SerializeState) -> crate::Result<()>;
+pub type SerializeFn<'a> =
+    fn(&'a str, ValueRef<'a>, &mut SerializeState) -> crate::Result<()>;
 
 /// Trait for serializing Rust types into JSON data.
 ///
@@ -20,8 +22,11 @@ pub trait Serialize {
     /// # Returns
     ///
     /// A result indicating success or failure of the serialization process.
-    fn serialize<'a>(&'a self, f: SerializeFn<'a>, state: &mut SerializeState)
-        -> crate::Result<()>;
+    fn serialize<'a>(
+        &'a self,
+        f: SerializeFn<'a>,
+        state: &mut SerializeState,
+    ) -> crate::Result<()>;
 }
 
 pub trait SerializeObj: Serialize + std::fmt::Debug {}
@@ -72,7 +77,11 @@ impl Json {
         state.buf.push('{');
         state.push_scope();
 
-        fn write_kv(key: &str, value: &ValueRef, state: &mut SerializeState) -> crate::Result<()> {
+        fn write_kv(
+            key: &str,
+            value: &ValueRef,
+            state: &mut SerializeState,
+        ) -> crate::Result<()> {
             if state.needs_comma() {
                 state.buf.push(',');
             }
@@ -96,7 +105,10 @@ impl Json {
     }
 }
 
-fn write_value(value: &ValueRef, state: &mut SerializeState) -> crate::Result<()> {
+fn write_value(
+    value: &ValueRef,
+    state: &mut SerializeState,
+) -> crate::Result<()> {
     match value {
         ValueRef::String(s) => {
             state.buf.push('"');

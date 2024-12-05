@@ -1,6 +1,7 @@
+use super::client::ClientEvent;
+use super::local::LocalEvent;
+use super::server::ServerEvent;
 use crate::cord::Cord;
-
-use super::{client::ClientEvent, local::LocalEvent, server::ServerEvent};
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]

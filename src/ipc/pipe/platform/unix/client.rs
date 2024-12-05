@@ -55,13 +55,20 @@ impl PipeClientImpl for PipeClient {
                         }
                         Ok(n) => match ClientEvent::deserialize(&buf[..n]) {
                             Ok(message) => {
-                                tx.send(Message::new(id, Event::Client(message))).ok();
+                                tx.send(Message::new(
+                                    id,
+                                    Event::Client(message),
+                                ))
+                                .ok();
                             }
                             Err(e) => {
                                 tx.send(server_event!(
                                     id,
                                     Log,
-                                    LogEvent::new(e.to_string(), LogLevel::Error)
+                                    LogEvent::new(
+                                        e.to_string(),
+                                        LogLevel::Error
+                                    )
                                 ))
                                 .ok();
                             }

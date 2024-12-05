@@ -16,7 +16,8 @@ impl ServerLock {
         if !file.try_lock()? {
             return Err(Error::new(
                 ErrorKind::AlreadyExists,
-                "Could not acquire a file lock while another instance is running",
+                "Could not acquire a file lock while another instance is \
+                 running",
             ));
         }
 

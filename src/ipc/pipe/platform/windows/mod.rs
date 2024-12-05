@@ -35,7 +35,9 @@ impl Default for Overlapped {
             internal_high: 0,
             offset: 0,
             offset_high: 0,
-            h_event: unsafe { CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut()) },
+            h_event: unsafe {
+                CreateEventW(std::ptr::null_mut(), 1, 0, std::ptr::null_mut())
+            },
         }
     }
 }
@@ -52,7 +54,10 @@ extern "system" {
         lpSecurityAttributes: LPVOID,
     ) -> HANDLE;
 
-    pub fn ConnectNamedPipe(hNamedPipe: HANDLE, lpOverlapped: *mut Overlapped) -> BOOL;
+    pub fn ConnectNamedPipe(
+        hNamedPipe: HANDLE,
+        lpOverlapped: *mut Overlapped,
+    ) -> BOOL;
 
     pub fn GetLastError() -> DWORD;
 

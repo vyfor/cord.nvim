@@ -1,14 +1,13 @@
 pub mod platform;
 
+use std::io;
+use std::sync::mpsc::Sender;
 use std::sync::Arc;
-use std::{io, sync::mpsc::Sender};
 
-use crate::client_event;
-use crate::{
-    local_event,
-    messages::{events::local::ErrorEvent, message::Message},
-    session::SessionManager,
-};
+use crate::messages::events::local::ErrorEvent;
+use crate::messages::message::Message;
+use crate::session::SessionManager;
+use crate::{client_event, local_event};
 
 /// Trait for server-side pipe operations.
 ///
@@ -22,7 +21,11 @@ pub trait PipeServerImpl {
     /// * `pipe_name` - The name of the pipe.
     /// * `tx` - A channel sender for sending messages.
     /// * `session_manager` - A session manager for handling client sessions.
-    fn new(pipe_name: &str, tx: Sender<Message>, session_manager: Arc<SessionManager>) -> Self
+    fn new(
+        pipe_name: &str,
+        tx: Sender<Message>,
+        session_manager: Arc<SessionManager>,
+    ) -> Self
     where
         Self: Sized;
 

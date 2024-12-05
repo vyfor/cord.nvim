@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use super::{serialize::Serialize, NIL};
+use super::serialize::Serialize;
+use super::NIL;
 
 #[derive(Debug, PartialEq)]
 pub enum Value {

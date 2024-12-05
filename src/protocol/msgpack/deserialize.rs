@@ -1,12 +1,15 @@
+use std::collections::HashMap;
+
+use super::value::Value;
 use super::{
-    value::Value, MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_MASK, FIXARRAY_SIZE_MASK,
-    FIXARRAY_VALUE, FIXMAP_MASK, FIXMAP_SIZE_MASK, FIXMAP_VALUE, FIXSTR_MASK, FIXSTR_SIZE_MASK,
-    FIXSTR_VALUE, FLOAT32, FLOAT64, INT16, INT32, INT64, INT8, MAP16, MAP32, NEGATIVE_FIXINT_MASK,
-    NEGATIVE_FIXINT_VALUE, NIL, POSITIVE_FIXINT_MASK, POSITIVE_FIXINT_VALUE, STR16, STR32, STR8,
-    TRUE, UINT16, UINT32, UINT64, UINT8,
+    MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_MASK, FIXARRAY_SIZE_MASK,
+    FIXARRAY_VALUE, FIXMAP_MASK, FIXMAP_SIZE_MASK, FIXMAP_VALUE, FIXSTR_MASK,
+    FIXSTR_SIZE_MASK, FIXSTR_VALUE, FLOAT32, FLOAT64, INT16, INT32, INT64,
+    INT8, MAP16, MAP32, NEGATIVE_FIXINT_MASK, NEGATIVE_FIXINT_VALUE, NIL,
+    POSITIVE_FIXINT_MASK, POSITIVE_FIXINT_VALUE, STR16, STR32, STR8, TRUE,
+    UINT16, UINT32, UINT64, UINT8,
 };
 use crate::protocol::error::ProtocolError;
-use std::collections::HashMap;
 
 /// Trait for deserializing MsgPack data into Rust types.
 ///
@@ -119,7 +122,11 @@ impl MsgPack {
     }
 
     #[inline]
-    fn parse_str(input: &[u8], pos: &mut usize, len: usize) -> crate::Result<Value> {
+    fn parse_str(
+        input: &[u8],
+        pos: &mut usize,
+        len: usize,
+    ) -> crate::Result<Value> {
         if *pos + len > input.len() {
             return Err(ProtocolError::InvalidLength.into());
         }
@@ -133,7 +140,11 @@ impl MsgPack {
     }
 
     #[inline]
-    fn parse_array(input: &[u8], pos: &mut usize, len: usize) -> crate::Result<Value> {
+    fn parse_array(
+        input: &[u8],
+        pos: &mut usize,
+        len: usize,
+    ) -> crate::Result<Value> {
         let mut values = Vec::with_capacity(len);
         for _ in 0..len {
             values.push(Self::parse_value(input, pos)?);
@@ -142,7 +153,11 @@ impl MsgPack {
     }
 
     #[inline]
-    fn parse_map(input: &[u8], pos: &mut usize, len: usize) -> crate::Result<Value> {
+    fn parse_map(
+        input: &[u8],
+        pos: &mut usize,
+        len: usize,
+    ) -> crate::Result<Value> {
         let mut map = HashMap::with_capacity(len);
         for _ in 0..len {
             let key = match Self::parse_value(input, pos)? {

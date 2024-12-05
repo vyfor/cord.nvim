@@ -1,5 +1,6 @@
+use std::fs::OpenOptions;
+use std::io;
 use std::os::windows::fs::OpenOptionsExt;
-use std::{fs::OpenOptions, io};
 
 use crate::ipc::discord::client::{Connection, RichClient};
 

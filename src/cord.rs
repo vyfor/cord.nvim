@@ -1,31 +1,17 @@
-use std::{
-    sync::{
-        mpsc::{self, Receiver, Sender},
-        Arc,
-    },
-    time::Duration,
-};
+use std::sync::mpsc::{self, Receiver, Sender};
+use std::sync::Arc;
+use std::time::Duration;
 
-use crate::{
-    ipc::{
-        discord::client::{Connection, RichClient},
-        pipe::{platform::server::PipeServer, PipeServerImpl},
-    },
-    local_event,
-    messages::{
-        events::{
-            event::{EventContext, OnEvent},
-            local::ErrorEvent,
-        },
-        message::Message,
-    },
-    server_event,
-    session::SessionManager,
-    util::{
-        lockfile::ServerLock,
-        logger::{LogLevel, Logger},
-    },
-};
+use crate::ipc::discord::client::{Connection, RichClient};
+use crate::ipc::pipe::platform::server::PipeServer;
+use crate::ipc::pipe::PipeServerImpl;
+use crate::messages::events::event::{EventContext, OnEvent};
+use crate::messages::events::local::ErrorEvent;
+use crate::messages::message::Message;
+use crate::session::SessionManager;
+use crate::util::lockfile::ServerLock;
+use crate::util::logger::{LogLevel, Logger};
+use crate::{local_event, server_event};
 
 /// Core application managing configuration, sessions, IPC with Discord, and logging.
 ///
@@ -56,7 +42,11 @@ impl Cord {
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = Arc::new(SessionManager::default());
         let rich_client = Arc::new(RichClient::connect(config.client_id)?);
-        let server = PipeServer::new(&config.pipe_name, tx.clone(), Arc::clone(&session_manager));
+        let server = PipeServer::new(
+            &config.pipe_name,
+            tx.clone(),
+            Arc::clone(&session_manager),
+        );
         let logger = Logger::new(tx.clone(), LogLevel::Off);
 
         Ok(Cord {

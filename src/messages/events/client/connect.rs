@@ -3,14 +3,10 @@ pub struct ConnectEvent;
 
 use std::sync::atomic::Ordering;
 
-use crate::{
-    ipc::pipe::PipeServerImpl,
-    messages::events::{
-        event::{EventContext, OnEvent},
-        server::ReadyEvent,
-    },
-    protocol::msgpack::MsgPack,
-};
+use crate::ipc::pipe::PipeServerImpl;
+use crate::messages::events::event::{EventContext, OnEvent};
+use crate::messages::events::server::ReadyEvent;
+use crate::protocol::msgpack::MsgPack;
 
 impl OnEvent for ConnectEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {

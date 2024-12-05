@@ -1,7 +1,5 @@
-use crate::{
-    messages::events::event::{EventContext, OnEvent},
-    presence::packet::Packet,
-};
+use crate::messages::events::event::{EventContext, OnEvent};
+use crate::presence::packet::Packet;
 
 #[derive(Debug, Default)]
 pub struct DisconnectEvent;

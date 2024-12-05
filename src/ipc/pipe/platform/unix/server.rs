@@ -6,13 +6,12 @@ use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
+use super::client::PipeClient;
 use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 use crate::session::SessionManager;
 use crate::{client_event, local_event};
-
-use super::client::PipeClient;
 
 pub struct PipeServer {
     session_manager: Arc<SessionManager>,
@@ -25,7 +24,11 @@ pub struct PipeServer {
 }
 
 impl PipeServerImpl for PipeServer {
-    fn new(pipe_name: &str, tx: Sender<Message>, session_manager: Arc<SessionManager>) -> Self {
+    fn new(
+        pipe_name: &str,
+        tx: Sender<Message>,
+        session_manager: Arc<SessionManager>,
+    ) -> Self {
         Self {
             session_manager,
             pipe_name: pipe_name.to_string(),
@@ -66,15 +69,21 @@ impl PipeServerImpl for PipeServer {
 
                 match listener.accept() {
                     Ok((stream, _)) => {
-                        let client_id = next_client_id.fetch_add(1, Ordering::SeqCst);
-                        let mut client = PipeClient::new(client_id, stream, tx.clone());
+                        let client_id =
+                            next_client_id.fetch_add(1, Ordering::SeqCst);
+                        let mut client =
+                            PipeClient::new(client_id, stream, tx.clone());
                         client.start_read_thread().ok();
                         session_manager.create_session(client_id, client);
                         tx.send(client_event!(client_id, Connect)).ok();
                     }
                     Err(e) => {
-                        tx.send(local_event!(0, Error, ErrorEvent::new(Box::new(e))))
-                            .ok();
+                        tx.send(local_event!(
+                            0,
+                            Error,
+                            ErrorEvent::new(Box::new(e))
+                        ))
+                        .ok();
                     }
                 }
             }

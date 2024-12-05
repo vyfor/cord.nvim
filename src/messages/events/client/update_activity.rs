@@ -28,7 +28,9 @@ impl OnEvent for UpdateActivityEvent {
             .then_some(
                 sessions
                     .iter()
-                    .filter(|s| s.1.last_activity.as_ref().is_some_and(|a| !a.is_idle))
+                    .filter(|s| {
+                        s.1.last_activity.as_ref().is_some_and(|a| !a.is_idle)
+                    })
                     .max_by_key(|s| s.1.last_updated)
                     .and_then(|(_, s)| s.last_activity.as_ref()),
             )

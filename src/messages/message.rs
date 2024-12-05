@@ -34,7 +34,9 @@ macro_rules! client_event {
         $crate::messages::message::Message::new(
             $id,
             $crate::messages::events::event::Event::Client(
-                $crate::messages::events::client::ClientEvent::$type(Default::default()),
+                $crate::messages::events::client::ClientEvent::$type(
+                    Default::default(),
+                ),
             ),
         )
     };
@@ -59,7 +61,9 @@ macro_rules! local_event {
         $crate::messages::message::Message::new(
             $id,
             $crate::messages::events::event::Event::Local(
-                $crate::messages::events::local::LocalEvent::$type(Default::default()),
+                $crate::messages::events::local::LocalEvent::$type(
+                    Default::default(),
+                ),
             ),
         )
     };
@@ -84,7 +88,9 @@ macro_rules! server_event {
         $crate::messages::message::Message::new(
             $id,
             $crate::messages::events::event::Event::Server(
-                $crate::messages::events::server::ServerEvent::$type(Default::default()),
+                $crate::messages::events::server::ServerEvent::$type(
+                    Default::default(),
+                ),
             ),
         )
     };

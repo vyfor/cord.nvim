@@ -1,11 +1,6 @@
-use crate::{
-    get_field_or_none,
-    protocol::{
-        json,
-        msgpack::{self, Value},
-    },
-    remove_field, remove_field_or_none,
-};
+use crate::protocol::json;
+use crate::protocol::msgpack::{self, Value};
+use crate::{get_field_or_none, remove_field, remove_field_or_none};
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Activity {
@@ -61,7 +56,9 @@ impl json::Serialize for Activity {
                 json::ValueRef::Array(
                     self.buttons
                         .iter()
-                        .map(|b| json::ValueRef::Object(b as &dyn json::Serialize))
+                        .map(|b| {
+                            json::ValueRef::Object(b as &dyn json::Serialize)
+                        })
                         .collect(),
                 ),
                 state,
@@ -129,20 +126,25 @@ impl msgpack::Deserialize for Activity {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
         let mut input = input.take_map().ok_or("Invalid activity")?;
 
-        let details = remove_field_or_none!(input, "details", |v| v.take_string());
+        let details =
+            remove_field_or_none!(input, "details", |v| v.take_string());
         let state = remove_field_or_none!(input, "state", |v| v.take_string());
-        let assets =
-            remove_field_or_none!(input, "assets", |v| ActivityAssets::deserialize(v).ok());
-        let timestamps =
-            remove_field_or_none!(input, "timestamps", |v| ActivityTimestamps::deserialize(v)
-                .ok());
-        let buttons = remove_field_or_none!(input, "buttons", |v| v.take_array().map(|v| v
-            .into_iter()
-            .map(ActivityButton::deserialize)
-            .filter_map(Result::ok)
-            .collect()))
+        let assets = remove_field_or_none!(input, "assets", |v| {
+            ActivityAssets::deserialize(v).ok()
+        });
+        let timestamps = remove_field_or_none!(input, "timestamps", |v| {
+            ActivityTimestamps::deserialize(v).ok()
+        });
+        let buttons = remove_field_or_none!(input, "buttons", |v| v
+            .take_array()
+            .map(|v| v
+                .into_iter()
+                .map(ActivityButton::deserialize)
+                .filter_map(Result::ok)
+                .collect()))
         .unwrap_or_default();
-        let is_idle = get_field_or_none!(input, "is_idle", |v| v.as_bool()).unwrap_or_default();
+        let is_idle = get_field_or_none!(input, "is_idle", |v| v.as_bool())
+            .unwrap_or_default();
 
         Ok(Activity {
             details,
@@ -159,10 +161,14 @@ impl msgpack::Deserialize for ActivityAssets {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
         let mut input = input.take_map().ok_or("Invalid activity assets")?;
 
-        let large_image = remove_field_or_none!(input, "large_image", |v| v.take_string());
-        let large_text = remove_field_or_none!(input, "large_text", |v| v.take_string());
-        let small_image = remove_field_or_none!(input, "small_image", |v| v.take_string());
-        let small_text = remove_field_or_none!(input, "small_text", |v| v.take_string());
+        let large_image =
+            remove_field_or_none!(input, "large_image", |v| v.take_string());
+        let large_text =
+            remove_field_or_none!(input, "large_text", |v| v.take_string());
+        let small_image =
+            remove_field_or_none!(input, "small_image", |v| v.take_string());
+        let small_text =
+            remove_field_or_none!(input, "small_text", |v| v.take_string());
 
         Ok(ActivityAssets {
             large_image,
@@ -175,7 +181,8 @@ impl msgpack::Deserialize for ActivityAssets {
 
 impl msgpack::Deserialize for ActivityTimestamps {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
-        let mut input = input.take_map().ok_or("Invalid activity timestamps")?;
+        let mut input =
+            input.take_map().ok_or("Invalid activity timestamps")?;
 
         let start = remove_field_or_none!(input, "start", |v| v.as_uinteger());
         let end = remove_field_or_none!(input, "end", |v| v.as_uinteger());

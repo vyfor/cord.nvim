@@ -6,11 +6,9 @@ pub struct LogEvent {
 
 use std::collections::HashMap;
 
-use crate::{
-    messages::events::event::{EventContext, OnEvent},
-    protocol::msgpack::{Serialize, ValueRef},
-    util::logger::LogLevel,
-};
+use crate::messages::events::event::{EventContext, OnEvent};
+use crate::protocol::msgpack::{Serialize, ValueRef};
+use crate::util::logger::LogLevel;
 
 impl OnEvent for LogEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {

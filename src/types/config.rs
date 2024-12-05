@@ -1,10 +1,9 @@
 #![allow(dead_code)]
 
-use crate::{
-    get_field,
-    protocol::msgpack::{deserialize::Deserialize, Value},
-    util::logger::LogLevel,
-};
+use crate::get_field;
+use crate::protocol::msgpack::deserialize::Deserialize;
+use crate::protocol::msgpack::Value;
+use crate::util::logger::LogLevel;
 
 #[derive(Debug, Clone)]
 pub struct PluginConfig {

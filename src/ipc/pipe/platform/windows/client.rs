@@ -5,7 +5,9 @@ use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
-use super::{GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING};
+use super::{
+    GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING,
+};
 use crate::ipc::pipe::{report_error, PipeClientImpl};
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
@@ -56,7 +58,13 @@ impl PipeClientImpl for PipeClient {
                 }
 
                 let mut bytes_transferred = 0;
-                if GetOverlappedResult(handle, &mut overlapped, &mut bytes_transferred, 1) == 0 {
+                if GetOverlappedResult(
+                    handle,
+                    &mut overlapped,
+                    &mut bytes_transferred,
+                    1,
+                ) == 0
+                {
                     return Err(io::Error::last_os_error());
                 }
 
@@ -91,7 +99,9 @@ impl PipeClientImpl for PipeClient {
 
                         if read_result == 0 {
                             let error = io::Error::last_os_error();
-                            if error.raw_os_error() != Some(ERROR_IO_PENDING as i32) {
+                            if error.raw_os_error()
+                                != Some(ERROR_IO_PENDING as i32)
+                            {
                                 report_error(id, &tx, error);
                                 break;
                             }
@@ -113,15 +123,24 @@ impl PipeClientImpl for PipeClient {
                             break;
                         }
 
-                        match ClientEvent::deserialize(&buf[..bytes_read as usize]) {
+                        match ClientEvent::deserialize(
+                            &buf[..bytes_read as usize],
+                        ) {
                             Ok(message) => {
-                                tx.send(Message::new(id, Event::Client(message))).ok();
+                                tx.send(Message::new(
+                                    id,
+                                    Event::Client(message),
+                                ))
+                                .ok();
                             }
                             Err(e) => {
                                 tx.send(server_event!(
                                     id,
                                     Log,
-                                    LogEvent::new(e.to_string(), LogLevel::Error)
+                                    LogEvent::new(
+                                        e.to_string(),
+                                        LogLevel::Error
+                                    )
                                 ))
                                 .ok();
                             }

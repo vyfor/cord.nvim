@@ -1,9 +1,9 @@
-use std::{borrow::Cow, sync::mpsc::Sender};
+use std::borrow::Cow;
+use std::sync::mpsc::Sender;
 
-use crate::{
-    messages::{events::server::LogEvent, message::Message},
-    server_event,
-};
+use crate::messages::events::server::LogEvent;
+use crate::messages::message::Message;
+use crate::server_event;
 
 pub struct Logger {
     tx: Sender<Message>,

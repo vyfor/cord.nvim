@@ -5,11 +5,7 @@ pub mod serialize;
 pub mod value;
 
 pub use deserialize::Deserialize;
-pub use serialize::Serialize;
-pub use serialize::SerializeFn;
-pub use serialize::SerializeObj;
-pub use serialize::SerializeState;
-pub use value::Value;
-pub use value::ValueRef;
+pub use serialize::{Serialize, SerializeFn, SerializeObj, SerializeState};
+pub use value::{Value, ValueRef};
 
 pub struct Json;

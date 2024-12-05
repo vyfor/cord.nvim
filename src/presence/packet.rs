@@ -1,6 +1,5 @@
-use crate::protocol::json;
-
 use super::activity::Activity;
+use crate::protocol::json;
 
 pub struct Packet<'a> {
     pub cmd: &'a str,

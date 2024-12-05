@@ -75,7 +75,8 @@ impl Args {
         }
 
         Ok(Args {
-            pipe_name: pipe_name.unwrap_or_else(|| DEFAULT_PIPE_NAME.to_string()),
+            pipe_name: pipe_name
+                .unwrap_or_else(|| DEFAULT_PIPE_NAME.to_string()),
             client_id: client_id.ok_or(CliError::Missing("--client-id"))?,
             timeout: timeout.unwrap_or(DEFAULT_TIMEOUT),
         })

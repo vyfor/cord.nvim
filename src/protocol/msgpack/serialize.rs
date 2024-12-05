@@ -1,13 +1,15 @@
 #![allow(dead_code)]
 
+use super::value::ValueRef;
 use super::{
-    value::ValueRef, MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_VALUE, FIXMAP_SIZE_MASK,
-    FIXMAP_VALUE, FIXSTR_VALUE, FLOAT64, INT64, MAP16, MAP32, NIL, STR16, STR32, TRUE, UINT16,
-    UINT32, UINT64, UINT8,
+    MsgPack, ARRAY16, ARRAY32, FALSE, FIXARRAY_VALUE, FIXMAP_SIZE_MASK,
+    FIXMAP_VALUE, FIXSTR_VALUE, FLOAT64, INT64, MAP16, MAP32, NIL, STR16,
+    STR32, TRUE, UINT16, UINT32, UINT64, UINT8,
 };
 use crate::protocol::error::ProtocolError;
 
-pub type SerializeFn<'a> = fn(&'a str, ValueRef<'a>, &mut SerializeState) -> crate::Result<()>;
+pub type SerializeFn<'a> =
+    fn(&'a str, ValueRef<'a>, &mut SerializeState) -> crate::Result<()>;
 
 /// Trait for serializing Rust types into MsgPack data.
 ///
@@ -25,8 +27,11 @@ pub trait Serialize {
     /// # Returns
     ///
     /// A result indicating success or failure of the serialization process.
-    fn serialize<'a>(&'a self, f: SerializeFn<'a>, state: &mut SerializeState)
-        -> crate::Result<()>;
+    fn serialize<'a>(
+        &'a self,
+        f: SerializeFn<'a>,
+        state: &mut SerializeState,
+    ) -> crate::Result<()>;
 }
 
 pub trait SerializeObj: Serialize + std::fmt::Debug {}
@@ -134,7 +139,10 @@ impl MsgPack {
         Ok(())
     }
 
-    fn write_value(value: &ValueRef, state: &mut SerializeState) -> crate::Result<()> {
+    fn write_value(
+        value: &ValueRef,
+        state: &mut SerializeState,
+    ) -> crate::Result<()> {
         match value {
             ValueRef::Nil => {
                 state.write_u8(NIL);
@@ -230,7 +238,11 @@ impl MsgPack {
         }
     }
 
-    fn write_kv(key: &str, value: &ValueRef, state: &mut SerializeState) -> crate::Result<()> {
+    fn write_kv(
+        key: &str,
+        value: &ValueRef,
+        state: &mut SerializeState,
+    ) -> crate::Result<()> {
         Self::write_str(key, state)?;
         Self::write_value(value, state)
     }

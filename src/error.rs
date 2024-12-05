@@ -1,8 +1,7 @@
 use std::error::Error;
-use std::fmt;
-use std::io;
 use std::num::ParseIntError;
 use std::string::ParseError;
+use std::{fmt, io};
 
 use crate::cli::error::CliError;
 use crate::protocol::error::ProtocolError;

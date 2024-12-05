@@ -1,11 +1,9 @@
 #![allow(clippy::large_enum_variant)]
 
-use crate::{
-    messages::events::event::{EventContext, OnEvent},
-    presence::activity::Activity,
-    protocol::msgpack::{Deserialize, MsgPack},
-    types::config::PluginConfig,
-};
+use crate::messages::events::event::{EventContext, OnEvent};
+use crate::presence::activity::Activity;
+use crate::protocol::msgpack::{Deserialize, MsgPack};
+use crate::types::config::PluginConfig;
 
 pub mod clear_activity;
 pub mod connect;
@@ -57,12 +55,12 @@ impl ClientEvent {
 
         Ok(match ty {
             "connect" => Self::Connect(ConnectEvent),
-            "initialize" => {
-                Self::Initialize(InitializeEvent::new(PluginConfig::deserialize(data!(map))?))
-            }
-            "update_activity" => {
-                Self::UpdateActivity(UpdateActivityEvent::new(Activity::deserialize(data!(map))?))
-            }
+            "initialize" => Self::Initialize(InitializeEvent::new(
+                PluginConfig::deserialize(data!(map))?,
+            )),
+            "update_activity" => Self::UpdateActivity(
+                UpdateActivityEvent::new(Activity::deserialize(data!(map))?),
+            ),
             "clear_activity" => Self::ClearActivity(ClearActivityEvent),
             "disconnect" => Self::Disconnect(DisconnectEvent),
             _ => return Err(format!("Unknown message type: {}", ty).into()),

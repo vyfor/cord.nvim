@@ -1,8 +1,9 @@
+use std::io::{Read, Write};
+use std::sync::atomic::AtomicBool;
+
 use crate::ipc::discord::utils;
 use crate::presence::packet::Packet;
 use crate::protocol::json::Json;
-use std::io::{Read, Write};
-use std::sync::atomic::AtomicBool;
 
 /// Manages the connection to Discord for sending and receiving data.
 ///
@@ -37,7 +38,8 @@ impl RichClient {
             .map_or(Err("Pipe not found".into()), |mut pipe| {
                 let payload = match data {
                     Some(packet) => {
-                        let mut payload = utils::encode(opcode, packet.len() as u32);
+                        let mut payload =
+                            utils::encode(opcode, packet.len() as u32);
                         payload.extend_from_slice(packet);
                         payload
                     }
@@ -67,7 +69,10 @@ impl RichClient {
     pub fn handshake(&self) -> crate::Result<()> {
         self.write(
             0,
-            Some(format!("{{\"v\": 1,\"client_id\":\"{}\"}}", self.client_id).as_bytes()),
+            Some(
+                format!("{{\"v\": 1,\"client_id\":\"{}\"}}", self.client_id)
+                    .as_bytes(),
+            ),
         )
     }
 

@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use std::str::from_utf8_unchecked;
 
-use super::{value::Value, Json};
+use super::value::Value;
+use super::Json;
 use crate::protocol::error::ProtocolError;
 
 /// Trait for deserializing JSON data into Rust types.
@@ -19,14 +20,21 @@ pub trait Deserialize: Sized {
     /// # Returns
     ///
     /// A result containing the deserialized Rust type or an error.
-    fn deserialize<'a>(input: &HashMap<&'a str, Value<'a>>) -> crate::Result<Self>;
+    fn deserialize<'a>(
+        input: &HashMap<&'a str, Value<'a>>,
+    ) -> crate::Result<Self>;
 }
 
 impl Json {
     pub fn deserialize(input: &str) -> crate::Result<HashMap<&str, Value>> {
         let input = input.trim().as_bytes();
-        if input.is_empty() || input[0] != b'{' || input[input.len() - 1] != b'}' {
-            return Err(ProtocolError::InvalidSyntax("Invalid JSON object").into());
+        if input.is_empty()
+            || input[0] != b'{'
+            || input[input.len() - 1] != b'}'
+        {
+            return Err(
+                ProtocolError::InvalidSyntax("Invalid JSON object").into()
+            );
         }
 
         let (value, _) = Self::parse_object(input, 1)?;
@@ -44,7 +52,10 @@ impl Json {
         pos
     }
 
-    fn parse_string_slice(input: &[u8], mut pos: usize) -> crate::Result<(&str, usize)> {
+    fn parse_string_slice(
+        input: &[u8],
+        mut pos: usize,
+    ) -> crate::Result<(&str, usize)> {
         let start = pos;
         while pos < input.len() {
             match input[pos] {
@@ -61,7 +72,10 @@ impl Json {
         Err(ProtocolError::UnexpectedEnd.into())
     }
 
-    fn parse_value(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
+    fn parse_value(
+        input: &[u8],
+        start: usize,
+    ) -> crate::Result<(Value<'_>, usize)> {
         let pos = Self::skip_whitespace(input, start);
         if pos >= input.len() {
             return Err(ProtocolError::UnexpectedEnd.into());
@@ -82,7 +96,10 @@ impl Json {
         }
     }
 
-    fn parse_array(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
+    fn parse_array(
+        input: &[u8],
+        start: usize,
+    ) -> crate::Result<(Value<'_>, usize)> {
         let mut pos = start;
         let mut values = Vec::new();
         let mut expecting_value = true;
@@ -94,7 +111,9 @@ impl Json {
             }
 
             match input[pos] {
-                b']' if !expecting_value => return Ok((Value::Array(values), pos + 1)),
+                b']' if !expecting_value => {
+                    return Ok((Value::Array(values), pos + 1))
+                }
                 b',' if !expecting_value => {
                     pos += 1;
                     expecting_value = true;
@@ -105,13 +124,18 @@ impl Json {
                     pos = new_pos;
                     expecting_value = false;
                 }
-                c => return Err(ProtocolError::UnexpectedChar(c as char).into()),
+                c => {
+                    return Err(ProtocolError::UnexpectedChar(c as char).into())
+                }
             }
         }
         Err(ProtocolError::UnexpectedEnd.into())
     }
 
-    fn parse_object(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
+    fn parse_object(
+        input: &[u8],
+        start: usize,
+    ) -> crate::Result<(Value<'_>, usize)> {
         let mut pos = start;
         let mut map = HashMap::new();
         let mut expecting_key = true;
@@ -123,16 +147,22 @@ impl Json {
             }
 
             match input[pos] {
-                b'}' if !expecting_key => return Ok((Value::Object(map), pos + 1)),
+                b'}' if !expecting_key => {
+                    return Ok((Value::Object(map), pos + 1))
+                }
                 b',' if !expecting_key => {
                     pos += 1;
                     expecting_key = true;
                 }
                 b'"' if expecting_key => {
-                    let (key, new_pos) = Self::parse_string_slice(input, pos + 1)?;
+                    let (key, new_pos) =
+                        Self::parse_string_slice(input, pos + 1)?;
                     pos = Self::skip_whitespace(input, new_pos);
                     if pos >= input.len() || input[pos] != b':' {
-                        return Err(ProtocolError::InvalidSyntax("Expected ':' after key").into());
+                        return Err(ProtocolError::InvalidSyntax(
+                            "Expected ':' after key",
+                        )
+                        .into());
                     }
                     pos = Self::skip_whitespace(input, pos + 1);
                     let (value, new_pos) = Self::parse_value(input, pos)?;
@@ -140,13 +170,18 @@ impl Json {
                     pos = new_pos;
                     expecting_key = false;
                 }
-                c => return Err(ProtocolError::UnexpectedChar(c as char).into()),
+                c => {
+                    return Err(ProtocolError::UnexpectedChar(c as char).into())
+                }
             }
         }
         Err(ProtocolError::UnexpectedEnd.into())
     }
 
-    fn parse_true(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
+    fn parse_true(
+        input: &[u8],
+        start: usize,
+    ) -> crate::Result<(Value<'_>, usize)> {
         if input.len() >= start + 4 && &input[start..start + 4] == b"true" {
             Ok((Value::Bool(true), start + 4))
         } else {
@@ -154,7 +189,10 @@ impl Json {
         }
     }
 
-    fn parse_false(input: &[u8], start: usize) -> crate::Result<(Value, usize)> {
+    fn parse_false(
+        input: &[u8],
+        start: usize,
+    ) -> crate::Result<(Value, usize)> {
         if input.len() >= start + 5 && &input[start..start + 5] == b"false" {
             Ok((Value::Bool(false), start + 5))
         } else {
@@ -162,7 +200,10 @@ impl Json {
         }
     }
 
-    fn parse_null(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
+    fn parse_null(
+        input: &[u8],
+        start: usize,
+    ) -> crate::Result<(Value<'_>, usize)> {
         if input.len() >= start + 4 && &input[start..start + 4] == b"null" {
             Ok((Value::Null, start + 4))
         } else {
@@ -170,7 +211,10 @@ impl Json {
         }
     }
 
-    fn parse_number(input: &[u8], start: usize) -> crate::Result<(Value<'_>, usize)> {
+    fn parse_number(
+        input: &[u8],
+        start: usize,
+    ) -> crate::Result<(Value<'_>, usize)> {
         let mut pos = start;
         let mut num_str = Vec::new();
 
@@ -187,7 +231,10 @@ impl Json {
                 }
                 b'.' => {
                     if num_str.contains(&b'.') {
-                        return Err(ProtocolError::InvalidSyntax("Multiple decimal points").into());
+                        return Err(ProtocolError::InvalidSyntax(
+                            "Multiple decimal points",
+                        )
+                        .into());
                     }
                     num_str.push(b'.');
                     pos += 1;
@@ -195,7 +242,9 @@ impl Json {
                 b'e' | b'E' => {
                     num_str.push(b'e');
                     pos += 1;
-                    if pos < input.len() && (input[pos] == b'+' || input[pos] == b'-') {
+                    if pos < input.len()
+                        && (input[pos] == b'+' || input[pos] == b'-')
+                    {
                         num_str.push(input[pos]);
                         pos += 1;
                     }
@@ -207,14 +256,19 @@ impl Json {
                 {
                     break;
                 }
-                c => return Err(ProtocolError::UnexpectedChar(c as char).into()),
+                c => {
+                    return Err(ProtocolError::UnexpectedChar(c as char).into())
+                }
             }
         }
 
         let num_str = unsafe { from_utf8_unchecked(&num_str) };
         match num_str.parse::<f64>() {
             Ok(num) => Ok((Value::Number(num), pos)),
-            Err(_) => Err(ProtocolError::InvalidSyntax("Invalid number format").into()),
+            Err(_) => {
+                Err(ProtocolError::InvalidSyntax("Invalid number format")
+                    .into())
+            }
         }
     }
 }
