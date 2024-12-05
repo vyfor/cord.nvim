@@ -1,3 +1,5 @@
+#![allow(clippy::large_enum_variant)]
+
 use crate::{
     messages::events::event::{EventContext, OnEvent},
     presence::activity::Activity,
