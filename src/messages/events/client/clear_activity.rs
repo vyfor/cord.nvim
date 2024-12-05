@@ -12,7 +12,12 @@ impl OnEvent for ClearActivityEvent {
         let latest = sessions
             .iter()
             .filter(|s| s.1.last_activity.is_some())
-            .max_by_key(|s| s.1.last_updated);
+            .max_by_key(|s| {
+                (
+                    s.1.last_activity.as_ref().is_some_and(|a| !a.is_idle),
+                    s.1.last_updated,
+                )
+            });
 
         if let Some((_, session)) = latest {
             ctx.cord.rich_client.update(&Packet::new(

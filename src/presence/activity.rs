@@ -1,4 +1,5 @@
 use crate::{
+    get_field_or_none,
     protocol::{
         json,
         msgpack::{self, Value},
@@ -13,6 +14,7 @@ pub struct Activity {
     pub assets: Option<ActivityAssets>,
     pub timestamps: Option<ActivityTimestamps>,
     pub buttons: Vec<ActivityButton>,
+    pub is_idle: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -140,6 +142,7 @@ impl msgpack::Deserialize for Activity {
             .filter_map(Result::ok)
             .collect()))
         .unwrap_or_default();
+        let is_idle = get_field_or_none!(input, "is_idle", |v| v.as_bool()).unwrap_or_default();
 
         Ok(Activity {
             details,
@@ -147,6 +150,7 @@ impl msgpack::Deserialize for Activity {
             assets,
             timestamps,
             buttons,
+            is_idle,
         })
     }
 }
