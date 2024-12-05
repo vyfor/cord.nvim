@@ -215,8 +215,8 @@ end
 function ActivityManager:on_buf_enter()
   local new_workspace_dir = vim.fn.expand '%:p:h'
   if new_workspace_dir ~= self.workspace_dir then
-    self.workspace_dir = new_workspace_dir
-    self.workspace_name = ws_utils.find(self.workspace_dir)
+    self.workspace_dir = ws_utils.find(new_workspace_dir)
+    self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
     if self.config.hooks.on_workspace_change then
       local opts = self.last_opts
       opts.workspace_dir = self.workspace_dir
@@ -241,8 +241,8 @@ end
 function ActivityManager:on_dir_changed()
   local new_workspace_dir = vim.fn.expand '%:p:h'
   if new_workspace_dir ~= self.workspace_dir then
-    self.workspace_dir = new_workspace_dir
-    self.workspace_name = ws_utils.find(self.workspace_dir)
+    self.workspace_dir = ws_utils.find(new_workspace_dir)
+    self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
     self:queue_update()
   end
 end
