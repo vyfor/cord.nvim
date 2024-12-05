@@ -224,6 +224,8 @@ function ActivityManager:resume()
   end
 end
 
+function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
+
 function ActivityManager:should_update_time()
   return self.config.display.show_time
     and (

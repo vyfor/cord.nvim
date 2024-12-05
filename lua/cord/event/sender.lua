@@ -25,7 +25,7 @@ function Producer:update_activity(activity)
   self:send_event('update_activity', activity)
 end
 
-function Producer:clear_activity() self:send_event 'clear_activity' end
+function Producer:clear_activity(force) self:send_event('clear_activity', force) end
 
 function Producer:disconnect() self:send_event 'disconnect' end
 

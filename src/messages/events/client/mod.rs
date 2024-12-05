@@ -61,7 +61,9 @@ impl ClientEvent {
             "update_activity" => Self::UpdateActivity(
                 UpdateActivityEvent::new(Activity::deserialize(data!(map))?),
             ),
-            "clear_activity" => Self::ClearActivity(ClearActivityEvent),
+            "clear_activity" => Self::ClearActivity(
+                ClearActivityEvent::deserialize(data!(map))?,
+            ),
             "disconnect" => Self::Disconnect(DisconnectEvent),
             _ => return Err(format!("Unknown message type: {}", ty).into()),
         })
