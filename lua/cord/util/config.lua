@@ -86,18 +86,23 @@ function M:validate(user_config)
     local client = constants.CLIENT_IDS[config.editor.client]
 
     if not client then
+      if config.editor.client:match '^%d+$' then
+        config.is_custom_client = true
+        if not config.editor.icon then
+          config.editor.icon = utils.get_asset('editor', 'neovim')
+        end
+        goto continue
+      end
+
       logger.error('Unknown client: ' .. config.editor.client)
       return false
     end
 
     config.editor.client = client.id
     config.editor.icon = utils.get_asset('editor', client.icon)
-  else
-    config.is_custom_client = true
-    if not config.editor.icon then
-      config.editor.icon = utils.get_asset('editor', 'neovim')
-    end
   end
+
+  ::continue::
 
   self.values = config
 
