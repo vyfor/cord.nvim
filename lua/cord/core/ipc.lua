@@ -28,9 +28,11 @@ function IPC:connect(callback)
     vim.schedule_wrap(function(err)
       if err then
         if err == 'ENOENT' then
-          spawn.spawn_server(self.config, self.path, function()
-            self:connect(callback)
-          end)
+          spawn.spawn_server(
+            self.config,
+            self.path,
+            function() self:connect(callback) end
+          )
           return
         else
           logger.error('Failed to connect to pipe: ' .. err)
@@ -80,12 +82,16 @@ function IPC:write(data, callback)
   return true
 end
 
+function IPC:on_close(callback) self.on_close_cb = callback end
+
 function IPC:close()
   if self.pipe then
     logger.debug 'Connection closed'
     self.pipe:read_stop()
     self.pipe:close()
     self.pipe = nil
+
+    if self.on_close_cb then self.on_close_cb() end
   end
 end
 

@@ -25,6 +25,15 @@ function M.setup(opts)
       M.producer:initialize(config.values)
       M.manager =
         ActivityManager.new { tx = M.producer, config = config.values }
+
+      client:on_close(function()
+        if config.values.hooks.on_disconnect then
+          config.values.hooks.on_disconnect()
+        end
+
+        M.manager:pause()
+      end)
+
       M.manager:run()
     end)
 
