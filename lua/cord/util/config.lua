@@ -44,10 +44,6 @@ M.values = {
     editing = function(opts)
       return 'Editing '
         .. (opts.filename ~= '' and opts.filename or 'a new file')
-        .. ':'
-        .. opts.cursor_line
-        .. ':'
-        .. opts.cursor_char
     end,
     file_browser = function(opts) return 'Browsing files in ' .. opts.tooltip end,
     plugin_manager = function(opts)
