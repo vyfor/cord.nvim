@@ -15,6 +15,10 @@ function ActivityManager.new(opts)
   self.workspace_dir = ws_utils.find(vim.fn.expand '%:p:h')
   self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.is_focused = true
+  self.is_paused = false
+  self.is_force_idle = false
+  self.last_activity = nil
+  self.last_opts = nil
 
   if config_utils:contains_git_url() then
     self.git_url = ws_utils.find_git_repository(self.workspace_dir)
@@ -31,11 +35,11 @@ function ActivityManager.new(opts)
   return self
 end
 
-function ActivityManager:queue_update()
-  vim.schedule(function() self:process_update() end)
+function ActivityManager:queue_update(force_update)
+  vim.schedule(function() self:process_update(force_update) end)
 end
 
-function ActivityManager:process_update()
+function ActivityManager:process_update(force_update)
   local cursor_position = vim.api.nvim_win_get_cursor(0)
   local buttons = config_utils:get_buttons()
 
@@ -55,7 +59,7 @@ function ActivityManager:process_update()
     is_idle = self.is_idle,
   }
 
-  if self:should_update(opts) then
+  if not self.is_force_idle and (force_update or self:should_update(opts)) then
     self:update_activity(opts)
   elseif not self.is_idle then
     self:check_idle(opts)
@@ -88,16 +92,17 @@ function ActivityManager:run()
   end
 
   self:setup_autocmds()
-  self:queue_update()
+  if self.config.usercmds then self:setup_usercmds() end
+  self:queue_update(true)
 end
 
 function ActivityManager:check_idle(opts)
-  if not self.config.idle.enable and not self.force_idle then return end
+  if not self.config.idle.enable and not self.is_force_idle then return end
   if self.is_idle then return end
 
   local time_elapsed = uv.now() - self.last_updated
   if
-    self.force_idle
+    self.is_force_idle
     or (
       time_elapsed > self.config.idle.timeout
       and (self.config.idle.ignore_focus or not self.is_focused)
@@ -128,7 +133,7 @@ function ActivityManager:update_activity(opts)
   if self:should_update_time() then self.timestamp = os.time() end
 
   self.is_idle = false
-  self.force_idle = false
+  self.is_force_idle = false
   self.last_opts = opts
   self.last_updated = uv.now()
 
@@ -147,6 +152,7 @@ function ActivityManager:pause()
     augroup END
   ]]
   if self.idle_timer then self.idle_timer:stop() end
+  self.is_paused = true
 end
 
 function ActivityManager:resume()
@@ -158,16 +164,52 @@ function ActivityManager:resume()
       vim.schedule_wrap(function() self:check_idle() end)
     )
   end
+  self.is_paused = false
 end
 
-function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
+function ActivityManager:hide()
+  self:pause()
+  self:clear_activity()
+end
 
-function ActivityManager:should_update_time()
-  return self.config.display.show_time
-    and (
-      self.config.timestamp.reset_on_change
-      or self.config.timestamp.reset_on_idle and self.is_idle
-    )
+function ActivityManager:toggle()
+  if self.is_paused then
+    self:resume()
+  else
+    self:hide()
+  end
+end
+
+function ActivityManager:force_idle()
+  self.is_force_idle = true
+  self:queue_update()
+end
+
+function ActivityManager:unforce_idle()
+  self.is_force_idle = false
+  self:queue_update(true)
+end
+
+function ActivityManager:toggle_idle()
+  if self.is_force_idle then
+    self:unforce_idle()
+  else
+    self:force_idle()
+  end
+end
+
+function ActivityManager:setup_usercmds()
+  if not self.config.usercmds then return end
+
+  vim.cmd [[
+    command! CordShowPresence lua require'cord'.manager:resume()
+    command! CordHidePresence lua require'cord'.manager:hide()
+    command! CordTogglePresence lua require'cord'.manager:toggle()
+    command! CordIdle lua require'cord'.manager:force_idle()
+    command! CordUnidle lua require'cord'.manager:unforce_idle()
+    command! CordToggleIdle lua require'cord'.manager:toggle_idle()
+    command! -bang CordClearPresence lua require'cord'.manager:clear_activity('<bang>' == '!')
+  ]]
 end
 
 function ActivityManager:on_buf_enter()
@@ -210,6 +252,7 @@ function ActivityManager:on_cursor_update() self:queue_update() end
 function ActivityManager:setup_autocmds()
   vim.cmd [[
     augroup CordActivityManager
+      autocmd!
       autocmd BufEnter * lua require'cord'.manager:on_buf_enter()
       autocmd FocusGained * lua require'cord'.manager:on_focus_gained()
       autocmd FocusLost * lua require'cord'.manager:on_focus_lost()
@@ -231,7 +274,17 @@ function ActivityManager:setup_autocmds()
     ]]
   end
 
-  self:queue_update()
+  self:queue_update(true)
+end
+
+function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
+
+function ActivityManager:should_update_time()
+  return self.config.display.show_time
+    and (
+      self.config.timestamp.reset_on_change
+      or self.config.timestamp.reset_on_idle and self.is_idle
+    )
 end
 
 return ActivityManager

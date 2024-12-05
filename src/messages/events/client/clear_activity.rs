@@ -15,7 +15,9 @@ impl OnEvent for ClearActivityEvent {
             let sessions = ctx.cord.session_manager.sessions.read().unwrap();
             let latest = sessions
                 .iter()
-                .filter(|s| s.1.last_activity.is_some())
+                .filter(|s| {
+                    s.0 != &ctx.client_id && s.1.last_activity.is_some()
+                })
                 .max_by_key(|s| {
                     (
                         s.1.last_activity.as_ref().is_some_and(|a| !a.is_idle),

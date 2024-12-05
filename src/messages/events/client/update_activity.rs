@@ -29,7 +29,11 @@ impl OnEvent for UpdateActivityEvent {
                 sessions
                     .iter()
                     .filter(|s| {
-                        s.1.last_activity.as_ref().is_some_and(|a| !a.is_idle)
+                        s.0 != &ctx.client_id
+                            && s.1
+                                .last_activity
+                                .as_ref()
+                                .is_some_and(|a| !a.is_idle)
                     })
                     .max_by_key(|s| s.1.last_updated)
                     .and_then(|(_, s)| s.last_activity.as_ref()),
