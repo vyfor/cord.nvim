@@ -17,6 +17,7 @@ function ActivityManager.new(opts)
   self.is_focused = true
   self.is_paused = false
   self.is_force_idle = false
+  self.events_enabled = true
   self.last_activity = nil
   self.last_opts = nil
 
@@ -36,34 +37,35 @@ function ActivityManager.new(opts)
 end
 
 function ActivityManager:queue_update(force_update)
-  vim.schedule(function() self:process_update(force_update) end)
-end
+  if not self.events_enabled then return end
+  vim.schedule(function()
+    local cursor_position = vim.api.nvim_win_get_cursor(0)
+    local buttons = config_utils:get_buttons()
 
-function ActivityManager:process_update(force_update)
-  local cursor_position = vim.api.nvim_win_get_cursor(0)
-  local buttons = config_utils:get_buttons()
+    local opts = {
+      manager = self,
+      filename = vim.fn.expand '%:t',
+      filetype = vim.bo.filetype,
+      is_read_only = vim.bo.readonly,
+      cursor_line = cursor_position[1],
+      cursor_char = cursor_position[2],
+      timestamp = self.timestamp,
+      buttons = buttons,
+      workspace_dir = self.workspace_dir,
+      workspace_name = self.workspace_name,
+      git_url = self.git_url,
+      is_focused = self.is_focused,
+      is_idle = self.is_idle,
+    }
 
-  local opts = {
-    manager = self,
-    filename = vim.fn.expand '%:t',
-    filetype = vim.bo.filetype,
-    is_read_only = vim.bo.readonly,
-    cursor_line = cursor_position[1],
-    cursor_char = cursor_position[2],
-    timestamp = self.timestamp,
-    buttons = buttons,
-    workspace_dir = self.workspace_dir,
-    workspace_name = self.workspace_name,
-    git_url = self.git_url,
-    is_focused = self.is_focused,
-    is_idle = self.is_idle,
-  }
-
-  if not self.is_force_idle and (force_update or self:should_update(opts)) then
-    self:update_activity(opts)
-  elseif not self.is_idle then
-    self:check_idle(opts)
-  end
+    if
+      not self.is_force_idle and (force_update or self:should_update(opts))
+    then
+      self:update_activity(opts)
+    elseif not self.is_idle then
+      self:check_idle(opts)
+    end
+  end)
 end
 
 function ActivityManager:should_update(opts)
@@ -97,6 +99,7 @@ function ActivityManager:run()
 end
 
 function ActivityManager:check_idle(opts)
+  if not self.events_enabled then return end
   if not self.config.idle.enable and not self.is_force_idle then return end
   if self.is_idle then return end
 
@@ -146,17 +149,13 @@ function ActivityManager:update_activity(opts)
 end
 
 function ActivityManager:pause()
-  vim.cmd [[
-    augroup CordActivityManager
-      autocmd!
-    augroup END
-  ]]
+  self:pause_events()
   if self.idle_timer then self.idle_timer:stop() end
   self.is_paused = true
 end
 
 function ActivityManager:resume()
-  self:setup_autocmds()
+  self:resume_events()
   if self.idle_timer then
     self.idle_timer:start(
       0,
@@ -165,6 +164,13 @@ function ActivityManager:resume()
     )
   end
   self.is_paused = false
+end
+
+function ActivityManager:pause_events() self.events_enabled = false end
+
+function ActivityManager:resume_events()
+  self.events_enabled = true
+  self:queue_update(true)
 end
 
 function ActivityManager:hide()
@@ -217,6 +223,7 @@ function ActivityManager:on_buf_enter()
   if new_workspace_dir ~= self.workspace_dir then
     self.workspace_dir = ws_utils.find(new_workspace_dir)
     self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
+
     if self.config.hooks.on_workspace_change then
       local opts = self.last_opts
       opts.workspace_dir = self.workspace_dir
@@ -229,12 +236,19 @@ function ActivityManager:on_buf_enter()
 end
 
 function ActivityManager:on_focus_gained()
+  if not self.events_enabled then return end
   self.is_focused = true
   self:queue_update()
 end
 
 function ActivityManager:on_focus_lost()
+  if not self.events_enabled then return end
   self.is_focused = false
+  self:queue_update()
+end
+
+function ActivityManager:on_cursor_update()
+  if not self.events_enabled then return end
   self:queue_update()
 end
 
@@ -243,11 +257,17 @@ function ActivityManager:on_dir_changed()
   if new_workspace_dir ~= self.workspace_dir then
     self.workspace_dir = ws_utils.find(new_workspace_dir)
     self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
+
+    if self.config.hooks.on_workspace_change then
+      local opts = self.last_opts
+      opts.workspace_dir = self.workspace_dir
+      opts.workspace_name = self.workspace_name
+      self.config.hooks.on_workspace_change(opts)
+    end
+
     self:queue_update()
   end
 end
-
-function ActivityManager:on_cursor_update() self:queue_update() end
 
 function ActivityManager:setup_autocmds()
   vim.cmd [[
@@ -277,7 +297,17 @@ function ActivityManager:setup_autocmds()
   self:queue_update(true)
 end
 
-function ActivityManager:set_activity(activity) self.tx:update_activity(activity) end
+function ActivityManager:clear_autocmds()
+  vim.cmd [[
+    augroup CordActivityManager
+      autocmd!
+    augroup END
+  ]]
+end
+
+function ActivityManager:set_activity(activity)
+  self.tx:update_activity(activity)
+end
 
 function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
 
