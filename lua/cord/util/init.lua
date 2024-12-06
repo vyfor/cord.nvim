@@ -1,7 +1,9 @@
 local logger = require 'cord.util.logger'
 local constants = require 'cord.util.constants'
 
-local os_name = vim.loop.os_uname().sysname
+local uv = vim.loop or vim.uv
+
+local os_name = uv.os_uname().sysname
 if os_name:find('Windows', 1, true) == 1 then
   os_name = 'Windows'
 elseif os_name:match 'BSD$' then
@@ -9,12 +11,12 @@ elseif os_name:match 'BSD$' then
 end
 
 local function file_exists(filename)
-  local stat = vim.loop.fs_stat(filename)
+  local stat = uv.fs_stat(filename)
   return stat and stat.type == 'file'
 end
 
 local function move_file(src, dest)
-  local result, err = os.rename(src, dest)
+  local result, err = uv.rename(src, dest)
   if not result then logger.error('Error moving file: ' .. err) end
 end
 

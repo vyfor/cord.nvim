@@ -1,6 +1,7 @@
-local uv = vim.loop
 local logger = require 'cord.util.logger'
 local utils = require 'cord.util'
+
+local uv = vim.loop or vim.uv
 
 local M = {}
 

@@ -2,7 +2,7 @@ local activities = require 'cord.activity'
 local ws_utils = require 'cord.util.workspace'
 local config_utils = require 'cord.util.config'
 
-local uv = vim.loop
+local uv = vim.loop or vim.uv
 
 local ActivityManager = {}
 local mt = { __index = ActivityManager }

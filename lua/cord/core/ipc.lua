@@ -1,7 +1,8 @@
-local uv = vim.loop
 local logger = require 'cord.util.logger'
 local utils = require 'cord.util'
 local spawn = require 'cord.core.spawn'
+
+local uv = vim.loop or vim.uv
 
 local IPC = {}
 local mt = { __index = IPC }

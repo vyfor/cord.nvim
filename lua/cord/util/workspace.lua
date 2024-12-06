@@ -1,4 +1,4 @@
-local uv = vim.loop
+local uv = vim.loop or vim.uv
 
 local VCS_MARKERS = {
   '.git',
