@@ -277,6 +277,8 @@ function ActivityManager:setup_autocmds()
   self:queue_update(true)
 end
 
+function ActivityManager:set_activity(activity) self.tx:update_activity(activity) end
+
 function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
 
 function ActivityManager:should_update_time()
