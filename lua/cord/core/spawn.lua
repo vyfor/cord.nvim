@@ -5,6 +5,11 @@ local uv = vim.loop or vim.uv
 
 local M = {}
 
+local function get_plugin_root()
+  local source = debug.getinfo(1, 'S').source:sub(2)
+  return vim.fn.fnamemodify(source, ':h:h:h:h')
+end
+
 function M.spawn_server(config, path, callback)
   local executable
   if config.advanced.server.executable_path then
@@ -12,6 +17,7 @@ function M.spawn_server(config, path, callback)
   else
     executable = utils.os_name == 'Windows' and 'target/release/cord.exe'
       or 'target/release/cord'
+    executable = get_plugin_root() .. '/' .. executable
   end
 
   if not utils.file_exists(executable) then
