@@ -297,6 +297,7 @@ function ActivityManager:setup_autocmds()
   self:queue_update(true)
 end
 
+--luacheck: push no unused args
 function ActivityManager:clear_autocmds()
   vim.cmd [[
     augroup CordActivityManager
@@ -304,6 +305,7 @@ function ActivityManager:clear_autocmds()
     augroup END
   ]]
 end
+-- luacheck: pop
 
 function ActivityManager:set_activity(activity)
   self.tx:update_activity(activity)
