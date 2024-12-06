@@ -121,6 +121,8 @@ function ActivityManager:update_idle_activity(opts)
 
   if self.config.idle.show_status then
     local activity = activities.build_idle_activity(self.config, opts)
+
+    if opts.skip_update then return end
     if self.config.hooks.on_idle then
       self.config.hooks.on_idle(opts, activity)
     end
@@ -141,6 +143,8 @@ function ActivityManager:update_activity(opts)
   self.last_updated = uv.now()
 
   local activity = activities.build_activity(self.config, opts)
+
+  if opts.skip_update then return end
   if self.config.hooks.on_update then
     self.config.hooks.on_update(opts, activity)
   end
