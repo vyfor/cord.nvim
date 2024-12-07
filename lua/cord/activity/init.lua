@@ -43,8 +43,12 @@ local function build_activity(cfg, opts)
       file_text = config.get(cfg.text.plugin_manager, opts)
     elseif type == 'lsp' then
       file_text = config.get(cfg.text.lsp, opts)
+    elseif type == 'docs' then
+      file_text = config.get(cfg.text.docs, opts)
     elseif type == 'vcs' then
       file_text = config.get(cfg.text.vcs, opts)
+    elseif type == 'dashboard' then
+      file_text = config.get(cfg.text.dashboard, opts)
     end
   end
 
