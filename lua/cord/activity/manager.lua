@@ -39,6 +39,11 @@ end
 function ActivityManager:queue_update(force_update)
   if not self.events_enabled then return end
   vim.schedule(function()
+    if self.should_skip_update then
+      self.should_skip_update = false
+      return
+    end
+
     local cursor_position = vim.api.nvim_win_get_cursor(0)
     local buttons = config_utils:get_buttons()
 
@@ -102,6 +107,10 @@ function ActivityManager:check_idle(opts)
   if not self.events_enabled then return end
   if not self.config.idle.enable and not self.is_force_idle then return end
   if self.is_idle then return end
+  if self.should_skip_update then
+    self.should_skip_update = false
+    return
+  end
 
   local time_elapsed = uv.now() - self.last_updated
   if
@@ -121,10 +130,6 @@ function ActivityManager:update_idle_activity(opts)
 
   if self.config.idle.show_status then
     local activity = activities.build_idle_activity(self.config, opts)
-    if opts.skip_update then
-      opts.skip_update = false
-      return
-    end
 
     if self.config.hooks.on_idle then
       self.config.hooks.on_idle(opts, activity)
@@ -146,10 +151,6 @@ function ActivityManager:update_activity(opts)
   self.last_updated = uv.now()
 
   local activity = activities.build_activity(self.config, opts)
-  if opts.skip_update then
-    opts.skip_update = false
-    return
-  end
 
   if self.config.hooks.on_update then
     self.config.hooks.on_update(opts, activity)
@@ -157,6 +158,8 @@ function ActivityManager:update_activity(opts)
 
   self.tx:update_activity(activity)
 end
+
+function ActivityManager:skip_update() self.should_skip_update = true end
 
 function ActivityManager:pause()
   self:pause_events()
