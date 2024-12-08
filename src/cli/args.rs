@@ -54,11 +54,11 @@ impl Args {
                 "--timeout" | "-t" => {
                     if i + 1 < args.len() {
                         match args[i + 1].parse() {
-                            Ok(t) if t > 0 => timeout = Some(t),
+                            Ok(t) => timeout = Some(t),
                             _ => {
                                 return Err(CliError::Invalid(
                                     "--timeout",
-                                    "timeout must be greater than 0",
+                                    "timeout must be a valid u64",
                                 )
                                 .into())
                             }
