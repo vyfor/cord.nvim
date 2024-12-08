@@ -4,7 +4,7 @@ local logger = require 'cord.util.logger'
 
 local M = {}
 
-function M.initialize(config)
+function M.initialize()
   local client = ipc.new(config.values)
   client:connect(function()
     local file_manager = require 'cord.util.file_manager'
@@ -41,7 +41,7 @@ function M.initialize(config)
         end
 
         client:close()
-        M.initialize(config)
+        M.initialize()
       end)
       M.producer:shutdown()
     else
@@ -75,7 +75,7 @@ end
 function M.setup(opts)
   if not config:validate(opts or {}) then return end
   logger.set_level(config.values.log_level)
-  M.initialize(config)
+  M.initialize()
 end
 
 return M
