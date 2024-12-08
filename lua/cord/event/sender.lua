@@ -27,4 +27,6 @@ end
 
 function Producer:disconnect() self:send_event 'disconnect' end
 
+function Producer:shutdown() self:send_event 'shutdown' end
+
 return Producer
