@@ -106,7 +106,7 @@ impl Cord {
                         format!("Invalid client ID: {}", msg).into(),
                         0,
                     );
-                    tx.send(local_event!(0, Shutdown)).ok();
+                    tx.send(server_event!(0, Shutdown)).ok();
                 } else {
                     tx.send(server_event!(0, Ready)).ok();
                 }
@@ -131,7 +131,8 @@ impl Cord {
 
     /// Shuts down the application.
     pub fn shutdown(&mut self) {
-        self.cleanup();
+        // self.cleanup();
+        println!("Shutting down...");
         std::process::exit(0);
     }
 }
