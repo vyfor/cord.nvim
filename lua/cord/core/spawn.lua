@@ -1,28 +1,22 @@
 local logger = require 'cord.util.logger'
 local utils = require 'cord.util'
+local file_manager = require 'cord.util.file_manager'
 
 local uv = vim.loop or vim.uv
 
 local M = {}
 
-local function get_plugin_root()
-  local source = debug.getinfo(1, 'S').source:sub(2)
-  return vim.fn.fnamemodify(source, ':h:h:h:h')
-end
-
 function M.spawn_server(config, path, callback)
-  local executable
-  if config.advanced.server.executable_path then
-    executable = config.advanced.server.executable_path
-  else
-    executable = utils.os_name == 'Windows' and 'target/release/cord.exe'
-      or 'target/release/cord'
-    executable = get_plugin_root() .. '/' .. executable
-  end
+  local executable = config.advanced.server.executable_path
+  if not executable then
+    local executable_path, err = file_manager.get_executable()
 
-  if not utils.file_exists(executable) then
-    logger.error('Server executable not found at \'' .. executable .. '\'')
-    return
+    if err then
+      logger.error(err)
+      return
+    end
+
+    executable = executable_path
   end
 
   local stdout = uv.new_pipe()

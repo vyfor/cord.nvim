@@ -13,11 +13,7 @@ end
 
 function Handler:on_event(type, data)
   local handler = self.handlers[type]
-  if handler then
-    handler(data)
-  else
-    logger.warn('Unknown event type: ' .. type)
-  end
+  if handler then handler(data) end
 end
 
 function Handler:register(type, callback) self.handlers[type] = callback end
