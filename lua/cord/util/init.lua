@@ -1,4 +1,3 @@
-local logger = require 'cord.util.logger'
 local constants = require 'cord.util.constants'
 
 local uv = vim.loop or vim.uv

@@ -1,5 +1,4 @@
 local logger = require 'cord.util.logger'
-local utils = require 'cord.util'
 local file_manager = require 'cord.util.file_manager'
 
 local uv = vim.loop or vim.uv
