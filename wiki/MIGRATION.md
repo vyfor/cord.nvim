@@ -14,13 +14,15 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 
 - The plugin is now event-driven, meaning changes are reflected instantly without any polling delays. When all instances disconnect, the server, as well as the connection to Discord, stay alive for a minute (configurable) before shutting down, which helps to avoid rate limiting issues.
 
+- A new `variables` option allows users to define custom variables, including functions, for dynamic text templates. This enhances the flexibility and customization of the Rich Presence display.
+
 > [!IMPORTANT]
 > A nightly version of the Rust compiler is required to build the server component. The latest version of `rustup` can be downloaded from [here](https://rustup.rs/). Then, install the nightly toolchain using `rustup install nightly`.
 > If you're using a plugin manager such as lazy.nvim, set the `build` key to `cargo build --release` to automatically rebuild the server on plugin updates.
 
 ## 🔧 Configuration Changes
 
-The config structure has been updated to be more flexible. Most notably, the majority of string options now support functions, giving you full control over the Rich Presence display.
+The config structure has been updated to be more flexible. Most notably, the majority of string options now support functions, giving you full control over the Rich Presence display. Additionally, a new `variables` option has been introduced to allow custom dynamic values in text templates.
 
 > [!NOTE]
 > Full configuration options can be found [here](CONFIGURATION.md).

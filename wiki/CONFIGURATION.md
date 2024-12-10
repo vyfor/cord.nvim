@@ -60,6 +60,12 @@ require('cord').setup {
 | `buttons` | `table \| nil` | `nil`                             | Configure [presence buttons](#buttons)        |
 | `assets`  | `table \| nil` | `nil`                             | Custom [file icons](#assets) configuration    |
 
+## 🧩 Variables
+
+| Option      | Type    | Default | Description                                                                                                                     |
+| ----------- | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `variables` | `table` | `nil`   | Define [custom variables](#custom-variables) for use in string templates. Functions can be used to dynamically generate values. |
+
 ## 🪝 Hooks
 
 | Option                      | Type                       | Description                                                                  |
@@ -146,6 +152,23 @@ Smart idle ensures that:
 - When an instance goes idle, it switches to show the most recent active one
 - You're only shown as idle when all instances are actually idle
 
+### Custom Variables
+
+The `variables` option allows you to define custom variables to be used in string templates. These variables can be static values or functions that dynamically generate values based on the current context. By default, the table is populated with the [options table](#options-table) but they can be overridden by user-defined variables.
+
+Example configuration:
+
+```lua
+require('cord').setup {
+    variables = {
+        filename = 'a file',
+        problems = function(opts) return #vim.diagnostic.get(0) end,
+    },
+    text = {
+        viewing = 'Viewing ${filename} - ${problems} problems',
+    }
+}
+
 ### User Commands
 
 - `:CordTogglePresence` - Toggle presence visibility
@@ -164,7 +187,7 @@ The `advanced.cursor_update_mode` option controls how cursor position updates ar
 - `'on_hold'` - Uses `CursorHold[I]` autocmd, updating only after the cursor has been stationary for `'updatetime'` milliseconds. Better performance but less accurate
 - `'none'` - Disables cursor position updates entirely
 
-### Activity Options
+### Options Table
 
 The `opts` parameter passed to all functions and hooks contains the following information:
 
@@ -195,7 +218,7 @@ The `opts` parameter passed to all functions and hooks contains the following in
     buttons           = table,            -- List of configured presence buttons
 
     -- Asset Information
-    type              = string,           -- Which category the asset belongs to
+    type              = string,           -- Which category the asset belongs to, e.g. 'language' or 'docs'
     name              = string,           -- Asset name, if any
     icon              = string,           -- Asset icon URL or name, if any
     tooltip           = string,           -- Hover text for the asset, if any
@@ -223,7 +246,7 @@ The `ActivityManager` contains useful methods:
 | `set_activity(activity)`     | Sets the rich presence to the provided [activity](#activity-options), offering complete control over the presence. |
 | `clear_activity(force)`      | Clears the current activity from the Discord presence. If `force` is true, it completely clears the presence.      |
 
-### `set_activity` Parameters
+### Activity Options
 
 | Parameter    | Type     | Description                                                                                          |
 | ------------ | -------- | ---------------------------------------------------------------------------------------------------- |
