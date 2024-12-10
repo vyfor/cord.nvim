@@ -60,6 +60,7 @@ M.values = {
   hooks = {
     on_ready = nil,
     on_update = nil,
+    on_activity = nil,
     on_idle = nil,
     on_workspace_change = nil,
     on_disconnect = nil,
