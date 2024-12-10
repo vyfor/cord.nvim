@@ -31,7 +31,7 @@ function Handler:run()
 
     local ok, event = pcall(mpack.decode, data)
     if not ok then
-      logger.error('Failed to decode event: ' .. event)
+      logger.error('Failed to decode event: ' .. event .. '; data: ' .. data)
       return
     end
 
