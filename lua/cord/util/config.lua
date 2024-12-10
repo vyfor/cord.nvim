@@ -116,14 +116,6 @@ function M.get(option, args)
   return option
 end
 
-function M:contains_git_url()
-  if not self.values.buttons then return false end
-  for i = 1, #self.values.buttons do
-    if self.values.buttons[i].url == 'git' then return true end
-  end
-  return false
-end
-
 function M:get_buttons()
   local buttons = self.values.buttons
   if not buttons then return end

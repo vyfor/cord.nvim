@@ -20,15 +20,12 @@ function ActivityManager.new(opts)
   self.events_enabled = true
   self.last_activity = nil
   self.last_opts = nil
+  self.git_url = ws_utils.find_git_repository(self.workspace_dir)
 
-  if config_utils:contains_git_url() then
-    self.git_url = ws_utils.find_git_repository(self.workspace_dir)
-
-    if self.config.buttons then
-      for i = 1, #self.config.buttons do
-        if self.config.buttons[i].url == 'git' then
-          self.config.buttons[i].url = self.git_url
-        end
+  if self.config.buttons then
+    for i = 1, #self.config.buttons do
+      if self.config.buttons[i].url == 'git' then
+        self.config.buttons[i].url = self.git_url
       end
     end
   end
