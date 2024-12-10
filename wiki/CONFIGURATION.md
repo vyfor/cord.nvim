@@ -170,36 +170,36 @@ The `opts` parameter passed to all functions and hooks contains the following in
 
 ```lua
 {
-    manager = ActivityManager, -- Reference to the ActivityManager instance
+    manager           = ActivityManager,  -- Reference to the ActivityManager instance
 
     -- File Information
-    filename = string,      -- Current buffer's filename
-    filetype = string,      -- Current buffer's filetype
-    is_read_only = boolean, -- Whether the current buffer is read-only
+    filename          = string,           -- Current buffer's filename
+    filetype          = string,           -- Current buffer's filetype
+    is_read_only      = boolean,          -- Whether the current buffer is read-only
 
     -- Cursor Information
-    cursor_line = number,   -- Current cursor line number
-    cursor_char = number,   -- Current cursor character number
+    cursor_line       = number,           -- Current cursor line number
+    cursor_char       = number,           -- Current cursor character number
 
     -- Timestamp Information
-    timestamp = number,     -- Timestamp passed to the Rich Presence in milliseconds
+    timestamp         = number,           -- Timestamp passed to the Rich Presence in milliseconds
 
     -- Workspace Information
-    workspace_dir = string,  -- Current workspace directory
-    workspace_name = string, -- Current workspace name
-    git_url = string,        -- Current Git repository URL, if any
+    workspace_dir     = string,           -- Current workspace directory
+    workspace_name    = string,           -- Current workspace name
+    git_url           = string,           -- Current Git repository URL, if any
 
     -- Editor Information
-    is_focused = boolean,   -- Whether Neovim is focused
-    is_idle = boolean,      -- Whether the session is idle
-    buttons = table,        -- List of configured presence buttons
+    is_focused        = boolean,          -- Whether Neovim is focused
+    is_idle           = boolean,          -- Whether the session is idle
+    buttons           = table,            -- List of configured presence buttons
 
     -- Asset Information
-    type = string,          -- Which category the asset belongs to
-    name = string,          -- Asset name, if any
-    icon = string,          -- Asset icon URL or name, if any
-    tooltip = string,       -- Hover text for the asset, if any
-    text = string,          -- Custom text to display, if any
+    type              = string,           -- Which category the asset belongs to
+    name              = string,           -- Asset name, if any
+    icon              = string,           -- Asset icon URL or name, if any
+    tooltip           = string,           -- Hover text for the asset, if any
+    text              = string,           -- Custom text to display, if any
 }
 ```
 
