@@ -1,15 +1,28 @@
+use std::str::FromStr;
+
 use crate::protocol::json;
 use crate::protocol::msgpack::{self, Value};
 use crate::{get_field_or_none, remove_field, remove_field_or_none};
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Activity {
+    pub ty: ActivityType,
     pub details: Option<String>,
     pub state: Option<String>,
     pub assets: Option<ActivityAssets>,
     pub timestamps: Option<ActivityTimestamps>,
     pub buttons: Vec<ActivityButton>,
     pub is_idle: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[repr(u8)]
+pub enum ActivityType {
+    #[default]
+    Playing = 0,
+    Listening = 2,
+    Watching = 3,
+    Competing = 5,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -32,12 +45,27 @@ pub struct ActivityButton {
     pub url: String,
 }
 
+impl FromStr for ActivityType {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "playing" => Ok(ActivityType::Playing),
+            "listening" => Ok(ActivityType::Listening),
+            "watching" => Ok(ActivityType::Watching),
+            "competing" => Ok(ActivityType::Competing),
+            _ => Err(()),
+        }
+    }
+}
+
 impl json::Serialize for Activity {
     fn serialize<'a>(
         &'a self,
         f: json::SerializeFn<'a>,
         state: &mut json::SerializeState,
     ) -> crate::Result<()> {
+        f("type", json::ValueRef::Number(self.ty as u8 as f64), state)?;
         if let Some(details) = &self.details {
             f("details", json::ValueRef::String(details), state)?;
         }
@@ -126,6 +154,10 @@ impl msgpack::Deserialize for Activity {
     fn deserialize<'a>(input: Value) -> crate::Result<Self> {
         let mut input = input.take_map().ok_or("Invalid activity")?;
 
+        let ty = get_field_or_none!(input, "type", |v| v.as_str())
+            .ok_or("Missing 'type' field")?
+            .parse()
+            .map_err(|_| "Invalid activity type")?;
         let details =
             remove_field_or_none!(input, "details", |v| v.take_string());
         let state = remove_field_or_none!(input, "state", |v| v.take_string());
@@ -147,6 +179,7 @@ impl msgpack::Deserialize for Activity {
             .unwrap_or_default();
 
         Ok(Activity {
+            ty,
             details,
             state,
             assets,
