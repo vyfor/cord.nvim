@@ -37,14 +37,8 @@ M.values = {
     icon = nil,
   },
   text = {
-    viewing = function(opts)
-      return 'Viewing '
-        .. (opts.filename ~= '' and opts.filename or 'a new file')
-    end,
-    editing = function(opts)
-      return 'Editing '
-        .. (opts.filename ~= '' and opts.filename or 'a new file')
-    end,
+    viewing = function(opts) return 'Viewing ' .. opts.filename end,
+    editing = function(opts) return 'Editing ' .. opts.filename end,
     file_browser = function(opts) return 'Browsing files in ' .. opts.tooltip end,
     plugin_manager = function(opts)
       return 'Managing plugins in ' .. opts.tooltip

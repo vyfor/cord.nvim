@@ -5,6 +5,7 @@ local utils = require 'cord.util'
 local function build_activity(cfg, opts)
   if opts.filetype == '' then
     if opts.filename == '' then
+      opts.filename = 'a new file'
       opts.filetype = 'Cord.new'
     else
       opts.filetype = 'Cord.unknown'
