@@ -20,11 +20,11 @@ local function build_activity(cfg, opts)
   local custom_icon, override_type =
     utils.get_icon(cfg, opts.filename, opts.filetype)
   if custom_icon then
-    opts.name = custom_icon.name
-    opts.icon = custom_icon.icon or icon
-    opts.tooltip = custom_icon.tooltip or tooltip
+    opts.name = config.get(custom_icon.name, opts)
+    opts.icon = config.get(custom_icon.icon, opts) or icon
+    opts.tooltip = config.get(custom_icon.tooltip, opts) or tooltip
     opts.type = custom_icon.type or type
-    opts.text = custom_icon.text
+    opts.text = config.get(custom_icon.text, opts)
     opts.filetype = override_type or opts.filetype
   end
 
