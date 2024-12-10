@@ -9,8 +9,8 @@ local VCS_MARKERS = {
 local M = {}
 
 M.find = function(initial_path)
+  if not initial_path or initial_path == '' then return nil end
   initial_path = initial_path:gsub('^%w+://+', '')
-  initial_path = vim.fn.fnamemodify(initial_path, ':p:h')
   local curr_dir = initial_path
 
   while curr_dir and curr_dir ~= '' do

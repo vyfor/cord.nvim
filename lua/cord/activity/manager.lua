@@ -12,7 +12,7 @@ function ActivityManager.new(opts)
 
   self.config = opts.config
   self.tx = opts.tx
-  self.workspace_dir = ws_utils.find(vim.fn.expand '%:p:h')
+  self.workspace_dir = ws_utils.find(vim.fn.expand '%:p:h') or vim.fn.getcwd()
   self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.is_focused = true
   self.is_paused = false
@@ -129,6 +129,8 @@ function ActivityManager:update_idle_activity(opts)
   self.last_updated = uv.now()
 
   if self.config.idle.show_status then
+    if self.config.hooks.on_update then self.config.hooks.on_update(opts) end
+
     local activity = activities.build_idle_activity(self.config, opts)
 
     if self.config.hooks.on_idle then
@@ -150,10 +152,12 @@ function ActivityManager:update_activity(opts)
   self.last_opts = opts
   self.last_updated = uv.now()
 
+  if self.config.hooks.on_update then self.config.hooks.on_update(opts) end
+
   local activity = activities.build_activity(self.config, opts)
 
-  if self.config.hooks.on_update then
-    self.config.hooks.on_update(opts, activity)
+  if self.config.hooks.on_activity then
+    self.config.hooks.on_activity(opts, activity)
   end
 
   self.tx:update_activity(activity)
@@ -232,19 +236,22 @@ function ActivityManager:setup_usercmds()
 end
 
 function ActivityManager:on_buf_enter()
-  local new_workspace_dir = vim.fn.expand '%:p:h'
-  if new_workspace_dir ~= self.workspace_dir then
-    self.workspace_dir = ws_utils.find(new_workspace_dir)
-    self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
-
-    if self.config.hooks.on_workspace_change then
-      local opts = self.last_opts
-      opts.workspace_dir = self.workspace_dir
-      opts.workspace_name = self.workspace_name
-      self.config.hooks.on_workspace_change(opts)
-    end
+  local new_workspace_dir = ws_utils.find(vim.fn.expand '%:p:h')
+  if not new_workspace_dir or new_workspace_dir == self.workspace_dir then
+    goto update
   end
 
+  self.workspace_dir = new_workspace_dir
+  self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
+
+  if self.config.hooks.on_workspace_change then
+    local opts = self.last_opts
+    opts.workspace_dir = self.workspace_dir
+    opts.workspace_name = self.workspace_name
+    self.config.hooks.on_workspace_change(opts)
+  end
+
+  ::update::
   self:queue_update()
 end
 
@@ -266,20 +273,22 @@ function ActivityManager:on_cursor_update()
 end
 
 function ActivityManager:on_dir_changed()
-  local new_workspace_dir = vim.fn.expand '%:p:h'
-  if new_workspace_dir ~= self.workspace_dir then
-    self.workspace_dir = ws_utils.find(new_workspace_dir)
-    self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
-
-    if self.config.hooks.on_workspace_change then
-      local opts = self.last_opts
-      opts.workspace_dir = self.workspace_dir
-      opts.workspace_name = self.workspace_name
-      self.config.hooks.on_workspace_change(opts)
-    end
-
-    self:queue_update()
+  local new_workspace_dir = ws_utils.find(vim.fn.expand '%:p:h')
+  if not new_workspace_dir or new_workspace_dir == self.workspace_dir then
+    return
   end
+
+  self.workspace_dir = new_workspace_dir
+  self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
+
+  if self.config.hooks.on_workspace_change then
+    local opts = self.last_opts
+    opts.workspace_dir = self.workspace_dir
+    opts.workspace_name = self.workspace_name
+    self.config.hooks.on_workspace_change(opts)
+  end
+
+  self:queue_update()
 end
 
 function ActivityManager:setup_autocmds()
@@ -310,15 +319,13 @@ function ActivityManager:setup_autocmds()
   self:queue_update(true)
 end
 
---luacheck: push no unused args
-function ActivityManager:clear_autocmds()
+function ActivityManager.clear_autocmds()
   vim.cmd [[
     augroup CordActivityManager
       autocmd!
     augroup END
   ]]
 end
--- luacheck: pop
 
 function ActivityManager:set_activity(activity)
   self.tx:update_activity(activity)
