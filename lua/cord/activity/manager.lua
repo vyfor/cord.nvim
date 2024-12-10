@@ -87,9 +87,9 @@ end
 
 function ActivityManager:run()
   self.last_updated = uv.now()
-  if self.config.timestamp.enable then self.timestamp = os.time() end
+  if self.config.timestamp.enabled then self.timestamp = os.time() end
 
-  if self.config.idle.enable then
+  if self.config.idle.enabled then
     self.idle_timer = uv.new_timer()
     self.idle_timer:start(
       0,
@@ -105,7 +105,7 @@ end
 
 function ActivityManager:check_idle(opts)
   if not self.events_enabled then return end
-  if not self.config.idle.enable and not self.is_force_idle then return end
+  if not self.config.idle.enabled and not self.is_force_idle then return end
   if self.is_idle then return end
   if self.should_skip_update then
     self.should_skip_update = false

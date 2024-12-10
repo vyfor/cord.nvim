@@ -8,7 +8,7 @@ M.values = {
   usercmds = true,
   log_level = vim.log.levels.ERROR,
   timestamp = {
-    enable = true,
+    enabled = true,
     reset_on_idle = false,
     reset_on_change = false,
   },
@@ -26,7 +26,7 @@ M.values = {
     scope = 'workspace',
   },
   idle = {
-    enable = true,
+    enabled = true,
     timeout = 300000,
     show_status = true,
     ignore_focus = true,
