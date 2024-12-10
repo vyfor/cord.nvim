@@ -48,11 +48,13 @@ idle = {
     ignore_focus = true,                        -- Ignore window focus for idle state
 }
 
+variables = {}                                  -- Define custom variables for use in string templates
+
 hooks = {
     on_ready = function() end,                  -- Server connection established
     on_update = function(opts) end,             -- Before building the activity
     on_activity = function(opts, activity) end, -- Before sending the activity
-    on_idle = function(state) end,              -- Entered idle state
+    on_idle = function(opts) end,               -- Entered idle state
     on_workspace_change = function(opts) end,   -- Workspace directory changed
     on_disconnect = function() end,             -- Server disconnected
 }

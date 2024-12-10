@@ -62,9 +62,9 @@ require('cord').setup {
 
 ## 🧩 Variables
 
-| Option      | Type    | Default | Description                                                                                                                     |
-| ----------- | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `variables` | `table` | `nil`   | Define [custom variables](#custom-variables) for use in string templates. Functions can be used to dynamically generate values. |
+| Option      | Type                      | Default | Description                                                                                                                                                                                                                                                               |
+| ----------- | ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variables` | `table \| boolean \| nil` | `nil`   | Define [custom variables](#custom-variables) for use in string templates. Functions can be used to dynamically generate values. If `true`, uses the default [options table](#options-table), if `table`, extends the default table, if `false`, disables custom variables |
 
 ## 🪝 Hooks
 
