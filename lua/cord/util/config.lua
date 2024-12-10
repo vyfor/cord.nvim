@@ -47,6 +47,7 @@ M.values = {
   },
   buttons = nil,
   assets = nil,
+  variables = nil,
   hooks = {
     on_ready = nil,
     on_update = nil,
@@ -102,6 +103,20 @@ end
 
 function M.get(option, args)
   if type(option) == 'function' then return option(args) end
+
+  if M.values.variables then
+    if type(M.values.variables) == 'table' then
+      for k, v in pairs(M.values.variables) do
+        if type(v) == 'function' then
+          args[k] = v(args)
+        else
+          args[k] = v
+        end
+      end
+    end
+
+    option = option:gsub('%${(.-)}', args)
+  end
 
   return option
 end
