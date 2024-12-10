@@ -21,10 +21,6 @@ M.values = {
     swap_fields = false,
     swap_icons = false,
   },
-  lsp = {
-    severity = vim.diagnostic.severity.ERROR,
-    scope = 'workspace',
-  },
   idle = {
     enabled = true,
     timeout = 300000,
