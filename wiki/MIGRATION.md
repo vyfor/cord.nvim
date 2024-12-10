@@ -28,17 +28,17 @@ The config structure has been updated to be more flexible. Most notably, the maj
 > Full configuration options can be found [here](CONFIGURATION.md).
 
 ### Changed Options
-```toml
-[Old]                    [New]
-timer.interval           Removed (now event-driven)
-timer.reset_on_idle      timestamp.reset_on_idle
-timer.reset_on_change    timestamp.reset_on_change
-editor.image             editor.icon
-display.show_time        timestamp.enabled
-idle.enable              idle.enabled
-idle.text                idle.details
-idle.disable_on_focus    idle.ignore_focus (inverted)
-log_level                use vim.log.levels instead of string values
+```md
+# [Old]                  # [New]
+  timer.interval           Removed (now event-driven)
+  timer.reset_on_idle      timestamp.reset_on_idle
+  timer.reset_on_change    timestamp.reset_on_change
+  editor.image             editor.icon
+  display.show_time        timestamp.enabled
+  idle.enable              idle.enabled
+  idle.text                idle.details
+  idle.disable_on_focus    idle.ignore_focus (inverted)
+  log_level                use vim.log.levels instead of string values
 ```
 
 ### New Options
