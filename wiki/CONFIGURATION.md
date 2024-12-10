@@ -8,6 +8,72 @@ require('cord').setup {
 }
 ```
 
+<details>
+  <summary>Default values</summary>
+
+```lua
+{
+  usercmds = true,
+  log_level = vim.log.levels.ERROR,
+  timestamp = {
+    enabled = true,
+    reset_on_idle = false,
+    reset_on_change = false,
+  },
+  editor = {
+    client = 'neovim',
+    tooltip = 'The Superior Text Editor',
+    icon = nil,
+  },
+  display = {
+    swap_fields = false,
+    swap_icons = false,
+  },
+  idle = {
+    enabled = true,
+    timeout = 300000,
+    show_status = true,
+    ignore_focus = true,
+    smart_idle = true,
+    details = 'Idling',
+    state = nil,
+    tooltip = '💤',
+    icon = nil,
+  },
+  text = {
+    viewing = function(opts) return 'Viewing ' .. opts.filename end,
+    editing = function(opts) return 'Editing ' .. opts.filename end,
+    file_browser = function(opts) return 'Browsing files in ' .. opts.tooltip end,
+    plugin_manager = function(opts) return 'Managing plugins in ' .. opts.tooltip end,
+    lsp_manager = function(opts) return 'Configuring LSP in ' .. opts.tooltip end,
+    docs = function(opts) return 'Reading ' .. opts.tooltip end,
+    vcs = function(opts) return 'Committing changes in ' .. opts.tooltip end,
+    workspace = function(opts) return 'In ' .. opts.workspace_name end,
+    dashboard = 'Home',
+  },
+  buttons = nil,
+  assets = nil,
+  variables = nil,
+  hooks = {
+    on_ready = nil,
+    on_update = nil,
+    on_activity = nil,
+    on_idle = nil,
+    on_workspace_change = nil,
+    on_disconnect = nil,
+  },
+  advanced = {
+    server = {
+      pipe_path = nil,
+      executable_path = nil,
+      timeout = 60000,
+    },
+    cursor_update_mode = 'on_move',
+  },
+}
+```
+</details>
+
 ## 🔧 Core Options
 
 | Option      | Type      | Default                | Description                                                  |
