@@ -168,6 +168,7 @@ require('cord').setup {
         viewing = 'Viewing ${filename} - ${problems} problems',
     }
 }
+```
 
 ### User Commands
 
