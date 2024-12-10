@@ -155,9 +155,8 @@ impl msgpack::Deserialize for Activity {
         let mut input = input.take_map().ok_or("Invalid activity")?;
 
         let ty = get_field_or_none!(input, "type", |v| v.as_str())
-            .ok_or("Missing 'type' field")?
-            .parse()
-            .map_err(|_| "Invalid activity type")?;
+            .and_then(|type_str| ActivityType::from_str(type_str).ok())
+            .unwrap_or_default();
         let details =
             remove_field_or_none!(input, "details", |v| v.take_string());
         let state = remove_field_or_none!(input, "state", |v| v.take_string());
