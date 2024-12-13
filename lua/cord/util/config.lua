@@ -6,7 +6,7 @@ local M = {}
 
 M.values = {
   usercmds = true,
-  log_level = vim.log.levels.ERROR,
+  log_level = vim.log.levels.INFO,
   timestamp = {
     enabled = true,
     reset_on_idle = false,
