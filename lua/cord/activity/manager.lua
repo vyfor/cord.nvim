@@ -4,9 +4,63 @@ local config_utils = require 'cord.util.config'
 
 local uv = vim.loop or vim.uv
 
+---@class ActivityManager
+---@field config CordConfig Configuration options
+---@field tx table Event transmitter instance
+---@field is_focused boolean Whether Neovim is focused
+---@field is_paused boolean Whether activity updates are paused
+---@field is_force_idle boolean Whether idle state is forced
+---@field events_enabled boolean Whether events are enabled
+---@field last_activity Activity Last activity state
+---@field last_opts CordOpts Last options passed to activity update
+---@field workspace_dir string Current workspace directory
+---@field git_url string|nil Current Git repository URL
 local ActivityManager = {}
 local mt = { __index = ActivityManager }
 
+---@class Activity
+---@field type? string One of 'playing', 'listening', 'watching', 'competing'
+---@field details? string Detailed information about what the user is doing
+---@field state? string Secondary information about what the user is doing
+---@field timestamps? ActivityTimestamps Contains `start` and `end` timestamps for the activity
+---@field assets? ActivityAssets Defines images and tooltips, including `large_image`, `large_text`, `small_image`, and `small_text`
+---@field buttons? CordButtonConfig[] Array of objects, each with `label` and `url`, defining interactive buttons in the presence
+---@field is_idle? boolean Whether the activity should be considered as idle
+
+---@class ActivityTimestamps
+---@field start? integer Start timestamp in milliseconds
+---@field end? integer End timestamp in milliseconds
+
+---@class ActivityAssets
+---@field large_image? string Large image ID or URL
+---@field large_text? string Large image text
+---@field small_image? string Small image ID or URL
+---@field small_text? string Small image text
+
+---@class CordOpts
+---@field manager ActivityManager Reference to the ActivityManager instance
+---@field filename string Current buffer's filename
+---@field filetype string Current buffer's filetype
+---@field is_read_only boolean Whether the current buffer is read-only
+---@field cursor_line integer Current cursor line
+---@field cursor_char integer Current cursor character
+---@field timestamp number Timestamp passed to the Rich Presence in milliseconds
+---@field workspace_dir string Current workspace directory
+---@field workspace_name string Current workspace name
+---@field git_url string Current Git repository URL, if any
+---@field is_focused boolean Whether Neovim is focused
+---@field is_idle boolean Whether the session is idle
+---@field buttons CordButtonConfig[] Buttons configuration
+---@field type string Which category the asset belongs to, e.g. 'language' or 'docs'
+---@field name? string Asset name, if any
+---@field icon string Asset icon URL or name, if any
+---@field tooltip string Asset tooltip text, if any
+---@field text string Asset text, if any
+
+---Create a new ActivityManager instance
+---@param opts {config: CordConfig, tx: table} Configuration and transmitter options
+---@param callback fun(manager: ActivityManager) Callback function called with the new instance
+---@return ActivityManager
 function ActivityManager.new(opts, callback)
   local self = setmetatable({}, mt)
 
@@ -16,8 +70,6 @@ function ActivityManager.new(opts, callback)
   self.is_paused = false
   self.is_force_idle = false
   self.events_enabled = true
-  self.last_activity = nil
-  self.last_opts = nil
 
   local cwd = vim.fn.getcwd()
   ws_utils.find(vim.fn.expand '%:p:h', function(dir)
@@ -40,6 +92,8 @@ function ActivityManager.new(opts, callback)
   return self
 end
 
+---Queue an activity update
+---@param force_update? boolean Whether to force the update regardless of conditions
 function ActivityManager:queue_update(force_update)
   if not self.events_enabled then return end
   vim.schedule(function()
@@ -49,8 +103,6 @@ function ActivityManager:queue_update(force_update)
     end
 
     local cursor_position = vim.api.nvim_win_get_cursor(0)
-    local buttons = config_utils:get_buttons()
-
     local opts = {
       manager = self,
       filename = vim.fn.expand '%:t',
@@ -59,13 +111,14 @@ function ActivityManager:queue_update(force_update)
       cursor_line = cursor_position[1],
       cursor_char = cursor_position[2],
       timestamp = self.timestamp,
-      buttons = buttons,
       workspace_dir = self.workspace_dir,
       workspace_name = self.workspace_name,
       git_url = self.git_url,
       is_focused = self.is_focused,
       is_idle = self.is_idle,
     }
+    local buttons = config_utils:get_buttons(opts)
+    opts.buttons = buttons
 
     if
       not self.is_force_idle and (force_update or self:should_update(opts))
@@ -77,6 +130,9 @@ function ActivityManager:queue_update(force_update)
   end)
 end
 
+---Check if an activity update is needed
+---@param opts CordOpts Options to check against
+---@return boolean Whether an update is needed
 function ActivityManager:should_update(opts)
   local should_update = not self.last_opts
     or opts.filename ~= self.last_opts.filename
@@ -89,6 +145,8 @@ function ActivityManager:should_update(opts)
   return should_update
 end
 
+---Run the activity manager
+---@return nil
 function ActivityManager:run()
   self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.last_updated = uv.now()
@@ -108,6 +166,9 @@ function ActivityManager:run()
   self:queue_update(true)
 end
 
+---Check if the activity should be updated to idle
+---@param opts? CordOpts Options to check against
+---@return nil
 function ActivityManager:check_idle(opts)
   if not self.events_enabled then return end
   if not self.config.idle.enabled and not self.is_force_idle then return end
@@ -129,6 +190,9 @@ function ActivityManager:check_idle(opts)
   end
 end
 
+---Update the activity to idle
+---@param opts CordOpts Options to update with
+---@return nil
 function ActivityManager:update_idle_activity(opts)
   self.is_idle = true
   self.last_updated = uv.now()
@@ -149,6 +213,9 @@ function ActivityManager:update_idle_activity(opts)
   end
 end
 
+---Update the activity
+---@param opts CordOpts Options to update with
+---@return nil
 function ActivityManager:update_activity(opts)
   if self:should_update_time() then self.timestamp = os.time() end
 
@@ -168,14 +235,20 @@ function ActivityManager:update_activity(opts)
   self.tx:update_activity(activity)
 end
 
+---Skip the next activity update
+---@return nil
 function ActivityManager:skip_update() self.should_skip_update = true end
 
+---Pause activity updates and events
+---@return nil
 function ActivityManager:pause()
   self:pause_events()
   if self.idle_timer then self.idle_timer:stop() end
   self.is_paused = true
 end
 
+---Resume activity updates and events
+---@return nil
 function ActivityManager:resume()
   self:resume_events()
   if self.idle_timer then
@@ -188,36 +261,33 @@ function ActivityManager:resume()
   self.is_paused = false
 end
 
+---Pause only events, keeping the current activity state
+---@return nil
 function ActivityManager:pause_events() self.events_enabled = false end
 
+---Resume events after they were paused
+---@return nil
 function ActivityManager:resume_events()
   self.events_enabled = true
   self:queue_update(true)
 end
 
-function ActivityManager:hide()
-  self:pause()
-  self:clear_activity()
-end
-
-function ActivityManager:toggle()
-  if self.is_paused then
-    self:resume()
-  else
-    self:hide()
-  end
-end
-
+---Force idle state
+---@return nil
 function ActivityManager:force_idle()
   self.is_force_idle = true
   self:queue_update()
 end
 
+---Unforce idle state
+---@return nil
 function ActivityManager:unforce_idle()
   self.is_force_idle = false
   self:queue_update(true)
 end
 
+---Toggle idle state
+---@return nil
 function ActivityManager:toggle_idle()
   if self.is_force_idle then
     self:unforce_idle()
@@ -226,6 +296,25 @@ function ActivityManager:toggle_idle()
   end
 end
 
+---Hide the activity
+---@return nil
+function ActivityManager:hide()
+  self:pause()
+  self:clear_activity()
+end
+
+---Toggle the activity
+---@return nil
+function ActivityManager:toggle()
+  if self.is_paused then
+    self:resume()
+  else
+    self:hide()
+  end
+end
+
+---Setup user commands
+---@return nil
 function ActivityManager:setup_usercmds()
   if not self.config.usercmds then return end
 
@@ -240,45 +329,8 @@ function ActivityManager:setup_usercmds()
   ]]
 end
 
-function ActivityManager:on_buf_enter()
-  ws_utils.find(
-    vim.fn.expand '%:p:h',
-    vim.schedule_wrap(function(dir)
-      if not dir or dir == self.workspace_dir then goto update end
-
-      self.workspace_dir = dir
-      self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
-
-      if self.config.hooks.on_workspace_change then
-        local opts = self.last_opts
-        opts.workspace_dir = self.workspace_dir
-        opts.workspace_name = self.workspace_name
-        self.config.hooks.on_workspace_change(opts)
-      end
-
-      ::update::
-      self:queue_update()
-    end)
-  )
-end
-
-function ActivityManager:on_focus_gained()
-  if not self.events_enabled then return end
-  self.is_focused = true
-  self:queue_update()
-end
-
-function ActivityManager:on_focus_lost()
-  if not self.events_enabled then return end
-  self.is_focused = false
-  self:queue_update()
-end
-
-function ActivityManager:on_cursor_update()
-  if not self.events_enabled then return end
-  self:queue_update()
-end
-
+---Setup autocmds
+---@return nil
 function ActivityManager:setup_autocmds()
   vim.cmd [[
     augroup CordActivityManager
@@ -306,6 +358,8 @@ function ActivityManager:setup_autocmds()
   self:queue_update(true)
 end
 
+---Clear autocmds
+---@return nil
 function ActivityManager.clear_autocmds()
   vim.cmd [[
     augroup CordActivityManager
@@ -314,18 +368,71 @@ function ActivityManager.clear_autocmds()
   ]]
 end
 
+---Set the activity
+---@param activity table Activity to set
+---@return nil
 function ActivityManager:set_activity(activity)
   self.tx:update_activity(activity)
 end
 
+---Clear the activity
+---@param force? boolean Whether to force clear the activity
+---@return nil
 function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
 
+---Check if the time should be updated
+---@return boolean Whether the time should be updated
 function ActivityManager:should_update_time()
-  return self.config.display.show_time
-    and (
-      self.config.timestamp.reset_on_change
-      or self.config.timestamp.reset_on_idle and self.is_idle
-    )
+  return self.config.timestamp.enabled
+      and (self.config.timestamp.reset_on_change or self.config.timestamp.reset_on_idle and self.is_idle)
+    or false
+end
+
+---Handle buffer enter event
+---@return nil
+function ActivityManager:on_buf_enter()
+  ws_utils.find(
+    vim.fn.expand '%:p:h',
+    vim.schedule_wrap(function(dir)
+      if not dir or dir == self.workspace_dir then goto update end
+
+      self.workspace_dir = dir
+      self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
+
+      if self.config.hooks.on_workspace_change then
+        local opts = self.last_opts or {}
+        opts.workspace_dir = self.workspace_dir
+        opts.workspace_name = self.workspace_name
+        self.config.hooks.on_workspace_change(opts)
+      end
+
+      ::update::
+      self:queue_update()
+    end)
+  )
+end
+
+---Handle focus gained event
+---@return nil
+function ActivityManager:on_focus_gained()
+  if not self.events_enabled then return end
+  self.is_focused = true
+  self:queue_update()
+end
+
+---Handle focus lost event
+---@return nil
+function ActivityManager:on_focus_lost()
+  if not self.events_enabled then return end
+  self.is_focused = false
+  self:queue_update()
+end
+
+---Handle cursor update event
+---@return nil
+function ActivityManager:on_cursor_update()
+  if not self.events_enabled then return end
+  self:queue_update()
 end
 
 return ActivityManager
