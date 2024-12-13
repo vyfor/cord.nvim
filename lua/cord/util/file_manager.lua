@@ -1,4 +1,7 @@
 local utils = require 'cord.util'
+local logger = require 'cord.util.logger'
+
+local uv = vim.loop or vim.uv
 
 local M = {}
 
@@ -25,30 +28,57 @@ function M.get_executable_name()
   return utils.os_name == 'Windows' and 'cord.exe' or 'cord'
 end
 
-function M.get_executable()
+function M.get_executable(pid, callback)
   local executable_name = M.get_executable_name()
   local target_path = M.get_target_path(executable_name)
   local data_path = M.get_data_path()
   local executable_path = data_path .. utils.path_sep .. executable_name
 
-  if utils.file_exists(target_path) then
-    if not utils.file_exists(executable_path) then
-      utils.mkdir(data_path)
+  uv.fs_stat(target_path, function(err)
+    if not err then
+      uv.fs_stat(executable_path, function(err)
+        if not err then
+          if pid then utils.kill_process(pid) end
+
+          utils.rm_file(executable_path, function(err)
+            if err then
+              callback(
+                nil,
+                'Failed to remove existing executable: ' .. err,
+                false
+              )
+              return
+            end
+            utils.move_file(target_path, executable_path, function(err)
+              if err then
+                callback(nil, 'Failed to move executable: ' .. err, false)
+                return
+              end
+              callback(executable_path, nil, true)
+            end)
+          end)
+        else
+          utils.mkdir(data_path, function()
+            utils.move_file(target_path, executable_path, function(err)
+              if err then
+                callback(nil, 'Failed to move executable: ' .. err, false)
+                return
+              end
+              callback(executable_path, nil, true)
+            end)
+          end)
+        end
+      end)
     else
-      local ok, err = utils.rm_file(executable_path)
-      if not ok then
-        return nil, 'Failed to remove existing executable: ' .. (err or '')
-      end
+      uv.fs_stat(executable_path, function(err)
+        if not err then
+          callback(executable_path, nil, false)
+        else
+          callback(nil, 'Executable not found', false)
+        end
+      end)
     end
-
-    local ok, err = utils.move_file(target_path, executable_path)
-    if not ok then return nil, 'Failed to move executable: ' .. (err or '') end
-    return executable_path
-  end
-
-  if utils.file_exists(executable_path) then return executable_path end
-
-  return nil, 'Executable not found'
+  end)
 end
 
 return M

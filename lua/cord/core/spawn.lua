@@ -5,36 +5,24 @@ local uv = vim.loop or vim.uv
 
 local M = {}
 
-function M.spawn_server(config, path, callback)
-  local executable = config.advanced.server.executable_path
-  if not executable then
-    local executable_path, err = file_manager.get_executable()
-
-    if err then
-      logger.error(err)
-      return
-    end
-
-    executable = executable_path
-  end
-
+local function spawn(executable, client, callback)
   local stdout = uv.new_pipe()
   local stderr = uv.new_pipe()
   uv.spawn(executable, {
     args = {
       '-p',
-      path,
+      client.path,
       '-c',
-      config.editor.client,
+      client.config.editor.client,
       '-t',
-      tostring(config.advanced.server.timeout),
+      tostring(client.config.advanced.server.timeout),
     },
     stdio = { nil, stdout, stderr },
     detached = true,
     hide = true,
   })
 
-  stderr:read_start(vim.schedule_wrap(function(err, chunk)
+  stderr:read_start(function(err, chunk)
     if err then
       logger.error('Failed to read stderr: ' .. err)
       return
@@ -48,9 +36,9 @@ function M.spawn_server(config, path, callback)
       end
       logger.error('Server error: ' .. chunk)
     end
-  end))
+  end)
 
-  stdout:read_start(vim.schedule_wrap(function(err, chunk)
+  stdout:read_start(function(err, chunk)
     if err then
       logger.error('Failed to read pipe: ' .. err)
       return
@@ -60,7 +48,25 @@ function M.spawn_server(config, path, callback)
       callback()
       return
     end
-  end))
+  end)
+end
+
+function M.spawn_server(client, callback)
+  local executable = client.config.advanced.server.executable_path
+
+  if not executable then
+    file_manager.get_executable(nil, function(executable_path, err)
+      if err then
+        logger.error(err)
+        return
+      end
+
+      executable = executable_path
+      spawn(executable, client, callback)
+    end)
+  else
+    spawn(executable, client, callback)
+  end
 end
 
 return M

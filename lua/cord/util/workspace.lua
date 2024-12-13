@@ -8,24 +8,33 @@ local VCS_MARKERS = {
 
 local M = {}
 
-M.find = function(initial_path)
-  if not initial_path or initial_path == '' then return nil end
+M.find = function(initial_path, callback)
+  if not initial_path or initial_path == '' then return callback(nil) end
+
   initial_path = initial_path:gsub('^%w+://+', '')
   local curr_dir = initial_path
 
-  while curr_dir and curr_dir ~= '' do
+  local function check_marker(curr_dir)
     for _, marker in ipairs(VCS_MARKERS) do
       local marker_path = curr_dir .. '/' .. marker
-      local stat = uv.fs_stat(marker_path)
-      if stat and stat.type == 'directory' then return curr_dir end
-    end
+      uv.fs_stat(marker_path, function(err, stat)
+        if err then return callback(nil) end
 
-    local parent = vim.fn.fnamemodify(curr_dir, ':h')
-    if parent == curr_dir then break end
-    curr_dir = parent
+        if stat and stat.type == 'directory' then
+          callback(curr_dir)
+        else
+          local parent = vim.fn.fnamemodify(curr_dir, ':h')
+          if parent == curr_dir then
+            callback(initial_path)
+          else
+            check_marker(parent)
+          end
+        end
+      end)
+    end
   end
 
-  return initial_path
+  check_marker(curr_dir)
 end
 
 local function format_url(url)
@@ -40,23 +49,33 @@ local function format_url(url)
   return nil
 end
 
-M.find_git_repository = function(workspace_path)
+M.find_git_repository = function(workspace_path, callback)
   local config_path = workspace_path .. '/.git/config'
 
-  local file = io.open(config_path, 'r')
-  if not file then return nil end
+  uv.fs_open(config_path, 'r', 438, function(err, fd)
+    if err then return callback(nil) end
 
-  local content = file:read '*a'
-  file:close()
+    uv.fs_read(fd, 4096, 0, function(err, content)
+      uv.fs_close(fd)
+      if err then return callback(nil) end
 
-  local origin_url =
-    content:match '%[remote "origin"%]%s*\n%s*url%s*=%s*([^\n]+)'
-  if origin_url then return format_url(vim.trim(origin_url)) end
+      local origin_url =
+        content:match '%[remote "origin"%]%s*\n%s*url%s*=%s*([^\n]+)'
+      if origin_url then
+        callback(format_url(vim.trim(origin_url)))
+        return
+      end
 
-  local first_url = content:match '%[remote "[^"]+"%]%s*\n%s*url%s*=%s*([^\n]+)'
-  if first_url then return format_url(vim.trim(first_url)) end
+      local first_url =
+        content:match '%[remote "[^"]+"%]%s*\n%s*url%s*=%s*([^\n]+)'
+      if first_url then
+        callback(format_url(vim.trim(first_url)))
+        return
+      end
 
-  return nil
+      callback(nil)
+    end)
+  end)
 end
 
 return M

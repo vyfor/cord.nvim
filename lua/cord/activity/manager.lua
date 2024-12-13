@@ -7,28 +7,35 @@ local uv = vim.loop or vim.uv
 local ActivityManager = {}
 local mt = { __index = ActivityManager }
 
-function ActivityManager.new(opts)
+function ActivityManager.new(opts, callback)
   local self = setmetatable({}, mt)
 
   self.config = opts.config
   self.tx = opts.tx
-  self.workspace_dir = ws_utils.find(vim.fn.expand '%:p:h') or vim.fn.getcwd()
-  self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.is_focused = true
   self.is_paused = false
   self.is_force_idle = false
   self.events_enabled = true
   self.last_activity = nil
   self.last_opts = nil
-  self.git_url = ws_utils.find_git_repository(self.workspace_dir)
 
-  if self.config.buttons then
-    for i = 1, #self.config.buttons do
-      if self.config.buttons[i].url == 'git' then
-        self.config.buttons[i].url = self.git_url
+  local cwd = vim.fn.getcwd()
+  ws_utils.find(vim.fn.expand '%:p:h', function(dir)
+    dir = dir or cwd
+    self.workspace_dir = dir
+    ws_utils.find_git_repository(dir, function(git_url)
+      self.git_url = git_url
+      if self.config.buttons then
+        for i = 1, #self.config.buttons do
+          if self.config.buttons[i].url == 'git' then
+            self.config.buttons[i].url = git_url
+          end
+        end
       end
-    end
-  end
+
+      callback(self)
+    end)
+  end)
 
   return self
 end
@@ -83,6 +90,7 @@ function ActivityManager:should_update(opts)
 end
 
 function ActivityManager:run()
+  self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.last_updated = uv.now()
   if self.config.timestamp.enabled then self.timestamp = os.time() end
 
@@ -233,23 +241,25 @@ function ActivityManager:setup_usercmds()
 end
 
 function ActivityManager:on_buf_enter()
-  local new_workspace_dir = ws_utils.find(vim.fn.expand '%:p:h')
-  if not new_workspace_dir or new_workspace_dir == self.workspace_dir then
-    goto update
-  end
+  ws_utils.find(
+    vim.fn.expand '%:p:h',
+    vim.schedule_wrap(function(dir)
+      if not dir or dir == self.workspace_dir then goto update end
 
-  self.workspace_dir = new_workspace_dir
-  self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
+      self.workspace_dir = dir
+      self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
 
-  if self.config.hooks.on_workspace_change then
-    local opts = self.last_opts
-    opts.workspace_dir = self.workspace_dir
-    opts.workspace_name = self.workspace_name
-    self.config.hooks.on_workspace_change(opts)
-  end
+      if self.config.hooks.on_workspace_change then
+        local opts = self.last_opts
+        opts.workspace_dir = self.workspace_dir
+        opts.workspace_name = self.workspace_name
+        self.config.hooks.on_workspace_change(opts)
+      end
 
-  ::update::
-  self:queue_update()
+      ::update::
+      self:queue_update()
+    end)
+  )
 end
 
 function ActivityManager:on_focus_gained()
@@ -269,25 +279,6 @@ function ActivityManager:on_cursor_update()
   self:queue_update()
 end
 
-function ActivityManager:on_dir_changed()
-  local new_workspace_dir = ws_utils.find(vim.fn.expand '%:p:h')
-  if not new_workspace_dir or new_workspace_dir == self.workspace_dir then
-    return
-  end
-
-  self.workspace_dir = new_workspace_dir
-  self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
-
-  if self.config.hooks.on_workspace_change then
-    local opts = self.last_opts
-    opts.workspace_dir = self.workspace_dir
-    opts.workspace_name = self.workspace_name
-    self.config.hooks.on_workspace_change(opts)
-  end
-
-  self:queue_update()
-end
-
 function ActivityManager:setup_autocmds()
   vim.cmd [[
     augroup CordActivityManager
@@ -295,7 +286,6 @@ function ActivityManager:setup_autocmds()
       autocmd BufEnter * lua require'cord'.manager:on_buf_enter()
       autocmd FocusGained * lua require'cord'.manager:on_focus_gained()
       autocmd FocusLost * lua require'cord'.manager:on_focus_lost()
-      autocmd DirChanged * lua require'cord'.manager:on_dir_changed()
     augroup END
   ]]
 

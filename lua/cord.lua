@@ -8,65 +8,65 @@ function M.initialize()
   local client = ipc.new(config.values)
   client:connect(function()
     local file_manager = require 'cord.util.file_manager'
-    local utils = require 'cord.util'
     local Producer = require 'cord.event.sender'
     local Handler = require 'cord.event.receiver'
+    local uv = vim.loop or vim.uv
 
     M.producer = Producer.new(client)
     M.handler = Handler.new(client)
+    M.handler:register('initialize', function(pid)
+      local executable = file_manager.get_executable_name()
+      local target_path = file_manager.get_target_path(executable)
+      uv.fs_stat(target_path, function(err)
+        if not err then
+          client:on_close(function()
+            file_manager.get_executable(pid, function(_, err, moved)
+              if err then
+                logger.error(err)
+                return
+              end
 
-    local executable = file_manager.get_executable_name()
-    local target_path = file_manager.get_target_path(executable)
-    if utils.file_exists(target_path) then
-      M.handler:register('shutdown', function()
-        local data_path = file_manager.get_data_path()
-        local executable_path = data_path .. utils.path_sep .. executable
-
-        if not utils.file_exists(executable_path) then
-          utils.mkdir(data_path)
+              if moved then
+                client:close()
+                M.initialize()
+              end
+            end)
+          end)
+          M.producer:shutdown()
         else
-          local ok, err = utils.rm_file(executable_path)
-          if not ok then
-            logger.error(
-              'Failed to remove existing executable: ' .. (err or '')
-            )
-            return
-          end
+          M.handler:register(
+            'ready',
+            vim.schedule_wrap(function()
+              logger.info 'Connected to Discord'
+
+              local ActivityManager = require 'cord.activity.manager'
+
+              if config.values.hooks.on_ready then
+                config.values.hooks.on_ready()
+              end
+
+              M.producer:initialize(config.values)
+
+              ActivityManager.new(
+                { tx = M.producer, config = config.values },
+                vim.schedule_wrap(function(manager)
+                  M.manager = manager
+
+                  client:on_close(vim.schedule_wrap(function()
+                    if config.values.hooks.on_disconnect then
+                      config.values.hooks.on_disconnect()
+                    end
+
+                    manager:pause()
+                  end))
+                  manager:run()
+                end)
+              )
+            end)
+          )
         end
-
-        local ok, err = utils.move_file(target_path, executable_path)
-        if not ok then
-          logger.error('Failed to move executable: ' .. (err or ''))
-          return
-        end
-
-        client:close()
-        M.initialize()
       end)
-      M.producer:shutdown()
-    else
-      M.handler:register('ready', function()
-        logger.info 'Connected to Discord'
-
-        local ActivityManager = require 'cord.activity.manager'
-
-        if config.values.hooks.on_ready then config.values.hooks.on_ready() end
-
-        M.producer:initialize(config.values)
-        M.manager =
-          ActivityManager.new { tx = M.producer, config = config.values }
-
-        client:on_close(function()
-          if config.values.hooks.on_disconnect then
-            config.values.hooks.on_disconnect()
-          end
-
-          M.manager:pause()
-        end)
-
-        M.manager:run()
-      end)
-    end
+    end)
 
     M.handler:run()
   end)
