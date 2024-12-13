@@ -6,15 +6,18 @@ pub struct LogEvent {
 
 use std::collections::HashMap;
 
+use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::protocol::msgpack::{Serialize, ValueRef};
+use crate::protocol::msgpack::{MsgPack, Serialize, ValueRef};
 use crate::util::logger::LogLevel;
 
 impl OnEvent for LogEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        ctx.cord
-            .logger
-            .log(self.level, self.message.into(), ctx.client_id);
+        let data = MsgPack::serialize(&self)?;
+        match ctx.client_id {
+            0 => ctx.cord.pipe.broadcast(&data)?,
+            _ => ctx.cord.pipe.write_to(ctx.client_id, &data)?,
+        }
 
         Ok(())
     }
