@@ -25,7 +25,8 @@ impl Serialize for ReadyEvent {
         f: crate::protocol::msgpack::SerializeFn<'a>,
         state: &mut crate::protocol::msgpack::SerializeState,
     ) -> crate::Result<()> {
-        f("type", ValueRef::String("ready"), state)?;
+        f("type", ValueRef::Str("ready"), state)?;
+        f("data", ValueRef::Nil, state)?;
 
         Ok(())
     }

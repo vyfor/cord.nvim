@@ -36,10 +36,10 @@ impl Serialize for LogEvent {
         state: &mut crate::protocol::msgpack::SerializeState,
     ) -> crate::Result<()> {
         let mut data = HashMap::new();
-        data.insert("message", ValueRef::String(&self.message));
+        data.insert("message", ValueRef::Str(&self.message));
         data.insert("level", ValueRef::UInteger(self.level as u64));
 
-        f("type", ValueRef::String("log"), state)?;
+        f("type", ValueRef::Str("log"), state)?;
         f("data", ValueRef::Map(data), state)?;
 
         Ok(())
