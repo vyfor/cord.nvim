@@ -11,7 +11,7 @@ use crate::messages::message::Message;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
 use crate::util::logger::{LogLevel, Logger};
-use crate::{local_event, server_event};
+use crate::{client_event, local_event, server_event};
 
 /// Core application managing configuration, sessions, IPC with Discord, and logging.
 ///
@@ -63,6 +63,7 @@ impl Cord {
 
     /// Runs the application.
     pub fn run(&mut self) -> crate::Result<()> {
+        self.tx.send(server_event!(0, Initialize)).ok();
         self.start_rpc()?;
         self.pipe.start()?;
         self.start_event_loop()?;
@@ -106,7 +107,7 @@ impl Cord {
                         format!("Invalid client ID: {}", msg).into(),
                         0,
                     );
-                    tx.send(server_event!(0, Shutdown)).ok();
+                    tx.send(client_event!(0, Shutdown)).ok();
                 } else {
                     tx.send(server_event!(0, Ready)).ok();
                 }
@@ -130,8 +131,9 @@ impl Cord {
     }
 
     /// Shuts down the application.
+    #[inline(always)]
     pub fn shutdown(&mut self) {
-        // self.cleanup();
+        self.cleanup();
         println!("Shutting down...");
         std::process::exit(0);
     }
