@@ -39,13 +39,18 @@ impl PipeClientImpl for PipeClient {
         if let Some(pipe) = &self.pipe {
             let handle = pipe.as_raw_handle();
             unsafe {
+                let data_len = data.len();
+                let mut framed_data = Vec::with_capacity(4 + data_len);
+                framed_data.extend_from_slice(&(data_len as u32).to_be_bytes());
+                framed_data.extend_from_slice(data);
+
                 let mut overlapped = Overlapped::default();
                 let mut bytes_written = 0;
 
                 let write_result = WriteFile(
                     handle,
-                    data.as_ptr(),
-                    data.len() as u32,
+                    framed_data.as_ptr(),
+                    framed_data.len() as u32,
                     &mut bytes_written,
                     &mut overlapped,
                 );

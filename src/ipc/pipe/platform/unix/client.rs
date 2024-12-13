@@ -36,7 +36,14 @@ impl PipeClientImpl for PipeClient {
     fn write(&mut self, data: &[u8]) -> io::Result<()> {
         self.write_pipe.as_mut().map_or(
             Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found")),
-            |pipe| pipe.write_all(data),
+            |pipe| {
+                let data_len = data.len();
+                let mut framed_data = Vec::with_capacity(4 + data_len);
+                framed_data.extend_from_slice(&(data_len as u32).to_be_bytes());
+                framed_data.extend_from_slice(data);
+
+                pipe.write_all(&framed_data)
+            },
         )
     }
 
