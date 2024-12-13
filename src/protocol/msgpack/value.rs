@@ -19,7 +19,8 @@ pub enum Value {
 #[repr(u8)]
 pub enum ValueRef<'a> {
     Nil = NIL,
-    String(&'a str),
+    Str(&'a str),
+    String(String),
     Float(f64),
     Integer(i64),
     UInteger(u64),

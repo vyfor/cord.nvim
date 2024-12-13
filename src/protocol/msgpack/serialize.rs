@@ -86,6 +86,7 @@ impl SerializeState {
 impl std::fmt::Debug for ValueRef<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            ValueRef::Str(s) => write!(f, "Str({:?})", s),
             ValueRef::String(s) => write!(f, "String({:?})", s),
             ValueRef::Float(n) => write!(f, "Number({:?})", n),
             ValueRef::Integer(i) => write!(f, "Integer({:?})", i),
@@ -102,7 +103,7 @@ impl std::fmt::Debug for ValueRef<'_> {
 impl MsgPack {
     pub fn serialize(value: &dyn Serialize) -> crate::Result<Vec<u8>> {
         let mut state = SerializeState::new();
-        state.write_u8(0x81);
+        state.write_u8(FIXMAP_VALUE | 2);
 
         fn serialize_adapter(
             key: &str,
@@ -148,6 +149,7 @@ impl MsgPack {
                 state.write_u8(NIL);
                 Ok(())
             }
+            ValueRef::Str(s) => Self::write_str(s, state),
             ValueRef::String(s) => Self::write_str(s, state),
             ValueRef::Float(n) => {
                 state.write_u8(FLOAT64);
