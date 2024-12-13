@@ -8,7 +8,6 @@ local mt = { __index = Handler }
 function Handler.new(client)
   local self = setmetatable({}, mt)
   self.client = client
-  self.buffer = ''
   self.handlers = {}
   return self
 end
