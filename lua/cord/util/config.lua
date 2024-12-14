@@ -172,7 +172,9 @@ function M:validate(user_config)
     end
 
     config.editor.client = client.id
-    config.editor.icon = utils.get_asset('editor', client.icon)
+    if not config.editor.icon then
+      config.editor.icon = utils.get_asset('editor', client.icon)
+    end
   end
 
   ::continue::
