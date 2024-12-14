@@ -9,15 +9,28 @@ function Handler.new(client)
   local self = setmetatable({}, mt)
   self.client = client
   self.handlers = {}
+  self.queue = {}
   return self
 end
 
 function Handler:on_event(type, data)
   local handler = self.handlers[type]
-  if handler then handler(data) end
+  if handler then
+    handler(data)
+  else
+    self.queue[type] = data
+  end
 end
 
-function Handler:register(type, callback) self.handlers[type] = callback end
+function Handler:register(type, callback)
+  local data = self.queue[type]
+  if data then
+    callback(data)
+    self.queue[type] = nil
+  end
+
+  self.handlers[type] = callback
+end
 
 function Handler:run()
   self:setup_default_handlers()
