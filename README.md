@@ -95,6 +95,7 @@ require('cord').setup {
     disable_on_focus = false,                   -- Do not display idle status when neovim is focused
     text = 'Idle',                              -- Text to display when idle
     tooltip = '💤',                             -- Text to display when hovering over the idle image
+    icon = nil,                                 -- Replace the default idle icon; either an asset ID or a URL
   },
   text = {
     viewing = 'Viewing {}',                     -- Text to display when viewing a readonly file
@@ -165,6 +166,7 @@ require('cord').setup {
       disable_on_focus = false,
       text = 'Idle',
       tooltip = '💤',
+      icon = nil,
     },
     text = {
       viewing = 'Viewing {}',
