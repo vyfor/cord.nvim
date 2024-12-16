@@ -11,8 +11,7 @@ use rpc::activity::ActivityButton;
 use std::sync::Mutex;
 use std::{ffi::c_char, time::UNIX_EPOCH};
 use util::utils::{
-    build_activity, build_presence, find_workspace, get_asset, ptr_to_string,
-    validate_buttons,
+    build_activity, build_presence, find_workspace, get_asset, ptr_to_string, validate_buttons,
 };
 use util::{status, types::AssetType};
 
@@ -33,6 +32,7 @@ pub struct Config {
     editor_tooltip: String,
     idle_text: String,
     idle_tooltip: String,
+    idle_icon: String,
     viewing_text: String,
     editing_text: String,
     file_browser_text: String,
@@ -71,6 +71,7 @@ pub struct InitArgs {
     pub editor_tooltip: *const c_char,
     pub idle_text: *const c_char,
     pub idle_tooltip: *const c_char,
+    pub idle_icon: *const c_char,
     pub viewing_text: *const c_char,
     pub editing_text: *const c_char,
     pub file_browser_text: *const c_char,
@@ -105,10 +106,7 @@ pub unsafe extern "C" fn is_connected() -> bool {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn init(
-    args_ptr: *const InitArgs,
-    buttons_ptr: *const Buttons,
-) -> u8 {
+pub unsafe extern "C" fn init(args_ptr: *const InitArgs, buttons_ptr: *const Buttons) -> u8 {
     if INITIALIZED {
         return status::UNINITIALIZED;
     }
@@ -116,9 +114,7 @@ pub unsafe extern "C" fn init(
     let args = &*args_ptr;
 
     let mut is_custom_client = false;
-    let (client_id, mut editor_image) = match ptr_to_string(args.client)
-        .as_str()
-    {
+    let (client_id, mut editor_image) = match ptr_to_string(args.client).as_str() {
         "vim" => (1219918645770059796, get_asset("editor", "vim")),
         "neovim" => (1219918880005165137, get_asset("editor", "neovim")),
         "lunarvim" => (1220295374087000104, get_asset("editor", "lunarvim")),
@@ -145,6 +141,11 @@ pub unsafe extern "C" fn init(
     let editor_tooltip = ptr_to_string(args.editor_tooltip);
     let idle_text = ptr_to_string(args.idle_text);
     let idle_tooltip = ptr_to_string(args.idle_tooltip);
+    let idle_icon = args
+        .idle_icon
+        .is_null()
+        .then(|| get_asset("editor", "idle"))
+        .unwrap_or(ptr_to_string(args.idle_icon));
     let viewing_text = ptr_to_string(args.viewing_text);
     let editing_text = ptr_to_string(args.editing_text);
     let file_browser_text = ptr_to_string(args.file_browser_text);
@@ -184,21 +185,21 @@ pub unsafe extern "C" fn init(
         )
     };
 
-    let workspace =
-        workspace.file_name().unwrap().to_string_lossy().to_string();
+    let workspace = workspace
+        .file_name()
+        .map(|f| f.to_string_lossy())
+        .unwrap_or_default()
+        .to_string();
     let ws = workspace.clone();
 
     let workspace_blacklist = if args.workspace_blacklist.is_null() {
         Vec::new()
     } else {
         let workspace_blacklist = &*args.workspace_blacklist;
-        std::slice::from_raw_parts(
-            workspace_blacklist,
-            args.workspace_blacklist_len as usize,
-        )
-        .iter()
-        .map(|s| ptr_to_string(s.to_owned()))
-        .collect::<Vec<String>>()
+        std::slice::from_raw_parts(workspace_blacklist, args.workspace_blacklist_len as usize)
+            .iter()
+            .map(|s| ptr_to_string(s.to_owned()))
+            .collect::<Vec<String>>()
     };
     let ws_blacklist = workspace_blacklist.clone();
 
@@ -221,6 +222,7 @@ pub unsafe extern "C" fn init(
                 editor_tooltip,
                 idle_text,
                 idle_tooltip,
+                idle_icon,
                 viewing_text,
                 editing_text,
                 file_browser_text,
@@ -247,9 +249,7 @@ pub unsafe extern "C" fn init(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn update_presence(
-    args_ptr: *const PresenceArgs,
-) -> bool {
+pub unsafe extern "C" fn update_presence(args_ptr: *const PresenceArgs) -> bool {
     if !INITIALIZED {
         return false;
     }
@@ -271,7 +271,7 @@ pub unsafe extern "C" fn update_presence(
 
             (
                 config.idle_text.clone(),
-                Some(get_asset("editor", "idle")),
+                Some(config.idle_icon.clone()),
                 config.idle_tooltip.clone(),
             )
         } else {
@@ -466,11 +466,7 @@ pub unsafe extern "C" fn update_presence_with_assets(
                     }
                     let name = if name.is_empty() { &filetype } else { &name };
 
-                    (
-                        config.file_browser_text.replace("{}", name),
-                        icon,
-                        tooltip,
-                    )
+                    (config.file_browser_text.replace("{}", name), icon, tooltip)
                 }
                 Some(AssetType::PluginManager) => {
                     if icon.is_empty() {
@@ -520,25 +516,22 @@ pub unsafe extern "C" fn update_presence_with_assets(
             || large_image.starts_with("https://"))
         {
             match mappings::get_by_filetype_or_none(&large_image, &filename) {
-                Some(Filetype::Language(icon, _)) => {
-                    get_asset("language", icon)
-                }
-                Some(Filetype::FileBrowser(icon, _)) => {
-                    get_asset("file_browser", icon)
-                }
-                Some(Filetype::PluginManager(icon, _)) => {
-                    get_asset("plugin_manager", icon)
-                }
+                Some(Filetype::Language(icon, _)) => get_asset("language", icon),
+                Some(Filetype::FileBrowser(icon, _)) => get_asset("file_browser", icon),
+                Some(Filetype::PluginManager(icon, _)) => get_asset("plugin_manager", icon),
                 Some(Filetype::Lsp(icon, _)) => get_asset("lsp", icon),
                 Some(Filetype::Vcs(icon, _)) => get_asset("vcs", icon),
-                _ => get_asset(match asset_ty {
-                    Some(AssetType::Language) => "language",
-                    Some(AssetType::FileBrowser) => "file_browser",
-                    Some(AssetType::PluginManager) => "plugin_manager",
-                    Some(AssetType::Lsp) => "lsp",
-                    Some(AssetType::Vcs) => "vcs",
-                    _ => "language",
-                }, &large_image),
+                _ => get_asset(
+                    match asset_ty {
+                        Some(AssetType::Language) => "language",
+                        Some(AssetType::FileBrowser) => "file_browser",
+                        Some(AssetType::PluginManager) => "plugin_manager",
+                        Some(AssetType::Lsp) => "lsp",
+                        Some(AssetType::Vcs) => "vcs",
+                        _ => "language",
+                    },
+                    &large_image,
+                ),
             }
         } else {
             large_image.to_owned()

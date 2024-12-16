@@ -56,6 +56,7 @@ local function init_discord(ffi)
       const char* editor_tooltip;
       const char* idle_text;
       const char* idle_tooltip;
+      const char* idle_icon;
       const char* viewing_text;
       const char* editing_text;
       const char* file_browser_text;

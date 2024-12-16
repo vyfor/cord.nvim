@@ -38,6 +38,7 @@ cord.config = {
     disable_on_focus = false,
     text = 'Idle',
     tooltip = '💤',
+    icon = nil,
   },
   text = {
     viewing = 'Viewing {}',
@@ -100,6 +101,7 @@ local function init(config)
       config.editor.tooltip,
       config.idle.text,
       config.idle.tooltip,
+      config.idle.icon,
       config.text.viewing,
       config.text.editing,
       config.text.file_browser,
