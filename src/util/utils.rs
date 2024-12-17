@@ -19,7 +19,7 @@ use crate::{
 pub const GITHUB_ASSETS_URL: &str =
     "http://raw.githubusercontent.com/vyfor/cord.nvim/master/assets";
 // Increment when modifying an existing icon
-const ASSETS_VERSION: &str = "17";
+const ASSETS_VERSION: &str = "18";
 const VCS_MARKERS: [&str; 3] = [".git", ".svn", ".hg"];
 
 #[inline(always)]
