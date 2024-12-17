@@ -14,6 +14,7 @@ pub fn get<'a>(
         "cr" => ("crystal", "Crystal"),
         "cs" => ("csharp", "C#"),
         "css" => ("css", "CSS"),
+        "cuda" => ("cuda", "CUDA"),
         "d" => ("d", "D "),
         "dart" => ("dart", "Dart"),
         "dockerfile" => ("docker", "Docker"),
