@@ -85,8 +85,6 @@ local function build_activity(cfg, opts)
     small_text = config.get(cfg.editor.tooltip, opts)
   end
 
-  print(large_image, large_text)
-
   return {
     details = details,
     state = state,
