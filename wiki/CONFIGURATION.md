@@ -99,24 +99,25 @@ require('cord').setup {
 
 ## 📊 Display
 
-| Option                | Type      | Default | Description                         |
-| --------------------- | --------- | ------- | ----------------------------------- |
-| `display.swap_fields` | `boolean` | `false` | Show workspace name before filename |
-| `display.swap_icons`  | `boolean` | `false` | Use editor icon as large image      |
+| Option                | Type      | Default | Description                                                                     |
+| --------------------- | --------- | ------- | ------------------------------------------------------------------------------- |
+| `display.style`       | `string`  | `onyx`  | Choose between different icon styles; one of 'onyx' (dark) or 'pastel' (accent) |
+| `display.swap_fields` | `boolean` | `false` | Show workspace name before filename                                             |
+| `display.swap_icons`  | `boolean` | `false` | Use editor icon as large image                                                  |
 
 ## 💤 Idle
 
-| Option              | Type                       | Default    | Description                                                   |
-| ------------------- | -------------------------- | ---------- | ------------------------------------------------------------- |
-| `idle.enabled`      | `boolean`                  | `true`     | Enable idle status detection                                  |
-| `idle.timeout`      | `number`                   | `300000`   | Milliseconds before marking the session as idle               |
-| `idle.show_status`  | `boolean`                  | `true`     | Show idle status in presence, or hide the presence if `false` |
-| `idle.ignore_focus` | `boolean`                  | `true`     | Show idle when Neovim is focused                              |
-| `idle.smart_idle`   | `boolean`                  | `true`     | Enable [smart idle](#smart-idle) feature                      |
-| `idle.details`      | `string \| function(opts)` | `'Idling'` | Details shown when idle                                       |
-| `idle.state`        | `string \| function(opts)` | `nil`      | State shown when idle                                         |
-| `idle.tooltip`      | `string \| function(opts)` | `'💤'`      | Tooltip shown when hovering over idle icon                    |
-| `idle.icon`         | `string \| function(opts)` | `nil`      | Custom icon URL or asset ID                                   |
+| Option              | Type                       | Default                                                                               | Description                                                   |
+| ------------------- | -------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `idle.enabled`      | `boolean`                  | `true`                                                                                | Enable idle status detection                                  |
+| `idle.timeout`      | `number`                   | `300000`                                                                              | Milliseconds before marking the session as idle               |
+| `idle.show_status`  | `boolean`                  | `true`                                                                                | Show idle status in presence, or hide the presence if `false` |
+| `idle.ignore_focus` | `boolean`                  | `true`                                                                                | Show idle when Neovim is focused                              |
+| `idle.smart_idle`   | `boolean`                  | `true`                                                                                | Enable [smart idle](#smart-idle) feature                      |
+| `idle.details`      | `string \| function(opts)` | `'Idling'`                                                                            | Details shown when idle                                       |
+| `idle.state`        | `string \| function(opts)` | `nil`                                                                                 | State shown when idle                                         |
+| `idle.tooltip`      | `string \| function(opts)` | `'💤'`                                                                                 | Tooltip shown when hovering over idle icon                    |
+| `idle.icon`         | `string \| function(opts)` | [`default idle icon`](https://github.com/vyfor/icons/blob/master/icons/onyx/idle.png) | Custom icon URL or asset ID                                   |
 
 ## 📝 Text & Assets
 
@@ -311,7 +312,7 @@ The `ActivityManager` contains useful methods:
 | `unforce_idle()`             | Clears the idle state and resumes normal activity.                                                                 |
 | `toggle_idle()`              | Toggles between idle and normal activity.                                                                          |
 | `set_activity(activity)`     | Sets the rich presence to the provided [activity](#activity-options), offering complete control over the presence. |
-| `clear_activity(force)`      | Clears the current activity from the Discord presence. If `force` is true, it completely clears the presence.      |
+| `clear_activity(force)`      | Clears the current activity from the server. If `force` is true, it completely clears the presence.                |
 
 ### Activity Options
 
@@ -320,6 +321,11 @@ The `ActivityManager` contains useful methods:
 | `type`       | `number` | One of 'playing', 'listening', 'watching'                                                            |
 | `state`      | `string` | The user's current state (e.g., "Editing a file").                                                   |
 | `details`    | `string` | Detailed information about what the user is doing.                                                   |
-| `timestamps` | `object` | Contains `start` and `end` timestamps for the activity.                                              |
-| `assets`     | `object` | Defines images and tooltips, including `large_image`, `large_text`, `small_image`, and `small_text`. |
+| `timestamps` | `table`  | Contains `start` and `end` timestamps for the activity.                                              |
+| `assets`     | `table`  | Defines images and tooltips, including `large_image`, `large_text`, `small_image`, and `small_text`. |
 | `buttons`    | `array`  | Array of objects, each with `label` and `url`, defining interactive buttons in the presence.         |
+
+### Useful Functions
+
+- `require('cord.icon').get(name: string, style?: string): string`
+  - Returns the URL for the specified icon name and optional style.
