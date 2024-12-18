@@ -21,13 +21,6 @@ local CLIENT_IDS = {
   },
 }
 
--- Increment this only when an existing icon is modified
-local ASSETS_VERSION = '1'
-local ASSETS_URL =
-  'https://raw.githubusercontent.com/vyfor/icons/master/icons/flat'
-
 return {
   CLIENT_IDS = CLIENT_IDS,
-  ASSETS_URL = ASSETS_URL,
-  ASSETS_VERSION = ASSETS_VERSION,
 }

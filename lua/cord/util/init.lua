@@ -1,4 +1,3 @@
-local constants = require 'cord.util.constants'
 local logger = require 'cord.util.logger'
 
 local uv = vim.loop or vim.uv
@@ -33,7 +32,7 @@ local function mkdir(path, callback) uv.fs_mkdir(path, 493, callback) end
 
 local function kill_process(pid) uv.kill(pid, 15) end
 
-local function get_icon(config, filename, filetype)
+local function get_custom_asset(config, filename, filetype)
   if not config.assets then return end
 
   local icon = config.assets[filetype]
@@ -50,16 +49,6 @@ local function get_icon(config, filename, filetype)
   if icon then return icon, 'Cord.override' end
 end
 
-local function get_asset(type, name)
-  return constants.ASSETS_URL
-    .. '/'
-    .. type
-    .. '/'
-    .. name
-    .. '.png?v='
-    .. constants.ASSETS_VERSION
-end
-
 return {
   path_sep = path_sep,
   os_name = os_name,
@@ -67,6 +56,5 @@ return {
   rm_file = rm_file,
   mkdir = mkdir,
   kill_process = kill_process,
-  get_icon = get_icon,
-  get_asset = get_asset,
+  get_custom_asset = get_custom_asset,
 }
