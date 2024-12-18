@@ -1,6 +1,7 @@
 local config = require 'cord.util.config'
 local mappings = require 'cord.mappings'
 local utils = require 'cord.util'
+local icons = require 'cord.icon'
 
 local function build_activity(cfg, opts)
   if opts.filetype == '' then
@@ -12,43 +13,49 @@ local function build_activity(cfg, opts)
     end
   end
 
-  local type, icon, tooltip = mappings.get(opts.filetype, opts.filename)
-  opts.type = type
-  opts.icon = utils.get_asset(type, icon)
+  local icon_type, icon, tooltip = mappings.get(opts.filetype, opts.filename)
+  opts.type = icon_type
+  opts.icon = icon and icons.get(icon)
   opts.tooltip = tooltip
 
   local custom_icon, override_type =
-    utils.get_icon(cfg, opts.filename, opts.filetype)
+    utils.get_custom_asset(cfg, opts.filename, opts.filetype)
   if custom_icon then
-    opts.name = config.get(custom_icon.name, opts)
-    opts.icon = config.get(custom_icon.icon, opts) or icon
-    opts.tooltip = config.get(custom_icon.tooltip, opts) or tooltip
-    opts.type = custom_icon.type or type
-    opts.text = config.get(custom_icon.text, opts)
-    opts.filetype = override_type or opts.filetype
+    if type(custom_icon) == 'string' then
+      opts.icon = custom_icon
+    else
+      opts.name = config.get(custom_icon.name, opts)
+      opts.tooltip = config.get(custom_icon.tooltip, opts) or tooltip
+      opts.type = custom_icon.type or icon_type or 'language'
+      opts.text = config.get(custom_icon.text, opts)
+      opts.filetype = override_type or opts.filetype
+      opts.icon = config.get(custom_icon.icon, opts)
+        or icon
+        or mappings.get_default_icon(opts.type)
+    end
   end
 
   local file_text
   if opts.text then
     file_text = opts.text
   else
-    if type == 'language' then
+    if icon_type == 'language' then
       if opts.is_read_only then
         file_text = config.get(cfg.text.viewing, opts)
       else
         file_text = config.get(cfg.text.editing, opts)
       end
-    elseif type == 'file_browser' then
+    elseif icon_type == 'file_browser' then
       file_text = config.get(cfg.text.file_browser, opts)
-    elseif type == 'plugin_manager' then
+    elseif icon_type == 'plugin_manager' then
       file_text = config.get(cfg.text.plugin_manager, opts)
-    elseif type == 'lsp' then
+    elseif icon_type == 'lsp' then
       file_text = config.get(cfg.text.lsp, opts)
-    elseif type == 'docs' then
+    elseif icon_type == 'docs' then
       file_text = config.get(cfg.text.docs, opts)
-    elseif type == 'vcs' then
+    elseif icon_type == 'vcs' then
       file_text = config.get(cfg.text.vcs, opts)
-    elseif type == 'dashboard' then
+    elseif icon_type == 'dashboard' then
       file_text = config.get(cfg.text.dashboard, opts)
     end
   end
@@ -70,13 +77,15 @@ local function build_activity(cfg, opts)
     large_image = cfg.editor.icon
     large_text = config.get(cfg.editor.tooltip, opts)
     small_image = opts.icon
-    small_text = opts.tooltip
+    small_text = opts.tooltip or opts.filetype
   else
     large_image = opts.icon
-    large_text = opts.tooltip
+    large_text = opts.tooltip or opts.filetype
     small_image = cfg.editor.icon
     small_text = config.get(cfg.editor.tooltip, opts)
   end
+
+  print(large_image, large_text)
 
   return {
     details = details,
@@ -109,11 +118,9 @@ local function build_idle_activity(cfg, opts)
     large_image = cfg.editor.icon
     large_text = config.get(cfg.editor.tooltip, opts)
     small_image = config.get(cfg.idle.icon, opts)
-      or utils.get_asset('editor', 'idle')
     small_text = config.get(cfg.idle.tooltip, opts)
   else
     large_image = config.get(cfg.idle.icon, opts)
-      or utils.get_asset('editor', 'idle')
     large_text = config.get(cfg.idle.tooltip, opts)
     small_image = cfg.editor.icon
     small_text = config.get(cfg.editor.tooltip, opts)

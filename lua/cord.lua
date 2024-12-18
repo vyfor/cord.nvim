@@ -75,9 +75,7 @@ end
 ---@param opts? CordConfig Configuration options for Cord
 ---@return nil
 function M.setup(opts)
-  if not config:validate(opts or {}) then return end
-  logger.set_level(config.values.log_level)
-  M.initialize()
+  if config:validate(opts or {}) then M.initialize() end
 end
 
 return M
