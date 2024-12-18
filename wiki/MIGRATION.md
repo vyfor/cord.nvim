@@ -16,6 +16,8 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 
 - A new `variables` option allows users to define custom variables, including functions, for dynamic text templates. This enhances the flexibility and customization of the Rich Presence display.
 
+- Many of the icons have been redesigned, and a new icon style has been introduced. The previous style, now called "Pastel" has been replaced with the default style, "Onyx" which features a sleek and modern dark theme. You can switch to a different style by using the `display.style` option.
+
 > [!IMPORTANT]
 > A nightly version of the Rust compiler is required to build the server component. The latest version of `rustup` can be downloaded from [here](https://rustup.rs/). Then, install the nightly toolchain using `rustup install nightly`.
 > If you're using a plugin manager such as lazy.nvim, set the `build` key to `cargo build --release` to automatically rebuild the server on plugin updates.
@@ -43,6 +45,10 @@ The config structure has been updated to be more flexible. Most notably, the maj
 
 ### New Options
 ```lua
+display = {
+    style = 'onyx',                             -- Choose between 'onyx' (dark) or 'pastel' (accent)
+}
+
 idle = {
     smart_idle = true,                          -- Enable smart idle feature
     ignore_focus = true,                        -- Ignore window focus for idle state
