@@ -1,11 +1,12 @@
 local M = {}
 
+M.default_icon = 'dashboard'
 local mappings = {
-  alpha = { 'default', 'Alpha' },
-  dashboard = { 'default', 'Dashboard' },
-  dashboardpreview = { 'default', 'Dashboard' },
-  ministarter = { 'default', 'mini.starter' },
-  startify = { 'default', 'Startify' },
+  alpha = { M.default_icon, 'Alpha' },
+  dashboard = { M.default_icon, 'Dashboard' },
+  dashboardpreview = { M.default_icon, 'Dashboard' },
+  ministarter = { M.default_icon, 'mini.starter' },
+  startify = { M.default_icon, 'Startify' },
 }
 
 M.get = function(filetype) return mappings[filetype] end

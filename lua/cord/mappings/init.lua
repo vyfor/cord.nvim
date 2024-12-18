@@ -8,6 +8,24 @@ local docs = require 'cord.mappings.docs'
 local vcs = require 'cord.mappings.vcs'
 local dashboard = require 'cord.mappings.dashboard'
 
+M.get_default_icon = function(type)
+  if type == 'file_browser' then
+    return file_browser.default_icon
+  elseif type == 'plugin_manager' then
+    return plugin_manager.default_icon
+  elseif type == 'lsp' then
+    return lsp_manager.default_icon
+  elseif type == 'docs' then
+    return docs.default_icon
+  elseif type == 'vcs' then
+    return vcs.default_icon
+  elseif type == 'dashboard' then
+    return dashboard.default_icon
+  else
+    return language.default_icon
+  end
+end
+
 M.get = function(filetype, filename)
   local result = language.get(filetype, filename)
   if result then return 'language', result[1], result[2] end
@@ -29,8 +47,6 @@ M.get = function(filetype, filename)
 
   result = dashboard.get(filetype)
   if result then return 'dashboard', result[1], result[2] end
-
-  return 'language', 'text', filetype
 end
 
 return M

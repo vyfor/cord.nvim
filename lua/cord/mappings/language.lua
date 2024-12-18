@@ -1,8 +1,9 @@
 local M = {}
 
+M.default_icon = 'text'
 local mappings = {
-  ['Cord.new'] = { 'text', 'New file' },
-  ['Cord.unknown'] = { 'text', 'Unknown' },
+  ['Cord.new'] = { M.default_icon, 'New file' },
+  ['Cord.unknown'] = { M.default_icon, 'Unknown' },
   autohotkey = { 'ahk', 'AutoHotkey' },
   asm = { 'assembly', 'Assembly' },
   astro = { 'astro', 'Astro' },
@@ -61,7 +62,7 @@ local mappings = {
   typescript = { 'typescript', 'TypeScript' },
   typescriptreact = { 'react', 'TSX' },
   v = { 'v', 'V' },
-  vim = { 'vim', 'VimL' },
+  vim = { 'viml', 'VimL' },
   vue = { 'vue', 'Vue' },
   yaml = { 'yaml', 'YAML' },
   zig = { 'zig', 'Zig' },
@@ -85,7 +86,7 @@ local special_cases = {
     local name = filename:lower()
     return (name == 'license' or name == 'license.txt')
         and { 'license', 'License file' }
-      or { 'text', 'Plain Text' }
+      or { M.default_icon, 'Plain Text' }
   end,
   toml = function(filename)
     return filename == 'Cargo.toml' and { 'cargo', 'Cargo' }

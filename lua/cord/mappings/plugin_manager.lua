@@ -1,9 +1,10 @@
 local M = {}
 
+M.default_icon = 'text'
 local mappings = {
-  lazy = { 'default', 'Lazy' },
-  pckr = { 'default', 'Pckr' },
-  packer = { 'default', 'Packer' },
+  lazy = { M.default_icon, 'Lazy' },
+  pckr = { M.default_icon, 'Pckr' },
+  packer = { M.default_icon, 'Packer' },
 }
 
 M.get = function(filetype) return mappings[filetype] end

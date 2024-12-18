@@ -1,17 +1,18 @@
 local M = {}
 
+M.default_icon = 'folder'
 local mappings = {
-  netrw = { 'default', 'Netrw' },
+  netrw = { M.default_icon, 'Netrw' },
   TelescopePrompt = { 'telescope', 'Telescope' },
-  dirvish = { 'default', 'Dirvish' },
-  fern = { 'default', 'Fern' },
-  oil = { 'default', 'Oil' },
-  oil_preview = { 'default', 'Oil' },
-  oil_progress = { 'default', 'Oil' },
-  NvimTree = { 'default', 'nvim-tree' },
-  minifiles = { 'default', 'mini.files' },
-  yazi = { 'default', 'Yazi' },
-  ['neo-tree'] = { 'default', 'Neo-Tree' },
+  dirvish = { M.default_icon, 'Dirvish' },
+  fern = { M.default_icon, 'Fern' },
+  oil = { M.default_icon, 'Oil' },
+  oil_preview = { M.default_icon, 'Oil' },
+  oil_progress = { M.default_icon, 'Oil' },
+  NvimTree = { M.default_icon, 'nvim-tree' },
+  minifiles = { M.default_icon, 'mini.files' },
+  yazi = { M.default_icon, 'Yazi' },
+  ['neo-tree'] = { M.default_icon, 'Neo-Tree' },
 }
 
 M.get = function(filetype) return mappings[filetype] end
