@@ -80,7 +80,7 @@
 
 local logger = require 'cord.util.logger'
 local constants = require 'cord.util.constants'
-local utils = require 'cord.util'
+local icons = require 'cord.icon'
 
 local M = {}
 
@@ -99,6 +99,7 @@ M.values = {
     icon = nil,
   },
   display = {
+    style = 'onyx',
     swap_fields = false,
     swap_icons = false,
   },
@@ -111,7 +112,7 @@ M.values = {
     details = 'Idling',
     state = nil,
     tooltip = '💤',
-    icon = nil,
+    icon = icons.get 'idle',
   },
   text = {
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
@@ -149,6 +150,8 @@ M.values = {
 
 function M:validate(user_config)
   local config = vim.tbl_deep_extend('force', self.values, user_config)
+  logger.set_level(config.log_level)
+  icons.set_style(config.display.style)
 
   if config.buttons and #config.buttons > 2 then
     logger.error 'There cannot be more than 2 buttons'
@@ -162,7 +165,7 @@ function M:validate(user_config)
       if config.editor.client:match '^%d+$' then
         config.is_custom_client = true
         if not config.editor.icon then
-          config.editor.icon = utils.get_asset('editor', 'neovim')
+          config.editor.icon = icons.get 'neovim'
         end
         goto continue
       end
@@ -173,7 +176,7 @@ function M:validate(user_config)
 
     config.editor.client = client.id
     if not config.editor.icon then
-      config.editor.icon = utils.get_asset('editor', client.icon)
+      config.editor.icon = icons.get(client.icon)
     end
   end
 
