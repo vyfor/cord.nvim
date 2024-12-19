@@ -14,59 +14,62 @@ function M.initialize()
 
     M.producer = Producer.new(client)
     M.handler = Handler.new(client)
-    M.handler:register('initialize', function(pid)
-      local executable = file_manager.get_executable_name()
-      local target_path = file_manager.get_target_path(executable)
-      uv.fs_stat(target_path, function(err)
-        if not err then
-          client:on_close(function()
-            file_manager.get_executable(pid, function(_, err, moved)
-              if err then
-                logger.error(err)
-                return
-              end
+    M.handler:register(
+      'initialize',
+      vim.schedule_wrap(function(pid)
+        local executable = file_manager.get_executable_name()
+        local target_path = file_manager.get_target_path(executable)
+        uv.fs_stat(target_path, function(err)
+          if not err then
+            client:on_close(function()
+              file_manager.get_executable(pid, function(_, err, moved)
+                if err then
+                  logger.error(err)
+                  return
+                end
 
-              if moved then
-                client:close()
-                M.initialize()
-              end
+                if moved then
+                  client:close()
+                  M.initialize()
+                end
+              end)
             end)
-          end)
-          M.producer:shutdown()
-        else
-          M.handler:register(
-            'ready',
-            vim.schedule_wrap(function()
-              logger.info 'Connected to Discord'
+            M.producer:shutdown()
+          else
+            M.handler:register(
+              'ready',
+              vim.schedule_wrap(function()
+                logger.info 'Connected to Discord'
 
-              local ActivityManager = require 'cord.activity.manager'
+                local ActivityManager = require 'cord.activity.manager'
 
-              if config.values.hooks.on_ready then
-                config.values.hooks.on_ready()
-              end
+                if config.values.hooks.on_ready then
+                  config.values.hooks.on_ready()
+                end
 
-              M.producer:initialize(config.values)
+                M.producer:initialize(config.values)
 
-              ActivityManager.new(
-                { tx = M.producer, config = config.values },
-                vim.schedule_wrap(function(manager)
-                  M.manager = manager
+                ActivityManager.new(
+                  { tx = M.producer, config = config.values },
+                  vim.schedule_wrap(function(manager)
+                    M.manager = manager
 
-                  client:on_close(vim.schedule_wrap(function()
-                    if config.values.hooks.on_disconnect then
-                      config.values.hooks.on_disconnect()
-                    end
+                    client:on_close(vim.schedule_wrap(function()
+                      if config.values.hooks.on_disconnect then
+                        config.values.hooks.on_disconnect()
+                      end
 
-                    manager:pause()
-                  end))
-                  manager:run()
-                end)
-              )
-            end)
-          )
-        end
+                      manager:pause()
+                    end))
+                    manager:run()
+                  end)
+                )
+              end)
+            )
+          end
+        end)
       end)
-    end)
+    )
 
     M.handler:run()
   end)

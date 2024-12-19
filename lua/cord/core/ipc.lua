@@ -24,21 +24,24 @@ function IPC:connect(callback)
   local pipe = uv.new_pipe()
   self.pipe = pipe
 
-  pipe:connect(self.path, function(err)
-    if err then
-      if err == 'ENOENT' then
-        spawn.spawn_server(self, function() self:connect(callback) end)
+  pipe:connect(
+    self.path,
+    vim.schedule_wrap(function(err)
+      if err then
+        if err == 'ENOENT' then
+          spawn.spawn_server(self, function() self:connect(callback) end)
+          return
+        else
+          logger.error('Failed to connect to pipe: ' .. err)
+        end
         return
-      else
-        logger.error('Failed to connect to pipe: ' .. err)
       end
-      return
-    end
 
-    logger.debug('Connected to pipe: ' .. self.path)
+      logger.debug('Connected to pipe: ' .. self.path)
 
-    if callback then callback() end
-  end)
+      if callback then callback() end
+    end)
+  )
 end
 
 function IPC:read_start(callback)
