@@ -189,7 +189,7 @@ function M:validate(user_config)
   return true
 end
 
-function M:get(option, args)
+function M.get(option, args)
   local is_function = type(option) == 'function'
 
   if is_function then
