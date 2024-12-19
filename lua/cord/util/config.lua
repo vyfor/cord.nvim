@@ -54,8 +54,9 @@
 ---@field on_disconnect? fun():nil
 
 ---@class CordAdvancedConfig
----@field cursor_update_mode? string Cursor update mode
 ---@field server? CordAdvancedServerConfig configuration
+---@field cursor_update_mode? string Cursor update mode
+---@field variables_in_functions? boolean Whether to use variables in functions
 
 ---@class CordAdvancedServerConfig
 ---@field pipe_path? string Path to the server's pipe
@@ -145,6 +146,7 @@ M.values = {
       timeout = 60000,
     },
     cursor_update_mode = 'on_move',
+    variables_in_functions = false,
   },
 }
 
@@ -187,25 +189,26 @@ function M:validate(user_config)
   return true
 end
 
-function M.get(option, args)
-  if type(option) == 'function' then return option(args) end
+function M:get(option, args)
+  local is_function = type(option) == 'function'
 
-  local variables = M.values.variables
-  if variables then
-    if type(variables) == 'table' then
-      for k, v in pairs(variables) do
-        if type(v) == 'function' then
-          args[k] = v(args)
-        else
-          args[k] = v
+  if is_function then
+    if not M.values.advanced.variables_in_functions then return option(args) end
+  else
+    local variables = M.values.variables
+    if variables then
+      if type(variables) == 'table' then
+        for k, v in pairs(variables) do
+          args[k] = (type(v) == 'function') and v(args) or v
         end
       end
+      if type(option) == 'string' then
+        option = option:gsub('%${(.-)}', args)
+      end
     end
-
-    option = option:gsub('%${(.-)}', args)
   end
 
-  return option
+  return is_function and option(args) or option
 end
 
 function M:get_buttons(opts)

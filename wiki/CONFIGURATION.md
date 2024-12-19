@@ -152,6 +152,7 @@ require('cord').setup {
 | `advanced.server.executable_path` | `string \| nil` | `nil`       | Custom server executable path                                                                                        |
 | `advanced.server.timeout`         | `number`        | `60000`     | Server shutdown timeout (ms)                                                                                         |
 | `advanced.cursor_update_mode`     | `string`        | `'on_move'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode) |
+| `advanced.variables_in_functions` | `boolean`       | `false`     | Whether to compute and use variables in functions                                                                    |
 
 ---
 
