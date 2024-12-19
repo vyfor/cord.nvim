@@ -14,8 +14,8 @@ local function build_activity(cfg, opts)
   end
 
   local icon_type, icon, tooltip = mappings.get(opts.filetype, opts.filename)
-  opts.type = icon_type
-  opts.icon = icon and icons.get(icon)
+  opts.type = icon_type or 'language'
+  opts.icon = icons.get(icon or mappings.get_default_icon(opts.type))
   opts.tooltip = tooltip
 
   local custom_icon, override_type =
@@ -26,12 +26,10 @@ local function build_activity(cfg, opts)
     else
       opts.name = config.get(custom_icon.name, opts)
       opts.tooltip = config.get(custom_icon.tooltip, opts) or tooltip
-      opts.type = custom_icon.type or icon_type or 'language'
+      opts.type = custom_icon.type or icon_type
       opts.text = config.get(custom_icon.text, opts)
       opts.filetype = override_type or opts.filetype
-      opts.icon = config.get(custom_icon.icon, opts)
-        or icon
-        or mappings.get_default_icon(opts.type)
+      opts.icon = config.get(custom_icon.icon, opts) or icon
     end
   end
 
@@ -39,23 +37,23 @@ local function build_activity(cfg, opts)
   if opts.text then
     file_text = opts.text
   else
-    if icon_type == 'language' then
+    if opts.type == 'language' then
       if opts.is_read_only then
         file_text = config.get(cfg.text.viewing, opts)
       else
         file_text = config.get(cfg.text.editing, opts)
       end
-    elseif icon_type == 'file_browser' then
+    elseif opts.type == 'file_browser' then
       file_text = config.get(cfg.text.file_browser, opts)
-    elseif icon_type == 'plugin_manager' then
+    elseif opts.type == 'plugin_manager' then
       file_text = config.get(cfg.text.plugin_manager, opts)
-    elseif icon_type == 'lsp' then
+    elseif opts.type == 'lsp' then
       file_text = config.get(cfg.text.lsp, opts)
-    elseif icon_type == 'docs' then
+    elseif opts.type == 'docs' then
       file_text = config.get(cfg.text.docs, opts)
-    elseif icon_type == 'vcs' then
+    elseif opts.type == 'vcs' then
       file_text = config.get(cfg.text.vcs, opts)
-    elseif icon_type == 'dashboard' then
+    elseif opts.type == 'dashboard' then
       file_text = config.get(cfg.text.dashboard, opts)
     end
   end
