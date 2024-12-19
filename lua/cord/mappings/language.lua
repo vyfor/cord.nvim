@@ -14,6 +14,7 @@ local mappings = {
   cr = { 'crystal', 'Crystal' },
   cs = { 'csharp', 'C#' },
   css = { 'css', 'CSS' },
+  cuda = { 'nvidia', 'CUDA' },
   d = { 'd', 'D' },
   dart = { 'dart', 'Dart' },
   dockerfile = { 'docker', 'Docker' },
