@@ -71,8 +71,9 @@ Cord features over 70 beautifully designed icons for languages and components wi
 
 ## 📖 Documentation  
 - [**Configuration Guide**](wiki/CONFIGURATION.md): Everything you need to customize Cord.  
-- [**Migration Guide**](wiki/MIGRATION.md): Smooth migration from Cord v1.  
-- [**Wiki**](https://github.com/vyfor/cord.nvim/wiki): Examples, best practices, and FAQs.
+- [**Examples**](wiki/EXAMPLES.md): Creative ways to customize your Discord presence.
+- [**Migration Guide**](wiki/MIGRATION.md): Smooth migration from Cord v1.
+- [**Wiki**](https://github.com/vyfor/cord.nvim/wiki): Examples, best practices, and FAQs. (Coming soon)
 
 ## 🤝 Contributing  
 We welcome contributions to make Cord even better!
