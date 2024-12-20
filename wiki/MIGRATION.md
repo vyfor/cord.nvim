@@ -124,3 +124,5 @@ assets = {
         text = 'Managing dependencies' -- As opposed to 'Editing Cargo.toml'
     }
 }```
+
+More information can be found in the [Configuration Guide](CONFIGURATION.md).
