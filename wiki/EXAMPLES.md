@@ -29,6 +29,9 @@ text = {
   editing = function(opts)
     return is_blacklisted(opts) and 'Editing a file' or ('Editing ' .. opts.filename)
   end,
+  workspace = function(opts)
+    return is_blacklisted(opts) and 'In a secret workspace' or ('Working on ' .. opts.filename)
+  end
 }
 ```
 
