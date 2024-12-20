@@ -157,6 +157,8 @@ function ActivityManager:run()
   self:setup_autocmds()
   if self.config.usercmds then self:setup_usercmds() end
   self:queue_update(true)
+
+  if self.config.hooks.on_ready then self.config.hooks.on_ready() end
 end
 
 ---Check if the activity should be updated to idle

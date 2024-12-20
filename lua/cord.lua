@@ -43,10 +43,6 @@ function M.initialize()
 
                 local ActivityManager = require 'cord.activity.manager'
 
-                if config.values.hooks.on_ready then
-                  config.values.hooks.on_ready()
-                end
-
                 M.producer:initialize(config.values)
 
                 ActivityManager.new(
