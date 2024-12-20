@@ -101,7 +101,7 @@ require('cord').setup {
 
 | Option                | Type      | Default | Description                                                                     |
 | --------------------- | --------- | ------- | ------------------------------------------------------------------------------- |
-| `display.style`       | `string`  | `onyx`  | Choose between different icon styles; one of 'onyx' (dark) or 'pastel' (accent) |
+| `display.theme`       | `string`  | `onyx`  | Choose between different icon themes; one of 'onyx' (dark) or 'pastel' (accent) |
 | `display.swap_fields` | `boolean` | `false` | Show workspace name before filename                                             |
 | `display.swap_icons`  | `boolean` | `false` | Use editor icon as large image                                                  |
 
@@ -328,5 +328,5 @@ The `ActivityManager` contains useful methods:
 
 ### Useful Functions
 
-- `require('cord.icon').get(name: string, style?: string): string`
-  - Returns the URL for the specified icon name and optional style.
+- `require('cord.icon').get(name: string, theme?: string): string`
+  - Returns the URL for the specified icon name and optional theme.

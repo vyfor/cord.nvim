@@ -9,6 +9,7 @@
 ---@field icon? string Optional editor icon
 
 ---@class CordDisplayConfig
+---@field theme? string Set icon theme
 ---@field swap_fields? boolean Whether to swap activity fields
 ---@field swap_icons? boolean Whether to swap activity icons
 
@@ -100,7 +101,7 @@ M.values = {
     icon = nil,
   },
   display = {
-    style = 'onyx',
+    theme = 'onyx',
     swap_fields = false,
     swap_icons = false,
   },
@@ -153,7 +154,7 @@ M.values = {
 function M:validate(user_config)
   local config = vim.tbl_deep_extend('force', self.values, user_config)
   logger.set_level(config.log_level)
-  icons.set_style(config.display.style)
+  icons.set_theme(config.display.theme)
 
   if config.buttons and #config.buttons > 2 then
     logger.error 'There cannot be more than 2 buttons'
