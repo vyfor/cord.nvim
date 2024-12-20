@@ -16,6 +16,9 @@ M.get = function(name, style)
     .. M.ICONS_VERSION
 end
 
-M.set_style = function(style) M.ICON_STYLE = style end
+M.set_style = function(style)
+  M.ICON_STYLE = style
+  M.DEFAULT_IDLE_ICON = (style == 'onyx') and 'keyboard' or 'idle'
+end
 
 return M
