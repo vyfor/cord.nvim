@@ -7,7 +7,7 @@
   </div>
   <h3>🚀 The most extensible Discord Rich Presence plugin for Neovim, powered by Rust.
   </h3>
-  <img src="https://github.com/user-attachments/assets/c6bfcf43-0d93-49f8-b5fc-b78aaeb62090" alt="Cord Banner">
+  <img src="https://github.com/user-attachments/assets/df73221e-565b-49e5-9dad-1c60aed6f9c3" alt="Cord Banner">
 </div>
 
 ## 📚 Table of Contents
