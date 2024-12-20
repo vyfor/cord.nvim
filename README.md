@@ -22,15 +22,15 @@
 ---
 
 ## ✨ Key Features  
-- 🌐 **Client-Server Design**: Handles multiple Neovim instances with a single connection to Discord.
-- ⚡ **Performance in Mind**: Lightweight, dependency-free, with blazingly-fast startup.
-- 🚀 **Event-Driven Architecture**: Instant presence updates with zero delays.  
-- 🎨 **Customizable Templates**: Dynamic string templates with custom variables.
-- 🔧 **Unmatched Configurability**: Function-based configuration for infinite customization possibilities.
-- 🧠 **Automated State Handling**: Automatically manages activities across all instances.
-- 💤 **Smart Idle Detection**: Identifies idle sessions and switches to the most recent non-idle session.
-- 🛠️ **Built-in Git Integration**: Detects repositories and workspaces based on VCS.
-- 🌍 **Cross-Platform**: Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
+- 🌐 **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
+- ⚡ **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
+- 🚀 **Event-Driven Architecture** — Instant presence updates with zero delays.  
+- 🎨 **Customizable Templates** — Dynamic string templates with custom variables.
+- 🔧 **Unmatched Configurability** — Function-based configuration for infinite customization possibilities.
+- 🧠 **Automated State Handling** — Automatically manages activities across all instances.
+- 💤 **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
+- 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS.
+- 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
 
 ---
 
