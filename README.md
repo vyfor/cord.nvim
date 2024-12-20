@@ -19,8 +19,6 @@
 - [🤝 Contributing](#-contributing)
 - [❓ FAQ](#-faq)
 
----
-
 ## ✨ Key Features  
 - 🌐 **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
 - ⚡ **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
@@ -32,13 +30,9 @@
 - 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS.
 - 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
 
----
-
 ## 🔌 Requirements  
 - **Neovim >= 0.6.0** 
 - **[Rust](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
-
----
 
 ## 📦 Installation  
 
@@ -70,27 +64,19 @@ use {
 
 </details>
 
----
-
 ## 🎨 Themes  
 Cord features over 70 beautifully designed icons for languages and components with distinct themes.
 
 👉 [**Explore the Showcase**](https://github.com/vyfor/icons#showcase)  
-
----
 
 ## 📖 Documentation  
 - [**Configuration Guide**](wiki/CONFIGURATION.md): Everything you need to customize Cord.  
 - [**Migration Guide**](wiki/MIGRATION.md): Smooth migration from Cord v1.  
 - [**Wiki**](https://github.com/vyfor/cord.nvim/wiki): Examples, best practices, and FAQs.
 
----
-
 ## 🤝 Contributing  
 We welcome contributions to make Cord even better!
 - Check out our [**Contribution Guidelines**](.github/CONTRIBUTING.md).  
-
----
 
 ## ❓ FAQ  
 Have questions or issues?  
