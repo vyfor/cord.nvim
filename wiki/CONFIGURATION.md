@@ -183,10 +183,10 @@ Buttons can have static or dynamic labels and URLs:
 buttons = {
     {
         label = function(opts)
-            return opts.git_url and 'View Repository' or 'Website'
+            return opts.repo_url and 'View Repository' or 'Website'
         end,
         url = function(opts)
-            return opts.git_url or 'https://example.com'
+            return opts.repo_url or 'https://example.com'
         end
     }
 }
@@ -279,7 +279,7 @@ The `opts` parameter passed to all functions and hooks contains the following in
     -- Workspace Information
     workspace_dir     = string,           -- Current workspace directory
     workspace_name    = string,           -- Current workspace name
-    git_url           = string,           -- Current Git repository URL, if any
+    repo_url          = string,           -- Current Git repository URL, if any
 
     -- Editor Information
     is_focused        = boolean,          -- Whether Neovim is focused

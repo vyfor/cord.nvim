@@ -14,7 +14,7 @@ local uv = vim.loop or vim.uv
 ---@field last_activity Activity Last activity state
 ---@field last_opts CordOpts Last options passed to activity update
 ---@field workspace_dir string Current workspace directory
----@field git_url string|nil Current Git repository URL
+---@field repo_url string|nil Current Git repository URL
 local ActivityManager = {}
 local mt = { __index = ActivityManager }
 
@@ -47,7 +47,7 @@ local mt = { __index = ActivityManager }
 ---@field timestamp number Timestamp passed to the Rich Presence in milliseconds
 ---@field workspace_dir string Current workspace directory
 ---@field workspace_name string Current workspace name
----@field git_url string Current Git repository URL, if any
+---@field repo_url string Current Git repository URL, if any
 ---@field is_focused boolean Whether Neovim is focused
 ---@field is_idle boolean Whether the session is idle
 ---@field buttons CordButtonConfig[] Buttons configuration
@@ -75,15 +75,8 @@ function ActivityManager.new(opts, callback)
   ws_utils.find(vim.fn.expand '%:p:h', function(dir)
     dir = dir or cwd
     self.workspace_dir = dir
-    ws_utils.find_git_repository(dir, function(git_url)
-      self.git_url = git_url
-      if self.config.buttons then
-        for i = 1, #self.config.buttons do
-          if self.config.buttons[i].url == 'git' then
-            self.config.buttons[i].url = git_url
-          end
-        end
-      end
+    ws_utils.find_git_repository(dir, function(repo_url)
+      self.repo_url = repo_url
 
       callback(self)
     end)
@@ -113,7 +106,7 @@ function ActivityManager:queue_update(force_update)
       timestamp = self.timestamp,
       workspace_dir = self.workspace_dir,
       workspace_name = self.workspace_name,
-      git_url = self.git_url,
+      repo_url = self.repo_url,
       is_focused = self.is_focused,
       is_idle = self.is_idle,
     }

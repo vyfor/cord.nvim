@@ -107,13 +107,13 @@ text = {
 buttons = {
     {
         label = function(opts)
-            if opts.git_url then
+            if opts.repo_url then
                 return 'View Repository'
             end
             return 'My Website'
         end,
         url = function(opts)
-            return opts.git_url or 'https://example.com'
+            return opts.repo_url or 'https://example.com'
         end
     }
 }
