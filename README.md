@@ -49,7 +49,6 @@
 {
   'vyfor/cord.nvim',
   build = 'cargo build --release',
-  event = 'VeryLazy',
   opts = {}, -- calls require('cord').setup()
 }
 ```
