@@ -13,21 +13,20 @@ require('cord').setup {
 
 ```lua
 {
-  usercmds = true,
-  log_level = vim.log.levels.ERROR,
-  timestamp = {
-    enabled = true,
-    reset_on_idle = false,
-    reset_on_change = false,
-  },
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',
     icon = nil,
   },
   display = {
+    theme = 'onyx',
     swap_fields = false,
     swap_icons = false,
+  },
+  timestamp = {
+    enabled = true,
+    reset_on_idle = false,
+    reset_on_change = false,
   },
   idle = {
     enabled = true,
@@ -63,12 +62,18 @@ require('cord').setup {
     on_disconnect = nil,
   },
   advanced = {
+    plugin = {
+      log_level = vim.log.levels.INFO,
+      autocmds = true,
+      usercmds = true,
+    },
     server = {
       pipe_path = nil,
       executable_path = nil,
       timeout = 60000,
     },
     cursor_update_mode = 'on_move',
+    variables_in_functions = false,
   },
 }
 ```
@@ -146,13 +151,16 @@ require('cord').setup {
 
 ## ⚙️ Advanced
 
-| Option                            | Type            | Default     | Description                                                                                                          |
-| --------------------------------- | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
-| `advanced.server.pipe_path`       | `string \| nil` | `nil`       | Custom IPC pipe path                                                                                                 |
-| `advanced.server.executable_path` | `string \| nil` | `nil`       | Custom server executable path                                                                                        |
-| `advanced.server.timeout`         | `number`        | `60000`     | Server shutdown timeout (ms)                                                                                         |
-| `advanced.cursor_update_mode`     | `string`        | `'on_move'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode) |
-| `advanced.variables_in_functions` | `boolean`       | `false`     | Whether to compute and use variables in functions                                                                    |
+| Option                            | Type            | Default               | Description                                                                                                          |
+| --------------------------------- | --------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `advanced.plugin.log_level`       | `number`        | `vim.log.levels.INFO` | Logging level for the plugin                                                                                         |
+| `advanced.plugin.autocmds`        | `boolean`       | `true`                | Enable autocmds                                                                                                      |
+| `advanced.plugin.usercmds`        | `boolean`       | `true`                | Enable [user commands](#user-commands)                                                                               |
+| `advanced.server.pipe_path`       | `string \| nil` | `nil`                 | Custom IPC pipe path                                                                                                 |
+| `advanced.server.executable_path` | `string \| nil` | `nil`                 | Custom server executable path                                                                                        |
+| `advanced.server.timeout`         | `number`        | `60000`               | Server shutdown timeout (ms)                                                                                         |
+| `advanced.cursor_update_mode`     | `string`        | `'on_move'`           | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode) |
+| `advanced.variables_in_functions` | `boolean`       | `false`               | Whether to compute and use variables in functions                                                                    |
 
 ---
 
