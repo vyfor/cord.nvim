@@ -80,14 +80,17 @@ function ActivityManager.new(opts, callback)
   ws_utils.find(rawdir, function(dir)
     dir = dir or cwd
     self.workspace_dir = dir
-    self.workspace_cache[rawdir] = {
+
+    local cache = {
       dir = dir,
       name = vim.fn.fnamemodify(dir, ':t'),
     }
 
     ws_utils.find_git_repository(dir, function(repo_url)
       self.repo_url = repo_url
-      self.workspace_cache[rawdir].repo_url = repo_url
+      cache.repo_url = repo_url
+
+      self.workspace_cache[rawdir] = cache
 
       callback(self)
     end)
