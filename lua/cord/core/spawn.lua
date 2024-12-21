@@ -55,15 +55,18 @@ function M.spawn_server(client, callback)
   local executable = client.config.advanced.server.executable_path
 
   if not executable then
-    file_manager.get_executable(nil, function(executable_path, err)
-      if err then
-        logger.error(err)
-        return
-      end
+    file_manager.get_executable(
+      nil,
+      vim.schedule_wrap(function(executable_path, err)
+        if err then
+          logger.error(err)
+          return
+        end
 
-      executable = executable_path
-      spawn(executable, client, callback)
-    end)
+        executable = executable_path
+        spawn(executable, client, callback)
+      end)
+    )
   else
     spawn(executable, client, callback)
   end
