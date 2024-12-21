@@ -16,6 +16,7 @@ local uv = vim.loop or vim.uv
 ---@field last_opts? CordOpts Previous options passed to activity updates, used to detect changes
 ---@field workspace_dir string Current workspace directory
 ---@field repo_url string|nil Current Git repository URL
+---@field workspace_cache table Cache of workspace directories, their names and repositories
 local ActivityManager = {}
 local mt = { __index = ActivityManager }
 
@@ -63,21 +64,30 @@ local mt = { __index = ActivityManager }
 ---@param callback fun(manager: ActivityManager) Callback function called with the new instance
 ---@return ActivityManager
 function ActivityManager.new(opts, callback)
-  local self = setmetatable({}, mt)
+  local self = setmetatable({
+    config = opts.config,
+    tx = opts.tx,
+    is_focused = true,
+    is_paused = false,
+    is_force_idle = false,
+    events_enabled = true,
+    workspace_cache = {},
+  }, mt)
 
-  self.config = opts.config
-  self.tx = opts.tx
-  self.is_focused = true
-  self.is_paused = false
-  self.is_force_idle = false
-  self.events_enabled = true
-
+  local rawdir = vim.fn.expand '%:p:h'
   local cwd = vim.fn.getcwd()
-  ws_utils.find(vim.fn.expand '%:p:h', function(dir)
+
+  ws_utils.find(rawdir, function(dir)
     dir = dir or cwd
     self.workspace_dir = dir
+    self.workspace_cache[rawdir] = {
+      dir = dir,
+      name = vim.fn.fnamemodify(dir, ':t'),
+    }
+
     ws_utils.find_git_repository(dir, function(repo_url)
       self.repo_url = repo_url
+      self.workspace_cache[rawdir].repo_url = repo_url
 
       callback(self)
     end)
@@ -95,9 +105,10 @@ function ActivityManager:run()
   if self.config.timestamp.enabled then self.timestamp = os.time() end
   if self.config.advanced.plugin.usercmds then self.setup_usercmds() end
   if self.config.hooks.on_ready then self.config.hooks.on_ready(self) end
-  if self.config.advanced.plugin.autocmds then self:setup_autocmds() end
 
   self:queue_update(true)
+  if self.config.advanced.plugin.autocmds then self:setup_autocmds() end
+
   if self.config.idle.enabled then
     self.idle_timer = uv.new_timer()
     self.idle_timer:start(
@@ -367,24 +378,75 @@ end
 ---Handle buffer enter event
 ---@return nil
 function ActivityManager:on_buf_enter()
+  local rawdir = vim.fn.expand '%:p:h'
+  local cached = self.workspace_cache[rawdir]
+  if cached then
+    if cached.dir ~= self.workspace_dir then
+      self.workspace_dir = cached.dir
+      self.workspace_name = cached.name
+      self.repo_url = cached.repo_url
+      self.opts.workspace_dir = self.workspace_dir
+      self.opts.workspace_name = self.workspace_name
+      self.opts.repo_url = self.repo_url
+
+      if self.config.hooks.on_workspace_change then
+        self.config.hooks.on_workspace_change(self.opts)
+      end
+    end
+
+    self:queue_update()
+    return
+  elseif cached == false then
+    if self.workspace_dir then
+      self.workspace_dir = nil
+      self.workspace_name = nil
+      self.repo_url = nil
+      self.opts.workspace_dir = nil
+      self.opts.workspace_name = nil
+      self.opts.repo_url = nil
+
+      if self.config.hooks.on_workspace_change then
+        self.config.hooks.on_workspace_change(self.opts)
+      end
+    end
+
+    self:queue_update()
+    return
+  end
+
   ws_utils.find(
     vim.fn.expand '%:p:h',
     vim.schedule_wrap(function(dir)
-      if not dir or dir == self.workspace_dir then goto update end
+      if not dir then
+        self.workspace_cache[rawdir] = false
+        self:queue_update()
+        return
+      end
 
       self.workspace_dir = dir
       self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
+      self.opts.workspace_dir = self.workspace_dir
+      self.opts.workspace_name = self.workspace_name
 
-      if self.config.hooks.on_workspace_change then
-        if not self.opts then self.opts = self:build_opts() end
-        self.opts.workspace_dir = self.workspace_dir
-        self.opts.workspace_name = self.workspace_name
+      ws_utils.find_git_repository(
+        self.workspace_dir,
+        vim.schedule_wrap(function(repo_url)
+          self.repo_url = repo_url
+          self.opts.repo_url = repo_url
 
-        self.config.hooks.on_workspace_change(self.opts)
-      end
+          self.workspace_cache[rawdir] = {
+            dir = self.workspace_dir,
+            name = self.workspace_name,
+            repo_url = self.repo_url,
+          }
 
-      ::update::
-      self:queue_update()
+          if self.config.hooks.on_workspace_change then
+            self.config.hooks.on_workspace_change(self.opts)
+          end
+
+          self:queue_update()
+        end)
+      )
     end)
   )
 end
