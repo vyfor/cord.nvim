@@ -140,14 +140,14 @@ require('cord').setup {
 
 ## 🪝 Hooks
 
-| Option                      | Type                       | Description                                                                  |
-| --------------------------- | -------------------------- | ---------------------------------------------------------------------------- |
-| `hooks.on_ready`            | `function`                 | Called when connected to the server and ready for communication with Discord |
-| `hooks.on_update`           | `function(opts)`           | Called before building activity                                              |
-| `hooks.on_activity`         | `function(opts, activity)` | Called before sending activity                                               |
-| `hooks.on_idle`             | `function(opts)`           | Called when idle state changes                                               |
-| `hooks.on_workspace_change` | `function(opts)`           | Called when workspace changes                                                |
-| `hooks.on_disconnect`       | `function`                 | Called when server disconnects                                               |
+| Option                      | Type                       | Description                                                                                                        |
+| --------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `hooks.on_ready`            | `function(manager)`        | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
+| `hooks.on_update`           | `function(opts)`           | Called before building activity ([opts](#options-table))                                                           |
+| `hooks.on_activity`         | `function(opts, activity)` | Called before sending activity ([opts](#options-table), [activity](#activity-options))                             |
+| `hooks.on_idle`             | `function(opts)`           | Called when idle state changes ([opts](#options-table))                                                            |
+| `hooks.on_workspace_change` | `function(opts)`           | Called when workspace changes ([opts](#options-table))                                                             |
+| `hooks.on_disconnect`       | `function`                 | Called when server disconnects                                                                                     |
 
 ## ⚙️ Advanced
 
