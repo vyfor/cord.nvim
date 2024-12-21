@@ -139,6 +139,20 @@ idle = {
 }
 ```
 
+### Hide Buttons on Idle
+```lua
+buttons = {
+  {
+    label = function(opts)
+      return opts.is_idle and '' or 'View Repository'
+    end,
+    url = function(opts)
+      return opts.is_idle and '' or opts.repo_url
+    end
+  }
+}
+```
+
 ### Random Quotes
 ```lua
 local quotes = {
