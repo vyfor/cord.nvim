@@ -40,7 +40,8 @@ The config structure has been updated to be more flexible. Most notably, the maj
   idle.enable              idle.enabled
   idle.text                idle.details
   idle.disable_on_focus    idle.ignore_focus (inverted)
-  log_level                use vim.log.levels instead of string values
+  log_level                moved to advanced.plugin.log_level, uses vim.log.levels instead of string values
+  usercmds                 moved to advanced.plugin.usercmds
 ```
 
 ### New Options
@@ -66,6 +67,11 @@ hooks = {
 }
 
 advanced = {
+    plugin = {
+        log_level = vim.log.levels.INFO,        -- Logging level
+        autocmds = true,                        -- Enable autocmds
+        usercmds = true,                        -- Enable user commands
+    },
     server = {
         pipe_path = nil,                        -- Custom IPC pipe path for the server
         executable_path = nil,                  -- Custom server executable path
