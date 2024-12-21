@@ -14,7 +14,10 @@ function Producer:send_event(type, data)
 end
 
 function Producer:initialize(config)
-  self:send_event('initialize', { log_level = config.log_level })
+  self:send_event(
+    'initialize',
+    { log_level = config.advanced.plugin.log_level }
+  )
 end
 
 function Producer:update_activity(activity)

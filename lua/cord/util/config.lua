@@ -36,8 +36,8 @@
 ---@field dashboard? string|fun(opts: CordOpts):string Text for dashboard activity
 
 ---@class CordButtonConfig
----@field label string|fun(opts: CordOpts):string Button label
----@field url string|fun(opts: CordOpts):string Button URL
+---@field label string|fun(opts: CordOpts):string? Button label
+---@field url string|fun(opts: CordOpts):string? Button URL
 
 ---@class CordAssetConfig
 ---@field name? string|fun(opts: CordOpts):string Asset name
@@ -47,7 +47,7 @@
 ---@field type? string|fun(opts: CordOpts):string Asset type
 
 ---@class CordHooksConfig
----@field on_ready? fun():nil
+---@field on_ready? fun(manager: ActivityManager):nil
 ---@field on_update? fun(opts: CordOpts):nil
 ---@field on_activity? fun(opts: CordOpts, activity: Activity):nil
 ---@field on_idle? fun(opts: CordOpts, activity: Activity?):nil
@@ -55,9 +55,15 @@
 ---@field on_disconnect? fun():nil
 
 ---@class CordAdvancedConfig
+---@field plugin? CordAdvancedPluginConfig configuration
 ---@field server? CordAdvancedServerConfig configuration
 ---@field cursor_update_mode? string Cursor update mode
 ---@field variables_in_functions? boolean Whether to use variables in functions
+
+---@class CordAdvancedPluginConfig
+---@field log_level? integer Logging level (from `vim.log.levels`)
+---@field autocmds? boolean Whether to enable autocmds
+---@field usercmds? boolean Whether to enable user commands
 
 ---@class CordAdvancedServerConfig
 ---@field pipe_path? string Path to the server's pipe
@@ -67,11 +73,9 @@
 ---@alias CordVariablesConfig { [string]: string|fun(opts: CordOpts):string }
 
 ---@class CordConfig
----@field usercmds? boolean Whether to create user commands
----@field log_level? integer Logging level (from vim.log.levels)
----@field timestamp? CordTimestampConfig Timestamp configuration
 ---@field editor? CordEditorConfig Editor configuration
 ---@field display? CordDisplayConfig Display configuration
+---@field timestamp? CordTimestampConfig Timestamp configuration
 ---@field idle? CordIdleConfig Idle configuration
 ---@field text? CordTextConfig Text configuration
 ---@field buttons? CordButtonConfig[] Buttons configuration
@@ -88,13 +92,6 @@ local M = {}
 
 ---@type CordConfig
 M.values = {
-  usercmds = true,
-  log_level = vim.log.levels.INFO,
-  timestamp = {
-    enabled = true,
-    reset_on_idle = false,
-    reset_on_change = false,
-  },
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',
@@ -104,6 +101,11 @@ M.values = {
     theme = 'onyx',
     swap_fields = false,
     swap_icons = false,
+  },
+  timestamp = {
+    enabled = true,
+    reset_on_idle = false,
+    reset_on_change = false,
   },
   idle = {
     enabled = true,
@@ -141,6 +143,11 @@ M.values = {
     on_disconnect = nil,
   },
   advanced = {
+    plugin = {
+      log_level = vim.log.levels.INFO,
+      autocmds = true,
+      usercmds = true,
+    },
     server = {
       pipe_path = nil,
       executable_path = nil,
@@ -153,7 +160,7 @@ M.values = {
 
 function M:validate(user_config)
   local config = vim.tbl_deep_extend('force', self.values, user_config)
-  logger.set_level(config.log_level)
+  logger.set_level(config.advanced.plugin.log_level)
   icons.set_theme(config.display.theme)
 
   if config.buttons and #config.buttons > 2 then
@@ -217,20 +224,38 @@ function M.get(option, args)
 end
 
 function M:get_buttons(opts)
-  local buttons = self.values.buttons
-  if not buttons then return end
+  if not self.values.buttons then return {} end
 
-  for i = 1, #buttons do
-    local button = buttons[i]
+  local buttons = {}
+  for i = 1, #self.values.buttons do
+    local sourcebtn = self.values.buttons[i]
+    local button = {}
 
-    if type(button.label) == 'function' then
-      buttons[i].label = button.label(opts)
+    if type(sourcebtn.label) == 'function' then
+      local label = sourcebtn.label(opts)
+      if not label then goto continue end
+      button.label = label
+    else
+      if not sourcebtn.label then goto continue end
+      button.label = sourcebtn.label
     end
 
-    if type(button.url) == 'function' then buttons[i].url = button.url(opts) end
+    if type(sourcebtn.url) == 'function' then
+      local url = sourcebtn.url(opts)
+      if not url then goto continue end
+      button.url = url
+    else
+      if not sourcebtn.url then goto continue end
+      button.url = sourcebtn.url
+    end
+
+    buttons[#buttons + 1] = button
+
+    ::continue::
   end
 
   return buttons
 end
+
 
 return M

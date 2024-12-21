@@ -15,14 +15,20 @@ M.find = function(initial_path, callback)
   local curr_dir = initial_path
 
   local function check_marker(curr_dir)
+    local pending = #VCS_MARKERS
+    local found = false
+
     for _, marker in ipairs(VCS_MARKERS) do
       local marker_path = curr_dir .. '/' .. marker
       uv.fs_stat(marker_path, function(err, stat)
-        if err then return callback(nil) end
+        pending = pending - 1
 
-        if stat and stat.type == 'directory' then
-          callback(curr_dir)
-        else
+        if not err and stat and stat.type == 'directory' then
+          if not found then
+            found = true
+            callback(curr_dir)
+          end
+        elseif pending == 0 and not found then
           local parent = vim.fn.fnamemodify(curr_dir, ':h')
           if parent == curr_dir then
             callback(initial_path)
