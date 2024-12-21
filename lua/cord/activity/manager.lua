@@ -163,7 +163,6 @@ end
 ---Update the activity to idle
 ---@return nil
 function ActivityManager:update_idle_activity()
-  print('is opts null?', self.opts == nil)
   if not self.opts then self.opts = self:build_opts() end
   self.opts.is_idle = true
   self.is_idle = true
