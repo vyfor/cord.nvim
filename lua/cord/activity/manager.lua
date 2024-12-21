@@ -218,6 +218,8 @@ function ActivityManager:skip_update() self.should_skip_update = true end
 ---Pause activity updates and events
 ---@return nil
 function ActivityManager:pause()
+  if self.is_paused then return end
+
   self:pause_events()
   if self.idle_timer then self.idle_timer:stop() end
   self.is_paused = true
@@ -226,6 +228,8 @@ end
 ---Resume activity updates and events
 ---@return nil
 function ActivityManager:resume()
+  if not self.is_paused then return end
+
   self:resume_events()
   if self.idle_timer then
     self.idle_timer:start(
