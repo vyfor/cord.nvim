@@ -22,6 +22,7 @@ local is_blacklisted = function(opts)
   return vim.tbl_contains(blacklist, opts.workspace_name)
 end
 
+-- use a custom text for the activity
 text = {
   viewing = function(opts)
     return is_blacklisted(opts) and 'Viewing a file' or ('Viewing ' .. opts.filename)
@@ -31,6 +32,18 @@ text = {
   end,
   workspace = function(opts)
     return is_blacklisted(opts) and 'In a secret workspace' or ('Working on ' .. opts.filename)
+  end
+}
+
+-- or simply hide the activity when in a blacklisted workspace
+hooks = {
+  on_workspace_change = function(opts)
+    if is_blacklisted(opts) then
+      opts.manager:skip_update() -- preferably skip updating the current activity
+      opts.manager:hide()
+    else 
+      opts.manager:resume()
+    end
   end
 }
 ```
@@ -93,6 +106,7 @@ text = {
 }
 ```
 
+### Dynamic Buttons
 ```lua
 buttons = {
   {
@@ -143,13 +157,22 @@ idle = {
 ```lua
 buttons = {
   {
-    label = function(opts)
-      return opts.is_idle and '' or 'View Repository'
-    end,
+    label = 'View Repository',
     url = function(opts)
-      return opts.is_idle and '' or opts.repo_url
+      if not opts.is_idle then return opts.repo_url end
     end
   }
+}
+```
+
+### Indicate Modified Buffers
+```lua
+text = {
+  editing = function(opts)
+    local text = 'Editing ' .. opts.filename
+    if vim.bo.modified then text = text .. '[+]' end
+    return text
+  end,
 }
 ```
 
@@ -167,7 +190,7 @@ local quotes = {
 }
 
 hooks = {
-  on_activity = function(opts, activity)
+  on_activity = function(_, activity)
     activity.details = quotes[math.random(#quotes)]
   end
 }
