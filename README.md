@@ -2,7 +2,7 @@
   <h1>🧩 <strong>Cord</strong> – Tailor Your Presence Like Never Before</h1>
   <div>
     <a href="https://github.com/vyfor/cord.nvim/stargazers"><img src="https://img.shields.io/github/stars/vyfor/cord.nvim?style=for-the-badge" alt="Stargazers"></a>
-    <a href="https://github.com/vyfor/cord.nvim/blob/master/LICENSE"><img src="https://img.shields.io/github/license/vyfor/cord.nvim?style=for-the-badge" alt="Apache-2.0 License"></a>
+    <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-%20%3E%3D%200.6.0-57A143?style=for-the-badge&logo=neovim" alt="Neovim"></a>
     <a href="https://github.com/vyfor/cord.nvim/forks"><img src="https://img.shields.io/github/forks/vyfor/cord.nvim?style=for-the-badge" alt="Forks"></a>
   </div>
   <h3>🚀 The most extensible Discord Rich Presence plugin for Neovim, powered by Rust.
