@@ -106,7 +106,6 @@ function ActivityManager:run()
   self.last_updated = uv.now()
 
   if self.config.timestamp.enabled then self.timestamp = os.time() end
-  if self.config.advanced.plugin.usercmds then self.setup_usercmds() end
   if self.config.hooks.on_ready then self.config.hooks.on_ready(self) end
 
   self:queue_update(true)
@@ -305,20 +304,6 @@ function ActivityManager:toggle()
   else
     self:hide()
   end
-end
-
----Setup user commands
----@return nil
-function ActivityManager.setup_usercmds()
-  vim.cmd [[
-    command! CordShowPresence lua require'cord'.manager:resume()
-    command! CordHidePresence lua require'cord'.manager:hide()
-    command! CordTogglePresence lua require'cord'.manager:toggle()
-    command! CordIdle lua require'cord'.manager:force_idle()
-    command! CordUnidle lua require'cord'.manager:unforce_idle()
-    command! CordToggleIdle lua require'cord'.manager:toggle_idle()
-    command! -bang CordClearPresence lua require'cord'.manager:clear_activity('<bang>' == '!')
-  ]]
 end
 
 ---Setup autocmds
