@@ -67,6 +67,7 @@ impl TryFrom<u64> for LogLevel {
             2 => Ok(LogLevel::Info),
             3 => Ok(LogLevel::Warn),
             4 => Ok(LogLevel::Error),
+            5 => Ok(LogLevel::Off),
             _ => Err(()),
         }
     }
