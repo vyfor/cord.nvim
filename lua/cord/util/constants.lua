@@ -1,3 +1,5 @@
+local VERSION = '2.0.0'
+
 local CLIENT_IDS = {
   vim = {
     id = '1219918645770059796',
@@ -22,5 +24,6 @@ local CLIENT_IDS = {
 }
 
 return {
+  VERSION = VERSION,
   CLIENT_IDS = CLIENT_IDS,
 }
