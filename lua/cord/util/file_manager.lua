@@ -31,7 +31,8 @@ function M.get_executable(pid, callback)
   local executable_name = M.get_executable_name()
   local target_path = M.get_target_path(executable_name)
   local data_path = M.get_data_path()
-  local executable_path = data_path .. utils.path_sep .. executable_name
+  local bin_path = data_path .. utils.path_sep .. 'bin'
+  local executable_path = bin_path .. utils.path_sep .. executable_name
 
   uv.fs_stat(target_path, function(err)
     if not err then
@@ -58,12 +59,14 @@ function M.get_executable(pid, callback)
           end)
         else
           utils.mkdir(data_path, function()
-            utils.move_file(target_path, executable_path, function(err)
-              if err then
-                callback(nil, 'Failed to move executable: ' .. err, false)
-                return
-              end
-              callback(executable_path, nil, true)
+            utils.mkdir(bin_path, function()
+              utils.move_file(target_path, executable_path, function(err)
+                if err then
+                  callback(nil, 'Failed to move executable: ' .. err, false)
+                  return
+                end
+                callback(executable_path, nil, true)
+              end)
             end)
           end)
         end
