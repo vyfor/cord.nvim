@@ -15,7 +15,7 @@ impl ErrorEvent {
 
 impl OnEvent for ErrorEvent {
     fn on_event(self, _ctx: &mut EventContext) -> crate::Result<()> {
-        eprintln!("Error: {}", self.error);
+        eprintln!("Error: {:?}", self.error);
 
         Ok(())
     }
