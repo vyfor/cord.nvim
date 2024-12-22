@@ -6,7 +6,7 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 
 ## ✨ What's New
 
-- We have switched to Cargo for building instead of directly calling rustc in build scripts, which often caused inconsistencies. But don't worry, the dependency count is still at [zero](../Cargo.toml)! Plus, users can benefit from cac
+- We have switched to Cargo for building instead of directly calling rustc in build scripts, which often caused inconsistencies. But don't worry, the dependency count is still at [zero](../Cargo.toml)! Plus, users can benefit from incremental builds.
 
 - The plugin now runs as a server that handles all your Neovim instances. When you start Neovim, it launches a server in the background and connects to it. Any additional Neovim instances will connect to the same server, ensuring only one Rich Presence is shown. The most recent activity always takes priority.
 
