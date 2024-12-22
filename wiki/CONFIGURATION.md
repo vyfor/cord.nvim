@@ -65,7 +65,6 @@ require('cord').setup {
     plugin = {
       log_level = vim.log.levels.INFO,
       autocmds = true,
-      usercmds = true,
     },
     server = {
       pipe_path = nil,
@@ -78,21 +77,6 @@ require('cord').setup {
 }
 ```
 </details>
-
-## 🔧 Core Options
-
-| Option      | Type      | Default                | Description                                                  |
-| ----------- | --------- | ---------------------- | ------------------------------------------------------------ |
-| `usercmds`  | `boolean` | `true`                 | Enable [user commands](#user-commands) for managing presence |
-| `log_level` | `number`  | `vim.log.levels.ERROR` | Set logging verbosity using Neovim's log levels              |
-
-## ⏰ Timestamp
-
-| Option                      | Type      | Default | Description                              |
-| --------------------------- | --------- | ------- | ---------------------------------------- |
-| `timestamp.enabled`         | `boolean` | `true`  | Show elapsed time in presence            |
-| `timestamp.reset_on_idle`   | `boolean` | `false` | Reset timestamp when entering idle state |
-| `timestamp.reset_on_change` | `boolean` | `false` | Reset timestamp when presence changes    |
 
 ## 🎨 Editor
 
@@ -109,6 +93,14 @@ require('cord').setup {
 | `display.theme`       | `string`  | `onyx`  | Choose between different icon themes; one of 'onyx' (dark) or 'pastel' (accent) |
 | `display.swap_fields` | `boolean` | `false` | Show workspace name before filename                                             |
 | `display.swap_icons`  | `boolean` | `false` | Use editor icon as large image                                                  |
+
+## ⏰ Timestamp
+
+| Option                      | Type      | Default | Description                              |
+| --------------------------- | --------- | ------- | ---------------------------------------- |
+| `timestamp.enabled`         | `boolean` | `true`  | Show elapsed time in presence            |
+| `timestamp.reset_on_idle`   | `boolean` | `false` | Reset timestamp when entering idle state |
+| `timestamp.reset_on_change` | `boolean` | `false` | Reset timestamp when presence changes    |
 
 ## 💤 Idle
 
@@ -155,7 +147,6 @@ require('cord').setup {
 | --------------------------------- | --------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `advanced.plugin.log_level`       | `number`        | `vim.log.levels.INFO` | Logging level for the plugin                                                                                         |
 | `advanced.plugin.autocmds`        | `boolean`       | `true`                | Enable autocmds                                                                                                      |
-| `advanced.plugin.usercmds`        | `boolean`       | `true`                | Enable [user commands](#user-commands)                                                                               |
 | `advanced.server.pipe_path`       | `string \| nil` | `nil`                 | Custom IPC pipe path                                                                                                 |
 | `advanced.server.executable_path` | `string \| nil` | `nil`                 | Custom server executable path                                                                                        |
 | `advanced.server.timeout`         | `number`        | `60000`               | Server shutdown timeout (ms)                                                                                         |
