@@ -30,54 +30,36 @@ The config structure has been updated to be more flexible. Most notably, the maj
 > Full configuration options can be found [here](CONFIGURATION.md).
 
 ### Changed Options
-```md
-# [Old]                  # [New]
-  timer.interval           Removed (now event-driven)
-  timer.reset_on_idle      timestamp.reset_on_idle
-  timer.reset_on_change    timestamp.reset_on_change
-  editor.image             editor.icon
-  display.show_time        timestamp.enabled
-  idle.enable              idle.enabled
-  idle.text                idle.details
-  idle.disable_on_focus    idle.ignore_focus (inverted)
-  log_level                moved to advanced.plugin.log_level, uses vim.log.levels instead of string values
-  usercmds                 moved to advanced.plugin.usercmds
-```
-
-### New Options
 ```lua
-display = {
-    theme = 'onyx',                             -- Choose between 'onyx' (dark) or 'pastel' (accent)
+-- Removed Options
+-- timer.interval (now event-driven)
+-- display.show_repository
+-- display.show_cursor_position
+-- display.workspace_blacklist
+-- lsp
+
+-- Renamed Options
+timestamp = {             -- was timer
+  enabled = true,         -- was display.show_time
+  reset_on_idle = true,   -- was timer.reset_on_idle
+  reset_on_change = true, -- was timer.reset_on_change
+}
+
+editor = {
+  icon = nil,             -- was editor.image
 }
 
 idle = {
-    smart_idle = true,                          -- Enable smart idle feature
-    ignore_focus = true,                        -- Ignore window focus for idle state
+  enabled = true,         -- was idle.enable
+  details = 'Idling',     -- was idle.text
+  ignore_focus = false,   -- was idle.disable_on_focus (inverted)
 }
 
-variables = {}                                  -- Define custom variables for use in string templates
-
-hooks = {
-    on_ready = function() end,                  -- Server connection established
-    on_update = function(opts) end,             -- Before building the activity
-    on_activity = function(opts, activity) end, -- Before sending the activity
-    on_idle = function(opts) end,               -- Entered idle state
-    on_workspace_change = function(opts) end,   -- Workspace directory changed
-    on_disconnect = function() end,             -- Server disconnected
-}
-
+-- Moved Options
 advanced = {
-    plugin = {
-        log_level = vim.log.levels.INFO,        -- Logging level
-        autocmds = true,                        -- Enable autocmds
-        usercmds = true,                        -- Enable user commands
-    },
-    server = {
-        pipe_path = nil,                        -- Custom IPC pipe path for the server
-        executable_path = nil,                  -- Custom server executable path
-        timeout = 60000,                        -- Server shutdown timeout (ms)
-    },
-    cursor_update_mode = 'on_move',             -- Which autocmd to use for cursor updates. One of 'on_move' or 'on_hold' or 'none'
+  plugin = {
+    log_level = vim.log.levels.INFO, -- was log_level (now uses vim.log.levels)
+  }
 }
 ```
 
@@ -88,7 +70,7 @@ Several built-in features have been removed in favor of customization through fu
 - Problem count
 - ToggleTerm handling
 
-These can now be implemented using hooks and custom functions.
+These can now be implemented using hooks and custom functions. See [examples](EXAMPLES.md).
 
 ## 🎨 Function-Based Customization
 
