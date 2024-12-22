@@ -11,7 +11,7 @@
 </div>
 
 ## 📚 Table of Contents
-- [✨ Key Features](#-key-features)
+- [💎 Features](#-features)
 - [🔌 Requirements](#-requirements)
 - [📦 Installation](#-installation)
 - [🎨 Themes](#-themes)
@@ -19,7 +19,7 @@
 - [🤝 Contributing](#-contributing)
 - [❓ FAQ](#-faq)
 
-## ✨ Key Features  
+## 💎 Features  
 - 🌐 **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
 - ⚡ **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
 - 🚀 **Event-Driven Architecture** — Instant presence updates with zero delays.  
@@ -29,6 +29,7 @@
 - 💤 **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
 - 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS.
 - 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
+- 🌸 **Rich Icon Collection** — Features over 70 uniquely designed icons.
 
 ## 🔌 Requirements  
 - **Neovim >= 0.6.0** 
@@ -65,7 +66,7 @@ use {
 </details>
 
 ## 🎨 Themes  
-Cord features over 70 beautifully designed icons for languages and components with distinct themes.
+Cord features over 70 beautifully designed icons for languages and components with distinct themes, with more to come!
 
 👉 [**Explore the Showcase**](https://github.com/vyfor/icons#showcase)  
 
