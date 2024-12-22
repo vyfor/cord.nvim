@@ -239,14 +239,15 @@ require('cord').setup {
 
 ### User Commands
 
-- `:CordTogglePresence` - Toggle presence visibility
-- `:CordShowPresence` - Show presence
-- `:CordHidePresence` - Hide presence
-- `:CordToggleIdle` - Toggle idle status
-- `:CordIdle` - Show idle status
-- `:CordUnidle` - Hide idle status
-- `:CordClearPresence` - Clear current session's presence
-- `:CordClearPresence!` - Clear the rich presence for all sessions
+- `:Cord toggle_presence` - Toggle presence visibility
+- `:Cord show_presence` - Show presence
+- `:Cord hide_presence` - Hide presence
+- `:Cord toggle_idle` - Toggle idle status
+- `:Cord idle` - Show idle status
+- `:Cord unidle` - Hide idle status
+- `:Cord clear_presence` - Clear the rich presence for all sessions
+- `:Cord build` - Build the server executable using `cargo`
+- `:Cord fetch` - Fetch the server executable from GitHub using `curl`
 
 ### Cursor Update Mode
 
