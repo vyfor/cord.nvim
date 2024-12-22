@@ -1,3 +1,10 @@
+>[!IMPORTANT]
+> **This is the legacy version of Cord. It has been deprecated and is unlikely to receive further updates. We encourage you to migrate to Cord v2 and assist us in hunting down any bugs or issues before the merge.**
+> - [Cord v2](https://github.com/vyfor/cord.nvim/tree/client-server)
+> - [Migration Guide](https://github.com/vyfor/cord.nvim/blob/client-server/wiki/MIGRATION.md)
+> - [Tracking Issue](https://github.com/vyfor/cord.nvim/issues/133)
+> - [Tracking Discussion](https://github.com/vyfor/cord.nvim/discussions/143)
+
 <div align="center">
   <h1>🧩 <strong>Cord</strong></h1>
   <div>
