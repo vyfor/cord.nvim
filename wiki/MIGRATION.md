@@ -37,6 +37,7 @@ The config structure has been updated to be more flexible. Most notably, the maj
 -- display.show_cursor_position
 -- display.workspace_blacklist
 -- lsp
+-- usercmds (now always available under 'Cord <command>')
 
 -- Renamed Options
 timestamp = {             -- was timer
