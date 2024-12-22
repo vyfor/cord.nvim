@@ -22,6 +22,7 @@ function M.initialize()
         if not err then
           M.client:on_close(function()
             file_manager.get_executable(
+              config.values,
               pid,
               vim.schedule_wrap(function(_, err, moved)
                 if err then

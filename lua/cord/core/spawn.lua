@@ -46,9 +46,13 @@ local function spawn(executable, client, callback)
 
     if chunk and chunk:match 'Ready' then
       callback()
+      stderr:close()
+      stdout:close()
       return
     end
   end)
+
+  return stdout, stderr
 end
 
 function M.spawn_server(client, callback)
@@ -56,6 +60,7 @@ function M.spawn_server(client, callback)
 
   if not executable then
     file_manager.get_executable(
+      client.config,
       nil,
       vim.schedule_wrap(function(executable_path, err)
         if err then

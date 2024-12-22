@@ -18,7 +18,7 @@ function IPC:connect(callback)
   if self.config.advanced.server.pipe_path then
     self.path = self.config.advanced.server.pipe_path
   else
-    self.path = (utils.os_name == 'Windows' and '\\\\.\\pipe\\' or '/tmp/')
+    self.path = (utils.os_name == 'windows' and '\\\\.\\pipe\\' or '/tmp/')
       .. 'cord-ipc'
   end
   local pipe = uv.new_pipe()

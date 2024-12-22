@@ -3,13 +3,17 @@ local logger = require 'cord.util.logger'
 local uv = vim.loop or vim.uv
 
 local path_sep = '/'
-local os_name = uv.os_uname().sysname
-if os_name:find('Windows', 1, true) == 1 then
+local os_name = uv.os_uname().sysname:lower()
+local os_arch = uv.os_uname().machine
+
+if os_name:match 'windows' then
   path_sep = '\\'
-  os_name = 'Windows'
-elseif os_name:match 'BSD$' then
-  os_name = 'BSD'
+  os_name = 'windows'
+elseif os_name:match 'bsd$' then
+  os_name = 'bsd'
 end
+if os_arch == 'arm64' then os_arch = 'aarch64' end
+if os_arch == 'i386' then os_arch = 'i686' end
 
 local function move_file(src, dest, callback)
   uv.fs_copyfile(src, dest, { ficlone = true }, function(copy_err)
@@ -52,6 +56,7 @@ end
 return {
   path_sep = path_sep,
   os_name = os_name,
+  os_arch = os_arch,
   move_file = move_file,
   rm_file = rm_file,
   mkdir = mkdir,

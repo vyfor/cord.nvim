@@ -24,10 +24,10 @@ function M.get_data_path()
 end
 
 function M.get_executable_name()
-  return utils.os_name == 'Windows' and 'cord.exe' or 'cord'
+  return utils.os_name == 'windows' and 'cord.exe' or 'cord'
 end
 
-function M.get_executable(pid, callback)
+function M.get_executable(config, pid, callback)
   local executable_name = M.get_executable_name()
   local target_path = M.get_target_path(executable_name)
   local data_path = M.get_data_path()
@@ -76,7 +76,17 @@ function M.get_executable(pid, callback)
         if not err then
           callback(executable_path, nil, false)
         else
-          callback(nil, 'Executable not found', false)
+          if config.advanced.server.build == 'fetch' then
+            require('cord.update').fetch(
+              function() callback(executable_path, nil, false) end
+            )
+          elseif config.advanced.server.build == 'build' then
+            require('cord.update').build(
+              function() callback(executable_path, nil, false) end
+            )
+          else
+            callback(nil, 'Executable not found', false)
+          end
         end
       end)
     end
