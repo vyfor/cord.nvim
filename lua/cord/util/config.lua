@@ -63,9 +63,9 @@
 ---@class CordAdvancedPluginConfig
 ---@field log_level? integer Logging level (from `vim.log.levels`)
 ---@field autocmds? boolean Whether to enable autocmds
----@field usercmds? boolean Whether to enable user commands
 
 ---@class CordAdvancedServerConfig
+---@field build? string How to acquire the server executable: 'fetch' or 'build' or 'none'
 ---@field pipe_path? string Path to the server's pipe
 ---@field executable_path? string Path to the server's executable
 ---@field timeout? integer Timeout in milliseconds
@@ -146,9 +146,9 @@ M.values = {
     plugin = {
       log_level = vim.log.levels.INFO,
       autocmds = true,
-      usercmds = true,
     },
     server = {
+      build = 'fetch',
       pipe_path = nil,
       executable_path = nil,
       timeout = 60000,
