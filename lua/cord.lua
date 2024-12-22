@@ -59,13 +59,6 @@ function M.initialize()
                   manager:run()
                 end)
               )
-
-              vim.cmd [[
-                augroup Cord
-                  autocmd!
-                  autocmd VimLeavePre * lua require'cord'.cleanup()
-                augroup END
-              ]]
             end)
           )
         end
