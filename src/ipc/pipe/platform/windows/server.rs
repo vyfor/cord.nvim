@@ -57,17 +57,12 @@ impl PipeServerImpl for PipeServer {
         let next_client_id = Arc::clone(&self.next_client_id);
         let running = Arc::clone(&self.running);
         let tx = self.tx.clone();
-        let notified = Arc::new(AtomicBool::new(false));
 
         self.thread_handle = Some(std::thread::spawn(move || {
+            let mut notified = false;
             while running.load(Ordering::SeqCst) {
                 if let Ok(handle) = PipeServer::create_pipe_instance(&pipe_name)
                 {
-                    if !notified.load(Ordering::SeqCst) {
-                        println!("Ready");
-                        notified.store(true, Ordering::SeqCst);
-                    }
-
                     unsafe {
                         let h_event = CreateEventW(
                             std::ptr::null_mut(),
@@ -117,6 +112,11 @@ impl PipeServerImpl for PipeServer {
                                 .ok();
                                 continue;
                             }
+                        }
+
+                        if !notified {
+                            println!("Ready");
+                            notified = true;
                         }
 
                         let mut bytes_transferred = 0;

@@ -58,13 +58,13 @@ impl PipeServerImpl for PipeServer {
         let next_client_id = Arc::clone(&self.next_client_id);
         let running = Arc::clone(&self.running);
         let listener = self.listener.as_ref().unwrap().try_clone()?;
-        let notified = Arc::new(AtomicBool::new(false));
 
         self.thread_handle = Some(std::thread::spawn(move || {
+            let mut notified = false;
             while running.load(Ordering::SeqCst) {
-                if !notified.load(Ordering::SeqCst) {
+                if !notified {
                     println!("Ready");
-                    notified.store(true, Ordering::SeqCst);
+                    notified = true;
                 }
 
                 match listener.accept() {
