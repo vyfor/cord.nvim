@@ -14,7 +14,31 @@ function IPC.new(config)
   return self
 end
 
-function IPC:connect(callback)
+local function kill_process(callback)
+  if utils.os_name == 'windows' then
+    uv.spawn('taskkill', {
+      args = {
+        '/F',
+        '/IM',
+        'cord.exe',
+      },
+    }, function() callback() end)
+  else
+    uv.spawn('sh', {
+      args = {
+        '-c',
+        'killall -9 -x cord',
+      },
+    }, function() callback() end)
+  end
+end
+
+function IPC:connect(callback, attempts, err)
+  if not attempts then attempts = 0 end
+  if attempts > 5 then
+    logger.error('Failed to connect to pipe: ' .. (err or 'nil'))
+  end
+
   if self.config.advanced.server.pipe_path then
     self.path = self.config.advanced.server.pipe_path
   else
@@ -27,8 +51,36 @@ function IPC:connect(callback)
   pipe:connect(self.path, function(err)
     if err then
       if err == 'ENOENT' then
+        logger.debug 'Pipe not found, spawning server...'
+
         spawn.spawn_server(self, function() self:connect(callback) end)
         return
+      elseif err == 'ECONNREFUSED' then
+        logger.debug 'Received ECONNREFUSED, retrying...'
+
+        if attempts == 3 then
+          kill_process(function()
+            spawn.spawn_server(self, function() self:connect(callback) end)
+          end)
+        else
+          vim.defer_fn(
+            function() self:connect(callback, attempts + 1, err) end,
+            1000
+          )
+        end
+      elseif err == 'ETIMEDOUT' then
+        logger.debug 'Received ETIMEDOUT, retrying...'
+
+        if attempts == 3 then
+          kill_process(function()
+            spawn.spawn_server(self, function() self:connect(callback) end)
+          end)
+        else
+          vim.defer_fn(
+            function() self:connect(callback, attempts + 1, err) end,
+            1000
+          )
+        end
       else
         logger.error('Failed to connect to pipe: ' .. err)
       end
