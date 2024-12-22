@@ -15,6 +15,7 @@ function M.initialize()
     M.producer = Producer.new(M.client)
     M.handler = Handler.new(M.client)
     M.handler:register('initialize', function(pid)
+      vim.g.cord_pid = pid
       local executable = file_manager.get_executable_name()
       local target_path = file_manager.get_target_path(executable)
       uv.fs_stat(target_path, function(err)
@@ -76,8 +77,17 @@ function M.setup(opts)
 end
 
 function M.cleanup()
-  if M.manager then M.manager.idle_timer:close() end
-  if M.client then M.client:close() end
+  if M.manager then
+    M.manager.clear_autocmds()
+    M.manager.idle_timer:close()
+    M.manager = nil
+  end
+  if M.client then
+    M.client:close()
+    M.client = nil
+  end
+  M.producer = nil
+  M.handler = nil
 end
 
 return M
