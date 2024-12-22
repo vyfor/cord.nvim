@@ -5,7 +5,7 @@ use super::error::CliError;
 const DEFAULT_TIMEOUT: u64 = 60000;
 #[cfg(target_os = "windows")]
 const DEFAULT_PIPE_NAME: &str = "\\\\.\\pipe\\cord-ipc";
-#[cfg(target_os = "linux")]
+#[cfg(not(target_os = "windows"))]
 const DEFAULT_PIPE_NAME: &str = "/tmp/cord-ipc";
 
 #[derive(Debug)]
