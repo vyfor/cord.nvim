@@ -6,7 +6,7 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 
 ## ✨ What's New
 
-- We have switched to Cargo for building instead of directly calling rustc in build scripts, which often caused inconsistencies. But don't worry, the dependency count is still at [zero](../Cargo.toml)!
+- We have switched to Cargo for building instead of directly calling rustc in build scripts, which often caused inconsistencies. But don't worry, the dependency count is still at [zero](../Cargo.toml)! Plus, users can benefit from cac
 
 - The plugin now runs as a server that handles all your Neovim instances. When you start Neovim, it launches a server in the background and connects to it. Any additional Neovim instances will connect to the same server, ensuring only one Rich Presence is shown. The most recent activity always takes priority.
 
@@ -19,8 +19,8 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 - Many of the icons have been redesigned, and a new theme has been introduced. The previous style, now called "Pastel" has been replaced with the new default style, "Onyx" which features a sleek and modern dark theme. You can switch between themes by using the `display.theme` option.
 
 > [!IMPORTANT]
-> A nightly version of the Rust compiler is required to build the server component. The latest version of `rustup` can be downloaded from [here](https://rustup.rs/). Then, install the nightly toolchain using `rustup install nightly`.
-> If you're using a plugin manager such as lazy.nvim, set the `build` key to `cargo build --release` to automatically rebuild the server on plugin updates.
+> A nightly version of the Rust compiler is required to build the server component. The latest version of `rustup` can be downloaded from [here](https://rustup.rs/). Then, specify the nightly version in the installation options or run `rustup install nightly` in the terminal.
+> If you're using a plugin manager such as lazy.nvim, set the `build` key to `cargo build --release` to automatically rebuild the server executable on plugin updates.
 
 ## 🔧 Configuration Changes
 
