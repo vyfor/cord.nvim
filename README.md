@@ -31,19 +31,25 @@
 - 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
 - 🌸 **Rich Icon Collection** — Features over 70 uniquely designed icons.
 
-## 🔌 Requirements  
-- **Neovim >= 0.6.0** 
-- **[Rust](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
-
 ## 📦 Installation  
 
+### Considerations
+Cord requires the server executables to be present. To get it, you can either:
+- **Fetch from GitHub**: By invoking `:Cord fetch` (async, recommended)
+  - Requires **[`curl`](https://curl.se)**
+- **Build from source**: By invoking `:Cord build` (async)
+  - Requires **[`Rust`](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
+- **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/bin/cord`
+
+### Installation
 <details>
 <summary>Using lazy.nvim</summary>
 
 ```lua
 {
   'vyfor/cord.nvim',
-  build = 'cargo build --release',
+  branch = 'client-server',
+  build = ':Cord fetch',
   opts = {}, -- calls require('cord').setup()
 }
 ```
@@ -56,12 +62,47 @@
 ```lua
 use {
   'vyfor/cord.nvim',
-  run = 'cargo build --release',
+  branch = 'client-server',
+  run = ':Cord fetch',
   config = function()
     require('cord').setup()
   end
 }
 ```
+
+</details>
+
+<details>
+<summary>Using Vim packages</summary>
+
+**Unix:**
+```bash
+git clone https://github.com/vyfor/cord.nvim.git ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
+```
+
+**Windows:**
+```powershell
+git clone https://github.com/vyfor/cord.nvim.git $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
+```
+
+Then call the following function somewhere in your configuration:
+```lua
+require('cord').setup()
+```
+
+Invoke `:Cord fetch` to whenever the plugin is updated.
+
+</details>
+
+<details>
+<summary>Other</summary>
+
+Make sure you call the following function somewhere in your configuration:
+```lua
+require('cord').setup()
+```
+
+Invoke `:Cord fetch` to whenever the plugin is updated.
 
 </details>
 
