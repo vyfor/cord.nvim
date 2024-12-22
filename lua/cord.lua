@@ -80,9 +80,17 @@ end
 
 function M.cleanup()
   if M.manager then
-    M.manager.clear_autocmds()
-    M.manager.idle_timer:close()
-    M.manager = nil
+    if vim.in_fast_event() then
+      vim.schedule(function()
+        M.manager:clear_autocmds()
+        M.manager.idle_timer:close()
+        M.manager = nil
+      end)
+    else
+      M.manager:clear_autocmds()
+      M.manager.idle_timer:close()
+      M.manager = nil
+    end
   end
   if M.client then
     M.client:close()
