@@ -1,8 +1,12 @@
 local logger = require 'cord.util.logger'
 
 local function build(callback)
+  if vim.g.cord_is_updating then return end
+  vim.g.cord_is_updating = true
+
   if not vim.fn.executable 'cargo' then
     logger.error 'cargo is not installed or not in PATH'
+    vim.g.cord_is_updating = false
     return
   end
 
@@ -24,10 +28,13 @@ local function build(callback)
   }, function(code, signal)
     if code ~= 0 then
       logger.error('Failed to build executable: ' .. code .. ' ' .. signal)
+      vim.g.cord_is_updating = false
       return
     end
 
     logger.info 'Successfully built executable. Restarting...'
+    vim.g.cord_is_updating = false
+
     require('cord'):cleanup()
     require('cord'):initialize()
 
@@ -36,8 +43,12 @@ local function build(callback)
 end
 
 local function fetch(callback)
+  if vim.g.cord_is_updating then return end
+  vim.g.cord_is_updating = true
+
   if not vim.fn.executable 'curl' then
     logger.error 'curl is not installed or not in PATH'
+    vim.g.cord_is_updating = false
     return
   end
 
@@ -84,6 +95,7 @@ local function fetch(callback)
     }, function(err)
       if err then
         logger.error('Failed to download update: ' .. err)
+        vim.g.cord_is_updating = false
         return
       end
 
@@ -91,10 +103,13 @@ local function fetch(callback)
         uv.fs_chmod(executable_path, '755', function(err)
           if err then
             logger.error('Failed to set executable permissions: ' .. err)
+            vim.g.cord_is_updating = false
             return
           end
 
           logger.info 'Successfully updated executable. Restarting...'
+          vim.g.cord_is_updating = false
+
           require('cord'):cleanup()
           require('cord'):initialize()
 
@@ -102,6 +117,8 @@ local function fetch(callback)
         end)
       else
         logger.info 'Successfully updated executable. Restarting...'
+        vim.g.cord_is_updating = false
+
         require('cord'):cleanup()
         require('cord'):initialize()
 

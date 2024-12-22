@@ -5,6 +5,7 @@ local logger = require 'cord.util.logger'
 local M = {}
 
 function M.initialize()
+  if vim.g.cord_is_building then return end
   M.client = ipc.new(config.values)
   M.client:connect(function()
     local file_manager = require 'cord.util.file_manager'
