@@ -39,7 +39,7 @@ local function spawn(executable, client, callback)
         return
       end
       if stderr_data:match '\n$' then
-        logger.error('Server error: ' .. stderr_data)
+        logger.error(stderr_data)
         stderr:close()
         stdout:close()
         return

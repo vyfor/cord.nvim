@@ -1,4 +1,5 @@
 use crate::messages::events::event::{EventContext, OnEvent};
+use crate::util::logger::LogLevel;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 
@@ -14,8 +15,12 @@ impl ErrorEvent {
 }
 
 impl OnEvent for ErrorEvent {
-    fn on_event(self, _ctx: &mut EventContext) -> crate::Result<()> {
-        eprintln!("Error: {:?}", self.error);
+    fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        ctx.cord.logger.log(
+            LogLevel::Error,
+            self.error.to_string().into(),
+            ctx.client_id,
+        );
 
         Ok(())
     }

@@ -25,8 +25,8 @@ pub enum CordErrorKind {
 ///
 /// The `CordError` struct encapsulates an error, providing detailed information
 /// about the error kind and its source.
-#[derive(Debug)]
 pub struct CordError {
+    #[allow(dead_code)]
     kind: CordErrorKind,
     source: Box<dyn Error + Send + Sync + 'static>,
 }
@@ -46,7 +46,13 @@ impl CordError {
 
 impl fmt::Display for CordError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Kind: {:?}, Source: {:?}", self.kind, self.source)
+        write!(f, "{}", self.source)
+    }
+}
+
+impl fmt::Debug for CordError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.source)
     }
 }
 

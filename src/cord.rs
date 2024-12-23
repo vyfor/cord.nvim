@@ -2,6 +2,7 @@ use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Arc;
 use std::time::Duration;
 
+use crate::error::CordErrorKind;
 use crate::ipc::discord::client::{Connection, RichClient};
 use crate::ipc::pipe::platform::server::PipeServer;
 use crate::ipc::pipe::PipeServerImpl;
@@ -41,7 +42,15 @@ impl Cord {
 
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = Arc::new(SessionManager::default());
-        let rich_client = Arc::new(RichClient::connect(config.client_id)?);
+        let rich_client = match RichClient::connect(config.client_id) {
+            Ok(client) => Arc::new(client),
+            Err(_) => {
+                return Err(crate::error::CordError::new(
+                    CordErrorKind::Io,
+                    "Failed to connect to Discord",
+                ));
+            }
+        };
         let server = PipeServer::new(
             &config.pipe_name,
             tx.clone(),
