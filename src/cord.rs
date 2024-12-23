@@ -6,12 +6,12 @@ use crate::ipc::discord::client::{Connection, RichClient};
 use crate::ipc::pipe::platform::server::PipeServer;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::messages::events::local::ErrorEvent;
+use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
 use crate::util::logger::{LogLevel, Logger};
-use crate::{client_event, local_event, server_event};
+use crate::{client_event, server_event};
 
 /// Core application managing configuration, sessions, IPC with Discord, and logging.
 ///
@@ -112,9 +112,17 @@ impl Cord {
                     tx.send(server_event!(0, Ready)).ok();
                 }
             }
-            Err(e) => {
-                tx.send(local_event!(0, Error, ErrorEvent::new(Box::new(e))))
-                    .ok();
+            Err(_) => {
+                tx.send(server_event!(
+                    0,
+                    Log,
+                    LogEvent::new(
+                        "Could not connect to Discord. Is Discord running?"
+                            .to_string(),
+                        LogLevel::Error
+                    )
+                ))
+                .ok();
             }
         });
 
