@@ -169,8 +169,6 @@ local function fetch(callback)
               '--fail',
             },
             vim.schedule_wrap(function(chunk, err)
-              logger.debug 'Successfully checked for updates'
-
               if err then
                 logger.error('Failed to check for updates: ' .. err)
                 vim.g.cord_is_updating = false
