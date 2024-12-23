@@ -21,21 +21,6 @@ M.get = function(args, callback)
         'curl exited with code: ' .. code .. '\nError: ' .. error_output
       )
     end
-
-    stdout:read_start(function(err, chunk)
-      if err then
-        stdout:close()
-        stderr:close()
-        callback(nil, 'Read error: ' .. err)
-      elseif chunk then
-        table.insert(chunks, chunk)
-      else
-        stdout:close()
-        stderr:close()
-        callback(table.concat(chunks))
-      end
-    end)
-    handle:close()
   end)
 
   if not handle then
@@ -45,9 +30,32 @@ M.get = function(args, callback)
     return
   end
 
-  stderr:read_start(function(err, data)
-    assert(not err, err)
-    if data then error_output = error_output .. data end
+  stdout:read_start(function(err, chunk)
+    if err then
+      stdout:close()
+      stderr:close()
+      handle:close()
+      callback(nil, 'Error reading stdout: ' .. err)
+    elseif chunk then
+      table.insert(chunks, chunk)
+    else
+      local response = table.concat(chunks)
+      stdout:close()
+      stderr:close()
+      handle:close()
+      callback(response)
+    end
+  end)
+
+  stderr:read_start(function(err, chunk)
+    if err then
+      stdout:close()
+      stderr:close()
+      handle:close()
+      callback(nil, 'Error reading stderr: ' .. err)
+    elseif chunk then
+      error_output = error_output .. chunk
+    end
   end)
 end
 

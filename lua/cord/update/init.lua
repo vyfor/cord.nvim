@@ -44,8 +44,6 @@ local function build(callback)
 end
 
 local function get_version(executable, callback)
-  logger.debug('Running \'' .. executable .. '\' --version...')
-
   local uv = vim.loop or vim.uv
 
   local handle = uv.new_pipe()
@@ -153,6 +151,7 @@ local function fetch(callback)
 
   uv.fs_stat(executable_path, function(err)
     if err then
+      logger.debug 'Version check failed, fetching latest...'
       fetch_executable()
     else
       logger.info 'Checking for updates...'
