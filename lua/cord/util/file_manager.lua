@@ -77,13 +77,9 @@ function M.get_executable(config, pid, callback)
           callback(executable_path, nil, false)
         else
           if config.advanced.server.build == 'fetch' then
-            require('cord.update').fetch(
-              function() callback(executable_path, nil, false) end
-            )
+            require('cord.update').fetch()
           elseif config.advanced.server.build == 'build' then
-            require('cord.update').build(
-              function() callback(executable_path, nil, false) end
-            )
+            require('cord.update').build()
           else
             callback(nil, 'Executable not found', false)
           end
