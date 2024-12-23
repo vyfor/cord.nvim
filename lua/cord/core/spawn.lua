@@ -22,33 +22,48 @@ local function spawn(executable, client, callback)
     hide = true,
   })
 
+  local stderr_data = ''
   stderr:read_start(function(err, chunk)
     if err then
       logger.error('Failed to read stderr: ' .. err)
+      stderr:close()
+      stdout:close()
       return
     end
     if chunk then
+      stderr_data = stderr_data .. chunk
       if chunk:match 'kind: AlreadyExists' then
         callback()
         stderr:close()
         stdout:close()
         return
       end
-      logger.error('Server error: ' .. chunk)
+      if stderr_data:match '\n$' then
+        logger.error('Server error: ' .. stderr_data)
+        stderr:close()
+        stdout:close()
+        return
+      end
     end
   end)
 
+  local stdout_data = ''
   stdout:read_start(function(err, chunk)
     if err then
       logger.error('Failed to read pipe: ' .. err)
+      stdout:close()
+      stderr:close()
       return
     end
 
-    if chunk and chunk:match 'Ready' then
-      callback()
-      stderr:close()
-      stdout:close()
-      return
+    if chunk then
+      stdout_data = stdout_data .. chunk
+      if stdout_data:match 'Ready\n$' then
+        callback()
+        stdout:close()
+        stderr:close()
+        return
+      end
     end
   end)
 
