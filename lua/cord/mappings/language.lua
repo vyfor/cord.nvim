@@ -45,6 +45,7 @@ local mappings = {
   nim = { 'nim', 'Nim' },
   nix = { 'nix', 'Nix' },
   ocaml = { 'ocaml', 'OCaml' },
+  odin = { 'odin', 'Odin' },
   pascal = { 'pascal', 'Pascal' },
   perl = { 'perl', 'Perl' },
   php = { 'php', 'PHP' },
