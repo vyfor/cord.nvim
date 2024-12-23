@@ -26,6 +26,10 @@ impl Args {
         let mut i = 1;
         while i < args.len() {
             match args[i].as_str() {
+                "--version" | "-v" => {
+                    print!("{}", env!("CARGO_PKG_VERSION"));
+                    std::process::exit(0);
+                }
                 "--pipe-name" | "-p" => {
                     if i + 1 < args.len() {
                         pipe_name = Some(args[i + 1].clone());
@@ -73,6 +77,8 @@ impl Args {
                 }
             }
         }
+
+        println!("v{}", env!("CARGO_PKG_VERSION"));
 
         Ok(Args {
             pipe_name: pipe_name
