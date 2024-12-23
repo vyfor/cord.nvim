@@ -44,6 +44,8 @@ local function build(callback)
 end
 
 local function get_version(executable, callback)
+  logger.debug('Running \'' .. executable .. '\' --version...')
+
   local uv = vim.loop or vim.uv
 
   local handle = uv.new_pipe()
@@ -157,8 +159,10 @@ local function fetch(callback)
 
       get_version(executable_path, function(version)
         if not version then
+          logger.debug 'Version check failed, fetching latest...'
           fetch_executable()
         else
+          logger.debug('Found version: ' .. version)
           client.get(
             {
               'https://api.github.com/repos/vyfor/cord.nvim/releases/latest',
@@ -182,7 +186,9 @@ local function fetch(callback)
                 return
               end
 
-              logger.debug('latest: ' .. tag .. ', current: ' .. version)
+              logger.debug(
+                'Latest version: ' .. tag .. ', Current version: ' .. version
+              )
               if tag == version then
                 logger.info 'Already on latest version'
               else
