@@ -17,14 +17,15 @@ local function build(callback)
 
   local pid = vim.g.cord_pid
   if pid then utils.kill_process(pid) end
+
   uv.spawn('cargo', {
     args = {
       'install',
       'cord-nvim',
+      '--force',
       '--root',
       require('cord.util.file_manager').get_data_path(),
     },
-    stdio = { nil, nil, nil },
   }, function(code, signal)
     if code ~= 0 then
       logger.error('Failed to build executable: ' .. code .. ' ' .. signal)
@@ -39,6 +40,27 @@ local function build(callback)
     require('cord'):initialize()
 
     if callback then callback() end
+  end)
+end
+
+local function get_version(executable, callback)
+  local uv = vim.loop or vim.uv
+
+  local handle = uv.new_pipe()
+  uv.spawn(executable, {
+    args = { '-v' },
+    stdio = { nil, handle, nil },
+  }, function(code, _)
+    if code == 0 then
+      handle:read_start(function(_, data)
+        local version
+        if data then version = data:gsub('^%s*(.-)%s*$', '%1') end
+        handle:close()
+        callback(version)
+      end)
+    else
+      callback()
+    end
   end)
 end
 
@@ -132,36 +154,44 @@ local function fetch(callback)
       fetch_executable()
     else
       logger.info 'Checking for updates...'
-      client.get(
-        {
-          'https://api.github.com/repos/vyfor/cord.nvim/releases/latest',
-          '--fail',
-        },
-        vim.schedule_wrap(function(chunk, err)
-          if err then
-            logger.error('Failed to check for updates: ' .. err)
-            return
-          end
 
-          local ok, data = pcall(vim.fn.json_decode, chunk)
-          if not ok then
-            logger.error('Failed to parse JSON response: ' .. data)
-            return
-          end
+      get_version(executable_path, function(version)
+        if not version then
+          fetch_executable()
+        else
+          client.get(
+            {
+              'https://api.github.com/repos/vyfor/cord.nvim/releases/latest',
+              '--fail',
+            },
+            vim.schedule_wrap(function(chunk, err)
+              if err then
+                logger.error('Failed to check for updates: ' .. err)
+                return
+              end
 
-          local tag = data.tag_name
-          if not tag then
-            logger.error 'No tag found in GitHub response'
-            return
-          end
+              local ok, data = pcall(vim.fn.json_decode, chunk)
+              if not ok then
+                logger.error('Failed to parse JSON response: ' .. data)
+                return
+              end
 
-          if tag == require('cord.util.constants').VERSION then
-            logger.info 'Already on latest version'
-          else
-            fetch_executable(tag)
-          end
-        end)
-      )
+              local tag = data.tag_name
+              if not tag then
+                logger.error 'No tag found in GitHub response'
+                return
+              end
+
+              logger.debug('latest: ' .. tag .. ', current: ' .. version)
+              if tag == version then
+                logger.info 'Already on latest version'
+              else
+                fetch_executable(tag)
+              end
+            end)
+          )
+        end
+      end)
     end
   end)
 end
