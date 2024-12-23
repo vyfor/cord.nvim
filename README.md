@@ -12,7 +12,6 @@
 
 ## 📚 Table of Contents
 - [💎 Features](#-features)
-- [🔌 Requirements](#-requirements)
 - [📦 Installation](#-installation)
 - [🎨 Themes](#-themes)
 - [📖 Documentation](#-documentation)
@@ -27,7 +26,7 @@
 - 🔧 **Unmatched Configurability** — Function-based configuration for infinite customization possibilities.
 - 🧠 **Automated State Handling** — Automatically manages activities across all instances.
 - 💤 **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
-- 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS.
+- 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS files without relying on command-line tools.
 - 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
 - 🌸 **Rich Icon Collection** — Features over 70 uniquely designed icons.
 
@@ -37,9 +36,11 @@
 Cord requires the server executables to be present. To get it, you can either:
 - **Fetch from GitHub**: By invoking `:Cord fetch` (async, recommended)
   - Requires **[`curl`](https://curl.se)**
-- **Build from source**: By invoking `:Cord build` (async)
+- **Build and install from crates.io**: By invoking `:Cord build` (async)
   - Requires **[`Rust`](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
-- **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/bin/cord`
+- **Build from source**: By invoking `cargo b --release`, Cord will automatically move the executable.
+  - Requires **[`Rust`](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
+- **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
 
 ### Installation
 <details>
