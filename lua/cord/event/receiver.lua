@@ -77,6 +77,7 @@ function Handler:setup_default_handlers()
   self:register('log', function(data)
     if data.level and data.message then
       logger.log_raw(data.level, data.message)
+      if data.level == vim.log.levels.ERROR then require('cord').cleanup() end
     end
   end)
 end
