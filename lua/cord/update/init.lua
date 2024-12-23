@@ -162,27 +162,32 @@ local function fetch(callback)
           logger.debug 'Version check failed, fetching latest...'
           fetch_executable()
         else
-          logger.debug('Found version: ' .. version)
+          logger.debug('Found local version: ' .. version)
           client.get(
             {
               'https://api.github.com/repos/vyfor/cord.nvim/releases/latest',
               '--fail',
             },
             vim.schedule_wrap(function(chunk, err)
+              logger.debug 'Successfully checked for updates'
+
               if err then
                 logger.error('Failed to check for updates: ' .. err)
+                vim.g.cord_is_updating = false
                 return
               end
 
               local ok, data = pcall(vim.fn.json_decode, chunk)
               if not ok then
                 logger.error('Failed to parse JSON response: ' .. data)
+                vim.g.cord_is_updating = false
                 return
               end
 
               local tag = data.tag_name
               if not tag then
                 logger.error 'No tag found in GitHub response'
+                vim.g.cord_is_updating = false
                 return
               end
 
@@ -191,6 +196,7 @@ local function fetch(callback)
               )
               if tag == version then
                 logger.info 'Already on latest version'
+                vim.g.cord_is_updating = false
               else
                 fetch_executable(tag)
               end
