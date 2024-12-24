@@ -478,7 +478,6 @@ function ActivityManager:on_focus_lost()
   if not self.events_enabled then return end
   self.is_focused = false
   self.opts.is_focused = false
-  self:queue_update()
 end
 
 ---Handle cursor update event
