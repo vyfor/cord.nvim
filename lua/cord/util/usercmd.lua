@@ -1,13 +1,34 @@
 local commands = {
   build = function() require('cord.update').build() end,
   fetch = function() require('cord.update').fetch() end,
-  show_presence = function() require('cord').manager:resume() end,
-  hide_presence = function() require('cord').manager:hide() end,
-  toggle_presence = function() require('cord').manager:toggle() end,
-  idle = function() require('cord').manager:force_idle() end,
-  unidle = function() require('cord').manager:unforce_idle() end,
-  toggle_idle = function() require('cord').manager:toggle_idle() end,
-  clear_presence = function() require('cord').manager:clear_activity() end,
+  show_presence = function()
+    local cord = require 'cord'
+    if cord.manager then cord.manager:resume() end
+  end,
+  hide_presence = function()
+    local cord = require 'cord'
+    if cord.manager then cord.manager:hide() end
+  end,
+  toggle_presence = function()
+    local cord = require 'cord'
+    if cord.manager then cord.manager:toggle() end
+  end,
+  idle = function()
+    local cord = require 'cord'
+    if cord.manager then cord.manager:force_idle() end
+  end,
+  unidle = function()
+    local cord = require 'cord'
+    if cord.manager then cord.manager:unforce_idle() end
+  end,
+  toggle_idle = function()
+    local cord = require 'cord'
+    if cord.manager then cord.manager:toggle_idle() end
+  end,
+  clear_presence = function()
+    local cord = require 'cord'
+    if cord.manager then cord.manager:clear_activity(true) end
+  end,
   restart = function()
     local cord = require 'cord'
 
