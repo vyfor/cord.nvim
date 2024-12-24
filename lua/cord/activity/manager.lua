@@ -157,7 +157,7 @@ function ActivityManager:check_idle()
   if
     self.is_force_idle
     or (
-      time_elapsed > self.config.idle.timeout
+      time_elapsed >= self.config.idle.timeout
       and (self.config.idle.ignore_focus or not self.is_focused)
     )
   then
@@ -267,6 +267,7 @@ function ActivityManager:resume()
 
   self:resume_events()
   if self.idle_timer then
+    self.idle_timer:stop()
     self.idle_timer:start(
       0,
       self.config.idle.timeout,
