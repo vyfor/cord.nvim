@@ -114,7 +114,7 @@ function ActivityManager:run()
   if self.config.idle.enabled then
     self.idle_timer = uv.new_timer()
     self.idle_timer:start(
-      self.config.idle.timeout,
+      0,
       self.config.idle.timeout,
       vim.schedule_wrap(function() self:check_idle() end)
     )
@@ -162,6 +162,20 @@ function ActivityManager:check_idle()
     )
   then
     self:update_idle_activity()
+  else
+    local time_remaining = self.config.idle.timeout - time_elapsed
+    self.idle_timer:stop()
+    self.idle_timer:start(
+      time_remaining,
+      0,
+      vim.schedule_wrap(function()
+        self.idle_timer:start(
+          0,
+          self.config.idle.timeout,
+          vim.schedule_wrap(function() self:check_idle() end)
+        )
+      end)
+    )
   end
 end
 
@@ -254,7 +268,7 @@ function ActivityManager:resume()
   self:resume_events()
   if self.idle_timer then
     self.idle_timer:start(
-      self.config.idle.timeout,
+      0,
       self.config.idle.timeout,
       vim.schedule_wrap(function() self:check_idle() end)
     )
