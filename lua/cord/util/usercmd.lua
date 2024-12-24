@@ -32,14 +32,20 @@ local commands = {
   restart = function()
     local cord = require 'cord'
 
+    if cord.client then
+      if cord.client.on_close_cb then cord.client.on_close_cb() end
+      cord.client:on_close(function()
+        cord.cleanup()
+        cord.initialize()
+      end)
+      cord.client:close()
+    end
+
     if cord.producer then
       cord.producer:shutdown()
     elseif vim.g.cord_pid then
       require('cord.util').kill_process(vim.g.cord_pid)
     end
-
-    cord.cleanup()
-    cord.initialize()
   end,
 }
 

@@ -22,6 +22,7 @@ function M.initialize()
       uv.fs_stat(target_path, function(err)
         if not err then
           M.client:on_close(function()
+            M.client:on_close(nil)
             file_manager.get_executable(
               config.values,
               pid,
@@ -57,7 +58,7 @@ function M.initialize()
                       config.values.hooks.on_disconnect()
                     end
 
-                    manager:pause()
+                    if M.manager then M.manager:pause() end
                   end))
                   manager:run()
                 end)
