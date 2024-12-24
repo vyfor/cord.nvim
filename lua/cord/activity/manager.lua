@@ -139,10 +139,6 @@ end
 ---@param force_update? boolean Whether to force the update regardless of conditions
 function ActivityManager:queue_update(force_update)
   if not self.events_enabled then return end
-  if self.should_skip_update then
-    self.should_skip_update = false
-    return
-  end
 
   self.opts = self:build_opts()
   if not self.is_force_idle and (force_update or self:should_update()) then
@@ -156,10 +152,6 @@ function ActivityManager:check_idle()
   if not self.events_enabled then return end
   if not self.config.idle.enabled and not self.is_force_idle then return end
   if self.is_idle then return end
-  if self.should_skip_update then
-    self.should_skip_update = false
-    return
-  end
 
   local time_elapsed = uv.now() - self.last_updated
   if
@@ -195,9 +187,20 @@ function ActivityManager:update_idle_activity()
       self.config.hooks.on_idle(self.opts, activity)
     end
 
+    if self.should_skip_update then
+      self.should_skip_update = false
+      return
+    end
+
     self.tx:update_activity(activity)
   else
     if self.config.hooks.on_idle then self.config.hooks.on_idle(self.opts) end
+
+    if self.should_skip_update then
+      self.should_skip_update = false
+      return
+    end
+
     self.tx:clear_activity()
   end
 end
@@ -219,6 +222,11 @@ function ActivityManager:update_activity()
 
   if self.config.hooks.on_activity then
     self.config.hooks.on_activity(self.opts, activity)
+  end
+
+  if self.should_skip_update then
+    self.should_skip_update = false
+    return
   end
 
   self.tx:update_activity(activity)
