@@ -30,7 +30,7 @@ local function build(callback)
       '--root',
       require('cord.util.file_manager').get_data_path(),
     },
-  }, function(code, signal)
+  }, function(code, _)
     if code ~= 0 then
       stderr:close()
       handle:close()
