@@ -104,17 +104,18 @@ require('cord').setup {
 
 ## 💤 Idle
 
-| Option              | Type                       | Default                                                                               | Description                                                   |
-| ------------------- | -------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `idle.enabled`      | `boolean`                  | `true`                                                                                | Enable idle status detection                                  |
-| `idle.timeout`      | `number`                   | `300000`                                                                              | Milliseconds before marking the session as idle               |
-| `idle.show_status`  | `boolean`                  | `true`                                                                                | Show idle status in presence, or hide the presence if `false` |
-| `idle.ignore_focus` | `boolean`                  | `true`                                                                                | Show idle when Neovim is focused                              |
-| `idle.smart_idle`   | `boolean`                  | `true`                                                                                | Enable [smart idle](#smart-idle) feature                      |
-| `idle.details`      | `string \| function(opts)` | `'Idling'`                                                                            | Details shown when idle                                       |
-| `idle.state`        | `string \| function(opts)` | `nil`                                                                                 | State shown when idle                                         |
-| `idle.tooltip`      | `string \| function(opts)` | `'💤'`                                                                                 | Tooltip shown when hovering over idle icon                    |
-| `idle.icon`         | `string \| function(opts)` | [`default idle icon`](https://github.com/vyfor/icons/blob/master/icons/onyx/idle.png) | Custom icon URL or asset ID                                   |
+| Option                 | Type                       | Default                                                                               | Description                                                   |
+| ---------------------- | -------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `idle.enabled`         | `boolean`                  | `true`                                                                                | Enable idle status detection                                  |
+| `idle.timeout`         | `number`                   | `300000`                                                                              | Milliseconds before marking the session as idle               |
+| `idle.show_status`     | `boolean`                  | `true`                                                                                | Show idle status in presence, or hide the presence if `false` |
+| `idle.ignore_focus`    | `boolean`                  | `true`                                                                                | Show idle despite Neovim having focus                         |
+| `idle.unidle_on_focus` | `boolean`                  | `true`                                                                                | Unidle the session when Neovim gains focus                    |
+| `idle.smart_idle`      | `boolean`                  | `true`                                                                                | Enable [smart idle](#smart-idle) feature                      |
+| `idle.details`         | `string \| function(opts)` | `'Idling'`                                                                            | Details shown when idle                                       |
+| `idle.state`           | `string \| function(opts)` | `nil`                                                                                 | State shown when idle                                         |
+| `idle.tooltip`         | `string \| function(opts)` | `'💤'`                                                                                 | Tooltip shown when hovering over idle icon                    |
+| `idle.icon`            | `string \| function(opts)` | [`default idle icon`](https://github.com/vyfor/icons/blob/master/icons/onyx/idle.png) | Custom icon URL or asset ID                                   |
 
 ## 📝 Text & Assets
 

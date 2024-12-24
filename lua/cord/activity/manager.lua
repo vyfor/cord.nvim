@@ -445,7 +445,8 @@ function ActivityManager:on_focus_gained()
   if not self.events_enabled then return end
   self.is_focused = true
   self.opts.is_focused = true
-  self:queue_update(true)
+
+  if self.config.idle.unidle_on_focus then self:queue_update(true) end
 end
 
 ---Handle focus lost event

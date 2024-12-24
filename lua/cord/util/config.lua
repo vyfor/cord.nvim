@@ -18,6 +18,7 @@
 ---@field timeout? integer Idle timeout in milliseconds
 ---@field show_status? boolean Whether to show idle status
 ---@field ignore_focus? boolean Whether to show idle when editor is focused
+---@field unidle_on_focus? boolean Whether to unidle the session when editor gains focus
 ---@field smart_idle? boolean Whether to enable smart idle feature
 ---@field details? string|fun(opts: CordOpts):string Details shown when idle
 ---@field state? string|fun(opts: CordOpts):string State shown when idle
@@ -112,6 +113,7 @@ M.values = {
     timeout = 300000,
     show_status = true,
     ignore_focus = true,
+    unidle_on_focus = true,
     smart_idle = true,
     details = 'Idling',
     state = nil,
