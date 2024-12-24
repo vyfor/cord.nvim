@@ -1,6 +1,6 @@
 local M = {}
 
-M.default_icon = 'text'
+M.default_icon = 'plugin'
 local mappings = {
   lazy = { M.default_icon, 'Lazy' },
   pckr = { M.default_icon, 'Pckr' },
