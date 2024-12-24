@@ -74,22 +74,32 @@ end
 local function get_version(executable, callback)
   local uv = vim.loop or vim.uv
 
-  local handle = uv.new_pipe()
-  uv.spawn(executable, {
+  local stdout = uv.new_pipe()
+  local handle
+  handle = uv.spawn(executable, {
     args = { '-v' },
-    stdio = { nil, handle, nil },
+    stdio = { nil, stdout, nil },
   }, function(code, _)
     if code == 0 then
-      handle:read_start(function(_, data)
+      stdout:read_start(function(_, data)
         local version
         if data then version = data:gsub('^%s*(.-)%s*$', '%1') end
+        stdout:close()
         handle:close()
         callback(version)
       end)
     else
+      stdout:close()
+      handle:close()
       callback()
     end
   end)
+
+  if not handle then
+    stdout:close()
+    logger.error 'Failed to spawn executable process'
+    vim.g.cord_is_updating = false
+  end
 end
 
 local function fetch(callback)
