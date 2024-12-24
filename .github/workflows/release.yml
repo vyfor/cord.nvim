@@ -1,0 +1,116 @@
+name: Publish Artifacts
+
+on:
+  push:
+    tags:
+      - '[0-9]+\.[0-9]+\.[0-9]+'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-pc-windows-gnu
+          - x86_64-unknown-freebsd
+          - i686-unknown-linux-gnu
+          - i686-pc-windows-gnu
+          - aarch64-unknown-linux-gnu
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+
+      - name: Install additional targets
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install cross
+        run: cargo install cross
+
+      - name: Build the binary
+        run: |
+          cross build --release --target ${{ matrix.target }}
+          mkdir -p dist
+          ARCH=$(echo ${{ matrix.target }} | cut -d '-' -f 1)
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            cp target/${{ matrix.target }}/release/cord.exe dist/${ARCH}-windows-cord.exe
+          elif [[ "${{ matrix.target }}" == *"linux"* ]]; then
+            cp target/${{ matrix.target }}/release/cord dist/${ARCH}-linux-cord
+          elif [[ "${{ matrix.target }}" == *"darwin"* ]]; then
+            cp target/${{ matrix.target }}/release/cord dist/${ARCH}-darwin-cord
+          elif [[ "${{ matrix.target }}" == *"freebsd"* ]]; then
+            cp target/${{ matrix.target }}/release/cord dist/${ARCH}-bsd-cord
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: dist/*
+
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+
+      - name: Install additional targets
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Build the binary on macOS
+        run: cargo build --release --target ${{ matrix.target }}
+      
+      - name: Copy macOS binaries
+        run: |
+          mkdir -p dist
+          ARCH=$(echo ${{ matrix.target }} | cut -d '-' -f 1)
+          if [[ "${{ matrix.target }}" == "x86_64-apple-darwin" ]]; then
+            cp target/${{ matrix.target }}/release/cord dist/${ARCH}-darwin-cord
+          elif [[ "${{ matrix.target }}" == "aarch64-apple-darwin" ]]; then
+            cp target/${{ matrix.target }}/release/cord dist/${ARCH}-darwin-cord
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: dist/*
+
+  upload-artifacts:
+    needs: [build, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: binaries
+          path: dist
+
+      - name: Upload binaries to release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: dist/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
