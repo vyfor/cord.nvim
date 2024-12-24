@@ -18,7 +18,11 @@ local function build(callback)
   local pid = vim.g.cord_pid
   if pid then utils.kill_process(pid) end
 
-  uv.spawn('cargo', {
+  local stderr = uv.new_pipe()
+  local error_output = ''
+
+  local handle
+  handle = uv.spawn('cargo', {
     args = {
       'install',
       'cord-nvim',
@@ -28,7 +32,14 @@ local function build(callback)
     },
   }, function(code, signal)
     if code ~= 0 then
-      logger.error('Failed to build executable: ' .. code .. ' ' .. signal)
+      stderr:close()
+      handle:close()
+      logger.error(
+        'Failed to build executable: cargo exited with code '
+          .. code
+          .. '\nError: '
+          .. error_output
+      )
       vim.g.cord_is_updating = false
       return
     end
@@ -40,6 +51,23 @@ local function build(callback)
     require('cord'):initialize()
 
     if callback then callback() end
+  end)
+
+  if not handle then
+    logger.error 'Failed to spawn cargo process'
+    vim.g.cord_is_updating = false
+    return
+  end
+
+  stderr:read_start(function(err, chunk)
+    if err then
+      stderr:close()
+      handle:close()
+      logger.error('Failed to read stderr: ' .. err)
+      vim.g.cord_is_updating = false
+    elseif chunk then
+      error_output = error_output .. chunk
+    end
   end)
 end
 
