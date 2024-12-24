@@ -27,7 +27,7 @@ local function kill_process(callback)
     uv.spawn('sh', {
       args = {
         '-c',
-        'killall -9 -x cord',
+        'pkill -15 -x cord',
       },
     }, function() callback() end)
   end
