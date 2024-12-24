@@ -8,7 +8,9 @@ use crate::ipc::pipe::platform::server::PipeServer;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::messages::events::local::ErrorEvent;
+use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
+use crate::protocol::msgpack::MsgPack;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
 use crate::util::logger::{LogLevel, Logger};
@@ -87,10 +89,23 @@ impl Cord {
                 .rx
                 .recv_timeout(Duration::from_millis(self.config.timeout))
             {
-                msg.event.on_event(&mut EventContext {
+                if let Err(e) = msg.event.on_event(&mut EventContext {
                     cord: self,
                     client_id: msg.client_id,
-                })?;
+                }) {
+                    if self.session_manager.sessions.read().unwrap().is_empty()
+                    {
+                        return Err(e);
+                    } else if let Ok(data) = MsgPack::serialize(&LogEvent::new(
+                        e.to_string(),
+                        LogLevel::Error,
+                    )) {
+                        self.pipe.broadcast(&data)?;
+                        return Ok(());
+                    }
+
+                    return Err(e);
+                }
             } else if self.session_manager.sessions.read().unwrap().is_empty() {
                 break;
             }

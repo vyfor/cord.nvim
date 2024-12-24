@@ -79,9 +79,10 @@ impl RichClient {
     /// Updates the client's rich presence.
     pub fn update(&self, packet: &Packet) -> crate::Result<()> {
         let encoded = Json::serialize(packet)?;
-        self.write(1, Some(encoded.as_bytes()))?;
-
-        Ok(())
+        match self.write(1, Some(encoded.as_bytes())) {
+            Err(_) => Err("The connection to Discord was lost".into()),
+            _ => Ok(()),
+        }
     }
 
     /// Clears the current rich presence.
@@ -89,8 +90,9 @@ impl RichClient {
         let packet = Packet::empty();
         let encoded = Json::serialize(&packet)?;
 
-        self.write(1, Some(encoded.as_bytes()))?;
-
-        Ok(())
+        match self.write(1, Some(encoded.as_bytes())) {
+            Err(_) => Err("The connection to Discord was lost".into()),
+            _ => Ok(()),
+        }
     }
 }
