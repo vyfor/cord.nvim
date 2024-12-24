@@ -1,10 +1,12 @@
 <div align="center">
   <h1>🧩 <strong>Cord</strong> – Tailor Your Presence Like Never Before</h1>
   <div>
-    <a href="https://github.com/vyfor/cord.nvim/stargazers"><img src="https://img.shields.io/github/stars/vyfor/cord.nvim?style=for-the-badge" alt="Stargazers"></a>
-    <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-%20%3E%3D%200.6.0-57A143?style=for-the-badge&logo=neovim" alt="Neovim"></a>
-    <a href="https://github.com/vyfor/cord.nvim/forks"><img src="https://img.shields.io/github/forks/vyfor/cord.nvim?style=for-the-badge" alt="Forks"></a>
+    <a href="https://github.com/vyfor/cord.nvim/stargazers"><img src="https://img.shields.io/github/stars/vyfor/cord.nvim?style=for-the-badge&color=8281f3&labelColor=242529" alt="Stargazers"></a>
+    <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-%20%3E%3D%200.6.0-ffffff?style=for-the-badge&logo=neovim&color=8281f3&labelColor=242529&logoColor=8281f3" alt="Neovim Logo"></a>
+    <a href="https://github.com/vyfor/cord.nvim/forks"><img src="https://img.shields.io/github/forks/vyfor/cord.nvim?style=for-the-badge&color=8281f3&labelColor=242529" alt="Forks"></a>
   </div>
+  <br/>
+  <img src="https://github.com/user-attachments/assets/8e684058-f3ea-4010-817e-529b47730abb" alt="Cord Logo" width="200px">
   <h3>🚀 The most extensible Discord Rich Presence plugin for Neovim, powered by Rust.
   </h3>
   <img src="https://github.com/user-attachments/assets/df73221e-565b-49e5-9dad-1c60aed6f9c3" alt="Cord Banner">
