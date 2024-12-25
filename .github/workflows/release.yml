@@ -47,14 +47,22 @@ jobs:
       - name: Install cross
         run: cargo install cross
 
-      - name: Build the binary
+      - name: Build and copy (Windows)
+        if: contains(matrix.target, 'windows')
+        shell: pwsh
+        run: |
+          cross build --release --target ${{ matrix.target }}
+          New-Item -ItemType Directory -Force -Path dist
+          $ARCH = "${{ matrix.target }}" -split '-' | Select-Object -First 1
+          Copy-Item "target/${{ matrix.target }}/release/cord.exe" -Destination "dist/${ARCH}-windows-cord.exe"
+
+      - name: Build and copy (Non-Windows)
+        if: contains(matrix.target, 'windows') != true
         run: |
           cross build --release --target ${{ matrix.target }}
           mkdir -p dist
           ARCH=$(echo ${{ matrix.target }} | cut -d '-' -f 1)
-          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
-            cp target/${{ matrix.target }}/release/cord.exe dist/${ARCH}-windows-cord.exe
-          elif [[ "${{ matrix.target }}" == *"linux"* ]]; then
+          if [[ "${{ matrix.target }}" == *"linux"* ]]; then
             cp target/${{ matrix.target }}/release/cord dist/${ARCH}-linux-cord
           elif [[ "${{ matrix.target }}" == *"darwin"* ]]; then
             cp target/${{ matrix.target }}/release/cord dist/${ARCH}-darwin-cord
@@ -63,7 +71,7 @@ jobs:
           fi
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: binaries
           path: dist/*
