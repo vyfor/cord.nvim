@@ -1,4 +1,3 @@
-local async = require 'cord.core.async'
 local Future = require 'cord.core.async.future'
 local uv = vim.loop or vim.uv
 
