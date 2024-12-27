@@ -1,6 +1,6 @@
 # 📖 Migration Guide
 
-### **⚡ Cord - Tailor your Rich Presence like never before**
+### **⚡ Cord - Rich Presence Reimagined**
 
 The plugin in question, **cord.nvim**, has been rewritten from scratch with a new client-server architecture in mind, bringing significant improvements in reliability and customization. Here's what you need to know when upgrading.
 
