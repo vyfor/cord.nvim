@@ -1,6 +1,7 @@
-local activities = require 'cord.activity'
-local ws_utils = require 'cord.util.workspace'
-local config_utils = require 'cord.util.config'
+local async = require 'cord.core.async'
+local activities = require 'cord.plugin.activity'
+local ws_utils = require 'cord.plugin.fs.workspace'
+local config_utils = require 'cord.plugin.config.util'
 
 local uv = vim.loop or vim.uv
 
@@ -49,7 +50,7 @@ local mt = { __index = ActivityManager }
 ---@field timestamp number Timestamp passed to the Rich Presence in milliseconds
 ---@field workspace_dir string Current workspace directory
 ---@field workspace_name string Current workspace name
----@field repo_url string Current Git repository URL, if any
+---@field repo_url? string Current Git repository URL, if any
 ---@field is_focused boolean Whether Neovim is focused
 ---@field is_idle boolean Whether the session is idle
 ---@field buttons CordButtonConfig[] Buttons configuration
@@ -61,9 +62,7 @@ local mt = { __index = ActivityManager }
 
 ---Create a new ActivityManager instance
 ---@param opts {config: CordConfig, tx: table} Configuration and transmitter options
----@param callback fun(manager: ActivityManager) Callback function called with the new instance
----@return ActivityManager
-function ActivityManager.new(opts, callback)
+ActivityManager.new = async.wrap(function(opts)
   local self = setmetatable({
     config = opts.config,
     tx = opts.tx,
@@ -75,29 +74,24 @@ function ActivityManager.new(opts, callback)
   }, mt)
 
   local rawdir = vim.fn.expand '%:p:h'
-  local cwd = vim.fn.getcwd()
+  local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
+  self.workspace_dir = dir
 
-  ws_utils.find(rawdir, function(dir)
-    dir = dir or cwd
-    self.workspace_dir = dir
+  local cache = {
+    dir = dir,
+    name = vim.fn.fnamemodify(dir, ':t'),
+  }
 
-    local cache = {
-      dir = dir,
-      name = vim.fn.fnamemodify(dir, ':t'),
-    }
+  local repo_url = ws_utils.find_git_repository(dir):get()
+  if repo_url then
+    self.repo_url = repo_url
+    cache.repo_url = repo_url
+  end
 
-    ws_utils.find_git_repository(dir, function(repo_url)
-      self.repo_url = repo_url
-      cache.repo_url = repo_url
-
-      self.workspace_cache[rawdir] = cache
-
-      callback(self)
-    end)
-  end)
+  self.workspace_cache[rawdir] = cache
 
   return self
-end
+end)
 
 ---Run the activity manager
 ---@return nil
@@ -118,6 +112,16 @@ function ActivityManager:run()
       self.config.idle.timeout,
       vim.schedule_wrap(function() self:check_idle() end)
     )
+  end
+end
+
+---Clean up the activity manager
+---@return nil
+function ActivityManager:cleanup()
+  self:clear_autocmds()
+  if self.idle_timer then
+    self.idle_timer:stop()
+    if not self.idle_timer:is_closing() then self.idle_timer:close() end
   end
 end
 
@@ -335,22 +339,22 @@ function ActivityManager:setup_autocmds()
   vim.cmd [[
     augroup CordActivityManager
       autocmd!
-      autocmd BufEnter * lua require'cord'.manager:on_buf_enter()
-      autocmd FocusGained * lua require'cord'.manager:on_focus_gained()
-      autocmd FocusLost * lua require'cord'.manager:on_focus_lost()
+      autocmd BufEnter * lua require'cord.server'.manager:on_buf_enter()
+      autocmd FocusGained * lua require'cord.server'.manager:on_focus_gained()
+      autocmd FocusLost * lua require'cord.server'.manager:on_focus_lost()
     augroup END
   ]]
 
   if self.config.advanced.cursor_update_mode == 'on_hold' then
     vim.cmd [[
       augroup CordActivityManager
-        autocmd CursorHold,CursorHoldI * lua require'cord'.manager:on_cursor_update()
+        autocmd CursorHold,CursorHoldI * lua require'cord.server'.manager:on_cursor_update()
       augroup END
     ]]
   elseif self.config.advanced.cursor_update_mode == 'on_move' then
     vim.cmd [[
       augroup CordActivityManager
-        autocmd CursorMoved,CursorMovedI * lua require'cord'.manager:on_cursor_update()
+        autocmd CursorMoved,CursorMovedI * lua require'cord.server'.manager:on_cursor_update()
       augroup END
     ]]
   end
@@ -425,41 +429,37 @@ function ActivityManager:on_buf_enter()
     return
   end
 
-  ws_utils.find(
-    vim.fn.expand '%:p:h',
-    vim.schedule_wrap(function(dir)
-      if not dir then
-        self.workspace_cache[rawdir] = false
-        self:queue_update()
-        return
-      end
+  async.run(function()
+    local ws_utils = require 'cord.plugin.fs.workspace'
+    local dir = ws_utils.find(vim.fn.expand '%:p:h'):get() or vim.fn.getcwd()
 
-      self.workspace_dir = dir
-      self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
-      self.opts.workspace_dir = self.workspace_dir
-      self.opts.workspace_name = self.workspace_name
+    if not dir then
+      self.workspace_cache[rawdir] = false
+      self:queue_update()
+      return
+    end
 
-      ws_utils.find_git_repository(
-        self.workspace_dir,
-        vim.schedule_wrap(function(repo_url)
-          self.repo_url = repo_url
-          self.opts.repo_url = repo_url
+    self.workspace_dir = dir
+    self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
+    self.opts.workspace_dir = self.workspace_dir
+    self.opts.workspace_name = self.workspace_name
 
-          self.workspace_cache[rawdir] = {
-            dir = self.workspace_dir,
-            name = self.workspace_name,
-            repo_url = self.repo_url,
-          }
+    local repo_url = ws_utils.find_git_repository(self.workspace_dir):get()
+    self.repo_url = repo_url
+    self.opts.repo_url = repo_url
 
-          if self.config.hooks.on_workspace_change then
-            self.config.hooks.on_workspace_change(self.opts)
-          end
+    self.workspace_cache[rawdir] = {
+      dir = self.workspace_dir,
+      name = self.workspace_name,
+      repo_url = self.repo_url,
+    }
 
-          self:queue_update()
-        end)
-      )
-    end)
-  )
+    if self.config.hooks.on_workspace_change then
+      self.config.hooks.on_workspace_change(self.opts)
+    end
+
+    self:queue_update()
+  end)
 end
 
 ---Handle focus gained event

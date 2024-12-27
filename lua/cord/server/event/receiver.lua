@@ -1,5 +1,4 @@
-local mpack = vim.mpack
-local logger = require 'cord.util.logger'
+local logger = require 'cord.plugin.log'
 local bit = require 'bit'
 
 local Handler = {}
@@ -36,10 +35,7 @@ function Handler:run()
   self:setup_default_handlers()
 
   local buffer = ''
-
   self.client:read_start(function(data)
-    if not data then return end
-
     buffer = buffer .. data
 
     while #buffer >= 4 do
@@ -53,7 +49,7 @@ function Handler:run()
       local message = string.sub(buffer, 5, 4 + length)
       buffer = string.sub(buffer, 5 + length)
 
-      local ok, event = pcall(mpack.decode, message)
+      local ok, event = pcall(vim.mpack.decode, message)
       if not ok then
         logger.error(
           'Failed to decode event: ' .. event .. '; data: ' .. message
@@ -77,7 +73,12 @@ function Handler:setup_default_handlers()
   self:register('log', function(data)
     if data.level and data.message then
       logger.log_raw(data.level, data.message)
-      if data.level == vim.log.levels.ERROR then require('cord').cleanup() end
+      if data.level == vim.log.levels.ERROR then
+        vim.schedule(function()
+          local manager = require('cord.server').manager
+          if manager then manager:pause() end
+        end)
+      end
     end
   end)
 end
