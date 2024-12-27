@@ -9,4 +9,4 @@ function! CordCompleteList(ArgLead, CmdLine, CmdPos)
     return filter(completions, 'v:val =~ "^" . a:ArgLead')
 endfunction
 
-command! -nargs=1 -complete=customlist,CordCompleteList Cord lua require'cord.util.usercmd'.handle({<f-args>})
+command! -nargs=1 -complete=customlist,CordCompleteList Cord lua require'cord.api.usercmd'.handle({<f-args>})
