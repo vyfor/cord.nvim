@@ -4,8 +4,8 @@ function M:validate(user_config)
   local logger = require 'cord.plugin.log'
   local icons = require 'cord.api.icon'
 
-  self.config = require('cord.plugin.config')
-  local config = vim.tbl_deep_extend('force', self.config, user_config)
+  local config_manager = require 'cord.plugin.config'
+  local config = vim.tbl_deep_extend('force', config_manager.opts, user_config)
   logger.set_level(config.advanced.plugin.log_level)
   icons.set_theme(config.display.theme)
 
@@ -42,6 +42,7 @@ function M:validate(user_config)
 
   ::continue::
 
+  config_manager.set_config(config)
   self.config = config
 
   return true
