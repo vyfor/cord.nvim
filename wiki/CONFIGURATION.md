@@ -166,13 +166,14 @@ text = {
     editing = function(opts)
         return string.format('Editing %s', opts.filename)
     end,
-    viewing = 'Viewing %s',              -- Simple string with filename placeholder
-    docs = 'Reading docs',               -- Shown in help buffers
-    dashboard = 'Home',                  -- Shown in dashboard buffers
+    viewing = 'Viewing a file',          -- Simple string with filename placeholder
     file_browser = 'Browsing files',     -- Shown in file explorer
     plugin_manager = 'Managing plugins', -- Shown in plugin manager
     lsp_manager = 'Configuring LSP',     -- Shown in LSP manager
-    vcs = 'Managing Git',                -- Shown in VCS related filetypes
+    docs = 'Reading docs',               -- Shown in help buffers
+    vcs = 'Committing changes',          -- Shown in VCS related filetypes
+    notes = 'Taking notes',              -- Shown in notes-taking related filetypes
+    dashboard = 'Home',                  -- Shown in dashboard buffers
 }
 ```
 
@@ -302,21 +303,21 @@ The `ActivityManager` contains useful methods:
 
 ### ActivityManager Methods
 
-| Method                       | Description                                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `queue_update(force_update)` | Schedules an update to the activity. If `force_update` is true, it bypasses checks and updates immediately.        |
-| `pause()`                    | Pauses all events and stops the idle timer.                                                                        |
-| `resume()`                   | Resumes events and restarts the idle timer.                                                                        |
-| `pause_events()`             | Disables event handling without affecting the idle timer.                                                          |
-| `resume_events()`            | Enables event handling and queues an immediate update.                                                             |
-| `skip_update()`              | Skips the next update once.                                                                                        |
-| `hide()`                     | Pauses events and clears the current activity.                                                                     |
-| `toggle()`                   | Toggles between pausing and resuming the activity updates.                                                         |
-| `force_idle()`               | Forcibly sets the session to idle.                                                                                 |
-| `unforce_idle()`             | Clears the idle state and resumes normal activity.                                                                 |
-| `toggle_idle()`              | Toggles between idle and normal activity.                                                                          |
-| `set_activity(activity)`     | Sets the rich presence to the provided [activity](#activity-options), offering complete control over the presence. |
-| `clear_activity(force)`      | Clears the current activity from the server. If `force` is true, it completely clears the presence.                |
+| Method                               | Description                                                                                                        |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `manager:queue_update(force_update)` | Schedules an update to the activity. If `force_update` is true, it bypasses checks and updates immediately.        |
+| `manager:pause()`                    | Pauses all events and stops the idle timer.                                                                        |
+| `manager:resume()`                   | Resumes events and restarts the idle timer.                                                                        |
+| `manager:pause_events()`             | Disables event handling without affecting the idle timer.                                                          |
+| `manager:resume_events()`            | Enables event handling and queues an immediate update.                                                             |
+| `manager:skip_update()`              | Skips the next update once.                                                                                        |
+| `manager:hide()`                     | Pauses events and clears the current activity.                                                                     |
+| `manager:toggle()`                   | Toggles between pausing and resuming the activity updates.                                                         |
+| `manager:force_idle()`               | Forcibly sets the session to idle.                                                                                 |
+| `manager:unforce_idle()`             | Clears the idle state and resumes normal activity.                                                                 |
+| `manager:toggle_idle()`              | Toggles between idle and normal activity.                                                                          |
+| `manager:set_activity(activity)`     | Sets the rich presence to the provided [activity](#activity-options), offering complete control over the presence. |
+| `manager:clear_activity(force)`      | Clears the current activity from the server. If `force` is true, it completely clears the presence.                |
 
 ### Activity Options
 
@@ -332,4 +333,4 @@ The `ActivityManager` contains useful methods:
 ### Useful Functions
 
 - `require('cord.icon').get(name: string, theme?: string): string`
-  - Returns the URL for the specified icon name and optional theme.
+  - Returns the URL for the specified icon name and optional theme, falling back to the configured theme.
