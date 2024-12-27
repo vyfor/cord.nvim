@@ -14,7 +14,7 @@
 
 ## 📚 Table of Contents
 - [💎 Features](#-features)
-- [📦 Installation](#-installation)
+- [📦 Install](#-install)
 - [🎨 Themes](#-themes)
 - [📖 Documentation](#-documentation)
 - [🤝 Contributing](#-contributing)
@@ -32,17 +32,22 @@
 - 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
 - 🌸 **Rich Icon Collection** — Features over 70 uniquely designed icons.
 
-## 📦 Installation  
+## 📦 Install 
 
 ### Considerations
+<details>
+<summary>Expand</summary>
+
 Cord requires the server executables to be present. To get it, you can either:
 - **Fetch from GitHub**: By invoking `:Cord fetch` (async, recommended)
   - Requires **[`curl`](https://curl.se)**
 - **Build and install from crates.io**: By invoking `:Cord build` (async)
   - Requires **[`Rust`](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
-- **Build from source**: By invoking `cargo b --release`, Cord will automatically move the executable.
+- **Build from source**: By invoking `cargo b --release` and then manually moving the resulting binary to `nvim-data-dir/cord/bin`
   - Requires **[`Rust`](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
 - **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
+
+</details>
 
 ### Installation
 <details>
@@ -80,12 +85,12 @@ use {
 
 **Unix:**
 ```bash
-git clone https://github.com/vyfor/cord.nvim.git ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
+git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
 ```
 
 **Windows:**
 ```powershell
-git clone https://github.com/vyfor/cord.nvim.git $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
+git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 ```
 
 Then call the following function somewhere in your configuration:
