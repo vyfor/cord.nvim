@@ -91,6 +91,6 @@ function IPC:close()
   if self.on_close then self.on_close() end
 end
 
-function IPC:is_closing() return self.pipe and self.pipe:is_closing() end
+function IPC:is_closing() return not self.pipe or self.pipe:is_closing() end
 
 return IPC
