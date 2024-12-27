@@ -31,6 +31,13 @@ text = {
 }
 ```
 
+### Omitting Fields
+```lua
+text = {
+  workspace = function() end,
+}
+```
+
 ### Workspace Blacklist
 ```lua
 local blacklist = {
