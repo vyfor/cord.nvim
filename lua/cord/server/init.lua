@@ -1,7 +1,7 @@
 local async = require 'cord.core.async'
 local logger = require 'cord.plugin.log'
 local pipe = require 'cord.core.uv.pipe'
-local config = require 'cord.plugin.config'
+local config = require('cord.plugin.config').opts
 
 local M = {}
 

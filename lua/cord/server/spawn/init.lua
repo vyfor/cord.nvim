@@ -23,7 +23,7 @@ M.spawn = async.wrap(function(client_id, pipe_path, exec_path)
         '-c',
         client_id,
         '-t',
-        require('cord.plugin.config').advanced.server.timeout,
+        require('cord.plugin.config').opts.advanced.server.timeout,
       },
       on_stdout = function(data)
         if data:match 'Ready' then resolve(false) end

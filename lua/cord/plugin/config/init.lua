@@ -85,8 +85,10 @@
 ---@field hooks? CordHooksConfig Hooks configuration
 ---@field advanced? CordAdvancedConfig Advanced configuration
 
+local M = {}
+
 ---@type CordConfig
-return {
+M.opts = {
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',
@@ -154,3 +156,7 @@ return {
     variables_in_functions = false,
   },
 }
+
+M.set_config = function(config) M.opts = config end
+
+return M
