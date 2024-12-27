@@ -42,7 +42,7 @@ M.connect = async.wrap(function(path, retried)
         if retry then return M.connect(path):await() end
         M.connect(path, true):await()
       end)
-    end, function(err) logger.error('Failed to spawn server: ' .. err) end)
+    end, function(err) logger.error(err) end)
 end)
 
 M.run = async.wrap(function()
