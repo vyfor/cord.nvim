@@ -12,6 +12,7 @@ pub struct ReadyEvent;
 impl OnEvent for ReadyEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         if !ctx.cord.rich_client.is_ready.swap(true, Ordering::SeqCst) {
+            println!("Broadcasting ready event...");
             ctx.cord.pipe.broadcast(&MsgPack::serialize(&self)?)?;
         }
 

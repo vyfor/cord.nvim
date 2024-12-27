@@ -9,15 +9,15 @@ pub mod clear_activity;
 pub mod connect;
 pub mod disconnect;
 pub mod initialize;
-pub mod update_activity;
 pub mod shutdown;
+pub mod update_activity;
 
 pub use clear_activity::ClearActivityEvent;
 pub use connect::ConnectEvent;
 pub use disconnect::DisconnectEvent;
 pub use initialize::InitializeEvent;
-pub use update_activity::UpdateActivityEvent;
 pub use shutdown::ShutdownEvent;
+pub use update_activity::UpdateActivityEvent;
 
 #[derive(Debug)]
 pub enum ClientEvent {

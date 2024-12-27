@@ -74,7 +74,6 @@ impl Cord {
 
     /// Runs the application.
     pub fn run(&mut self) -> crate::Result<()> {
-        self.tx.send(server_event!(0, Initialize)).ok();
         self.start_rpc()?;
         self.pipe.start()?;
         self.start_event_loop()?;

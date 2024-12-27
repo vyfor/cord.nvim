@@ -78,8 +78,6 @@ impl Args {
             }
         }
 
-        println!("v{}", env!("CARGO_PKG_VERSION"));
-
         Ok(Args {
             pipe_name: pipe_name
                 .unwrap_or_else(|| DEFAULT_PIPE_NAME.to_string()),
