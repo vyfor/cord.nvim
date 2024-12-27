@@ -1,6 +1,26 @@
 # 🎨 Customization Examples
 
-This guide showcases various creative ways to customize your Discord presence using Cord's powerful configuration system.
+Learn how to customize your Discord presence in countless ways using Cord's robust configuration system. The possibilities are endless, and the only limit is your creativity!
+
+### Customizing Icons
+
+>![IMPORATANT] If you use a plugin manager, avoid using `require` directly in tables; instead, use them within function initializers.
+
+```lua
+config = function()
+  require('cord').setup {
+    display = {
+      theme = 'pastel',
+    },
+    lazy = {
+      -- change default idle icon to keyboard
+      icon = require('cord.icon').get('keyboard'),
+      -- or use another theme's idle icon
+      icon = require('cord.icon').get('idle', 'onyx'),
+    }
+  }
+end
+```
 
 ### Cursor Position
 ```lua
