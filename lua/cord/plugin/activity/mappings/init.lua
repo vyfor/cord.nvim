@@ -1,12 +1,12 @@
 local M = {}
 
-local language = require 'cord.mappings.language'
-local file_browser = require 'cord.mappings.file_browser'
-local lsp_manager = require 'cord.mappings.lsp_manager'
-local plugin_manager = require 'cord.mappings.plugin_manager'
-local docs = require 'cord.mappings.docs'
-local vcs = require 'cord.mappings.vcs'
-local dashboard = require 'cord.mappings.dashboard'
+local language = require 'cord.plugin.activity.mappings.language'
+local file_browser = require 'cord.plugin.activity.mappings.file_browser'
+local lsp_manager = require 'cord.plugin.activity.mappings.lsp_manager'
+local plugin_manager = require 'cord.plugin.activity.mappings.plugin_manager'
+local docs = require 'cord.plugin.activity.mappings.docs'
+local vcs = require 'cord.plugin.activity.mappings.vcs'
+local dashboard = require 'cord.plugin.activity.mappings.dashboard'
 
 M.get_default_icon = function(type)
   if type == 'file_browser' then

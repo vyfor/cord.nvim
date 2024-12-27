@@ -85,14 +85,8 @@
 ---@field hooks? CordHooksConfig Hooks configuration
 ---@field advanced? CordAdvancedConfig Advanced configuration
 
-local logger = require 'cord.util.logger'
-local constants = require 'cord.util.constants'
-local icons = require 'cord.icon'
-
-local M = {}
-
 ---@type CordConfig
-M.values = {
+return {
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',
@@ -130,6 +124,7 @@ M.values = {
     lsp_manager = function(opts) return 'Configuring LSP in ' .. opts.tooltip end,
     docs = function(opts) return 'Reading ' .. opts.tooltip end,
     vcs = function(opts) return 'Committing changes in ' .. opts.tooltip end,
+    notes = function(opts) return 'Taking notes in ' .. opts.tooltip end,
     workspace = function(opts) return 'In ' .. opts.workspace_name end,
     dashboard = 'Home',
   },
@@ -159,105 +154,3 @@ M.values = {
     variables_in_functions = false,
   },
 }
-
-function M:validate(user_config)
-  local config = vim.tbl_deep_extend('force', self.values, user_config)
-  logger.set_level(config.advanced.plugin.log_level)
-  icons.set_theme(config.display.theme)
-
-  if config.buttons and #config.buttons > 2 then
-    logger.error 'There cannot be more than 2 buttons'
-    return false
-  end
-
-  if type(config.editor.client) == 'string' then
-    local client = constants.CLIENT_IDS[config.editor.client]
-
-    if not client then
-      if config.editor.client:match '^%d+$' then
-        config.is_custom_client = true
-        if not config.editor.icon then
-          config.editor.icon = icons.get 'neovim'
-        end
-        goto continue
-      end
-
-      logger.error('Unknown client: ' .. config.editor.client)
-      return false
-    end
-
-    config.editor.client = client.id
-    if not config.editor.icon then
-      config.editor.icon = icons.get(client.icon)
-    end
-
-    if not config.idle.icon then
-      config.idle.icon = icons.get(icons.DEFAULT_IDLE_ICON)
-    end
-  end
-
-  ::continue::
-
-  self.values = config
-
-  return true
-end
-
-function M.get(option, args)
-  local is_function = type(option) == 'function'
-
-  if is_function then
-    if not M.values.advanced.variables_in_functions then return option(args) end
-  else
-    local variables = M.values.variables
-    if variables then
-      if type(variables) == 'table' then
-        for k, v in pairs(variables) do
-          args[k] = (type(v) == 'function') and v(args) or v
-        end
-      end
-      if type(option) == 'string' then
-        option = option:gsub('%${(.-)}', args)
-      end
-    end
-  end
-
-  return is_function and option(args) or option
-end
-
-function M:get_buttons(opts)
-  if not self.values.buttons then return {} end
-
-  local buttons = {}
-  for i = 1, #self.values.buttons do
-    local sourcebtn = self.values.buttons[i]
-    local button = {}
-
-    if type(sourcebtn.label) == 'function' then
-      local label = sourcebtn.label(opts)
-      if not label then goto continue end
-      button.label = label
-    else
-      if not sourcebtn.label then goto continue end
-      button.label = sourcebtn.label
-    end
-
-    if type(sourcebtn.url) == 'function' then
-      local url = sourcebtn.url(opts)
-      if not url then goto continue end
-      button.url = url
-    else
-      if not sourcebtn.url then goto continue end
-      button.url = sourcebtn.url
-    end
-
-    buttons[#buttons + 1] = button
-
-    ::continue::
-  end
-
-  return buttons
-end
-
-
-return M

@@ -10,6 +10,7 @@ function Producer.new(client)
 end
 
 function Producer:send_event(type, data)
+  if self.client:is_closing() then return end
   self.client:write(mpack.encode { type = type, data = data })
 end
 
