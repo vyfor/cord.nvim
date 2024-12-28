@@ -60,6 +60,7 @@
 ---@field server? CordAdvancedServerConfig configuration
 ---@field cursor_update_mode? string Cursor update mode
 ---@field variables_in_functions? boolean Whether to use variables in functions
+---@field match_in_mappings? boolean Whether to use `:match()` calls in mappings to detect languages, not supported by Neovim, by matching against file extensions
 
 ---@class CordAdvancedPluginConfig
 ---@field log_level? integer Logging level (from `vim.log.levels`)
@@ -154,6 +155,7 @@ M.opts = {
     },
     cursor_update_mode = 'on_hold',
     variables_in_functions = false,
+    match_in_mappings = true,
   },
 }
 
