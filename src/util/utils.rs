@@ -45,3 +45,25 @@ macro_rules! remove_field_or_none {
         $map.remove($field).and_then($expr)
     };
 }
+
+/// Prints a message to stdout without panicking.
+#[macro_export]
+macro_rules! echo {
+    ($($arg:tt)*) => {{
+        use std::io::{self, Write};
+        let stdout = io::stdout();
+        let mut handle = stdout.lock();
+        let _ = writeln!(handle, $($arg)*);
+    }};
+}
+
+/// Prints a message to stderr without panicking.
+#[macro_export]
+macro_rules! error {
+    ($($arg:tt)*) => {{
+        use std::io::{self, Write};
+        let stderr = io::stderr();
+        let mut handle = stderr.lock();
+        let _ = writeln!(handle, $($arg)*);
+    }};
+}

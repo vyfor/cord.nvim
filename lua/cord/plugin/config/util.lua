@@ -11,7 +11,7 @@ function M:validate(user_config)
 
   if config.buttons and #config.buttons > 2 then
     logger.error 'There cannot be more than 2 buttons'
-    return false
+    return
   end
 
   if type(config.editor.client) == 'string' then
@@ -27,7 +27,7 @@ function M:validate(user_config)
       end
 
       logger.error('Unknown client: ' .. config.editor.client)
-      return false
+      return
     end
 
     config.editor.client = client.id
@@ -45,7 +45,7 @@ function M:validate(user_config)
   config_manager.set_config(config)
   self.config = config
 
-  return true
+  return config
 end
 
 function M:get(option, args)

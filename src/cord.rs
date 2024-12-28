@@ -157,7 +157,6 @@ impl Cord {
     #[inline(always)]
     pub fn shutdown(&mut self) {
         self.cleanup();
-        println!("Shutting down...");
         std::process::exit(0);
     }
 }
