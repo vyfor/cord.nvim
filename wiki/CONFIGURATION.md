@@ -76,6 +76,7 @@ require('cord').setup {
     },
     cursor_update_mode = 'on_hold',
     variables_in_functions = false,
+    match_in_mappings = true,
   },
 }
 ```
@@ -157,6 +158,7 @@ require('cord').setup {
 | `advanced.server.timeout`         | `number`        | `60000`               | Server shutdown timeout (ms)                                                                                                                                                                       |
 | `advanced.cursor_update_mode`     | `string`        | `'on_move'`           | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                                               |
 | `advanced.variables_in_functions` | `boolean`       | `false`               | Whether to compute and use variables in functions                                                                                                                                                  |
+| `advanced.match_in_mappings`      | `boolean`       | `true`                | Whether to match against file extensions in mappings                                                                                                                                               |
 
 ---
 
@@ -335,5 +337,5 @@ The `ActivityManager` contains useful methods:
 
 ### Useful Functions
 
-- `require('cord.icon').get(name: string, theme?: string): string`
+- `require('cord.api.icon').get(name: string, theme?: string): string`
   - Returns the URL for the specified icon name and optional theme, falling back to the configured theme.
