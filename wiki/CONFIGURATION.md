@@ -33,6 +33,7 @@ require('cord').setup {
     timeout = 300000,
     show_status = true,
     ignore_focus = true,
+    unidle_on_focus = true,
     smart_idle = true,
     details = 'Idling',
     state = nil,
@@ -67,11 +68,12 @@ require('cord').setup {
       autocmds = true,
     },
     server = {
+      build = 'fetch',
       pipe_path = nil,
       executable_path = nil,
       timeout = 60000,
     },
-    cursor_update_mode = 'on_move',
+    cursor_update_mode = 'on_hold',
     variables_in_functions = false,
   },
 }
