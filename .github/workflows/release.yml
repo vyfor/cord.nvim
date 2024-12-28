@@ -19,6 +19,11 @@ jobs:
           - os: ubuntu-latest
             target: i686-unknown-linux-musl
 
+          - os: ubuntu-latest
+            target: x86_64-unknown-freebsd
+          - os: ubuntu-latest
+            target: i686-unknown-freebsd
+
           - os: macos-latest
             target: x86_64-apple-darwin
           - os: macos-latest
