@@ -152,7 +152,7 @@ M.opts = {
       executable_path = nil,
       timeout = 60000,
     },
-    cursor_update_mode = 'on_move',
+    cursor_update_mode = 'on_hold',
     variables_in_functions = false,
   },
 }
