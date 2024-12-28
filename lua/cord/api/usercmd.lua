@@ -72,7 +72,10 @@ M.handle = function(args)
   if command then
     command()
   else
-    error('Unknown command: ' .. '\'' .. args[1] .. '\'')
+    require('cord.plugin.log').log_raw(
+      vim.log.levels.ERROR,
+      'Unknown command: ' .. '\'' .. args[1] .. '\''
+    )
   end
 end
 
