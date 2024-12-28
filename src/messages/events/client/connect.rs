@@ -11,7 +11,6 @@ use crate::protocol::msgpack::MsgPack;
 impl OnEvent for ConnectEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         if ctx.cord.rich_client.is_ready.load(Ordering::SeqCst) {
-            println!("Sending ready event...");
             ctx.cord
                 .pipe
                 .write_to(ctx.client_id, &MsgPack::serialize(&ReadyEvent)?)?;

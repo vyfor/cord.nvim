@@ -1,6 +1,7 @@
 use std::env;
 
 use super::error::CliError;
+use crate::echo;
 
 const DEFAULT_TIMEOUT: u64 = 60000;
 #[cfg(target_os = "windows")]
@@ -27,7 +28,7 @@ impl Args {
         while i < args.len() {
             match args[i].as_str() {
                 "--version" | "-v" => {
-                    print!("{}", env!("CARGO_PKG_VERSION"));
+                    echo!("{}", env!("CARGO_PKG_VERSION"));
                     std::process::exit(0);
                 }
                 "--pipe-name" | "-p" => {

@@ -11,7 +11,7 @@ use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 use crate::session::SessionManager;
-use crate::{client_event, local_event};
+use crate::{client_event, echo, local_event};
 
 pub struct PipeServer {
     session_manager: Arc<SessionManager>,
@@ -63,7 +63,7 @@ impl PipeServerImpl for PipeServer {
             let mut notified = false;
             while running.load(Ordering::SeqCst) {
                 if !notified {
-                    println!("Ready");
+                    echo!("Ready");
                     notified = true;
                 }
 
