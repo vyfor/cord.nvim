@@ -139,6 +139,7 @@ M.fetch = async.wrap(function()
 
             async.run(function()
               server.is_updating = false
+              require('cord.core.uv.fs').chmod(executable_path, '755'):await()
               cord:initialize()
             end)
           end, function(err)

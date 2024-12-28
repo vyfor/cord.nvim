@@ -29,7 +29,7 @@ end
 
 function M.mkdir(path, mode)
   return Future.new(function(resolve, reject)
-    uv.fs_mkdir(path, mode or 511, function(err)  -- 511 = 0777 in octal
+    uv.fs_mkdir(path, mode or 511, function(err) -- 511 = 0777 in octal
       if err then
         reject(err)
         return
@@ -53,7 +53,7 @@ end
 
 function M.readfile(path)
   return Future.new(function(resolve, reject)
-    uv.fs_open(path, 'r', 438, function(err, fd)  -- 438 = 0666 in octal
+    uv.fs_open(path, 'r', 438, function(err, fd) -- 438 = 0666 in octal
       if err then
         reject(err)
         return
@@ -81,7 +81,7 @@ end
 
 function M.writefile(path, data)
   return Future.new(function(resolve, reject)
-    uv.fs_open(path, 'w', 438, function(err, fd)  -- 438 = 0666 in octal
+    uv.fs_open(path, 'w', 438, function(err, fd) -- 438 = 0666 in octal
       if err then
         reject(err)
         return
@@ -95,6 +95,18 @@ function M.writefile(path, data)
         end
         resolve(bytes_written)
       end)
+    end)
+  end)
+end
+
+function M.chmod(path, mode)
+  return Future.new(function(resolve, reject)
+    uv.fs_chmod(path, mode, function(err)
+      if err then
+        reject(err)
+        return
+      end
+      resolve(true)
     end)
   end)
 end
