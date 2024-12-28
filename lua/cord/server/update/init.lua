@@ -45,7 +45,7 @@ M.build = async.wrap(function()
 
             async.run(function()
               server.is_updating = false
-              cord.initialize():await()
+              cord:initialize()
             end)
           end, function(err)
             server.is_updating = false
@@ -139,7 +139,7 @@ M.fetch = async.wrap(function()
 
             async.run(function()
               server.is_updating = false
-              cord.initialize():await()
+              cord:initialize()
             end)
           end, function(err)
             server.is_updating = false

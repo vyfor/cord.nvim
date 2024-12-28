@@ -48,7 +48,7 @@ M.restart = function()
 
     require('cord.plugin.log').debug 'Restarting...'
     local function initialize()
-      require('cord.core.async').run(function() cord:initialize():await() end)
+      require('cord.core.async').run(function() cord:initialize() end)
     end
 
     if cord.manager then cord.manager:cleanup() end
