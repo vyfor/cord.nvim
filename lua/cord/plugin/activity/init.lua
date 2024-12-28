@@ -70,6 +70,8 @@ local function build_activity(config, opts)
       file_text = config_utils:get(config.text.docs, opts)
     elseif opts.type == 'vcs' then
       file_text = config_utils:get(config.text.vcs, opts)
+    elseif opts.type == 'notes' then
+      file_text = config_utils:get(config.text.notes, opts)
     elseif opts.type == 'dashboard' then
       file_text = config_utils:get(config.text.dashboard, opts)
     end

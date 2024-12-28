@@ -6,6 +6,7 @@ local lsp_manager = require 'cord.plugin.activity.mappings.lsp_manager'
 local plugin_manager = require 'cord.plugin.activity.mappings.plugin_manager'
 local docs = require 'cord.plugin.activity.mappings.docs'
 local vcs = require 'cord.plugin.activity.mappings.vcs'
+local notes = require 'cord.plugin.activity.mappings.notes'
 local dashboard = require 'cord.plugin.activity.mappings.dashboard'
 
 M.get_default_icon = function(type)
@@ -19,6 +20,8 @@ M.get_default_icon = function(type)
     return docs.default_icon
   elseif type == 'vcs' then
     return vcs.default_icon
+  elseif type == 'notes' then
+    return notes.default_icon
   elseif type == 'dashboard' then
     return dashboard.default_icon
   else
@@ -44,6 +47,9 @@ M.get = function(filetype, filename)
 
   result = vcs.get(filetype)
   if result then return 'vcs', result[1], result[2] end
+
+  result = notes.get(filetype)
+  if result then return 'notes', result[1], result[2] end
 
   result = dashboard.get(filetype)
   if result then return 'dashboard', result[1], result[2] end

@@ -48,6 +48,7 @@ require('cord').setup {
     lsp_manager = function(opts) return 'Configuring LSP in ' .. opts.tooltip end,
     docs = function(opts) return 'Reading ' .. opts.tooltip end,
     vcs = function(opts) return 'Committing changes in ' .. opts.tooltip end,
+    notes = function(opts) return 'Taking notes in ' .. opts.tooltip end,
     workspace = function(opts) return 'In ' .. opts.workspace_name end,
     dashboard = 'Home',
   },
