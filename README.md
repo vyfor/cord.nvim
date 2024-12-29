@@ -12,13 +12,13 @@
   <img src="https://github.com/user-attachments/assets/df73221e-565b-49e5-9dad-1c60aed6f9c3" alt="Cord Banner">
 </div>
 
-## 📚 Table of Contents
-- [💎 Features](#-features)
-- [📦 Install](#-install)
-- [🎨 Themes](#-themes)
-- [📖 Documentation](#-documentation)
-- [🤝 Contributing](#-contributing)
-- [❓ FAQ](#-faq)
+<div align="center">
+  <a href="#-install">Installation</a>
+  <span> • </span>
+  <a href="#-documentation">Documentation</a>
+  <span> • </span>
+  <a href="https://discord.gg/q9rC4bjCHv">Discord</a>
+</div>
 
 ## 💎 Features  
 - 🌐 **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
@@ -51,7 +51,7 @@ Cord requires the server executables to be present. To get it, you can either:
 
 ### Installation
 <details>
-<summary><strong>Using lazy.nvim</strong></summary>
+<summary>Using <strong>lazy.nvim</strong></summary>
 
 ```lua
 {
@@ -65,7 +65,7 @@ Cord requires the server executables to be present. To get it, you can either:
 </details>
 
 <details>
-<summary><strong>Using packer.nvim</strong></summary>
+<summary>Using <strong>packer.nvim</strong></summary>
 
 ```lua
 use {
@@ -81,7 +81,7 @@ use {
 </details>
 
 <details>
-<summary><strong>Using rocks.nvim</strong></summary>
+<summary>Using <strong>rocks.nvim</strong></summary>
 
 Cord is available on [LuaRocks](https://luarocks.org/modules/vyfor/cord.nvim).
 
@@ -95,7 +95,7 @@ Invoke `:Cord update` to whenever the plugin is updated.
 </details>
 
 <details>
-<summary><strong>Using Vim packages</strong></summary>
+<summary>Using <strong>Vim packages</strong></summary>
 
 **Unix:**
 ```bash
@@ -117,7 +117,7 @@ Invoke `:Cord update` to whenever the plugin is updated.
 </details>
 
 <details>
-<summary><strong>Other</strong></summary>
+<summary>Other</summary>
 
 Make sure you call the following function somewhere in your configuration:
 ```lua
@@ -151,5 +151,6 @@ Have questions or issues?
 ---
 
 <div align="center">  
-  <p>💬 Questions? Reach me out on Discord: <a href="https://discord.com/users/446729269872427018"><strong>vyfor</strong></a></p>  
+  <p>💬 Questions? Reach me out on Discord: <a href="https://discord.com/users/446729269872427018"><strong>vyfor</strong></a></p>
+  <div><a href="https://discord.gg/q9rC4bjCHv"><img src="https://discord.com/api/guilds/1322899307925602366/widget.png?style=banner3" alt="cord.nvim"/></a></div>
 </div>
