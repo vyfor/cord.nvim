@@ -79,6 +79,18 @@ M.restart = function()
     cord.tx:shutdown()
   end)
 end
+M.status = function()
+  local cord = require 'cord.server'
+  if cord.status == 'ready' then
+    require('cord.plugin.log').info 'Status: Connected to Discord'
+  elseif cord.status == 'connecting' then
+    require('cord.plugin.log').info 'Status: Connecting to server'
+  elseif cord.status == 'connected' then
+    require('cord.plugin.log').info 'Status: Connecting to Discord'
+  else
+    require('cord.plugin.log').info 'Status: Disconnected'
+  end
+end
 
 M.handle = function(args)
   local command = M[args[1]]

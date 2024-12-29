@@ -10,6 +10,7 @@ function M:connect(path, retried)
       return
     end
 
+    self.status = 'connecting'
     logger.debug 'Connecting...'
 
     logger.debug('Pipe: ' .. path)
@@ -17,6 +18,7 @@ function M:connect(path, retried)
     local _, err = M.client:connect(path):get()
 
     if not err then
+      self.status = 'connected'
       logger.debug 'Connected to pipe'
       return M:run():await()
     end
@@ -59,6 +61,7 @@ function M:run()
     M.rx:register(
       'ready',
       vim.schedule_wrap(function()
+        self.status = 'ready'
         async.run(function()
           logger.info 'Connected to Discord'
           M.tx:initialize(self.config)
@@ -67,6 +70,7 @@ function M:run()
           local manager, err =
             ActivityManager.new({ tx = M.tx, config = self.config }):get()
           if not manager or err then
+            self.status = 'disconnected'
             self.client:close()
             logger.error(err or 'Failed to initialize activity manager')
             return
@@ -92,6 +96,7 @@ function M:run()
 end
 
 function M:initialize(config)
+  self.status = 'connecting'
   self.config = config or self.config
   async.run(function()
     logger.debug 'Initializing server...'
@@ -100,7 +105,10 @@ function M:initialize(config)
       or require('cord.plugin.constants').get_pipe_path()
 
     local _, err = M:connect(path):get()
-    if err then logger.error(err) end
+    if err then
+      self.status = 'disconnected'
+      logger.error(err)
+    end
   end)
 end
 
