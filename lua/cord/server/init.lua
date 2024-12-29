@@ -10,7 +10,7 @@ function M:connect(path, retried)
       return
     end
 
-    logger.info 'Connecting...'
+    logger.debug 'Connecting...'
     logger.debug('Pipe: ' .. path)
     M.client = require('cord.core.uv.pipe').new()
     local _, err = M.client:connect(path):get()
