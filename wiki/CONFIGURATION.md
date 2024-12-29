@@ -256,6 +256,7 @@ require('cord').setup {
 - `:Cord clear_presence` - Clear the rich presence for all sessions
 - `:Cord build` - Build the server executable using `cargo`
 - `:Cord fetch` - Fetch the server executable from GitHub using `curl`
+- `:Cord update` - Update the server executable using the configured update mode
 - `:Cord restart` - Restart the server executable
 
 ### Cursor Update Mode
