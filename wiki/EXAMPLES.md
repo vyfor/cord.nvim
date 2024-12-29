@@ -4,7 +4,8 @@ Learn how to customize your Discord presence in countless ways using Cord's robu
 
 ### Customizing Icons
 
->![IMPORATANT] If you use a plugin manager, avoid using `require` directly in tables; instead, use them within function initializers.
+>[!IMPORTANT]
+> If you use a plugin manager, avoid using `require` directly in tables; instead, use them within function initializers.
 
 ```lua
 config = function()
@@ -14,9 +15,9 @@ config = function()
     },
     lazy = {
       -- change default idle icon to keyboard
-      icon = require('cord.icon').get('keyboard'),
+      icon = require('cord.api.icon').get('keyboard'),
       -- or use another theme's idle icon
-      icon = require('cord.icon').get('idle', 'onyx'),
+      icon = require('cord.api.icon').get('idle', 'onyx'),
     }
   }
 end
