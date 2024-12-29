@@ -17,19 +17,20 @@ function Async.wrap(fn)
         return
       end
 
-      local success, result = xpcall(function()
+      local success, result = pcall(function()
         ---@diagnostic disable-next-line: deprecated
         local unpack = table.unpack or unpack
         return fn(unpack(args))
-      end, function(err)
+      end)
+      if not success then
         require('cord.plugin.log').tracecb(
           function()
-            return 'Error in async.wrap: ' .. err .. '\n' .. debug.traceback()
+            return 'Error in async.wrap: '
+              .. result
+              .. '\n'
+              .. debug.traceback()
           end
         )
-      end)
-
-      if not success then
         reject(result)
         return
       end
@@ -68,7 +69,7 @@ function Async.run(fn)
         end
       end
     else
-      error(ret[1])
+      error(ret[1], 0)
     end
   end
 

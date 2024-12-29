@@ -77,7 +77,7 @@ M.fetch = async.wrap(function()
   server.is_updating = true
 
   if not vim.fn.executable 'curl' then
-    error 'curl is not installed or not in PATH'
+    error('curl is not installed or not in PATH', 0)
     return
   end
 
@@ -200,11 +200,11 @@ M.fetch = async.wrap(function()
                 if res.code == 0 then
                   local ok, data = pcall(vim.fn.json_decode, res.stdout)
                   if not ok then
-                    error('Failed to parse JSON response: ' .. data)
+                    error('Failed to parse JSON response: ' .. data, 0)
                   end
 
                   if not data.tag_name then
-                    error 'No tag found in GitHub response'
+                    error('No tag found in GitHub response', 0)
                   end
 
                   if data.tag_name == version then
@@ -217,7 +217,7 @@ M.fetch = async.wrap(function()
 
                   fetch_executable(data.tag_name)
                 else
-                  error('Failed to fetch latest release: ' .. res.stdout)
+                  error('Failed to fetch latest release: ' .. res.stdout, 0)
                 end
               end)
             end))

@@ -11,6 +11,7 @@ function M:connect(path, retried)
     end
 
     logger.debug 'Connecting...'
+
     logger.debug('Pipe: ' .. path)
     M.client = require('cord.core.uv.pipe').new()
     local _, err = M.client:connect(path):get()
@@ -20,10 +21,7 @@ function M:connect(path, retried)
       return M:run():await()
     end
 
-    if retried then
-      logger.error('Failed to connect to pipe: ' .. err)
-      return
-    end
+    if retried then error('Failed to connect to pipe: ' .. err, 0) end
 
     if err ~= 'ENOENT' and err ~= 'ECONNRESET' then
       if err == 'ECONNREFUSED' or err == 'ETIMEDOUT' then
@@ -32,27 +30,22 @@ function M:connect(path, retried)
         goto spawn
       end
 
-      logger.error('Failed to connect to pipe: ' .. err)
-      return
+      error('Failed to connect to pipe: ' .. err, 0)
     end
 
     ::spawn::
     logger.debug 'Pipe not found. Spawning server executable...'
-
-    local process = require 'cord.server.spawn'
-    process
+    local retry = require('cord.server.spawn')
       .spawn(
         self.config.editor.client,
         path,
         self.config.advanced.server.executable_path
       )
-      :and_then(function(retry)
-        async.run(function()
-          logger.debug 'Server executable spawned'
-          if retry then return M:connect(path):await() end
-          M:connect(path, true):await()
-        end)
-      end, function(err) logger.error(err) end)
+      :await()
+
+    logger.debug 'Server executable spawned'
+    if retry then return M:connect(path):await() end
+    M:connect(path, true):await()
   end)()
 end
 
@@ -71,10 +64,16 @@ function M:run()
           M.tx:initialize(self.config)
 
           local ActivityManager = require 'cord.plugin.activity.manager'
-          local manager =
-            ActivityManager.new({ tx = M.tx, config = self.config }):await()
+          local manager, err =
+            ActivityManager.new({ tx = M.tx, config = self.config }):get()
+          if not manager or err then
+            self.client:close()
+            logger.error(err or 'Failed to initialize activity manager')
+            return
+          end
 
           M.client.on_close = vim.schedule_wrap(function()
+            M.status = 'disconnected'
             if M.manager then M.manager:cleanup() end
             if self.config.hooks.on_disconnect then
               self.config.hooks.on_disconnect()
@@ -100,7 +99,8 @@ function M:initialize(config)
     local path = self.config.advanced.server.pipe_path
       or require('cord.plugin.constants').get_pipe_path()
 
-    M:connect(path):await()
+    local _, err = M:connect(path):get()
+    if err then logger.error(err) end
   end)
 end
 

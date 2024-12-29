@@ -9,7 +9,7 @@ M.spawn = async.wrap(function(client_id, pipe_path, exec_path)
 
   local fs = require 'cord.core.uv.fs'
   if not fs.stat(exec_path):await() then
-    error 'Could not find server executable. Please update it'
+    error('Could not find server executable. Please update it', 0)
     return
   end
 

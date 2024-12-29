@@ -119,6 +119,7 @@ function Future.await(future)
           .. debug.traceback()
       end
     )
+    return
   end
 
   future:and_then(
@@ -130,7 +131,7 @@ function Future.await(future)
   if success then
     return result
   else
-    error(result)
+    error(result, 0)
   end
 end
 
@@ -143,6 +144,7 @@ function Future.get(future)
           .. debug.traceback()
       end
     )
+    return
   end
 
   future:and_then(

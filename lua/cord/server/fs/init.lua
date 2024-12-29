@@ -35,7 +35,7 @@ M.get_executable = async.wrap(function(config)
       local result = require('cord.server.update').build():await()
       return result
     else
-      error 'Executable not found'
+      error('Executable not found', 0)
     end
   end
 end)
