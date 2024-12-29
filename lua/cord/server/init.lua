@@ -25,15 +25,22 @@ function M:connect(path, retried)
       return
     end
 
-    if err ~= 'ENOENT' then
+    if err ~= 'ENOENT' and err ~= 'ECONNRESET' then
+      if err == 'ECONNREFUSED' or err == 'ETIMEDOUT' then
+        logger.debug 'Found stale pipe. Removing...'
+        require('cord.core.uv.fs').unlink(path):get()
+        goto spawn
+      end
+
       logger.error('Failed to connect to pipe: ' .. err)
       return
     end
 
+    ::spawn::
     logger.debug 'Pipe not found. Spawning server executable...'
 
-    local spawn = require 'cord.server.spawn'
-    spawn
+    local process = require 'cord.server.spawn'
+    process
       .spawn(
         self.config.editor.client,
         path,
