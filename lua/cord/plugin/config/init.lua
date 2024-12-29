@@ -67,7 +67,7 @@
 ---@field autocmds? boolean Whether to enable autocmds
 
 ---@class CordAdvancedServerConfig
----@field build? string How to acquire the server executable: 'fetch' or 'build' or 'none'
+---@field update? string How to acquire the server executable: 'fetch' or 'build' or 'none'
 ---@field pipe_path? string Path to the server's pipe
 ---@field executable_path? string Path to the server's executable
 ---@field timeout? integer Timeout in milliseconds
@@ -148,7 +148,7 @@ M.opts = {
       autocmds = true,
     },
     server = {
-      build = 'fetch',
+      update = 'fetch',
       pipe_path = nil,
       executable_path = nil,
       timeout = 60000,

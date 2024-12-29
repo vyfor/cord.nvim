@@ -27,7 +27,7 @@ M.get_executable = async.wrap(function(config)
   if stat then
     return { path = executable_path, error = nil, needs_update = false }
   else
-    local mode = config.advanced.server.build
+    local mode = config.advanced.server.update
     if mode == 'fetch' then
       local result = require('cord.server.update').fetch():await()
       return result

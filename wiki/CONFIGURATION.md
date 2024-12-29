@@ -69,7 +69,7 @@ require('cord').setup {
       autocmds = true,
     },
     server = {
-      build = 'fetch',
+      update = 'fetch',
       pipe_path = nil,
       executable_path = nil,
       timeout = 60000,
@@ -152,7 +152,7 @@ require('cord').setup {
 | --------------------------------- | --------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `advanced.plugin.log_level`       | `number`        | `vim.log.levels.INFO` | Logging level for the plugin                                                                                                                                                                       |
 | `advanced.plugin.autocmds`        | `boolean`       | `true`                | Enable autocmds                                                                                                                                                                                    |
-| `advanced.server.build`           | `string`        | `'fetch'`             | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
+| `advanced.server.update`          | `string`        | `'fetch'`             | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
 | `advanced.server.pipe_path`       | `string \| nil` | `nil`                 | Custom IPC pipe path                                                                                                                                                                               |
 | `advanced.server.executable_path` | `string \| nil` | `nil`                 | Custom server executable path                                                                                                                                                                      |
 | `advanced.server.timeout`         | `number`        | `60000`               | Server shutdown timeout (ms)                                                                                                                                                                       |
