@@ -51,7 +51,7 @@ Cord requires the server executables to be present. To get it, you can either:
 
 ### Installation
 <details>
-<summary>Using lazy.nvim</summary>
+<summary><strong>Using lazy.nvim</strong></summary>
 
 ```lua
 {
@@ -65,7 +65,7 @@ Cord requires the server executables to be present. To get it, you can either:
 </details>
 
 <details>
-<summary>Using packer.nvim</summary>
+<summary><strong>Using packer.nvim</strong></summary>
 
 ```lua
 use {
@@ -81,7 +81,21 @@ use {
 </details>
 
 <details>
-<summary>Using Vim packages</summary>
+<summary><strong>Using rocks.nvim</strong></summary>
+
+Cord is available on [LuaRocks](https://luarocks.org/modules/vyfor/cord.nvim).
+
+```vim
+:Rocks install cord.nvim
+```
+
+Do not forget to call `require('cord').setup()` to initialize the plugin, or set `config = true`.
+Invoke `:Cord update` to whenever the plugin is updated.
+
+</details>
+
+<details>
+<summary><strong>Using Vim packages</strong></summary>
 
 **Unix:**
 ```bash
@@ -103,7 +117,7 @@ Invoke `:Cord update` to whenever the plugin is updated.
 </details>
 
 <details>
-<summary>Other</summary>
+<summary><strong>Other</strong></summary>
 
 Make sure you call the following function somewhere in your configuration:
 ```lua
