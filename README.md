@@ -57,7 +57,7 @@ Cord requires the server executables to be present. To get it, you can either:
 {
   'vyfor/cord.nvim',
   branch = 'client-server',
-  build = ':Cord fetch',
+  build = ':Cord update',
   opts = {}, -- calls require('cord').setup()
 }
 ```
@@ -71,7 +71,7 @@ Cord requires the server executables to be present. To get it, you can either:
 use {
   'vyfor/cord.nvim',
   branch = 'client-server',
-  run = ':Cord fetch',
+  run = ':Cord update',
   config = function()
     require('cord').setup()
   end
@@ -98,7 +98,7 @@ Then call the following function somewhere in your configuration:
 require('cord').setup()
 ```
 
-Invoke `:Cord fetch` to whenever the plugin is updated.
+Invoke `:Cord update` to whenever the plugin is updated.
 
 </details>
 
@@ -110,7 +110,7 @@ Make sure you call the following function somewhere in your configuration:
 require('cord').setup()
 ```
 
-Invoke `:Cord fetch` to whenever the plugin is updated.
+Invoke `:Cord update` to whenever the plugin is updated.
 
 </details>
 
