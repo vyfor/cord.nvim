@@ -2,13 +2,27 @@ local M = {}
 
 M.build = function()
   require('cord.core.async').run(
-    function() require('cord.server.update').build() end
+    function() require('cord.server.update').build():await() end
   )
 end
 M.fetch = function()
   require('cord.core.async').run(
-    function() require('cord.server.update').fetch() end
+    function() require('cord.server.update').fetch():await() end
   )
+end
+M.update = function()
+  local mode = require('cord.plugin.config').opts.advanced.server.update
+
+  if mode == 'fetch' then
+    M.fetch()
+  elseif mode == 'build' then
+    M.build()
+  elseif mode ~= 'none' then
+    require('cord.plugin.log').log_raw(
+      vim.log.levels.ERROR,
+      'Unknown update mode: ' .. '\'' .. mode .. '\''
+    )
+  end
 end
 M.show_presence = function()
   local cord = require 'cord.server'
