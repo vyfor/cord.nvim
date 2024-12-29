@@ -209,7 +209,9 @@ M.fetch = async.wrap(function()
 
                   if data.tag_name == version then
                     server.is_updating = false
-                    logger.info('Already on latest version ' .. data.tag_name)
+                    logger.info(
+                      'Already on latest server version ' .. data.tag_name
+                    )
                     return
                   end
 
