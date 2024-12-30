@@ -7,14 +7,12 @@ use crate::ipc::discord::client::{Connection, RichClient};
 use crate::ipc::pipe::platform::server::PipeServer;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::messages::events::local::ErrorEvent;
 use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
 use crate::protocol::msgpack::MsgPack;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
 use crate::util::logger::{LogLevel, Logger};
-use crate::{client_event, local_event, server_event};
 
 /// Core application managing configuration, sessions, IPC with Discord, and logging.
 ///
@@ -115,31 +113,13 @@ impl Cord {
     }
 
     /// Starts RPC with Discord.
-    pub fn start_rpc(&self) -> crate::Result<()> {
+    pub fn start_rpc(&mut self) -> crate::Result<()> {
         self.rich_client.handshake()?;
-        let rich_client = self.rich_client.clone();
         let tx = self.tx.clone();
-        let logger = self.logger.clone();
-        std::thread::spawn(move || match rich_client.read() {
-            Ok(msg) => {
-                let msg = String::from_utf8_lossy(&msg);
 
-                if msg.contains("Invalid Client ID") {
-                    logger.log(
-                        LogLevel::Error,
-                        format!("Invalid client ID: {}", msg).into(),
-                        0,
-                    );
-                    tx.send(client_event!(0, Shutdown)).ok();
-                } else {
-                    tx.send(server_event!(0, Ready)).ok();
-                }
-            }
-            Err(e) => {
-                tx.send(local_event!(0, Error, ErrorEvent::new(e.into())))
-                    .ok();
-            }
-        });
+        Arc::get_mut(&mut self.rich_client)
+            .expect("Failed to start read thread")
+            .start_read_thread(tx.clone())?;
 
         Ok(())
     }
