@@ -5,7 +5,7 @@ use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
-use super::{
+use crate::ipc::bindings::{
     GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING,
 };
 use crate::ipc::pipe::{report_error, PipeClientImpl};

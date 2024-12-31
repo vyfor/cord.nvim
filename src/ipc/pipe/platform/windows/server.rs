@@ -9,7 +9,7 @@ use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use super::client::PipeClient;
-use super::{
+use crate::ipc::bindings::{
     CloseHandle, ConnectNamedPipe, CreateEventW, CreateNamedPipeW,
     GetLastError, GetOverlappedResult, Overlapped, ERROR_IO_PENDING,
     ERROR_PIPE_CONNECTED, FILE_FLAG_OVERLAPPED, HANDLE, INVALID_HANDLE_VALUE,
