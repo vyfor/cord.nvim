@@ -1,6 +1,8 @@
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::Sender;
+use std::sync::Arc;
 use std::thread::JoinHandle;
+use std::time::Duration;
 
 use crate::messages::message::Message;
 use crate::presence::packet::Packet;
@@ -16,7 +18,7 @@ use crate::protocol::json::Json;
 pub struct RichClient {
     pub client_id: u64,
     #[cfg(target_os = "windows")]
-    pub pipe: Option<std::sync::Arc<std::fs::File>>,
+    pub pipe: Option<Arc<std::fs::File>>,
     #[cfg(not(target_os = "windows"))]
     pub read_pipe: Option<std::os::unix::net::UnixStream>,
     #[cfg(not(target_os = "windows"))]
@@ -24,6 +26,7 @@ pub struct RichClient {
     pub pid: u32,
     pub is_ready: AtomicBool,
     pub thread_handle: Option<JoinHandle<()>>,
+    pub is_reconnecting: Arc<AtomicBool>,
 }
 
 /// Defines methods for connecting and closing the client.
@@ -68,5 +71,39 @@ impl RichClient {
             Err(_) => Err("The connection to Discord was lost".into()),
             _ => Ok(()),
         }
+    }
+
+    /// Reconnects to Discord with exponential backoff.
+    pub fn reconnect(
+        &mut self,
+        initial_interval: u64,
+        tx: Sender<Message>,
+    ) -> crate::Result<()> {
+        self.is_reconnecting.store(true, Ordering::SeqCst);
+        self.close();
+
+        std::thread::sleep(Duration::from_millis(500));
+
+        while self.is_reconnecting.load(Ordering::SeqCst) {
+            if let Ok(mut client) = Self::connect(self.client_id) {
+                if client.handshake().is_ok() {
+                    *self = client;
+                    if let Err(e) = self.start_read_thread(tx) {
+                        self.is_reconnecting.store(false, Ordering::SeqCst);
+                        return Err(e);
+                    };
+
+                    break;
+                } else {
+                    client.close();
+                }
+            };
+
+            std::thread::sleep(Duration::from_millis(initial_interval));
+        }
+
+        self.is_reconnecting.store(false, Ordering::SeqCst);
+
+        Ok(())
     }
 }

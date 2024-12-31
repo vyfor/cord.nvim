@@ -55,6 +55,7 @@ impl Connection for RichClient {
                     pid: std::process::id(),
                     is_ready: false.into(),
                     thread_handle: None,
+                    is_reconnecting: Arc::new(false.into()),
                 };
 
                 return Ok(client);
@@ -197,62 +198,59 @@ impl Connection for RichClient {
     }
 
     fn write(&self, opcode: u32, data: Option<&[u8]>) -> crate::Result<()> {
-        self.pipe.as_ref().map_or(
-            Err(DiscordError::PipeNotFound.into()),
-            |pipe| {
-                let payload = match data {
-                    Some(packet) => {
-                        let mut payload =
-                            utils::encode(opcode, packet.len() as u32);
-                        payload.extend_from_slice(packet);
-                        payload
-                    }
-                    None => utils::encode(opcode, 0),
+        self.pipe.as_ref().map_or(Ok(()), |pipe| {
+            let payload = match data {
+                Some(packet) => {
+                    let mut payload =
+                        utils::encode(opcode, packet.len() as u32);
+                    payload.extend_from_slice(packet);
+                    payload
+                }
+                None => utils::encode(opcode, 0),
+            };
+
+            unsafe {
+                let handle = pipe.as_raw_handle();
+                let h_event =
+                    CreateEventW(ptr::null_mut(), 1, 0, ptr::null_mut());
+
+                let mut overlapped = Overlapped {
+                    internal: 0,
+                    internal_high: 0,
+                    offset: 0,
+                    offset_high: 0,
+                    h_event,
                 };
 
-                unsafe {
-                    let handle = pipe.as_raw_handle();
-                    let h_event =
-                        CreateEventW(ptr::null_mut(), 1, 0, ptr::null_mut());
+                let mut bytes_written = 0;
+                let write_result = WriteFile(
+                    handle,
+                    payload.as_ptr(),
+                    payload.len() as u32,
+                    &mut bytes_written,
+                    &mut overlapped,
+                );
 
-                    let mut overlapped = Overlapped {
-                        internal: 0,
-                        internal_high: 0,
-                        offset: 0,
-                        offset_high: 0,
-                        h_event,
-                    };
-
-                    let mut bytes_written = 0;
-                    let write_result = WriteFile(
-                        handle,
-                        payload.as_ptr(),
-                        payload.len() as u32,
-                        &mut bytes_written,
-                        &mut overlapped,
-                    );
-
-                    if write_result == 0 {
-                        let error = GetLastError();
-                        if error != ERROR_IO_PENDING {
-                            return Err(DiscordError::ConnectionClosed.into());
-                        }
-                    }
-
-                    let mut bytes_transferred = 0;
-                    if GetOverlappedResult(
-                        handle,
-                        &mut overlapped,
-                        &mut bytes_transferred,
-                        1,
-                    ) == 0
-                    {
+                if write_result == 0 {
+                    let error = GetLastError();
+                    if error != ERROR_IO_PENDING {
                         return Err(DiscordError::ConnectionClosed.into());
                     }
-
-                    Ok(())
                 }
-            },
-        )
+
+                let mut bytes_transferred = 0;
+                if GetOverlappedResult(
+                    handle,
+                    &mut overlapped,
+                    &mut bytes_transferred,
+                    1,
+                ) == 0
+                {
+                    return Err(DiscordError::ConnectionClosed.into());
+                }
+
+                Ok(())
+            }
+        })
     }
 }

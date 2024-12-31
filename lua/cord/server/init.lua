@@ -60,6 +60,7 @@ function M:run()
 
     M.rx:register(
       'ready',
+      true,
       vim.schedule_wrap(function()
         self.status = 'ready'
         async.run(function()
@@ -86,12 +87,34 @@ function M:run()
 
           manager:run()
           M.manager = manager
+
+          M.rx:register(
+            'disconnect',
+            false,
+            vim.schedule_wrap(function()
+              self.status = 'connected'
+              M.manager:cleanup()
+              if self.config.hooks.on_disconnect then
+                self.config.hooks.on_disconnect()
+              end
+
+              M.rx:register(
+                'ready',
+                true,
+                vim.schedule_wrap(function()
+                  self.status = 'connected'
+                  logger.info 'Reconnected to Discord'
+                  M.manager:run()
+                end)
+              )
+            end)
+          )
         end)
       end)
     )
 
-    M.rx:run()
     logger.debug 'Server initialized'
+    M.rx:run()
   end)()
 end
 

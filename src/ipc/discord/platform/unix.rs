@@ -3,6 +3,7 @@ use std::io::{self, Read, Write};
 use std::net::Shutdown;
 use std::os::unix::net::UnixStream;
 use std::sync::mpsc::Sender;
+use std::sync::Arc;
 
 use crate::ipc::discord::client::{Connection, RichClient};
 use crate::ipc::discord::error::DiscordError;
@@ -52,6 +53,7 @@ impl Connection for RichClient {
                             pid: std::process::id(),
                             is_ready: false.into(),
                             thread_handle: None,
+                            is_reconnecting: Arc::new(false.into()),
                         });
                     }
                     Err(e) => match e.kind() {
@@ -169,24 +171,21 @@ impl Connection for RichClient {
     }
 
     fn write(&self, opcode: u32, data: Option<&[u8]>) -> crate::Result<()> {
-        self.write_pipe.as_ref().map_or(
-            Err(DiscordError::PipeNotFound.into()),
-            |mut pipe| {
-                let payload = match data {
-                    Some(packet) => {
-                        let mut payload =
-                            utils::encode(opcode, packet.len() as u32);
-                        payload.extend_from_slice(packet);
-                        payload
-                    }
-                    None => utils::encode(opcode, 0),
-                };
-
-                match pipe.write_all(&payload) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(DiscordError::Io(e).into()),
+        self.write_pipe.as_ref().map_or(Ok(()), |mut pipe| {
+            let payload = match data {
+                Some(packet) => {
+                    let mut payload =
+                        utils::encode(opcode, packet.len() as u32);
+                    payload.extend_from_slice(packet);
+                    payload
                 }
-            },
-        )
+                None => utils::encode(opcode, 0),
+            };
+
+            match pipe.write_all(&payload) {
+                Ok(_) => Ok(()),
+                Err(e) => Err(DiscordError::Io(e).into()),
+            }
+        })
     }
 }

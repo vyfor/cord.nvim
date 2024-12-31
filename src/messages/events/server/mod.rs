@@ -1,6 +1,8 @@
+pub mod disconnect;
 pub mod log;
 pub mod ready;
 
+pub use disconnect::DisconnectEvent;
 pub use log::LogEvent;
 pub use ready::ReadyEvent;
 
@@ -10,6 +12,8 @@ use crate::messages::events::event::{EventContext, OnEvent};
 pub enum ServerEvent {
     Ready(ReadyEvent),
     Log(LogEvent),
+    #[allow(dead_code)]
+    Disconnect(DisconnectEvent),
 }
 
 impl OnEvent for ServerEvent {
@@ -17,6 +21,7 @@ impl OnEvent for ServerEvent {
         match self {
             Self::Ready(e) => e.on_event(ctx),
             Self::Log(e) => e.on_event(ctx),
+            Self::Disconnect(e) => e.on_event(ctx),
         }
     }
 }

@@ -58,6 +58,7 @@
 ---@class CordAdvancedConfig
 ---@field plugin? CordAdvancedPluginConfig configuration
 ---@field server? CordAdvancedServerConfig configuration
+---@field discord? CordAdvancedDiscordConfig configuration
 ---@field cursor_update_mode? string Cursor update mode
 ---@field variables_in_functions? boolean Whether to use variables in functions
 ---@field match_in_mappings? boolean Whether to use `:match()` calls in mappings to detect languages, not supported by Neovim, by matching against file extensions
@@ -71,6 +72,9 @@
 ---@field pipe_path? string Path to the server's pipe
 ---@field executable_path? string Path to the server's executable
 ---@field timeout? integer Timeout in milliseconds
+
+---@class CordAdvancedDiscordConfig
+---@field reconnect_interval? integer Reconnect interval in milliseconds, 0 to disable
 
 ---@alias CordVariablesConfig { [string]: string|fun(opts: CordOpts):string }
 
@@ -152,6 +156,9 @@ M.opts = {
       pipe_path = nil,
       executable_path = nil,
       timeout = 60000,
+    },
+    discord = {
+      reconnect_interval = 0,
     },
     cursor_update_mode = 'on_hold',
     variables_in_functions = false,
