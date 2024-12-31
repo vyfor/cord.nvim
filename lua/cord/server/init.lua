@@ -102,7 +102,7 @@ function M:run()
                 'ready',
                 true,
                 vim.schedule_wrap(function()
-                  self.status = 'connected'
+                  self.status = 'ready'
                   logger.info 'Reconnected to Discord'
                   M.manager:run()
                 end)
