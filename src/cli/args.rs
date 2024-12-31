@@ -4,6 +4,7 @@ use super::error::CliError;
 use crate::echo;
 
 const DEFAULT_TIMEOUT: u64 = 60000;
+const DEFAULT_RECONNECT_INTERVAL: u64 = 0;
 #[cfg(target_os = "windows")]
 const DEFAULT_PIPE_NAME: &str = "\\\\.\\pipe\\cord-ipc";
 #[cfg(not(target_os = "windows"))]
@@ -14,6 +15,7 @@ pub struct Args {
     pub pipe_name: String,
     pub client_id: u64,
     pub timeout: u64,
+    pub reconnect_interval: u64,
 }
 
 impl Args {
@@ -23,6 +25,7 @@ impl Args {
         let mut pipe_name = None;
         let mut client_id = None;
         let mut timeout = None;
+        let mut reconnect_interval = None;
 
         let mut i = 1;
         while i < args.len() {
@@ -73,6 +76,25 @@ impl Args {
                         return Err(CliError::Missing("--timeout").into());
                     }
                 }
+                "--reconnect-interval" | "-r" => {
+                    if i + 1 < args.len() {
+                        match args[i + 1].parse() {
+                            Ok(t) => reconnect_interval = Some(t),
+                            _ => {
+                                return Err(CliError::Invalid(
+                                    "--reconnect-interval",
+                                    "reconnect interval must be a valid u64",
+                                )
+                                .into())
+                            }
+                        }
+                        i += 2;
+                    } else {
+                        return Err(
+                            CliError::Missing("--reconnect-interval").into()
+                        );
+                    }
+                }
                 other => {
                     return Err(CliError::Unknown(other.to_string()).into());
                 }
@@ -84,6 +106,8 @@ impl Args {
                 .unwrap_or_else(|| DEFAULT_PIPE_NAME.to_string()),
             client_id: client_id.ok_or(CliError::Missing("--client-id"))?,
             timeout: timeout.unwrap_or(DEFAULT_TIMEOUT),
+            reconnect_interval: reconnect_interval
+                .unwrap_or(DEFAULT_RECONNECT_INTERVAL),
         })
     }
 }

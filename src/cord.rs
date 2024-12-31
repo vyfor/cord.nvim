@@ -1,5 +1,5 @@
 use std::sync::mpsc::{self, Receiver, Sender};
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use std::time::Duration;
 
 use crate::error::CordErrorKind;
@@ -27,7 +27,7 @@ use crate::util::logger::{LogLevel, Logger};
 pub struct Cord {
     pub config: Config,
     pub session_manager: Arc<SessionManager>,
-    pub rich_client: Arc<RichClient>,
+    pub rich_client: Arc<RwLock<RichClient>>,
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
@@ -43,7 +43,7 @@ impl Cord {
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = Arc::new(SessionManager::default());
         let rich_client = match RichClient::connect(config.client_id) {
-            Ok(client) => Arc::new(client),
+            Ok(client) => Arc::new(RwLock::new(client)),
             Err(_) => {
                 return Err(crate::error::CordError::new(
                     CordErrorKind::Io,
@@ -114,12 +114,12 @@ impl Cord {
 
     /// Starts RPC with Discord.
     pub fn start_rpc(&mut self) -> crate::Result<()> {
-        self.rich_client.handshake()?;
-        let tx = self.tx.clone();
-
-        Arc::get_mut(&mut self.rich_client)
-            .expect("Failed to start read thread")
-            .start_read_thread(tx.clone())?;
+        let mut rich_client = self
+            .rich_client
+            .write()
+            .expect("Failed to lock rich client");
+        rich_client.handshake()?;
+        rich_client.start_read_thread(self.tx.clone())?;
 
         Ok(())
     }
@@ -127,7 +127,9 @@ impl Cord {
     /// Cleans up before shutdown.
     pub fn cleanup(&mut self) {
         if let Some(client) = Arc::get_mut(&mut self.rich_client) {
-            client.close();
+            if let Ok(client) = client.get_mut() {
+                client.close();
+            }
         }
 
         self.pipe.stop();
@@ -146,15 +148,22 @@ pub struct Config {
     pub pipe_name: String,
     pub client_id: u64,
     pub timeout: u64,
+    pub reconnect_interval: u64,
 }
 
 impl Config {
     /// Creates a new configuration.
-    pub fn new(pipe_name: String, client_id: u64, timeout: u64) -> Self {
+    pub fn new(
+        pipe_name: String,
+        client_id: u64,
+        timeout: u64,
+        reconnect_interval: u64,
+    ) -> Self {
         Self {
             pipe_name,
             client_id,
             timeout,
+            reconnect_interval,
         }
     }
 }

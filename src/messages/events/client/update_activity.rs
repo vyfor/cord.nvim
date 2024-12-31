@@ -18,7 +18,8 @@ impl UpdateActivityEvent {
 impl OnEvent for UpdateActivityEvent {
     // if new activity is idle, set the most recent activity available, if not, display the new activity
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        if !ctx.cord.rich_client.is_ready.load(Ordering::SeqCst) {
+        let rich_client = ctx.cord.rich_client.read().unwrap();
+        if !rich_client.is_ready.load(Ordering::SeqCst) {
             return Ok(());
         }
 
@@ -41,9 +42,7 @@ impl OnEvent for UpdateActivityEvent {
             .flatten()
             .unwrap_or(&self.activity);
 
-        ctx.cord
-            .rich_client
-            .update(&Packet::new(ctx.cord.rich_client.pid, Some(activity)))?;
+        rich_client.update(&Packet::new(rich_client.pid, Some(activity)))?;
 
         if let Some(session) = sessions.get_mut(&ctx.client_id) {
             session.set_last_activity(self.activity);

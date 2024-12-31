@@ -230,4 +230,16 @@ M.fetch = async.wrap(function()
   end)
 end)
 
+M.version = function()
+  local executable_path = require('cord.server.fs').get_executable_path()
+  local process = require 'cord.core.uv.process'
+
+  local result, err = process
+    .spawn({
+      cmd = executable_path,
+      args = { '-v' },
+    })
+    :get()
+end
+
 return M

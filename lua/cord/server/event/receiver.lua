@@ -15,20 +15,25 @@ end
 function Handler:on_event(type, data)
   local handler = self.handlers[type]
   if handler then
-    handler(data)
+    if handler.oneshot then self.handlers[type] = nil end
+    handler.callback(data)
   else
     self.queue[type] = data
   end
 end
 
-function Handler:register(type, callback)
+function Handler:register(type, oneshot, callback)
   local data = self.queue[type]
   if data then
     callback(data)
     self.queue[type] = nil
+    if oneshot then return end
   end
 
-  self.handlers[type] = callback
+  self.handlers[type] = {
+    oneshot = oneshot,
+    callback = callback,
+  }
 end
 
 function Handler:run()
@@ -70,7 +75,7 @@ function Handler:run()
 end
 
 function Handler:setup_default_handlers()
-  self:register('log', function(data)
+  self:register('log', false, function(data)
     if data.level and data.message then
       logger.log_raw(data.level, data.message)
       if data.level == vim.log.levels.ERROR then

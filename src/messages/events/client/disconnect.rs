@@ -19,12 +19,13 @@ impl OnEvent for DisconnectEvent {
             });
 
         if let Some((_, session)) = latest {
-            ctx.cord.rich_client.update(&Packet::new(
-                ctx.cord.rich_client.pid,
+            let rich_client = ctx.cord.rich_client.read().unwrap();
+            rich_client.update(&Packet::new(
+                rich_client.pid,
                 session.last_activity.as_ref(),
             ))?;
         } else {
-            ctx.cord.rich_client.clear()?;
+            ctx.cord.rich_client.read().unwrap().clear()?;
         }
 
         Ok(())

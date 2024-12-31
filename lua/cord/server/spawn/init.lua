@@ -24,6 +24,8 @@ M.spawn = async.wrap(function(client_id, pipe_path, exec_path)
         client_id,
         '-t',
         require('cord.plugin.config').opts.advanced.server.timeout,
+        '-r',
+        require('cord.plugin.config').opts.advanced.discord.reconnect_interval,
       },
       on_stdout = function(data)
         if data:match 'Ready' then resolve(false) end

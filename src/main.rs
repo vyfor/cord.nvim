@@ -17,5 +17,11 @@ use error::Result;
 
 fn main() -> Result<()> {
     let args = Args::parse()?;
-    Cord::new(Config::new(args.pipe_name, args.client_id, args.timeout))?.run()
+    Cord::new(Config::new(
+        args.pipe_name,
+        args.client_id,
+        args.timeout,
+        args.reconnect_interval,
+    ))?
+    .run()
 }
