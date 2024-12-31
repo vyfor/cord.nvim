@@ -1,6 +1,5 @@
 use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::Sender;
-use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use crate::messages::message::Message;
@@ -17,7 +16,7 @@ use crate::protocol::json::Json;
 pub struct RichClient {
     pub client_id: u64,
     #[cfg(target_os = "windows")]
-    pub pipe: Option<Arc<std::fs::File>>,
+    pub pipe: Option<std::sync::Arc<std::fs::File>>,
     #[cfg(not(target_os = "windows"))]
     pub read_pipe: Option<std::os::unix::net::UnixStream>,
     #[cfg(not(target_os = "windows"))]
