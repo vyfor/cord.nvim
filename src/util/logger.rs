@@ -27,7 +27,7 @@ impl Logger {
     }
 
     pub fn log(&self, level: LogLevel, message: Cow<str>, client_id: u32) {
-        if level <= self.level && level != LogLevel::Off {
+        if level >= self.level && level != LogLevel::Off {
             self.tx
                 .send(server_event!(
                     client_id,
