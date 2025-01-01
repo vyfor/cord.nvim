@@ -24,7 +24,7 @@ pub struct RichClient {
     #[cfg(not(target_os = "windows"))]
     pub write_pipe: Option<std::os::unix::net::UnixStream>,
     pub pid: u32,
-    pub is_ready: AtomicBool,
+    pub is_ready: Arc<AtomicBool>,
     pub thread_handle: Option<JoinHandle<()>>,
     pub is_reconnecting: Arc<AtomicBool>,
 }

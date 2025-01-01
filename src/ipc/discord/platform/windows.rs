@@ -2,6 +2,7 @@ use std::ffi::OsStr;
 use std::fs::File;
 use std::os::windows::ffi::OsStrExt;
 use std::os::windows::io::{AsRawHandle, FromRawHandle};
+use std::sync::atomic::Ordering;
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::{io, ptr};
@@ -53,7 +54,7 @@ impl Connection for RichClient {
                     client_id,
                     pipe: Some(Arc::new(pipe)),
                     pid: std::process::id(),
-                    is_ready: false.into(),
+                    is_ready: Arc::new(false.into()),
                     thread_handle: None,
                     is_reconnecting: Arc::new(false.into()),
                 };
@@ -76,6 +77,7 @@ impl Connection for RichClient {
         if let Some(pipe) = self.pipe.as_ref() {
             let pipe = pipe.clone();
             let client_id = self.client_id;
+            let is_ready = self.is_ready.clone();
 
             let handle = std::thread::spawn(move || {
                 let mut buf = [0u8; 8192];
@@ -167,8 +169,14 @@ impl Connection for RichClient {
                                                 .ok();
                                                 break;
                                             }
-                                            tx.send(server_event!(0, Ready))
+                                            if !is_ready
+                                                .swap(true, Ordering::SeqCst)
+                                            {
+                                                tx.send(server_event!(
+                                                    0, Ready
+                                                ))
                                                 .ok();
+                                            }
                                         }
                                         Opcode::Close => {
                                             tx.send(local_event!(

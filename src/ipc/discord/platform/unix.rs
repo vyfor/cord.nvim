@@ -2,6 +2,7 @@ use std::env::var;
 use std::io::{self, Read, Write};
 use std::net::Shutdown;
 use std::os::unix::net::UnixStream;
+use std::sync::atomic::Ordering;
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
 
@@ -51,7 +52,7 @@ impl Connection for RichClient {
                             read_pipe: Some(read_pipe),
                             write_pipe: Some(pipe),
                             pid: std::process::id(),
-                            is_ready: false.into(),
+                            is_ready: Arc::new(false.into()),
                             thread_handle: None,
                             is_reconnecting: Arc::new(false.into()),
                         });
@@ -82,6 +83,7 @@ impl Connection for RichClient {
     fn start_read_thread(&mut self, tx: Sender<Message>) -> crate::Result<()> {
         if let Some(mut read_pipe) = self.read_pipe.take() {
             let client_id = self.client_id;
+            let is_ready = self.is_ready.clone();
 
             let handle = std::thread::spawn(move || {
                 let mut buf = [0u8; 8192];
@@ -128,10 +130,15 @@ impl Connection for RichClient {
                                                     .ok();
                                                     break;
                                                 }
-                                                tx.send(server_event!(
-                                                    0, Ready
-                                                ))
-                                                .ok();
+                                                if !is_ready.swap(
+                                                    true,
+                                                    Ordering::SeqCst,
+                                                ) {
+                                                    tx.send(server_event!(
+                                                        0, Ready
+                                                    ))
+                                                    .ok();
+                                                }
                                             }
                                             Opcode::Close => {
                                                 tx.send(local_event!(
