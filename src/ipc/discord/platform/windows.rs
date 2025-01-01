@@ -68,9 +68,7 @@ impl Connection for RichClient {
 
     fn close(&mut self) {
         self.pipe = None;
-        if let Some(handle) = self.thread_handle.take() {
-            handle.join().ok();
-        }
+        let _ = self.thread_handle.take();
     }
 
     fn start_read_thread(&mut self, tx: Sender<Message>) -> crate::Result<()> {
