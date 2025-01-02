@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - client-server
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  get-next-version:
+    uses: semantic-release-action/next-release-version/.github/workflows/next-release-version.yml@v4
+
+  release:
+    runs-on: ubuntu-latest
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs: [get-next-version]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Invoke semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm install -g semantic-release
+          npm install -g @semantic-release/changelog
+          npm install -g @semantic-release/git
+          npm install -g @semantic-release/github
+          npx semantic-release
+
+  luarocks:
+    name: LuaRocks Publish
+    runs-on: ubuntu-latest
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs: [get-next-version]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nvim-neorocks/luarocks-tag-release@v7
+        with:
+          # version: ${{ needs.get-next-version.outputs.new-release-version }}
+          version: "scm"
+          detailed_description: |
+            Meet the future of rich presence with Cord, the most extensible Discord Rich Presence plugin for Neovim, powered by Rust. 
+            Cord offers a wide range of customization options allowing you to create custom and dynamic experiences that adapt to your needs.
+            The possibilities are endless, and the only limit is your creativity!
+        env:
+          LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
