@@ -139,7 +139,7 @@ jobs:
     name: LuaRocks Publish
     runs-on: ubuntu-latest
     if: needs.get-next-version.outputs.new-release-published == 'true'
-    needs: [get-next-version, build]
+    needs: [get-next-version, release]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -148,6 +148,7 @@ jobs:
       - uses: nvim-neorocks/luarocks-tag-release@v7
         with:
           # version: ${{ needs.get-next-version.outputs.new-release-version }}
+          copy_directories: "plugin"
           version: "scm"
           detailed_description: |
             Meet the future of rich presence with Cord, the most extensible Discord Rich Presence plugin for Neovim, powered by Rust. 
