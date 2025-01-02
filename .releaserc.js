@@ -23,25 +23,20 @@ module.exports = {
               context.context.isServerUpdate = true;
             }
 
-            console.log(commit);
             const shortHash = commit.hash.substring(0, 7);
 
-            return {
-              type: commit.type,
-              scope: commit.scope,
-              subject: commit.subject || '',
-              hash: shortHash,
-              shortDesc: commit.subject || '',
-              body: commit.body || '',
-              footer: commit.footer || '',
-              notes: commit.notes || []
-            };
+            return {};
           }
         }
       }
     ],
     "@semantic-release/changelog",
-    "@semantic-release/github",
+    [
+      "@semantic-release/github",
+      {
+        "assets": "dist/*"
+      }
+    ],
     [
       "@semantic-release/git",
       {

@@ -22,8 +22,7 @@ jobs:
   build:
     name: Build ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
-    if: false
-    # if: needs.get-next-version.outputs.new-release-published == 'true'
+    if: needs.get-next-version.outputs.new-release-published == 'true'
     needs:
       - get-next-version
     strategy:
@@ -113,8 +112,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: needs.get-next-version.outputs.new-release-published == 'true'
-    # needs: [get-next-version, build]
-    needs: [get-next-version]
+    needs: [get-next-version, build]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
