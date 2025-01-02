@@ -1,14 +1,30 @@
-name: Publish Artifacts
+name: Release
 
 on:
+  workflow_dispatch:
   push:
-    tags:
-      - '[0-9]+\.[0-9]+\.0'
+    branches:
+      - master
+      - client-server
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
 
 jobs:
+  get-next-version:
+    uses: semantic-release-action/next-release-version/.github/workflows/next-release-version.yml@v4
+      
   build:
     name: Build ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs:
+      - get-next-version
     strategy:
       matrix:
         include:
@@ -18,27 +34,27 @@ jobs:
             target: aarch64-unknown-linux-musl
           - os: ubuntu-latest
             target: i686-unknown-linux-musl
-
           - os: ubuntu-latest
             target: x86_64-unknown-freebsd
           - os: ubuntu-latest
             target: i686-unknown-freebsd
-
           - os: macos-latest
             target: x86_64-apple-darwin
           - os: macos-latest
             target: aarch64-apple-darwin
-
           - os: windows-latest
             target: x86_64-pc-windows-msvc
           - os: windows-latest
             target: aarch64-pc-windows-msvc
           - os: windows-latest
             target: i686-pc-windows-msvc
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -46,12 +62,20 @@ jobs:
           toolchain: nightly
           override: true
 
+      - name: Install semantic-release-cargo
+        uses: taiki-e/install-action@v2
+        with:
+          tool: semantic-release-cargo@2
+
+      - name: Prepare semantic-release for Rust
+        run: semantic-release-cargo prepare ${{ needs.get-next-version.outputs.new-release-version }}
+          
       - name: Install additional targets
         run: rustup target add ${{ matrix.target }}
-
+        
       - name: Install cross
         run: cargo install cross
-
+        
       - name: Build and copy (Windows)
         if: contains(matrix.target, 'windows')
         shell: pwsh
@@ -60,7 +84,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path dist
           $ARCH = "${{ matrix.target }}" -split '-' | Select-Object -First 1
           Copy-Item "target/${{ matrix.target }}/release/cord.exe" -Destination "dist/${ARCH}-windows-cord.exe"
-
+          
       - name: Build and copy (Non-Windows)
         if: contains(matrix.target, 'windows') != true
         run: |
@@ -74,29 +98,52 @@ jobs:
           elif [[ "${{ matrix.target }}" == *"freebsd"* ]]; then
             cp target/${{ matrix.target }}/release/cord dist/${ARCH}-bsd-cord
           fi
-
+          
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: binaries
           path: dist/*
 
-  upload-artifacts:
-    needs: [build]
+  release:
     runs-on: ubuntu-latest
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs: [get-next-version, build]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+    
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
           name: binaries
           path: dist
 
-      - name: Upload binaries to release
-        uses: ncipollo/release-action@v1
+      - name: Invoke semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm install -g semantic-release
+          npm install -g @semantic-release/changelog
+          npm install -g @semantic-release/git
+          npm install -g @semantic-release/github
+          npx semantic-release
+
+  luarocks:
+    name: LuaRocks Publish
+    runs-on: ubuntu-latest
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs: [get-next-version, build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nvim-neorocks/luarocks-tag-release@v7
         with:
-          artifacts: dist/*
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+          version: ${{ needs.get-next-version.outputs.new-release-version }}
+          detailed_description: |
+            Meet the future of rich presence with Cord, the most extensible Discord Rich Presence plugin for Neovim, powered by Rust. 
+            Cord offers a wide range of customization options allowing you to create custom and dynamic experiences that adapt to your needs.
+            The possibilities are endless, and the only limit is your creativity!
+        env:
+          LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
