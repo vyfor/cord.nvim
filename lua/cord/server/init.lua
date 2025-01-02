@@ -136,8 +136,8 @@ function M:initialize(config)
 end
 
 function M:cleanup()
-  if M.manager then M.manager:cleanup() end
-  if M.client and not M.client:is_closing() then M.client:close() end
+  if self.manager then self.manager:cleanup() end
+  if self.client and not self.client:is_closing() then self.client:close() end
 end
 
 return M
