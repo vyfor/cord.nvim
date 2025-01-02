@@ -1,3 +1,23 @@
+# [v2.0.0-beta.2]
+
+_2025-01-02_
+
+### chore
+
+* change semantic release config ([](https://github.com/vyfor/cord.nvim/commit/705f0ac11985a03323daf56fceb096259665dd65))
+* update `.gitignore` ([](https://github.com/vyfor/cord.nvim/commit/bb072143f32d44139470af409a94b724da2abe7e))
+* update releaserc ([](https://github.com/vyfor/cord.nvim/commit/5fbdd5dcacea85be899d031ae148da773387672a))
+
+
+### ci
+
+* update `release.yml` ([](https://github.com/vyfor/cord.nvim/commit/99848180eadd4d8b3f3bd3a4b35b75e786e9deca))
+
+
+### fix
+
+* resolve autocmds errors ([](https://github.com/vyfor/cord.nvim/commit/02340b11391843e852182b74e8dcd085084e724f))
+
 # [2.0.0-beta.1](https://github.com/vyfor/cord.nvim/compare/v1.0.0...v2.0.0-beta.1) (2025-01-02)
 
 
