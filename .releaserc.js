@@ -18,14 +18,14 @@ module.exports = {
           "transform": function (commit, context) {
             if (!context.context) context.context = {};
 
-            const defaultTransform = context.defaultTransform;
-            const entry = defaultTransform(commit, context);
-
             if (commit.scope === 'server') {
               context.context.isServerUpdate = true;
             }
 
-            return entry;
+            return {
+              title: commit.subject,
+              body: commit.body || ''
+            };
           }
         }
       }
