@@ -13,11 +13,9 @@ module.exports = {
     [
       "@semantic-release/release-notes-generator",
       {
-        "preset": "conventionalcommits",
+        "preset": "angular",
         "writerOpts": {
           "headerPartial": "# {{#with context}}{{#if isServerUpdate}}⚙️ {{/if}}{{/with}}[{{currentTag}}]{{#if title}} {{title}}{{/if}}\n\n{{#if date}}_{{date}}_{{/if}}",
-          "commitPartial": "* {{subject}} ([{{hash}}]({{#if @root.repository}}{{@root.repository}}/commit/{{hash}}{{else}}{{@root.repoUrl}}/commit/{{hash}}{{/if}}))\n",
-          "mainTemplate": "{{> header}}\n\n{{#each commitGroups}}\n\n{{#if title}}\n### {{title}}\n\n{{/if}}{{#each commits}}{{> commit}}{{/each}}\n{{/each}}\n\n{{> footer}}",
           "transform": function (commit, context) {
             if (!context.context) context.context = {};
 
@@ -25,6 +23,7 @@ module.exports = {
               context.context.isServerUpdate = true;
             }
 
+            console.log(commit);
             const shortHash = commit.hash.substring(0, 7);
 
             return {
@@ -42,12 +41,7 @@ module.exports = {
       }
     ],
     "@semantic-release/changelog",
-    [
-      "@semantic-release/github",
-      {
-        "assets": "dist/*"
-      }
-    ],
+    "@semantic-release/github",
     [
       "@semantic-release/git",
       {
