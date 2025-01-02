@@ -144,7 +144,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: nvim-neorocks/luarocks-tag-release@v7
         with:
-          version: ${{ needs.get-next-version.outputs.new-release-version }}
+          # version: ${{ needs.get-next-version.outputs.new-release-version }}
+          version: "scm"
           detailed_description: |
             Meet the future of rich presence with Cord, the most extensible Discord Rich Presence plugin for Neovim, powered by Rust. 
             Cord offers a wide range of customization options allowing you to create custom and dynamic experiences that adapt to your needs.
