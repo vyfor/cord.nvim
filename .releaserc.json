@@ -1,15 +1,13 @@
 {
-  "release": {
-    "branches": [
-      "master",
-      {
-        "name": "client-server",
-        "prerelease": "beta",
-        "channel": "beta"
-      }
-    ],
-    "repositoryUrl": "https://github.com/vyfor/cord.nvim"
-  },
+  "branches": [
+    "master",
+    {
+      "name": "client-server",
+      "prerelease": "beta",
+      "channel": "beta"
+    }
+  ],
+  "repositoryUrl": "https://github.com/vyfor/cord.nvim",
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
