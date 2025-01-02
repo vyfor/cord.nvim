@@ -7,6 +7,9 @@
       "channel": "beta"
     }
   ],
+  "lastRelease": {
+    "version": "1.0.0"
+  },
   "repositoryUrl": "https://github.com/vyfor/cord.nvim",
   "plugins": [
     "@semantic-release/commit-analyzer",
