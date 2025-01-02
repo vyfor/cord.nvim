@@ -16,14 +16,13 @@ module.exports = {
         "preset": "angular",
         "writerOpts": {
           "headerPartial": "# {{#with context}}{{#if isServerUpdate}}⚙️ {{/if}}{{/with}}[{{currentTag}}]{{#if title}} {{title}}{{/if}}\n\n{{#if date}}_{{date}}_{{/if}}",
+          "commitPartial": "* {{#if scope}}**{{scope}}**: {{/if}}{{subject}} ([#{{commit.short}}]({{@root.repository}}/commit/{{hash}}))\n",
           "transform": function (commit, context) {
             if (!context.context) context.context = {};
 
             if (commit.scope === 'server') {
               context.context.isServerUpdate = true;
             }
-
-            const shortHash = commit.hash.substring(0, 7);
 
             return {};
           }
