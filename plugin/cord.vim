@@ -1,6 +1,6 @@
 augroup Cord
     autocmd!
-    autocmd VimLeavePre * lua local cord = require 'cord.server'; if cord.client and not cord.client:is_closing() then cord.client:close() end
+    autocmd VimLeavePre * lua require 'cord.server':cleanup() end
 augroup END
 
 function! CordCompleteList(ArgLead, CmdLine, CmdPos)
