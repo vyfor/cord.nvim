@@ -25,6 +25,7 @@ jobs:
     if: needs.get-next-version.outputs.new-release-published == 'true'
     needs:
       - get-next-version
+      - check-server
     strategy:
       matrix:
         include:
