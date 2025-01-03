@@ -31,7 +31,7 @@ impl Args {
         while i < args.len() {
             match args[i].as_str() {
                 "--version" | "-v" => {
-                    echo!("{}", env!("CARGO_PKG_VERSION"));
+                    echo!("{}", crate::cord::VERSION);
                     std::process::exit(0);
                 }
                 "--pipe-name" | "-p" => {

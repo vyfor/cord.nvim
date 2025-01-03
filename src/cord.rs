@@ -14,6 +14,8 @@ use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
 use crate::util::logger::{LogLevel, Logger};
 
+pub const VERSION: &str = include_str!("../.github/server-version.txt");
+
 /// Core application managing configuration, sessions, IPC with Discord, and logging.
 ///
 /// # Fields
