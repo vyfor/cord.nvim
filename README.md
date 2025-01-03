@@ -20,6 +20,9 @@
   <a href="https://discord.gg/q9rC4bjCHv">Discord</a>
 </div>
 
+>[!IMPORTANT]
+> Cord no longer requires Rust to be installed. Rust component will be automatically downloaded from GitHub Releases.
+
 ## 💎 Features  
 - 🌐 **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
 - ⚡ **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
@@ -39,13 +42,9 @@
 <summary>Expand</summary>
 
 Cord requires the server executables to be present. To get it, you can either:
-- **Fetch from GitHub**: By invoking `:Cord fetch` (async, recommended)
-  - Requires **[`curl`](https://curl.se)**
-- **Build and install from crates.io**: By invoking `:Cord build` (async)
-  - Requires **[`Rust`](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
-- **Build from source**: By invoking `cargo b --release` and then manually moving the resulting binary to `nvim-data-dir/cord/bin`
-  - Requires **[`Rust`](https://www.rust-lang.org/tools/install) >= 1.85.0 nightly**
+- **Fetch from GitHub**: Invoking `:Cord fetch` (async, recommended). Make sure you have **[`curl`](https://curl.se)** installed.
 - **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
+- [**Build from source**](#️-build-from-source)
 
 </details>
 
@@ -90,7 +89,7 @@ Cord is available on [LuaRocks](https://luarocks.org/modules/vyfor/cord.nvim).
 ```
 
 Do not forget to call `require('cord').setup()` to initialize the plugin, or set `config = true`.
-Invoke `:Cord update` to whenever the plugin is updated.
+Invoke `:Cord update` whenever the plugin is updated.
 
 </details>
 
@@ -112,7 +111,7 @@ Then call the following function somewhere in your configuration:
 require('cord').setup()
 ```
 
-Invoke `:Cord update` to whenever the plugin is updated.
+Invoke `:Cord update` whenever the plugin is updated.
 
 </details>
 
@@ -124,7 +123,7 @@ Make sure you call the following function somewhere in your configuration:
 require('cord').setup()
 ```
 
-Invoke `:Cord update` to whenever the plugin is updated.
+Invoke `:Cord update` whenever the plugin is updated.
 
 </details>
 
@@ -147,6 +146,14 @@ We welcome contributions to make Cord even better!
 Have questions or issues?  
 - [**FAQ**](https://github.com/vyfor/cord.nvim/wiki/FAQ)  
 - [**Troubleshooting Guide**](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)  
+
+## 🛠️ Build From Source
+>[!NOTE]
+> Make sure you have **[Rust](https://www.rust-lang.org/tools/install)** >= 1.85.0 installed.
+
+To build Cord from source, you can either:
+- Run `cargo b --release` and then manually move the resulting binary to `nvim-data-dir/cord/bin`
+- Run `:Cord build` to build and install the binary from crates.io (async)
 
 ---
 
