@@ -109,6 +109,30 @@ jobs:
           name: binaries
           path: dist/*
 
+  check-server:
+    runs-on: ubuntu-latest
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs:
+      - get-next-version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Server Version
+        run: |
+          CARGO_VERSION=$(grep '^version = ' Cargo.toml | cut -d'"' -f2)
+          SERVER_VERSION=$(cat .github/server-version.txt | tr -d '\n')
+          if [ "$CARGO_VERSION" != "$SERVER_VERSION" ]; then
+            echo "$CARGO_VERSION" > .github/server-version.txt
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            git add .github/server-version.txt
+            git commit -m "chore: update server version to $CARGO_VERSION [skip ci]"
+            git push
+          fi
+
   release:
     runs-on: ubuntu-latest
     if: needs.get-next-version.outputs.new-release-published == 'true'
