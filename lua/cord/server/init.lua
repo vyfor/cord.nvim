@@ -95,12 +95,16 @@ function M:run()
                 self.config.hooks.on_disconnect()
               end
 
+              if self.config.advanced.discord.reconnect.enabled then
+                logger.info 'Reconnecting...'
+              end
+
               M.rx:register(
                 'ready',
                 true,
                 vim.schedule_wrap(function()
                   self.status = 'ready'
-                  logger.info 'Reconnected to Discord'
+                  logger.info 'Connected to Discord'
                   M.manager:run()
                 end)
               )
