@@ -73,12 +73,8 @@ jobs:
           key: ${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
         
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        id: rust-toolchain
-        with:
-          profile: minimal
-          toolchain: nightly
-          override: true
+        run: |
+          rustup default nightly
 
       - name: Install semantic-release-cargo
         uses: taiki-e/install-action@v2
