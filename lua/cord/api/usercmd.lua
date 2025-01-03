@@ -91,6 +91,16 @@ M.status = function()
     require('cord.plugin.log').info 'Status: Disconnected'
   end
 end
+M.check_version = function()
+  require('cord.core.async').run(
+    function() require('cord.server.update').check_version():await() end
+  )
+end
+M.version = function()
+  require('cord.core.async').run(
+    function() require('cord.server.update').version():await() end
+  )
+end
 
 M.handle = function(args)
   local command = M[args[1]]

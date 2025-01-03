@@ -71,6 +71,98 @@ M.build = async.wrap(function()
   end)
 end)
 
+local function get_local_version()
+  local process = require 'cord.core.uv.process'
+  local executable_path = require('cord.server.fs').get_executable_path()
+
+  return async.wrap(function()
+    local res = process
+      .spawn({
+        cmd = executable_path,
+        args = { '-v' },
+      })
+      :await()
+
+    if res.code ~= 0 then
+      error('Failed to get local version', 0)
+      return nil
+    end
+
+    local version = res.stdout:gsub('^%s*(.-)%s*$', '%1')
+    if not version then
+      error('Failed to parse local version', 0)
+      return nil
+    end
+
+    return version
+  end)()
+end
+
+local function check_versions()
+  local process = require 'cord.core.uv.process'
+
+  local current_version = async.wrap(function() return get_local_version() end)
+
+  local latest_version = async.wrap(function()
+    local res = process
+      .spawn({
+        cmd = 'curl',
+        args = {
+          'https://raw.githubusercontent.com/vyfor/cord.nvim/refs/heads/client-server/.github/server-version.txt',
+          '--fail',
+        },
+      })
+      :await()
+
+    if res.code ~= 0 then
+      error('Failed to fetch latest version: ' .. res.stdout, 0)
+      return nil
+    end
+
+    local version = res.stdout:gsub('^%s*(.-)%s*$', '%1')
+    if not version then
+      error('Failed to parse latest version', 0)
+      return nil
+    end
+
+    return version
+  end)
+
+  return current_version():await(), latest_version():await()
+end
+
+M.check_version = async.wrap(function()
+  local server = require 'cord.server'
+  if server.is_updating then return end
+
+  if not vim.fn.executable 'curl' then
+    error('curl is not installed or not in PATH', 0)
+    return
+  end
+
+  async.run(function()
+    logger.info 'Checking for updates...'
+    local current, latest = check_versions()
+
+    if current and latest then
+      if latest == current then
+        logger.info('You are on the latest server version ' .. latest)
+      else
+        logger.info(
+          'New version available: ' .. latest .. ' (current: ' .. current .. ')'
+        )
+      end
+    end
+  end)
+end)
+
+M.version = async.wrap(function()
+  async.run(function()
+    local version = get_local_version():await()
+    if version then logger.info('Server version: ' .. version) end
+  end)
+end)
+
 M.fetch = async.wrap(function()
   local server = require 'cord.server'
   if server.is_updating then return end
@@ -144,7 +236,6 @@ M.fetch = async.wrap(function()
             end)
           end, function(err)
             server.is_updating = false
-
             logger.error(err)
           end)
       end)
@@ -167,64 +258,18 @@ M.fetch = async.wrap(function()
 
   async.run(function()
     logger.info 'Checking for updates...'
-    process
-      .spawn({
-        cmd = executable_path,
-        args = { '-v' },
-      })
-      :and_then(function(res)
-        if res.code ~= 0 then
-          fetch_executable()
-          return
-        end
+    local current, latest = check_versions()
 
-        local version = res.stdout:gsub('^%s*(.-)%s*$', '%1')
-        if not version then
-          fetch_executable()
-          return
-        end
-
-        logger.debug('Local version: ' .. version)
-
-        async.run(function()
-          process
-            .spawn({
-              cmd = 'curl',
-              args = {
-                'https://raw.githubusercontent.com/vyfor/cord.nvim/refs/heads/client-server/.github/server-version.txt',
-                '--fail',
-              },
-            })
-            :and_then(vim.schedule_wrap(function(res)
-              async.run(function()
-                if res.code == 0 then
-                  local latest = res.stdout:gsub('^%s*(.-)%s*$', '%1')
-                  if not latest then
-                    error(
-                      'Failed to parse latest release; code: ' .. res.code,
-                      0
-                    )
-                    return
-                  end
-
-                  if latest == version then
-                    server.is_updating = false
-                    logger.info('Already on latest server version ' .. latest)
-                    return
-                  end
-
-                  fetch_executable(latest)
-                else
-                  error('Failed to fetch latest release: ' .. res.stdout, 0)
-                end
-              end)
-            end))
-            :catch(function(err)
-              server.is_updating = false
-              logger.error('Failed to fetch latest release: ' .. err)
-            end)
-        end)
-      end, function() fetch_executable() end)
+    if current and latest then
+      if latest == current then
+        server.is_updating = false
+        logger.info('Already on latest server version ' .. latest)
+      else
+        fetch_executable(latest)
+      end
+    else
+      fetch_executable()
+    end
   end)
 end)
 

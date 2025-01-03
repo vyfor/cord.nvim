@@ -110,6 +110,7 @@ end
 
 function Future:catch(on_rejected) return self:and_then(nil, on_rejected) end
 
+---@return any
 function Future.await(future)
   local co = coroutine.running()
   if not co then
