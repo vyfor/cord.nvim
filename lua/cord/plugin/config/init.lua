@@ -162,7 +162,7 @@ M.opts = {
       update = 'fetch',
       pipe_path = nil,
       executable_path = nil,
-      timeout = 60000,
+      timeout = 300000,
     },
     discord = {
       reconnect = {
