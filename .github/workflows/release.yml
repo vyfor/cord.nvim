@@ -154,7 +154,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: needs.get-next-version.outputs.new-release-published == 'true'
-    needs: [get-next-version, build]
+    needs: [get-next-version, build, check-server]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
