@@ -61,10 +61,23 @@ jobs:
         
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
+        id: rust-toolchain
         with:
           profile: minimal
           toolchain: nightly
           override: true
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        id: cargo-cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.cachekey }}-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install semantic-release-cargo
         uses: taiki-e/install-action@v2
