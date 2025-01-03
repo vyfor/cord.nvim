@@ -52,7 +52,7 @@ function M:get(option, args)
   local is_function = type(option) == 'function'
 
   if is_function then
-    if not self.config.advanced.variables_in_functions then return option(args) end
+    if not self.config.advanced.plugin.variables_in_functions then return option(args) end
   else
     local variables = self.config.variables
     if variables then

@@ -345,13 +345,13 @@ function ActivityManager:setup_autocmds()
     augroup END
   ]]
 
-  if self.config.advanced.cursor_update_mode == 'on_hold' then
+  if self.config.advanced.plugin.cursor_update == 'on_hold' then
     vim.cmd [[
       augroup CordActivityManager
         autocmd CursorHold,CursorHoldI * lua require'cord.server'.manager:on_cursor_update()
       augroup END
     ]]
-  elseif self.config.advanced.cursor_update_mode == 'on_move' then
+  elseif self.config.advanced.plugin.cursor_update == 'on_move' then
     vim.cmd [[
       augroup CordActivityManager
         autocmd CursorMoved,CursorMovedI * lua require'cord.server'.manager:on_cursor_update()

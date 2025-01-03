@@ -201,7 +201,7 @@ M.get = function(filetype, filename)
     return result[1], result[2], result[3]
   end
 
-  if not config.advanced.match_in_mappings then return end
+  if not config.advanced.plugin.match_in_mappings then return end
   local result = filename:match '%.([^%.]+)$'
   if result then
     result = M.extension_mappings[result:lower()]

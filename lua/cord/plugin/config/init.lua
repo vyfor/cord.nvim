@@ -59,13 +59,13 @@
 ---@field plugin? CordAdvancedPluginConfig configuration
 ---@field server? CordAdvancedServerConfig configuration
 ---@field discord? CordAdvancedDiscordConfig configuration
----@field cursor_update_mode? string Cursor update mode
----@field variables_in_functions? boolean Whether to use variables in functions
----@field match_in_mappings? boolean Whether to use `:match()` calls in mappings to detect languages, not supported by Neovim, by matching against file extensions
 
 ---@class CordAdvancedPluginConfig
----@field log_level? integer Logging level (from `vim.log.levels`)
 ---@field autocmds? boolean Whether to enable autocmds
+---@field log_level? integer Logging level (from `vim.log.levels`)
+---@field cursor_update? string Cursor update mode
+---@field variables_in_functions? boolean Whether to use variables in functions
+---@field match_in_mappings? boolean Whether to match against file extensions in mappings
 
 ---@class CordAdvancedServerConfig
 ---@field update? string How to acquire the server executable: 'fetch' or 'build' or 'none'
@@ -74,7 +74,11 @@
 ---@field timeout? integer Timeout in milliseconds
 
 ---@class CordAdvancedDiscordConfig
----@field reconnect_interval? integer Reconnect interval in milliseconds, 0 to disable
+---@field reconnect? CordAdvancedDiscordReconnectConfig Reconnection configuration
+
+---@class CordAdvancedDiscordReconnectConfig
+---@field enabled? boolean Whether reconnection is enabled
+---@field interval? integer Reconnection interval in milliseconds, 0 to disable
 
 ---@alias CordVariablesConfig { [string]: string|fun(opts: CordOpts):string }
 
@@ -148,8 +152,11 @@ M.opts = {
   },
   advanced = {
     plugin = {
-      log_level = vim.log.levels.INFO,
       autocmds = true,
+      log_level = vim.log.levels.INFO,
+      cursor_update = 'on_hold',
+      variables_in_functions = false,
+      match_in_mappings = true,
     },
     server = {
       update = 'fetch',
@@ -158,11 +165,11 @@ M.opts = {
       timeout = 60000,
     },
     discord = {
-      reconnect_interval = 0,
+      reconnect = {
+        enabled = false,
+        interval = 5000,
+      },
     },
-    cursor_update_mode = 'on_hold',
-    variables_in_functions = false,
-    match_in_mappings = true,
   },
 }
 

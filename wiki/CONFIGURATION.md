@@ -65,8 +65,11 @@ require('cord').setup {
   },
   advanced = {
     plugin = {
-      log_level = vim.log.levels.INFO,
       autocmds = true,
+      log_level = vim.log.levels.INFO,
+      cursor_update = 'on_hold',
+      variables_in_functions = false,
+      match_in_mappings = true,
     },
     server = {
       update = 'fetch',
@@ -74,9 +77,12 @@ require('cord').setup {
       executable_path = nil,
       timeout = 60000,
     },
-    cursor_update_mode = 'on_hold',
-    variables_in_functions = false,
-    match_in_mappings = true,
+    discord = {
+      reconnect = {
+        enabled = false,
+        interval = 5000,
+      },
+    },
   },
 }
 ```
@@ -148,17 +154,19 @@ require('cord').setup {
 
 ## ⚙️ Advanced
 
-| Option                            | Type            | Default               | Description                                                                                                                                                                                        |
-| --------------------------------- | --------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `advanced.plugin.log_level`       | `number`        | `vim.log.levels.INFO` | Logging level for the plugin                                                                                                                                                                       |
-| `advanced.plugin.autocmds`        | `boolean`       | `true`                | Enable autocmds                                                                                                                                                                                    |
-| `advanced.server.update`          | `string`        | `'fetch'`             | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
-| `advanced.server.pipe_path`       | `string \| nil` | `nil`                 | Custom IPC pipe path                                                                                                                                                                               |
-| `advanced.server.executable_path` | `string \| nil` | `nil`                 | Custom server executable path                                                                                                                                                                      |
-| `advanced.server.timeout`         | `number`        | `60000`               | Server shutdown timeout (ms)                                                                                                                                                                       |
-| `advanced.cursor_update_mode`     | `string`        | `'on_move'`           | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                                               |
-| `advanced.variables_in_functions` | `boolean`       | `false`               | Whether to compute and use variables in functions                                                                                                                                                  |
-| `advanced.match_in_mappings`      | `boolean`       | `true`                | Whether to match against file extensions in mappings                                                                                                                                               |
+| Option                                   | Type            | Default               | Description                                                                                                                                                                                        |
+| ---------------------------------------- | --------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `advanced.plugin.autocmds`               | `boolean`       | `true`                | Enable autocmds                                                                                                                                                                                    |
+| `advanced.plugin.log_level`              | `number`        | `vim.log.levels.INFO` | Logging level for the plugin                                                                                                                                                                       |
+| `advanced.plugin.cursor_update`          | `string`        | `'on_hold'`           | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                                               |
+| `advanced.plugin.variables_in_functions` | `boolean`       | `false`               | Whether to compute and use variables in functions                                                                                                                                                  |
+| `advanced.plugin.match_in_mappings`      | `boolean`       | `true`                | Whether to match against file extensions in mappings                                                                                                                                               |
+| `advanced.server.update`                 | `string`        | `'fetch'`             | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
+| `advanced.server.pipe_path`              | `string \| nil` | `nil`                 | Custom IPC pipe path                                                                                                                                                                               |
+| `advanced.server.executable_path`        | `string \| nil` | `nil`                 | Custom server executable path                                                                                                                                                                      |
+| `advanced.server.timeout`                | `number`        | `60000`               | Server shutdown timeout (ms)                                                                                                                                                                       |
+| `advanced.discord.reconnect.enabled`     | `boolean`       | `true`                | Whether reconnection is enabled. Has minimal impact on performance.                                                                                                                                |
+| `advanced.discord.reconnect.interval`    | `number`        | `5000`                | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
 
 ---
 
