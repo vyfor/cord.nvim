@@ -12,7 +12,7 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 
 - A new smart idle system has been implemented - you're only shown as idle when all your Neovim instances are actually idle. When an instance goes idle, it automatically switches back to show your most recent active one.
 
-- The plugin is now event-driven, meaning changes are reflected instantly without any polling delays. When all instances disconnect, the server, as well as the connection to Discord, stay alive for a minute (configurable) before shutting down, which helps to avoid rate limiting issues.
+- The plugin is now event-driven, meaning changes are reflected instantly without any polling delays. When all instances disconnect, the server, as well as the connection to Discord, stay alive for a little while (configurable) before shutting down, which helps to avoid rate limiting issues.
 
 - A new `variables` option allows users to define custom variables, including functions, for dynamic text templates. This enhances the flexibility and customization of the Rich Presence display.
 

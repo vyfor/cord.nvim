@@ -75,7 +75,7 @@ require('cord').setup {
       update = 'fetch',
       pipe_path = nil,
       executable_path = nil,
-      timeout = 60000,
+      timeout = 300000,
     },
     discord = {
       reconnect = {
@@ -164,7 +164,7 @@ require('cord').setup {
 | `advanced.server.update`                 | `string`        | `'fetch'`             | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
 | `advanced.server.pipe_path`              | `string \| nil` | `nil`                 | Custom IPC pipe path                                                                                                                                                                               |
 | `advanced.server.executable_path`        | `string \| nil` | `nil`                 | Custom server executable path                                                                                                                                                                      |
-| `advanced.server.timeout`                | `number`        | `60000`               | Server shutdown timeout (ms)                                                                                                                                                                       |
+| `advanced.server.timeout`                | `number`        | `300000`              | Server shutdown timeout (ms)                                                                                                                                                                       |
 | `advanced.discord.reconnect.enabled`     | `boolean`       | `true`                | Whether reconnection is enabled. Has minimal impact on performance.                                                                                                                                |
 | `advanced.discord.reconnect.interval`    | `number`        | `5000`                | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
 
@@ -335,14 +335,15 @@ The `ActivityManager` contains useful methods:
 
 ### Activity Options
 
-| Parameter    | Type     | Description                                                                                          |
-| ------------ | -------- | ---------------------------------------------------------------------------------------------------- |
-| `type`       | `number` | One of 'playing', 'listening', 'watching'                                                            |
-| `state`      | `string` | The user's current state (e.g., "Editing a file").                                                   |
-| `details`    | `string` | Detailed information about what the user is doing.                                                   |
-| `timestamps` | `table`  | Contains `start` and `end` timestamps for the activity.                                              |
-| `assets`     | `table`  | Defines images and tooltips, including `large_image`, `large_text`, `small_image`, and `small_text`. |
-| `buttons`    | `array`  | Array of objects, each with `label` and `url`, defining interactive buttons in the presence.         |
+| Parameter    | Type      | Description                                                                                          |
+| ------------ | --------- | ---------------------------------------------------------------------------------------------------- |
+| `type`       | `number`  | One of 'playing', 'listening', 'watching'                                                            |
+| `state`      | `string`  | The user's current state (e.g., "Editing a file").                                                   |
+| `details`    | `string`  | Detailed information about what the user is doing.                                                   |
+| `timestamps` | `table`   | Contains `start` and `end` timestamps for the activity.                                              |
+| `assets`     | `table`   | Defines images and tooltips, including `large_image`, `large_text`, `small_image`, and `small_text`. |
+| `buttons`    | `array`   | Array of objects, each with `label` and `url`, defining interactive buttons in the presence.         |
+| `is_idle`    | `boolean` | Whether the activity should be considered as idle.                                                   |
 
 ### Useful Functions
 
