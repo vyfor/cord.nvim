@@ -88,7 +88,7 @@ M.fetch = async.wrap(function()
     local base_url
     if tag then
       logger.info('Found new version: ' .. tag .. '. Downloading...')
-      base_url = 'https://github.com/vyfor/cord.nvim/releases/download/'
+      base_url = 'https://github.com/vyfor/cord.nvim/releases/download/v'
         .. tag
         .. '/'
     else
@@ -191,31 +191,29 @@ M.fetch = async.wrap(function()
             .spawn({
               cmd = 'curl',
               args = {
-                'https://api.github.com/repos/vyfor/cord.nvim/releases/latest',
+                'https://raw.githubusercontent.com/vyfor/cord.nvim/refs/heads/client-server/.github/server-version.txt',
                 '--fail',
               },
             })
             :and_then(vim.schedule_wrap(function(res)
               async.run(function()
                 if res.code == 0 then
-                  local ok, data = pcall(vim.fn.json_decode, res.stdout)
-                  if not ok then
-                    error('Failed to parse JSON response: ' .. data, 0)
-                  end
-
-                  if not data.tag_name then
-                    error('No tag found in GitHub response', 0)
-                  end
-
-                  if data.tag_name == version then
-                    server.is_updating = false
-                    logger.info(
-                      'Already on latest server version ' .. data.tag_name
+                  local latest = res.stdout:gsub('^%s*(.-)%s*$', '%1')
+                  if not latest then
+                    error(
+                      'Failed to parse latest release; code: ' .. res.code,
+                      0
                     )
                     return
                   end
 
-                  fetch_executable(data.tag_name)
+                  if latest == version then
+                    server.is_updating = false
+                    logger.info('Already on latest server version ' .. latest)
+                    return
+                  end
+
+                  fetch_executable(latest)
                 else
                   error('Failed to fetch latest release: ' .. res.stdout, 0)
                 end
