@@ -34,13 +34,13 @@ function M:validate(user_config)
     if not config.editor.icon then
       config.editor.icon = icons.get(client.icon)
     end
-
-    if not config.idle.icon then
-      config.idle.icon = icons.get(icons.DEFAULT_IDLE_ICON)
-    end
   end
 
   ::continue::
+
+  if not config.idle.icon then
+    config.idle.icon = icons.get(icons.DEFAULT_IDLE_ICON)
+  end
 
   config_manager.set_config(config)
   self.config = config
