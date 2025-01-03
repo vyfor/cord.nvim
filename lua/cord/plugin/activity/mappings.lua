@@ -139,6 +139,7 @@ M.mappings = {
   dashboard = { 'dashboard', M.default_icons.dashboard, 'Dashboard' },
   dashboardpreview = { 'dashboard', M.default_icons.dashboard, 'Dashboard' },
   ministarter = { 'dashboard', M.default_icons.dashboard, 'mini.starter' },
+  snacks_dashboard = { 'dashboard', M.default_icons.dashboard, 'Snacks Dashboard' },
   startify = { 'dashboard', M.default_icons.dashboard, 'Startify' },
 }
 
@@ -153,8 +154,7 @@ M.special_cases = {
       or { 'language', 'kotlin', 'Kotlin' }
   end,
   markdown = function(filename)
-    return filename:lower() == 'license.md'
-        and { 'language', 'license', 'License file' }
+    return filename:lower() == 'license.md' and { 'language', 'license', 'License file' }
       or { 'language', 'markdown', 'Markdown' }
   end,
   text = function(filename)
@@ -187,9 +187,7 @@ M.cord_related = {
   ['Cord.unknown'] = { 'language', M.default_icons.language, 'Unknown' },
 }
 
-M.get_default_icon = function(type)
-  return M.default_icons[type] or M.default_icons.language
-end
+M.get_default_icon = function(type) return M.default_icons[type] or M.default_icons.language end
 
 M.get = function(filetype, filename)
   local result = M.mappings[filetype]
