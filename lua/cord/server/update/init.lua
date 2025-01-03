@@ -36,9 +36,7 @@ M.build = async.wrap(function()
             if res.code ~= 0 then
               server.is_updating = false
               logger.error 'Failed to build executable'
-              if res.stderr then
-                logger.error('cargo\'s stderr: ' .. res.stderr)
-              end
+              if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
               return
             end
             logger.info 'Successfully built executable. Restarting...'
@@ -81,18 +79,12 @@ local function get_local_version()
         cmd = executable_path,
         args = { '-v' },
       })
-      :await()
+      :get()
 
-    if res.code ~= 0 then
-      error('Failed to get local version', 0)
-      return nil
-    end
-
+    if not res then return nil end
+    if res.code ~= 0 then return nil end
     local version = res.stdout:gsub('^%s*(.-)%s*$', '%1')
-    if not version then
-      error('Failed to parse local version', 0)
-      return nil
-    end
+    if not version then return nil end
 
     return version
   end)()
@@ -148,9 +140,7 @@ M.check_version = async.wrap(function()
       if latest == current then
         logger.info('You are on the latest server version ' .. latest)
       else
-        logger.info(
-          'New version available: ' .. latest .. ' (current: ' .. current .. ')'
-        )
+        logger.info('New version available: ' .. latest .. ' (current: ' .. current .. ')')
       end
     end
   end)
@@ -180,9 +170,7 @@ M.fetch = async.wrap(function()
     local base_url
     if tag then
       logger.info('Found new version: ' .. tag .. '. Downloading...')
-      base_url = 'https://github.com/vyfor/cord.nvim/releases/download/v'
-        .. tag
-        .. '/'
+      base_url = 'https://github.com/vyfor/cord.nvim/releases/download/v' .. tag .. '/'
     else
       logger.info 'Downloading latest version...'
       base_url = 'https://github.com/vyfor/cord.nvim/releases/latest/download/'
@@ -216,15 +204,8 @@ M.fetch = async.wrap(function()
           :and_then(function(res)
             if res.code ~= 0 then
               server.is_updating = false
-              logger.error(
-                'Failed to download executable; code: '
-                  .. res.code
-                  .. ', path: '
-                  .. url
-              )
-              if res.stderr then
-                logger.error('curl\'s stderr: ' .. res.stderr)
-              end
+              logger.error('Failed to download executable; code: ' .. res.code .. ', path: ' .. url)
+              if res.stderr then logger.error('curl\'s stderr: ' .. res.stderr) end
               return
             end
             logger.info 'Successfully updated executable. Restarting...'
