@@ -37,13 +37,10 @@ function M:connect(path, retried)
 
     ::spawn::
     logger.debug 'Pipe not found. Spawning server executable...'
-    local retry = require('cord.server.spawn')
-      .spawn(
-        self.config.editor.client,
-        path,
-        self.config.advanced.server.executable_path
-      )
-      :await()
+
+    local process = require('cord.server.spawn').spawn(self.config, path)
+    local should_continue, retry = process:await()
+    if not should_continue then return end
 
     logger.debug 'Server executable spawned'
     if retry then return M:connect(path):await() end
