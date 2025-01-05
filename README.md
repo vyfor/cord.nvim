@@ -34,6 +34,7 @@
 - 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS files without relying on command-line tools.
 - 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
 - 🌸 **Rich Icon Collection** — Features over 70 uniquely designed icons.
+- 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
 
 ## 📦 Install 
 
