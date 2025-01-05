@@ -75,14 +75,6 @@ jobs:
       - name: Set up Rust
         run: |
           rustup default nightly
-
-      - name: Install semantic-release-cargo
-        uses: taiki-e/install-action@v2
-        with:
-          tool: semantic-release-cargo@2
-
-      - name: Prepare semantic-release for Rust
-        run: semantic-release-cargo prepare ${{ needs.get-next-version.outputs.new-release-version }}
           
       - name: Install additional targets
         run: rustup target add ${{ matrix.target }}
@@ -134,19 +126,49 @@ jobs:
           fetch-depth: 0
           ref: client-server
 
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        id: cargo-cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: x86_64-unknown-linux-musl-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install semantic-release-cargo
+        uses: taiki-e/install-action@v2
+        with:
+          tool: semantic-release-cargo@2
+
+      - name: Prepare semantic-release for Rust
+        run: semantic-release-cargo prepare ${{ needs.get-next-version.outputs.new-release-version }}
+
       - name: Check Server Version
         run: |
-          CARGO_VERSION=$(grep '^version = ' Cargo.toml | cut -d'"' -f2)
-          SERVER_VERSION=$(cat .github/server-version.txt | tr -d '\n')
-          if [ "$CARGO_VERSION" != "$SERVER_VERSION" ]; then
-            echo "$CARGO_VERSION" > .github/server-version.txt
-            git checkout client-server
-            git config --global user.name 'github-actions[bot]'
-            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-            git add .github/server-version.txt
-            git commit -m "chore: update server version to $CARGO_VERSION [skip ci]"
-            git push
+          git checkout client-server
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add Cargo.toml Cargo.lock
+          git commit -m "build: bump project version to $CARGO_VERSION [skip ci]"
+
+          changes=$(git diff --name-only $(git describe --tags --abbrev=0)..HEAD -- src/)
+
+          if [ -n "$changes" ]; then
+            CARGO_VERSION="${{ needs.get-next-version.outputs.new-release-version }}"
+            SERVER_VERSION=$(cat .github/server-version.txt | tr -d '\n')
+            if [ "$CARGO_VERSION" != "$SERVER_VERSION" ]; then
+              echo "Server version needs to be updated"
+              echo "$CARGO_VERSION" > .github/server-version.txt
+              
+              git add .github/server-version.txt
+              git commit -m "chore: update server version to $CARGO_VERSION [skip ci]"
+            fi
           fi
+
+          git push
 
   release:
     runs-on: ubuntu-latest
@@ -167,11 +189,13 @@ jobs:
       - name: Invoke semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
           npm install -g semantic-release
           npm install -g @semantic-release/changelog
           npm install -g @semantic-release/git
           npm install -g @semantic-release/github
+          npm install -g @semantic-release-cargo/semantic-release-cargo
           npx semantic-release --repository-url https://github.com/vyfor/cord.nvim
 
   luarocks:
