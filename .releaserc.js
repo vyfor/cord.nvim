@@ -28,13 +28,11 @@ module.exports = {
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    ["@semantic-release-cargo/semantic-release-cargo"],
     [
       "@semantic-release/exec",
       {
-        "verifyConditionsCmd": "./semantic-release-cargo verify-conditions",
-        "prepareCmd": "./semantic-release-cargo prepare ${nextRelease.version}",
-        "publishCmd": "./semantic-release-cargo publish"
+        "verifyConditionsCmd": "semantic-release-cargo verify-conditions",
+        "publishCmd": "semantic-release-cargo publish"
       }
     ]
   ]
