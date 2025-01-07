@@ -79,6 +79,18 @@ M.restart = function()
     cord.tx:shutdown()
   end)
 end
+M.shutdown = function()
+  local cord = require 'cord.server'
+
+  if not cord.client or cord.client:is_closing() then
+    return require('cord.plugin.log').info 'Server is not running'
+  end
+
+  cord.is_updating = false
+  if cord.manager then cord.manager:cleanup() end
+  cord.tx:shutdown()
+  require('cord.plugin.log').info 'Stopped server'
+end
 M.status = function()
   local cord = require 'cord.server'
   if cord.status == 'ready' then
