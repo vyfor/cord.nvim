@@ -74,6 +74,7 @@ M.mappings = {
   sh = { 'language', 'shell', 'Shell script' },
   sql = { 'language', 'sql', 'SQL' },
   svelte = { 'language', 'svelte', 'Svelte' },
+  svg = { 'language', 'svg', 'SVG' },
   swift = { 'language', 'swift', 'Swift' },
   typescript = { 'language', 'typescript', 'TypeScript' },
   typescriptreact = { 'language', 'react', 'TSX' },
