@@ -99,7 +99,6 @@ function ActivityManager:run()
   self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.last_updated = uv.now()
 
-  if self.config.timestamp.enabled then self.timestamp = os.time() end
   if self.config.hooks.on_ready then self.config.hooks.on_ready(self) end
 
   self:queue_update(true)
@@ -194,16 +193,15 @@ function ActivityManager:update_idle_activity()
   if self.config.idle.show_status then
     local buttons = config_utils:get_buttons(self.opts)
     self.opts.buttons = buttons
-
-    if self.config.hooks.on_update then
-      self.config.hooks.on_update(self.opts)
+    if self.config.timestamp.enabled and self.config.timestamp.reset_on_idle then
+      self.opts.timestamp = os.time()
     end
+
+    if self.config.hooks.on_update then self.config.hooks.on_update(self.opts) end
 
     local activity = activities.build_idle_activity(self.config, self.opts)
 
-    if self.config.hooks.on_idle then
-      self.config.hooks.on_idle(self.opts, activity)
-    end
+    if self.config.hooks.on_idle then self.config.hooks.on_idle(self.opts, activity) end
 
     if self.should_skip_update then
       self.should_skip_update = false
@@ -226,7 +224,7 @@ end
 ---Update the activity
 ---@return nil
 function ActivityManager:update_activity()
-  if self:should_update_time() then self.timestamp = os.time() end
+  if self:should_update_time() then self.opts.timestamp = os.time() end
 
   self.is_idle = false
   self.is_force_idle = false
@@ -238,9 +236,7 @@ function ActivityManager:update_activity()
 
   local activity = activities.build_activity(self.config, self.opts)
 
-  if self.config.hooks.on_activity then
-    self.config.hooks.on_activity(self.opts, activity)
-  end
+  if self.config.hooks.on_activity then self.config.hooks.on_activity(self.opts, activity) end
 
   if self.should_skip_update then
     self.should_skip_update = false
@@ -373,9 +369,7 @@ end
 ---Set the activity
 ---@param activity table Activity to set
 ---@return nil
-function ActivityManager:set_activity(activity)
-  self.tx:update_activity(activity)
-end
+function ActivityManager:set_activity(activity) self.tx:update_activity(activity) end
 
 ---Clear the activity
 ---@param force? boolean Whether to force clear the activity
@@ -498,13 +492,13 @@ function ActivityManager:build_opts()
     is_read_only = vim.bo.readonly,
     cursor_line = cursor_position[1],
     cursor_char = cursor_position[2],
-    timestamp = self.timestamp,
     workspace_dir = self.workspace_dir,
     workspace_name = self.workspace_name,
     repo_url = self.repo_url,
     is_focused = self.is_focused,
     is_idle = self.is_idle,
   }
+  if self.config.timestamp.enabled then opts.timestamp = os.time() end
   local buttons = config_utils:get_buttons(opts)
   opts.buttons = buttons
 
