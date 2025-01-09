@@ -147,8 +147,8 @@ require('cord').setup {
 | --------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `hooks.on_ready`            | `function(manager)`        | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
 | `hooks.on_update`           | `function(opts)`           | Called before building activity ([opts](#options-table))                                                           |
-| `hooks.on_activity`         | `function(opts, activity)` | Called before sending activity ([opts](#options-table), [activity](#activity-options))                             |
-| `hooks.on_idle`             | `function(opts)`           | Called when idle state changes ([opts](#options-table))                                                            |
+| `hooks.on_activity`         | `function(opts, activity)` | Called before sending the built regular activity ([opts](#options-table), [activity](#activity-options))           |
+| `hooks.on_idle`             | `function(opts)`           | Called before sending the built idle activity ([opts](#options-table))                                             |
 | `hooks.on_workspace_change` | `function(opts)`           | Called when workspace changes ([opts](#options-table))                                                             |
 | `hooks.on_disconnect`       | `function`                 | Called when server disconnects                                                                                     |
 

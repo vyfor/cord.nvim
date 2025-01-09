@@ -8,13 +8,13 @@ Learn how to customize your Discord presence in countless ways using Cord's robu
 > If you use a plugin manager, avoid using `require` directly in tables; instead, use them within function initializers.
 
 ```lua
-config = function()
-  require('cord').setup {
+opts = function()
+  return {
     display = {
       theme = 'pastel',
     },
     lazy = {
-      -- change default idle icon to keyboard
+      -- change default idle icon for 'pastel' theme to keyboard
       icon = require('cord.api.icon').get('keyboard'),
       -- or use another theme's idle icon
       icon = require('cord.api.icon').get('idle', 'onyx'),
@@ -36,6 +36,30 @@ text = {
 ```lua
 text = {
   workspace = function() end,
+}
+```
+
+### Local Time as Timestamp
+```lua
+hooks = {
+  on_activity = function(opts, activity)
+    local date = os.date('*t')
+    date.hour, date.min, date.sec = 0, 0, 0
+    activity.timestamps.start = os.time(date)
+  end,
+
+  -- optionally, you can do one of the two:
+  -- A. also set local time for idle status, or
+  on_idle = function(opts, activity)
+    local date = os.date('*t')
+    date.hour, date.min, date.sec = 0, 0, 0
+    activity.timestamps.start = os.time(date)
+  end
+}
+
+-- B. reset the timestamp for idle activity, regular activity is not affected in this case
+timestamp = {
+  reset_on_idle = true
 }
 ```
 
@@ -117,7 +141,7 @@ text = {
 
 ### LSP-Aware Status
 ```lua
-local get_errors = function(bufnr) return vim.diagnostic.get(bufnr, { severity = { vim.diagnostic.severity.ERROR } }) end
+local get_errors = function(bufnr) return vim.diagnostic.get(bufnr, { severity = vim.diagnostic.severity.ERROR }) end
 local errors = get_errors(vim.api.nvim_get_current_buf()) -- pass the current buffer; pass nil to get errors for all buffers
 
 vim.api.nvim_create_autocmd('DiagnosticChanged', {
@@ -229,7 +253,7 @@ local user, api_key, song = 'YOUR_USERNAME', 'YOUR_API_KEY'
 local timer = vim.uv.new_timer()
 timer:start(
   0,
-  20000, -- look for new song every 20 seconds
+  15000, -- look for new song every 15 seconds (default ratelimit on most Discord clients)
   vim.schedule_wrap(function()
     vim.system(
       { 'curl', 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' .. user .. '&api_key=' .. api_key .. '&format=json&limit=1, '-s', '--fail' },
