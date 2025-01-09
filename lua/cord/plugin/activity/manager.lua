@@ -224,8 +224,6 @@ end
 ---Update the activity
 ---@return nil
 function ActivityManager:update_activity()
-  if self:should_update_time() then self.opts.timestamp = os.time() end
-
   self.is_idle = false
   self.is_force_idle = false
   self.last_opts = self.opts
@@ -498,7 +496,14 @@ function ActivityManager:build_opts()
     is_focused = self.is_focused,
     is_idle = self.is_idle,
   }
-  if self.config.timestamp.enabled then opts.timestamp = os.time() end
+  if self.config.timestamp.enabled then
+    if self.last_opts and self.last_opts.timestamp then
+      opts.timestamp = self.last_opts.timestamp
+    else
+      opts.timestamp = os.time()
+    end
+  end
+  if self:should_update_time() then opts.timestamp = os.time() end
   local buttons = config_utils:get_buttons(opts)
   opts.buttons = buttons
 
