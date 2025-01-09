@@ -179,11 +179,20 @@ M.special_cases = {
 
 M.extension_mappings = {
   -- Languages
+  bmp = { 'language', 'picture', 'BMP' },
+  gif = { 'language', 'picture', 'GIF' },
   gml = { 'language', 'gml', 'GameMaker Language' },
+  heif = { 'language', 'picture', 'HEIF' },
   hx = { 'language', 'haxe', 'Haxe' },
   hxml = { 'language', 'haxe', 'Haxe' },
+  ico = { 'language', 'picture', 'ICO' },
+  jpeg = { 'language', 'picture', 'JPEG' },
+  jpg = { 'language', 'picture', 'JPEG' },
   pcss = { 'language', 'postcss', 'PostCSS' },
+  png = { 'language', 'picture', 'PNG' },
   postcss = { 'language', 'postcss', 'PostCSS' },
+  tiff = { 'language', 'picture', 'TIFF' },
+  webp = { 'language', 'picture', 'WebP' },
 }
 
 M.cord_related = {
