@@ -8,8 +8,11 @@ require('cord').setup {
 }
 ```
 
-<details>
+<details id="default-config">
   <summary>Default values</summary>
+
+  >[!NOTE]
+  > You only need to specify the values you want to change. Your configuration will be merged with the default config, so any fields you don't specify will use their default values.
 
 ```lua
 {
@@ -172,24 +175,37 @@ require('cord').setup {
 
 ### Text Options
 
-The `text` table supports both static strings and functions for dynamic content. These are simplified placeholders, the default configuration uses a function to dynamically set the context.
+The `text` table allows you to customize the displayed text for different states. You can customize it in three different ways:
 
+1. Using simple strings:
+```lua
+text = {
+    editing = 'Editing a file',
+    viewing = 'Viewing a file',
+}
+```
+
+2. Using functions for dynamic text:
 ```lua
 text = {
     editing = function(opts)
         return string.format('Editing %s', opts.filename)
     end,
-    viewing = 'Viewing a file',                 -- Simple string with filename placeholder
-    file_browser = 'Browsing files',            -- Shown in file explorer
-    plugin_manager = 'Managing plugins',        -- Shown in plugin manager
-    lsp_manager = 'Configuring LSP',            -- Shown in LSP manager
-    docs = 'Reading docs',                      -- Shown in help buffers
-    vcs = 'Committing changes',                 -- Shown in VCS related filetypes
-    notes = 'Taking notes',                     -- Shown in notes-taking related filetypes
-    dashboard = 'Home',                         -- Shown in dashboard buffers
-    workspace = 'Workspace: ${workspace_name}', -- `variables` must be set in order to use string templates `${}`
 }
 ```
+
+3. Using string templates (requires enabling variables):
+```lua
+{
+    text = {
+        editing = 'Editing ${filename}',
+        file_browser = 'Browsing files in ${tooltip}',
+    },
+    variables = true, -- Enable string templates
+}
+```
+
+To see all available options, refer to the [default configuration](#default-config).
 
 ### Buttons
 
