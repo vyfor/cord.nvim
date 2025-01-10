@@ -144,6 +144,7 @@ M.mappings = {
   dashboard = { 'dashboard', M.default_icons.dashboard, 'Dashboard' },
   dashboardpreview = { 'dashboard', M.default_icons.dashboard, 'Dashboard' },
   ministarter = { 'dashboard', M.default_icons.dashboard, 'mini.starter' },
+  nvdash = { 'dashboard', M.default_icons.dashboard, 'NvDash' },
   snacks_dashboard = { 'dashboard', M.default_icons.dashboard, 'Snacks Dashboard' },
   startify = { 'dashboard', M.default_icons.dashboard, 'Startify' },
 }
