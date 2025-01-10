@@ -1,9 +1,8 @@
 Welcome to the **cord.nvim** wiki!
 
-- [Migration from v1](Migration.md)
-- [Configuration](Configuration.md)
+- [Migration from v1](Migration)
+- [Configuration](Configuration)
 - [Examples](Examples.md)
-- [Add or change file icons](Add-or-change-file-icons.md)
-- [FAQ](FAQ.md)
-- [Troubleshooting](Troubleshooting.md)
-- [Contributing](Contributing.md)
+- [Add or change file icons](Add-or-change-file-icons)
+- [Troubleshooting](Troubleshooting)
+- [Contributing](Contributing)
