@@ -172,21 +172,22 @@ require('cord').setup {
 
 ### Text Options
 
-The `text` table supports both static strings and functions for dynamic content:
+The `text` table supports both static strings and functions for dynamic content. These are simplified placeholders, the default configuration uses a function to dynamically set the context.
 
 ```lua
 text = {
     editing = function(opts)
         return string.format('Editing %s', opts.filename)
     end,
-    viewing = 'Viewing a file',          -- Simple string with filename placeholder
-    file_browser = 'Browsing files',     -- Shown in file explorer
-    plugin_manager = 'Managing plugins', -- Shown in plugin manager
-    lsp_manager = 'Configuring LSP',     -- Shown in LSP manager
-    docs = 'Reading docs',               -- Shown in help buffers
-    vcs = 'Committing changes',          -- Shown in VCS related filetypes
-    notes = 'Taking notes',              -- Shown in notes-taking related filetypes
-    dashboard = 'Home',                  -- Shown in dashboard buffers
+    viewing = 'Viewing a file',                 -- Simple string with filename placeholder
+    file_browser = 'Browsing files',            -- Shown in file explorer
+    plugin_manager = 'Managing plugins',        -- Shown in plugin manager
+    lsp_manager = 'Configuring LSP',            -- Shown in LSP manager
+    docs = 'Reading docs',                      -- Shown in help buffers
+    vcs = 'Committing changes',                 -- Shown in VCS related filetypes
+    notes = 'Taking notes',                     -- Shown in notes-taking related filetypes
+    dashboard = 'Home',                         -- Shown in dashboard buffers
+    workspace = 'Workspace: ${workspace_name}', -- `variables` must be set in order to use string templates `${}`
 }
 ```
 
