@@ -3,7 +3,7 @@
 ### Rich Presence is not shown in Discord
 1. Ensure that `cord.nvim` is loaded (try running a user command, e.g. `:Cord status`)
 2. Confirm that your Activity Privacy settings are [enabled](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce)
-3. Set [`advanced.plugin.log_level`](./Configuration.md#️-advanced) to `vim.log.levels.TRACE` and check `:messages` for logs
+3. Set [`advanced.plugin.log_level`](https://github.com/vyfor/cord.nvim/wiki/Configuration#️-advanced) to `vim.log.levels.TRACE` and check `:messages` for logs
 4. Verify that the Discord IPC pipe exists:
 
    **Windows:**

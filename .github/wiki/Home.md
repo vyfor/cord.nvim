@@ -1,8 +1,8 @@
 Welcome to the **cord.nvim** wiki!
 
-- [Migration from v1](Migration)
-- [Configuration](Configuration)
-- [Examples](Examples.md)
-- [Add or change file icons](Add-or-change-file-icons)
-- [Troubleshooting](Troubleshooting)
-- [Contributing](Contributing)
+- [Migrating from v1](https://github.com/vyfor/cord.nvim/wiki/Migration)
+- [Configuration](https://github.com/vyfor/cord.nvim/wiki/Configuration)
+- [Examples](https://github.com/vyfor/cord.nvim/wiki/Examples)
+- [Add or Change File Icons](https://github.com/vyfor/cord.nvim/wiki/File-Icons)
+- [Troubleshooting](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)
+- [Contributing](https://github.com/vyfor/cord.nvim/wiki/Contributing)

@@ -24,4 +24,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: .github/wiki
+          preprocess: true
           strategy: init

@@ -211,6 +211,7 @@ buttons = {
 ### Assets
 
 Override icons and text for specific filetypes or filenames. Most of the options also support functions.
+See 
 
 ```lua
 assets = {

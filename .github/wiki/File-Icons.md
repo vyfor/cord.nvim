@@ -12,15 +12,15 @@ require('cord').setup {
 
 ## Icon Configuration Options
 
-| Option      | Type              | Description                                                                                                  |
-| ----------- | ----------------- | ------------------------------------------------------------------------------------------------------------ |
-| **(key)**   | `string`          | The key can be a Vim filetype (like `lua`), a filename (like `Cargo.toml`), or a file extension (like `.rs`) |
-| **(value)** | `string \| table` | This can either be a string pointing to the icon or a table with options below                               |
-| `icon`      | `string`          | A direct URL to the icon image or the name of the rich presence asset (in case you use your own application) |
-| `tooltip`   | `string`          | Text that appears when hovering over the icon                                                                |
-| `name`      | `string`          | An optional override for the icon name. Redundant for `language` types                                       |
-| `text`      | `string`          | An optional override for the icon text. Unlike other options, this will fully override the text              |
-| `type`      | `string`          | Specifies the context of the asset.                                                                          |
+| Option      | Type                  | Description                                                                                                  |
+| ----------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **(key)**   | `string`              | The key can be a Vim filetype (like `lua`), a filename (like `Cargo.toml`), or a file extension (like `.rs`) |
+| **(value)** | `string \| table`     | This can either be a string pointing to the icon or a table with options below                               |
+| `icon`      | `string \| function ` | A direct URL to the icon image or the name of the rich presence asset (in case you use your own application) |
+| `tooltip`   | `string \| function`  | Text that appears when hovering over the icon                                                                |
+| `name`      | `string \| function`  | An optional override for the icon name. Redundant for `language` types                                       |
+| `text`      | `string \| function`  | An optional override for the icon text. Unlike other options, this will fully override the text              |
+| `type`      | `string`              | Specifies the context of the asset.                                                                          |
 
 Available types:
 - `language` (default)
