@@ -229,7 +229,7 @@ assets = {
 ```
 
 > [!TIP]
-> A detailed guide can be found in the [Wiki](https://github.com/vyfor/cord.nvim/wiki/Add-or-change-file-icons).
+> A detailed guide can be found in the [Wiki](https://github.com/vyfor/cord.nvim/wiki/File-Icons).
 
 ### Smart Idle
 
