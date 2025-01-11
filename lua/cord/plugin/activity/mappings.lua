@@ -107,15 +107,29 @@ M.filetype_mappings = {
   zsh = { 'language', 'shell', 'Zsh' },
 
   -- File Browsers
-  netrw = { 'file_browser', M.default_icons.file_browser, 'Netrw' },
-  TelescopePrompt = { 'file_browser', 'telescope', 'Telescope' },
+  carbon = { 'file_browser', M.default_icons.file_browser, 'Carbon' },
+  CHADTree = { 'file_browser', M.default_icons.file_browser, 'ChadTree' },
+  dirbuf = { 'file_browser', M.default_icons.file_browser, 'Dirbuf' },
   dirvish = { 'file_browser', M.default_icons.file_browser, 'Dirvish' },
+  drex = { 'file_browser', M.default_icons.file_browser, 'Drex' },
   fern = { 'file_browser', M.default_icons.file_browser, 'Fern' },
+  Fm = { 'file_browser', M.default_icons.file_browser, 'Fm' },
+  fzf = { 'file_browser', M.default_icons.file_browser, 'FZF' },
+  fzflua_backdrop = { 'file_browser', M.default_icons.file_browser, 'FZF' },
+  lir = { 'file_browser', M.default_icons.file_browser, 'Lir' },
   oil = { 'file_browser', M.default_icons.file_browser, 'Oil' },
   oil_preview = { 'file_browser', M.default_icons.file_browser, 'Oil' },
   oil_progress = { 'file_browser', M.default_icons.file_browser, 'Oil' },
+  nerdtree = { 'file_browser', M.default_icons.file_browser, 'NerdTree' },
+  NNN = { 'file_browser', M.default_icons.file_browser, 'NNN' },
   NvimTree = { 'file_browser', M.default_icons.file_browser, 'nvim-tree' },
   minifiles = { 'file_browser', M.default_icons.file_browser, 'mini.files' },
+  rnvimr = { 'file_browser', M.default_icons.file_browser, 'Ranger' },
+  sfm = { 'file_browser', M.default_icons.file_browser, 'SFM' },
+  TelescopePrompt = { 'file_browser', 'telescope', 'Telescope' },
+  tfm = { 'file_browser', M.default_icons.file_browser, 'TFM' },
+  triptych_backdrop = { 'file_browser', M.default_icons.file_browser, 'Triptych' },
+  Yanil = { 'file_browser', M.default_icons.file_browser, 'Yanil' },
   yazi = { 'file_browser', M.default_icons.file_browser, 'Yazi' },
   ['neo-tree'] = { 'file_browser', M.default_icons.file_browser, 'Neo-Tree' },
 
@@ -123,6 +137,7 @@ M.filetype_mappings = {
   lazy = { 'plugin_manager', M.default_icons.plugin_manager, 'Lazy' },
   pckr = { 'plugin_manager', M.default_icons.plugin_manager, 'Packer' },
   packer = { 'plugin_manager', M.default_icons.plugin_manager, 'Packer' },
+  ['minideps-confirm'] = { 'plugin_manager', M.default_icons.plugin_manager, 'mini.deps' },
 
   -- LSP Managers
   mason = { 'lsp', M.default_icons.lsp, 'Mason' },
@@ -155,6 +170,7 @@ M.filetype_mappings = {
 
   -- Notes
   norg = { 'notes', 'neorg', 'Neorg' },
+  note = { 'notes', M.default_icons.notes, 'Note.nvim' },
   org = { 'notes', 'org', 'Orgmode' },
   ['org-roam-node-buffer'] = { 'notes', 'org', 'Orgmode' },
   ['org-roam-select'] = { 'notes', 'org', 'Orgmode' },
@@ -165,8 +181,12 @@ M.filetype_mappings = {
   dashboardpreview = { 'dashboard', M.default_icons.dashboard, 'Dashboard' },
   ministarter = { 'dashboard', M.default_icons.dashboard, 'mini.starter' },
   nvdash = { 'dashboard', M.default_icons.dashboard, 'NvDash' },
+  profile = { 'dashboard', M.default_icons.dashboard, 'Profile' },
   snacks_dashboard = { 'dashboard', M.default_icons.dashboard, 'Snacks Dashboard' },
+  spaceport = { 'dashboard', M.default_icons.dashboard, 'Spaceport' },
   startify = { 'dashboard', M.default_icons.dashboard, 'Startify' },
+  startup = { 'dashboard', M.default_icons.dashboard, 'Startup' },
+  veil = { 'dashboard', M.default_icons.dashboard, 'Veil' },
 }
 
 M.filename_mappings = {
