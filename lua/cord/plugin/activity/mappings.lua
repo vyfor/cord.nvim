@@ -209,6 +209,9 @@ M.filetype_mappings = {
   ['neotest-output-panel'] = { 'test', M.default_icons.test, 'Neotest' },
   ['neotest-summary'] = { 'test', M.default_icons.test, 'Neotest' },
   ['quicktest-output'] = { 'test', M.default_icons.test, 'Quicktest' },
+
+  -- Diagnostics
+  trouble = { 'diagnostics', M.default_icons.diagnostics, 'Trouble' },
 }
 
 M.filename_mappings = {

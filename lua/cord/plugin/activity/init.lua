@@ -32,6 +32,7 @@ local text_config = {
   notes = config.text.notes,
   debug = config.text.debug,
   test = config.text.test,
+  diagnostics = config.text.diagnostics,
   dashboard = config.text.dashboard,
 }
 
