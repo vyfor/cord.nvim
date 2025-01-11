@@ -10,6 +10,10 @@ M.default_icons = {
   docs = 'book',
   vcs = 'git',
   notes = 'notes',
+  debug = 'bug',
+  test = 'tests',
+  diagnostics = 'diagnostics',
+  games = 'controller',
   dashboard = 'dashboard',
 }
 
