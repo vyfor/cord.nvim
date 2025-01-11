@@ -30,6 +30,7 @@ local text_config = {
   docs = config.text.docs,
   vcs = config.text.vcs,
   notes = config.text.notes,
+  debug = config.text.debug,
   test = config.text.test,
   dashboard = config.text.dashboard,
 }

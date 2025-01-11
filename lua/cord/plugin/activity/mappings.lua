@@ -192,6 +192,16 @@ M.filetype_mappings = {
   startup = { 'dashboard', M.default_icons.dashboard, 'Startup' },
   veil = { 'dashboard', M.default_icons.dashboard, 'Veil' },
 
+  -- Debug
+  dapui_console = { 'debug', M.default_icons.debug, 'DAP' },
+  dapui_hover = { 'debug', M.default_icons.debug, 'DAP' },
+  dapui_scopes = { 'debug', M.default_icons.debug, 'DAP' },
+  dapui_stacks = { 'debug', M.default_icons.debug, 'DAP' },
+  dapui_watches = { 'debug', M.default_icons.debug, 'DAP' },
+  nvimgdb = { 'debug', M.default_icons.debug, 'GNU Debugger' },
+  ['dap-float'] = { 'debug', M.default_icons.debug, 'DAP' },
+  ['dap-repl'] = { 'debug', M.default_icons.debug, 'DAP' },
+
   -- Test
   coverage = { 'test', M.default_icons.test, 'Coverage' },
   ['neotest-attach'] = { 'test', M.default_icons.test, 'Neotest' },

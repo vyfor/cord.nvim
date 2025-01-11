@@ -35,6 +35,7 @@
 ---@field docs? string|fun(opts: CordOpts):string Text for documentation activity
 ---@field vcs? string|fun(opts: CordOpts):string Text for VCS activity
 ---@field notes? string|fun(opts: CordOpts):string Text for notes activity
+---@field debug? string|fun(opts: CordOpts):string Text for debugging-related plugin activity
 ---@field test? string|fun(opts: CordOpts):string Text for testing-related plugin activity
 ---@field dashboard? string|fun(opts: CordOpts):string Text for dashboard activity
 
@@ -137,6 +138,7 @@ M.opts = {
     docs = function(opts) return 'Reading ' .. opts.tooltip end,
     vcs = function(opts) return 'Committing changes in ' .. opts.tooltip end,
     notes = function(opts) return 'Taking notes in ' .. opts.tooltip end,
+    debug = function(opts) return 'Debugging in ' .. opts.tooltip end,
     test = function(opts) return 'Testing in ' .. opts.tooltip end,
     dashboard = 'Home',
   },
