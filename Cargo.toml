@@ -7,7 +7,7 @@ keywords = ["discord-rpc", "discord", "rich-presence", "neovim", "plugin"]
 license = "Apache-2.0"
 name = "cord-nvim"
 repository = "https://github.com/vyfor/cord.nvim"
-version = "2.0.0-beta.11"
+version = "2.0.0-beta.12"
 rust-version = "1.85"
 
 [[bin]]
