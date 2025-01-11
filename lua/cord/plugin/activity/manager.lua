@@ -199,7 +199,7 @@ function ActivityManager:update_idle_activity()
 
     if self.config.hooks.on_update then self.config.hooks.on_update(self.opts) end
 
-    local activity = activities.build_idle_activity(self.config, self.opts)
+    local activity = activities.build_idle_activity(self.opts)
 
     if self.config.hooks.on_idle then self.config.hooks.on_idle(self.opts, activity) end
 
@@ -232,7 +232,7 @@ function ActivityManager:update_activity()
 
   if self.config.hooks.on_update then self.config.hooks.on_update(self.opts) end
 
-  local activity = activities.build_activity(self.config, self.opts)
+  local activity = activities.build_activity(self.opts)
 
   if self.config.hooks.on_activity then self.config.hooks.on_activity(self.opts, activity) end
 

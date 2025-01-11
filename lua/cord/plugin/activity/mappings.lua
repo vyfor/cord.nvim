@@ -13,7 +13,7 @@ M.default_icons = {
   dashboard = 'dashboard',
 }
 
-M.mappings = {
+M.filetype_mappings = {
   -- Languages
   autohotkey = { 'language', 'ahk', 'AutoHotkey' },
   asm = { 'language', 'assembly', 'Assembly' },
@@ -43,6 +43,7 @@ M.mappings = {
   gitignore = { 'language', 'git', 'Git' },
   gitsendemail = { 'language', 'git', 'Git' },
   go = { 'language', 'go', 'Go' },
+  groovy = { 'language', 'groovy', 'Groovy' },
   haskell = { 'language', 'haskell', 'Haskell' },
   html = { 'language', 'html', 'HTML' },
   java = { 'language', 'java', 'Java' },
@@ -50,12 +51,16 @@ M.mappings = {
   javascriptreact = { 'language', 'react', 'JSX' },
   json = { 'language', 'json', 'JSON' },
   julia = { 'language', 'julia', 'Julia' },
+  kotlin = { 'language', 'kotlin', 'Kotlin' },
   tex = { 'language', 'latex', 'LaTeX' },
   texmf = { 'language', 'latex', 'LaTeX' },
+  text = { 'language', M.default_icons.language, 'Plain Text' },
+  toml = { 'language', 'toml', 'TOML' },
   plaintex = { 'language', 'latex', 'LaTeX' },
   lisp = { 'language', 'lisp', 'Lisp' },
   logcheck = { 'language', 'logs', 'Logcheck' },
   lua = { 'language', 'lua', 'Lua' },
+  markdown = { 'language', 'markdown', 'Markdown' },
   nim = { 'language', 'nim', 'Nim' },
   nix = { 'language', 'nix', 'Nix' },
   ocaml = { 'language', 'ocaml', 'OCaml' },
@@ -82,6 +87,7 @@ M.mappings = {
   v = { 'language', 'v', 'V ' },
   vim = { 'language', 'viml', 'VimL' },
   vue = { 'language', 'vue', 'Vue' },
+  xml = { 'language', 'xml', 'XML' },
   yaml = { 'language', 'yaml', 'YAML' },
   zig = { 'language', 'zig', 'Zig' },
   zsh = { 'language', 'shell', 'Zsh' },
@@ -148,53 +154,34 @@ M.mappings = {
   startify = { 'dashboard', M.default_icons.dashboard, 'Startify' },
 }
 
-M.special_cases = {
+M.filename_mappings = {
   -- Languages
-  groovy = function(filename)
-    return filename == 'build.gradle' and { 'language', 'gradle', 'Gradle' }
-      or { 'language', 'groovy', 'Groovy' }
-  end,
-  kotlin = function(filename)
-    return filename == 'build.gradle.kts' and { 'language', 'gradle', 'Gradle' }
-      or { 'language', 'kotlin', 'Kotlin' }
-  end,
-  markdown = function(filename)
-    return filename:lower() == 'license.md' and { 'language', 'license', 'License file' }
-      or { 'language', 'markdown', 'Markdown' }
-  end,
-  text = function(filename)
-    local name = filename:lower()
-    return (name == 'license' or name == 'license.txt')
-        and { 'language', 'license', 'License file' }
-      or { 'language', M.default_icon, 'Plain Text' }
-  end,
-  toml = function(filename)
-    return filename == 'Cargo.toml' and { 'language', 'cargo', 'Cargo' }
-      or { 'language', 'toml', 'TOML' }
-  end,
-  xml = function(filename)
-    return filename == 'pom.xml' and { 'language', 'maven', 'Maven' }
-      or { 'language', 'xml', 'XML' }
-  end,
+  ['build.gradle'] = { 'language', 'gradle', 'Gradle' },
+  ['build.gradle.kts'] = { 'language', 'gradle', 'Gradle' },
+  ['cargo.toml'] = { 'language', 'cargo', 'Cargo' },
+  ['license'] = { 'language', 'license', 'License file' },
+  ['license.md'] = { 'language', 'license', 'License file' },
+  ['license.txt'] = { 'language', 'license', 'License file' },
+  ['pom.xml'] = { 'language', 'maven', 'Maven' },
 }
 
 M.extension_mappings = {
   -- Languages
-  bmp = { 'language', 'picture', 'BMP' },
-  gif = { 'language', 'picture', 'GIF' },
-  gml = { 'language', 'gml', 'GameMaker Language' },
-  heif = { 'language', 'picture', 'HEIF' },
-  hx = { 'language', 'haxe', 'Haxe' },
-  hxml = { 'language', 'haxe', 'Haxe' },
-  ico = { 'language', 'picture', 'ICO' },
-  jpeg = { 'language', 'picture', 'JPEG' },
-  jpg = { 'language', 'picture', 'JPEG' },
-  log = { 'language', 'logs', 'Logs' },
-  pcss = { 'language', 'postcss', 'PostCSS' },
-  png = { 'language', 'picture', 'PNG' },
-  postcss = { 'language', 'postcss', 'PostCSS' },
-  tiff = { 'language', 'picture', 'TIFF' },
-  webp = { 'language', 'picture', 'WebP' },
+  ['.bmp'] = { 'language', 'picture', 'BMP' },
+  ['.gif'] = { 'language', 'picture', 'GIF' },
+  ['.gml'] = { 'language', 'gml', 'GameMaker Language' },
+  ['.heif'] = { 'language', 'picture', 'HEIF' },
+  ['.hx'] = { 'language', 'haxe', 'Haxe' },
+  ['.hxml'] = { 'language', 'haxe', 'Haxe' },
+  ['.ico'] = { 'language', 'picture', 'ICO' },
+  ['.jpeg'] = { 'language', 'picture', 'JPEG' },
+  ['.jpg'] = { 'language', 'picture', 'JPEG' },
+  ['.log'] = { 'language', 'logs', 'Logs' },
+  ['.pcss'] = { 'language', 'postcss', 'PostCSS' },
+  ['.png'] = { 'language', 'picture', 'PNG' },
+  ['.postcss'] = { 'language', 'postcss', 'PostCSS' },
+  ['.tiff'] = { 'language', 'picture', 'TIFF' },
+  ['.webp'] = { 'language', 'picture', 'WebP' },
 }
 
 M.cord_related = {
@@ -205,20 +192,18 @@ M.cord_related = {
 M.get_default_icon = function(type) return M.default_icons[type] or M.default_icons.language end
 
 M.get = function(filetype, filename)
-  local result = M.mappings[filetype]
+  local result = M.filename_mappings[filename:lower()]
   if result then return result[1], result[2], result[3] end
 
-  local result = M.special_cases[filetype]
-  if result then
-    local result = result(filename)
-    return result[1], result[2], result[3]
-  end
+  local result = M.filetype_mappings[filetype]
+  if result then return result[1], result[2], result[3] end
 
-  if not config.advanced.plugin.match_in_mappings then return end
-  local result = filename:match '%.([^%.]+)$'
-  if result then
-    result = M.extension_mappings[result:lower()]
-    if result then return result[1], result[2], result[3] end
+  if config.advanced.plugin.match_in_mappings then
+    local extension = filename:match '%..*$'
+    if extension then
+      result = M.extension_mappings[extension]
+      if result then return result[1], result[2], result[3] end
+    end
   end
 
   local result = M.cord_related[filetype]

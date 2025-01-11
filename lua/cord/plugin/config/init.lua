@@ -30,9 +30,10 @@
 ---@field editing? string|fun(opts: CordOpts):string Text for editing activity
 ---@field file_browser? string|fun(opts: CordOpts):string Text for file browser activity
 ---@field plugin_manager? string|fun(opts: CordOpts):string Text for plugin manager activity
----@field lsp_manager? string|fun(opts: CordOpts):string Text for LSP manager activity
+---@field lsp? string|fun(opts: CordOpts):string Text for LSP manager activity
 ---@field docs? string|fun(opts: CordOpts):string Text for documentation activity
 ---@field vcs? string|fun(opts: CordOpts):string Text for VCS activity
+---@field notes? string|fun(opts: CordOpts):string Text for notes activity
 ---@field workspace? string|fun(opts: CordOpts):string Text for workspace activity
 ---@field dashboard? string|fun(opts: CordOpts):string Text for dashboard activity
 
@@ -129,9 +130,7 @@ M.opts = {
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
     editing = function(opts) return 'Editing ' .. opts.filename end,
     file_browser = function(opts) return 'Browsing files in ' .. opts.tooltip end,
-    plugin_manager = function(opts)
-      return 'Managing plugins in ' .. opts.tooltip
-    end,
+    plugin_manager = function(opts) return 'Managing plugins in ' .. opts.tooltip end,
     lsp_manager = function(opts) return 'Configuring LSP in ' .. opts.tooltip end,
     docs = function(opts) return 'Reading ' .. opts.tooltip end,
     vcs = function(opts) return 'Committing changes in ' .. opts.tooltip end,
