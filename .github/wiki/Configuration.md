@@ -11,8 +11,7 @@ require('cord').setup {
 <details id="default-config">
   <summary>Default values</summary>
 
-  >[!NOTE]
-  > You only need to specify the values you want to change. Your configuration will be merged with the default config, so any fields you don't specify will use their default values.
+  > Note: You only need to specify the values you want to change. Your configuration will be merged with the default config, so any fields you don't specify will use their default values.
 
 ```lua
 {
@@ -44,15 +43,19 @@ require('cord').setup {
     icon = nil,
   },
   text = {
+    workspace = function(opts) return 'In ' .. opts.workspace_name end,
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
     editing = function(opts) return 'Editing ' .. opts.filename end,
     file_browser = function(opts) return 'Browsing files in ' .. opts.tooltip end,
     plugin_manager = function(opts) return 'Managing plugins in ' .. opts.tooltip end,
-    lsp_manager = function(opts) return 'Configuring LSP in ' .. opts.tooltip end,
+    lsp = function(opts) return 'Configuring LSP in ' .. opts.tooltip end,
     docs = function(opts) return 'Reading ' .. opts.tooltip end,
     vcs = function(opts) return 'Committing changes in ' .. opts.tooltip end,
     notes = function(opts) return 'Taking notes in ' .. opts.tooltip end,
-    workspace = function(opts) return 'In ' .. opts.workspace_name end,
+    debug = function(opts) return 'Debugging in ' .. opts.tooltip end,
+    test = function(opts) return 'Testing in ' .. opts.tooltip end,
+    diagnostics = function(opts) return 'Fixing problems in ' .. opts.tooltip end,
+    games = function(opts) return 'Playing ' .. opts.tooltip end,
     dashboard = 'Home',
   },
   buttons = nil,
@@ -130,13 +133,33 @@ require('cord').setup {
 | `idle.tooltip`         | `string \| function(opts)` | `'💤'`                                                                                 | Tooltip shown when hovering over idle icon                    |
 | `idle.icon`            | `string \| function(opts)` | [`default idle icon`](https://github.com/vyfor/icons/blob/master/icons/onyx/idle.png) | Custom icon URL or asset ID                                   |
 
-## 📝 Text & Assets
+## 📝 Text
 
-| Option    | Type           | Default                           | Description                                   |
-| --------- | -------------- | --------------------------------- | --------------------------------------------- |
-| `text`    | `table`        | See [Text Options](#text-options) | Customize displayed text for different states |
-| `buttons` | `table \| nil` | `nil`                             | Configure [presence buttons](#buttons)        |
-| `assets`  | `table \| nil` | `nil`                             | Custom [file icons](#assets) configuration    |
+| Option           | Type                       | Default                           | Description                                        |
+| ---------------- | -------------------------- | --------------------------------- | -------------------------------------------------- |
+| `workspace`      | `string \| function(opts)` | `In {workspace_name}`             | Text shown when in a workspace                     |
+| `viewing`        | `string \| function(opts)` | `Viewing {filename}`              | Text shown when viewing a file                     |
+| `editing`        | `string \| function(opts)` | `Editing {filename}`              | Text shown when editing a file                     |
+| `file_browser`   | `string \| function(opts)` | `Browsing files in {tooltip}`     | Text shown when in a file browser                  |
+| `plugin_manager` | `string \| function(opts)` | `Managing plugins in {tooltip}`   | Text shown when in a plugin manager                |
+| `lsp`            | `string \| function(opts)` | `Configuring LSP in {tooltip}`    | Text shown when in an LSP manager                  |
+| `docs`           | `string \| function(opts)` | `Reading {tooltip}`               | Text shown when in a docs buffer                   |
+| `vcs`            | `string \| function(opts)` | `Committing changes in {tooltip}` | Text shown when in a VCS buffer                    |
+| `notes`          | `string \| function(opts)` | `Taking notes in {tooltip}`       | Text shown when in a notes buffer                  |
+| `debug`          | `string \| function(opts)` | `Debugging in {tooltip}`          | Text shown when in a debug-related plugin buffer   |
+| `test`           | `string \| function(opts)` | `Testing in {tooltip}`            | Text shown when in a testing-related plugin buffer |
+| `diagnostics`    | `string \| function(opts)` | `Fixing problems in {tooltip}`    | Text shown when in a diagnostics buffer            |
+| `games`          | `string \| function(opts)` | `Playing {tooltip}`               | Text shown when in a game buffer                   |
+| `dashboard`      | `string`                   | `Home`                            | Text shown when in a dashboard buffer              |
+
+> Also see [Text Options](#text-options)
+
+## 📂 Assets
+
+| Option    | Type           | Default | Description                                |
+| --------- | -------------- | ------- | ------------------------------------------ |
+| `buttons` | `table \| nil` | `nil`   | Configure [presence buttons](#buttons)     |
+| `assets`  | `table \| nil` | `nil`   | Custom [file icons](#assets) configuration |
 
 ## 🧩 Variables
 
