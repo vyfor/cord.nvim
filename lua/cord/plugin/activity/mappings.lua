@@ -251,9 +251,6 @@ M.get = function(filetype, filename)
   local result = M.filename_mappings[filename:lower()]
   if result then return result[1], result[2], result[3] end
 
-  local result = M.filetype_mappings[filetype]
-  if result then return result[1], result[2], result[3] end
-
   if config.advanced.plugin.match_in_mappings then
     local extension = filename:match '%..*$'
     if extension then
@@ -261,6 +258,9 @@ M.get = function(filetype, filename)
       if result then return result[1], result[2], result[3] end
     end
   end
+
+  local result = M.filetype_mappings[filetype]
+  if result then return result[1], result[2], result[3] end
 
   local result = M.cord_related[filetype]
   if result then return result[1], result[2], result[3] end
