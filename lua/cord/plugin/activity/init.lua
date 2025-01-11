@@ -33,6 +33,7 @@ local text_config = {
   debug = config.text.debug,
   test = config.text.test,
   diagnostics = config.text.diagnostics,
+  games = config.text.games,
   dashboard = config.text.dashboard,
 }
 

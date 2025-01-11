@@ -37,6 +37,7 @@
 ---@field notes? string|fun(opts: CordOpts):string Text for notes activity
 ---@field debug? string|fun(opts: CordOpts):string Text for debugging-related plugin activity
 ---@field test? string|fun(opts: CordOpts):string Text for testing-related plugin activity
+---@field games? string|fun(opts: CordOpts):string Text for games activity
 ---@field diagnostics? string|fun(opts: CordOpts):string Text for diagnostics activity
 ---@field dashboard? string|fun(opts: CordOpts):string Text for dashboard activity
 
@@ -142,6 +143,7 @@ M.opts = {
     debug = function(opts) return 'Debugging in ' .. opts.tooltip end,
     test = function(opts) return 'Testing in ' .. opts.tooltip end,
     diagnostics = function(opts) return 'Fixing problems in ' .. opts.tooltip end,
+    games = function(opts) return 'Playing ' .. opts.tooltip end,
     dashboard = 'Home',
   },
   buttons = nil,

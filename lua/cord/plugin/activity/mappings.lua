@@ -212,6 +212,10 @@ M.filetype_mappings = {
 
   -- Diagnostics
   trouble = { 'diagnostics', M.default_icons.diagnostics, 'Trouble' },
+
+  -- Games
+  sudoku = { 'games', M.default_icons.games, 'Sudoku' },
+  tetris = { 'games', M.default_icons.games, 'Tetris' },
 }
 
 M.filename_mappings = {
