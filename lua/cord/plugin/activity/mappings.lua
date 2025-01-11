@@ -191,6 +191,14 @@ M.filetype_mappings = {
   startify = { 'dashboard', M.default_icons.dashboard, 'Startify' },
   startup = { 'dashboard', M.default_icons.dashboard, 'Startup' },
   veil = { 'dashboard', M.default_icons.dashboard, 'Veil' },
+
+  -- Test
+  coverage = { 'test', M.default_icons.test, 'Coverage' },
+  ['neotest-attach'] = { 'test', M.default_icons.test, 'Neotest' },
+  ['neotest-output'] = { 'test', M.default_icons.test, 'Neotest' },
+  ['neotest-output-panel'] = { 'test', M.default_icons.test, 'Neotest' },
+  ['neotest-summary'] = { 'test', M.default_icons.test, 'Neotest' },
+  ['quicktest-output'] = { 'test', M.default_icons.test, 'Quicktest' },
 }
 
 M.filename_mappings = {

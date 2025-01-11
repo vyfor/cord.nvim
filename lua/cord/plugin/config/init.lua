@@ -26,6 +26,7 @@
 ---@field icon? string Idle icon
 
 ---@class CordTextConfig
+---@field workspace? string|fun(opts: CordOpts):string Text for workspace activity
 ---@field viewing? string|fun(opts: CordOpts):string Text for viewing activity
 ---@field editing? string|fun(opts: CordOpts):string Text for editing activity
 ---@field file_browser? string|fun(opts: CordOpts):string Text for file browser activity
@@ -34,7 +35,7 @@
 ---@field docs? string|fun(opts: CordOpts):string Text for documentation activity
 ---@field vcs? string|fun(opts: CordOpts):string Text for VCS activity
 ---@field notes? string|fun(opts: CordOpts):string Text for notes activity
----@field workspace? string|fun(opts: CordOpts):string Text for workspace activity
+---@field test? string|fun(opts: CordOpts):string Text for testing-related plugin activity
 ---@field dashboard? string|fun(opts: CordOpts):string Text for dashboard activity
 
 ---@class CordButtonConfig
@@ -127,6 +128,7 @@ M.opts = {
     icon = nil,
   },
   text = {
+    workspace = function(opts) return 'In ' .. opts.workspace_name end,
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
     editing = function(opts) return 'Editing ' .. opts.filename end,
     file_browser = function(opts) return 'Browsing files in ' .. opts.tooltip end,
@@ -135,7 +137,7 @@ M.opts = {
     docs = function(opts) return 'Reading ' .. opts.tooltip end,
     vcs = function(opts) return 'Committing changes in ' .. opts.tooltip end,
     notes = function(opts) return 'Taking notes in ' .. opts.tooltip end,
-    workspace = function(opts) return 'In ' .. opts.workspace_name end,
+    test = function(opts) return 'Testing in ' .. opts.tooltip end,
     dashboard = 'Home',
   },
   buttons = nil,

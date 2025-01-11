@@ -21,6 +21,7 @@ local function get_custom_asset(config, filename, filetype)
 end
 
 local text_config = {
+  workspace = config.text.workspace,
   viewing = config.text.viewing,
   editing = config.text.editing,
   file_browser = config.text.file_browser,
@@ -29,8 +30,8 @@ local text_config = {
   docs = config.text.docs,
   vcs = config.text.vcs,
   notes = config.text.notes,
+  test = config.text.test,
   dashboard = config.text.dashboard,
-  workspace = config.text.workspace,
 }
 
 local function build_activity(opts)
