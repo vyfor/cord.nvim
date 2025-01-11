@@ -227,7 +227,6 @@ buttons = {
 ### Assets
 
 Override icons and text for specific filetypes or filenames. Most of the options also support functions.
-See 
 
 ```lua
 assets = {
@@ -237,15 +236,26 @@ assets = {
         text = 'Writing in Rust'    -- Override entire text
     },
     netrw = {
-        name = 'Netrw',             -- Override icon name only
-        icon = 'default',           -- Use default icon
-        type = 'file_browser'       -- Set icon type
+        name = 'Netrw',             -- Override asset name only
+        type = 'file_browser'       -- Set asset type
     }
 }
 ```
 
 > [!TIP]
 > A detailed guide can be found in the [Wiki](https://github.com/vyfor/cord.nvim/wiki/File-Icons).
+
+Some languages cannot be identified solely by their filename or extension. In such cases, we can utilize the `vim.filetype.add` function to add extra patterns for filetype detection:
+
+```lua
+vim.filetype.add {
+  pattern = {
+    ['.*/waybar/config'] = 'jsonc',
+    ['.*/hypr/.*%.conf'] = 'hyprlang',
+    -- ...
+  },
+}
+```
 
 ### Smart Idle
 

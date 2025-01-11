@@ -58,6 +58,18 @@ lua = {
 }
 ```
 
+Some languages cannot be identified solely by their filename or extension. In such cases, we can utilize the `vim.filetype.add` function to add extra patterns for filetype detection:
+
+```lua
+vim.filetype.add {
+  pattern = {
+    ['.*/waybar/config'] = 'jsonc',
+    ['.*/hypr/.*%.conf'] = 'hyprlang',
+    -- ...
+  },
+}
+```
+
 ## Overriding Default Icons
 
 In addition to setting icons for specific filetypes or extensions, you can also define icons for generic scenarios:
