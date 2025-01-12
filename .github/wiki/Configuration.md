@@ -135,22 +135,22 @@ require('cord').setup {
 
 ## 📝 Text
 
-| Option           | Type                       | Default                           | Description                                        |
-| ---------------- | -------------------------- | --------------------------------- | -------------------------------------------------- |
-| `workspace`      | `string \| function(opts)` | `In {workspace_name}`             | Text shown when in a workspace                     |
-| `viewing`        | `string \| function(opts)` | `Viewing {filename}`              | Text shown when viewing a file                     |
-| `editing`        | `string \| function(opts)` | `Editing {filename}`              | Text shown when editing a file                     |
-| `file_browser`   | `string \| function(opts)` | `Browsing files in {tooltip}`     | Text shown when in a file browser                  |
-| `plugin_manager` | `string \| function(opts)` | `Managing plugins in {tooltip}`   | Text shown when in a plugin manager                |
-| `lsp`            | `string \| function(opts)` | `Configuring LSP in {tooltip}`    | Text shown when in an LSP manager                  |
-| `docs`           | `string \| function(opts)` | `Reading {tooltip}`               | Text shown when in a docs buffer                   |
-| `vcs`            | `string \| function(opts)` | `Committing changes in {tooltip}` | Text shown when in a VCS buffer                    |
-| `notes`          | `string \| function(opts)` | `Taking notes in {tooltip}`       | Text shown when in a notes buffer                  |
-| `debug`          | `string \| function(opts)` | `Debugging in {tooltip}`          | Text shown when in a debug-related plugin buffer   |
-| `test`           | `string \| function(opts)` | `Testing in {tooltip}`            | Text shown when in a testing-related plugin buffer |
-| `diagnostics`    | `string \| function(opts)` | `Fixing problems in {tooltip}`    | Text shown when in a diagnostics buffer            |
-| `games`          | `string \| function(opts)` | `Playing {tooltip}`               | Text shown when in a game buffer                   |
-| `dashboard`      | `string`                   | `Home`                            | Text shown when in a dashboard buffer              |
+| Option           | Type                                  | Default                           | Description                                        |
+| ---------------- | ------------------------------------- | --------------------------------- | -------------------------------------------------- |
+| `workspace`      | `string \| function(opts) \| boolean` | `In {workspace_name}`             | Text shown when in a workspace                     |
+| `viewing`        | `string \| function(opts) \| boolean` | `Viewing {filename}`              | Text shown when viewing a file                     |
+| `editing`        | `string \| function(opts) \| boolean` | `Editing {filename}`              | Text shown when editing a file                     |
+| `file_browser`   | `string \| function(opts) \| boolean` | `Browsing files in {tooltip}`     | Text shown when in a file browser                  |
+| `plugin_manager` | `string \| function(opts) \| boolean` | `Managing plugins in {tooltip}`   | Text shown when in a plugin manager                |
+| `lsp`            | `string \| function(opts) \| boolean` | `Configuring LSP in {tooltip}`    | Text shown when in an LSP manager                  |
+| `docs`           | `string \| function(opts) \| boolean` | `Reading {tooltip}`               | Text shown when in a docs buffer                   |
+| `vcs`            | `string \| function(opts) \| boolean` | `Committing changes in {tooltip}` | Text shown when in a VCS buffer                    |
+| `notes`          | `string \| function(opts) \| boolean` | `Taking notes in {tooltip}`       | Text shown when in a notes buffer                  |
+| `debug`          | `string \| function(opts) \| boolean` | `Debugging in {tooltip}`          | Text shown when in a debug-related plugin buffer   |
+| `test`           | `string \| function(opts) \| boolean` | `Testing in {tooltip}`            | Text shown when in a testing-related plugin buffer |
+| `diagnostics`    | `string \| function(opts) \| boolean` | `Fixing problems in {tooltip}`    | Text shown when in a diagnostics buffer            |
+| `games`          | `string \| function(opts) \| boolean` | `Playing {tooltip}`               | Text shown when in a game buffer                   |
+| `dashboard`      | `string \| function(opts) \| boolean` | `'Home'`                          | `Home`                                             | Text shown when in a dashboard buffer |
 
 > Also see [Text Options](#text-options)
 
@@ -228,7 +228,26 @@ text = {
 }
 ```
 
-To see all available options, refer to the [default configuration](#default-config).
+> To see all available options, refer to the [default configuration](#default-config).
+
+It is also possible to use boolean values to completely disable a category:
+
+```lua
+text = {
+    workspace = '',         -- Omit the text from the activity, meaning it will only have one row of text
+    games = function() end, -- Returning `nil` is the same as above
+
+    file_browser = true,    -- Ignore these types of buffers and the current activity will remain unchanged
+    plugin_manager = false, -- Hide the activity for these types of buffers
+
+    -- Also applicable to functions
+    diagnostics = function(opts)
+        -- Only show diagnostics activity if there are problems, otherwise do nothing
+        return #vim.diagnostics.get(vim.api.nvim_get_current_buf()) > 0 and 'Fixing problems in ' .. opts.tooltip or true
+    end,
+}
+```
+
 
 ### Buttons
 

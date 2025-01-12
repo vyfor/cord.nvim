@@ -233,7 +233,10 @@ function ActivityManager:update_activity()
   if self.config.hooks.on_update then self.config.hooks.on_update(self.opts) end
 
   local activity = activities.build_activity(self.opts)
+  if activity == true then return end
+  if activity == false then return self:clear_activity() end
 
+  ---@diagnostic disable-next-line: param-type-mismatch -- ensured to be of type Activity
   if self.config.hooks.on_activity then self.config.hooks.on_activity(self.opts, activity) end
 
   if self.should_skip_update then

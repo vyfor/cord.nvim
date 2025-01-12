@@ -35,7 +35,11 @@ text = {
 ### Omitting Fields
 ```lua
 text = {
+  workspace = '',
+  -- or
   workspace = function() end,
+  -- or
+  workspace = function() return '' end
 }
 ```
 
