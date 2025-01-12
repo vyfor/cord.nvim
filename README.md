@@ -33,7 +33,7 @@
 - 💤 **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
 - 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS files without relying on command-line tools.
 - 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
-- 🌸 **Rich Icon Collection** — Features over 70 uniquely designed icons.
+- 🌸 **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
 - 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
 
 ## 📦 Install 
@@ -129,7 +129,7 @@ Invoke `:Cord update` whenever the plugin is updated.
 </details>
 
 ## 🎨 Themes  
-Cord features over 70 beautifully designed icons for languages and components with distinct themes, with more to come!
+Cord features over 120 beautifully designed icons for languages and components with distinct themes, with more to come!
 
 👉 [**Explore the Showcase**](https://github.com/vyfor/icons#showcase)  
 
