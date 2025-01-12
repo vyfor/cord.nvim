@@ -4,7 +4,7 @@
 ---@field reset_on_change? boolean Whether to reset timestamp when changing activities
 
 ---@class CordEditorConfig
----@field client? string Editor client name, one of 'vim', 'neovim', 'lunarvim', 'nvchad', 'astronvim' or a custom Discord application ID
+---@field client? string Editor client name, one of 'vim', 'neovim', 'lunarvim', 'nvchad', 'astronvim', 'lazyvim' or a custom Discord application ID
 ---@field tooltip? string Editor tooltip text
 ---@field icon? string Optional editor icon
 

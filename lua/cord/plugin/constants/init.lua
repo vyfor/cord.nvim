@@ -25,8 +25,7 @@ end
 M.get_pipe_path = function()
   if M.pipe_path then return M.pipe_path end
 
-  M.pipe_path = M.get_os().name == 'windows' and '\\\\.\\pipe\\cord-ipc'
-    or '/tmp/cord-ipc'
+  M.pipe_path = M.get_os().name == 'windows' and '\\\\.\\pipe\\cord-ipc' or '/tmp/cord-ipc'
 
   return M.pipe_path
 end
@@ -51,6 +50,10 @@ M.CLIENT_IDS = {
   astronvim = {
     id = '1230866983977746532',
     icon = 'astronvim',
+  },
+  lazyvim = {
+    id = '1328074831601729567',
+    icon = 'lazyvim',
   },
 }
 
