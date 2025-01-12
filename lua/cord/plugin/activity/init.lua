@@ -37,6 +37,7 @@ local text_config = {
   dashboard = config.text.dashboard,
 }
 
+---@return Activity|boolean
 local function build_activity(opts)
   if opts.filetype == '' then
     if opts.filename == '' then
@@ -73,22 +74,32 @@ local function build_activity(opts)
   else
     if opts.type == 'language' then
       if opts.is_read_only then
-        file_text = config_utils:get(text_config.viewing, opts)
+        local text = config_utils:get(text_config.viewing, opts)
+        if text == true or text == false then return text end
+        if text ~= '' then file_text = text end
       else
-        file_text = config_utils:get(text_config.editing, opts)
+        local text = config_utils:get(text_config.editing, opts)
+        if text == true or text == false then return text end
+        if text ~= '' then file_text = text end
       end
     else
-      file_text = config_utils:get(text_config[opts.type], opts)
+      local text = config_utils:get(text_config[opts.type], opts)
+      if text == true or text == false then return text end
+      if text ~= '' then file_text = text end
     end
   end
 
   local details, state
   if config.display.swap_fields then
-    details = config_utils:get(text_config.workspace, opts)
+    local workspace = config_utils:get(text_config.workspace, opts)
+    if workspace == true or workspace == false then return workspace end
+    if workspace ~= '' then details = workspace end
     state = file_text
   else
+    local workspace = config_utils:get(text_config.workspace, opts)
+    if workspace == true or workspace == false then return workspace end
+    if workspace ~= '' then state = workspace end
     details = file_text
-    state = config_utils:get(text_config.workspace, opts)
   end
 
   local large_image, large_text, small_image, small_text
@@ -123,6 +134,7 @@ local function build_activity(opts)
   }
 end
 
+---@return Activity
 local function build_idle_activity(opts)
   local details, state
   if config.display.swap_fields then

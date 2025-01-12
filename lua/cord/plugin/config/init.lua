@@ -23,23 +23,23 @@
 ---@field details? string|fun(opts: CordOpts):string Details shown when idle
 ---@field state? string|fun(opts: CordOpts):string State shown when idle
 ---@field tooltip? string|fun(opts: CordOpts):string Tooltip shown when hovering over idle icon
----@field icon? string Idle icon
+---@field icon? string|fun(opts: CordOpts):string Idle icon
 
 ---@class CordTextConfig
----@field workspace? string|fun(opts: CordOpts):string Text for workspace activity
----@field viewing? string|fun(opts: CordOpts):string Text for viewing activity
----@field editing? string|fun(opts: CordOpts):string Text for editing activity
----@field file_browser? string|fun(opts: CordOpts):string Text for file browser activity
----@field plugin_manager? string|fun(opts: CordOpts):string Text for plugin manager activity
----@field lsp? string|fun(opts: CordOpts):string Text for LSP manager activity
----@field docs? string|fun(opts: CordOpts):string Text for documentation activity
----@field vcs? string|fun(opts: CordOpts):string Text for VCS activity
----@field notes? string|fun(opts: CordOpts):string Text for notes activity
----@field debug? string|fun(opts: CordOpts):string Text for debugging-related plugin activity
----@field test? string|fun(opts: CordOpts):string Text for testing-related plugin activity
----@field games? string|fun(opts: CordOpts):string Text for games activity
----@field diagnostics? string|fun(opts: CordOpts):string Text for diagnostics activity
----@field dashboard? string|fun(opts: CordOpts):string Text for dashboard activity
+---@field workspace? string|fun(opts: CordOpts):string|boolean Text for workspace activity
+---@field viewing? string|fun(opts: CordOpts):string|boolean Text for viewing activity
+---@field editing? string|fun(opts: CordOpts):string|boolean Text for editing activity
+---@field file_browser? string|fun(opts: CordOpts):string|boolean Text for file browser activity
+---@field plugin_manager? string|fun(opts: CordOpts):string|boolean Text for plugin manager activity
+---@field lsp? string|fun(opts: CordOpts):string|boolean Text for LSP manager activity
+---@field docs? string|fun(opts: CordOpts):string|boolean Text for documentation activity
+---@field vcs? string|fun(opts: CordOpts):string|boolean Text for VCS activity
+---@field notes? string|fun(opts: CordOpts):string|boolean Text for notes activity
+---@field debug? string|fun(opts: CordOpts):string|boolean Text for debugging-related plugin activity
+---@field test? string|fun(opts: CordOpts):string|boolean Text for testing-related plugin activity
+---@field games? string|fun(opts: CordOpts):string|boolean Text for games activity
+---@field diagnostics? string|fun(opts: CordOpts):string|boolean Text for diagnostics activity
+---@field dashboard? string|fun(opts: CordOpts):string|boolean Text for dashboard activity
 
 ---@class CordButtonConfig
 ---@field label string|fun(opts: CordOpts):string? Button label
