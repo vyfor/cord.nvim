@@ -4,7 +4,6 @@ use std::net::Shutdown;
 use std::os::unix::net::UnixStream;
 use std::sync::atomic::Ordering;
 use std::sync::mpsc::Sender;
-use std::sync::Arc;
 
 use crate::ipc::discord::client::{Connection, RichClient};
 use crate::ipc::discord::error::DiscordError;
@@ -28,7 +27,7 @@ impl Connection for RichClient {
     ///
     /// Followed by:
     /// * `/discord-ipc-{i}` - where `i` is a number from 0 to 9
-    fn connect(client_id: u64) -> crate::Result<Self> {
+    fn connect(&mut self) -> crate::Result<()> {
         let dirs = ["XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"]
             .iter()
             .filter_map(|&dir| var(dir).ok())
@@ -47,15 +46,9 @@ impl Connection for RichClient {
                     Ok(pipe) => {
                         let read_pipe =
                             pipe.try_clone().map_err(DiscordError::Io)?;
-                        return Ok(RichClient {
-                            client_id,
-                            read_pipe: Some(read_pipe),
-                            write_pipe: Some(pipe),
-                            pid: std::process::id(),
-                            is_ready: Arc::new(false.into()),
-                            thread_handle: None,
-                            is_reconnecting: Arc::new(false.into()),
-                        });
+                        self.read_pipe = Some(read_pipe);
+                        self.write_pipe = Some(pipe);
+                        return Ok(());
                     }
                     Err(e) => match e.kind() {
                         io::ErrorKind::NotFound => continue,

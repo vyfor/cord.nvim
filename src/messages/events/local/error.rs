@@ -37,21 +37,13 @@ impl OnEvent for ErrorEvent {
                         .pipe
                         .broadcast(&MsgPack::serialize(&DisconnectEvent)?)?;
 
-                    let logger = ctx.cord.logger.clone();
                     let rich_client = ctx.cord.rich_client.clone();
                     let tx = ctx.cord.tx.clone();
                     std::thread::spawn(move || {
-                        if let Err(e) = rich_client
+                        rich_client
                             .write()
                             .unwrap()
-                            .reconnect(reconnect_interval, tx)
-                        {
-                            logger.log(
-                                LogLevel::Error,
-                                e.to_string().into(),
-                                0,
-                            );
-                        };
+                            .reconnect(reconnect_interval, tx);
                     });
 
                     ctx.cord.logger.log(

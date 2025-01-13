@@ -87,6 +87,7 @@ require('cord').setup {
       reconnect = {
         enabled = false,
         interval = 5000,
+        initial = true,
       },
     },
   },
@@ -191,8 +192,9 @@ require('cord').setup {
 | `advanced.server.pipe_path`              | `string \| nil` | `nil`                 | Custom IPC pipe path                                                                                                                                                                               |
 | `advanced.server.executable_path`        | `string \| nil` | `nil`                 | Custom server executable path                                                                                                                                                                      |
 | `advanced.server.timeout`                | `number`        | `300000`              | Server shutdown timeout (ms)                                                                                                                                                                       |
-| `advanced.discord.reconnect.enabled`     | `boolean`       | `true`                | Whether reconnection is enabled. Has minimal impact on performance.                                                                                                                                |
+| `advanced.discord.reconnect.enabled`     | `boolean`       | `false`               | Whether reconnection is enabled. Has minimal impact on performance                                                                                                                                 |
 | `advanced.discord.reconnect.interval`    | `number`        | `5000`                | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
+| `advanced.discord.reconnect.initial`     | `boolean`       | `true`                | Whether to reconnect if initial connection fails                                                                                                                                                   |
 
 ---
 

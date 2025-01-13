@@ -32,7 +32,7 @@ pub struct RichClient {
 /// Defines methods for connecting and closing the client.
 pub trait Connection {
     /// Connects to Discord using the given client ID.
-    fn connect(client_id: u64) -> crate::Result<RichClient>;
+    fn connect(&mut self) -> crate::Result<()>;
     /// Closes the connection to Discord.
     fn close(&mut self);
     /// Start reading from Discord in a separate thread
@@ -42,6 +42,22 @@ pub trait Connection {
 }
 
 impl RichClient {
+    pub fn new(client_id: u64) -> Self {
+        Self {
+            client_id,
+            #[cfg(target_os = "windows")]
+            pipe: None,
+            #[cfg(not(target_os = "windows"))]
+            read_pipe: None,
+            #[cfg(not(target_os = "windows"))]
+            write_pipe: None,
+            pid: std::process::id(),
+            is_ready: Arc::new(AtomicBool::new(false)),
+            thread_handle: None,
+            is_reconnecting: Arc::new(AtomicBool::new(false)),
+        }
+    }
+
     /// Establishes a connection with Discord.
     pub fn handshake(&self) -> crate::Result<()> {
         self.write(
@@ -74,23 +90,20 @@ impl RichClient {
     }
 
     /// Reconnects to Discord with exponential backoff.
-    pub fn reconnect(
-        &mut self,
-        initial_interval: u64,
-        tx: Sender<Message>,
-    ) -> crate::Result<()> {
+    pub fn reconnect(&mut self, interval: u64, tx: Sender<Message>) {
         self.is_reconnecting.store(true, Ordering::SeqCst);
         self.close();
 
         std::thread::sleep(Duration::from_millis(500));
 
+        let mut client = Self::new(self.client_id);
         while self.is_reconnecting.load(Ordering::SeqCst) {
-            if let Ok(mut client) = Self::connect(self.client_id) {
+            if client.connect().is_ok() {
                 if client.handshake().is_ok() {
                     *self = client;
-                    if let Err(e) = self.start_read_thread(tx) {
+                    if self.start_read_thread(tx).is_err() {
+
                         self.is_reconnecting.store(false, Ordering::SeqCst);
-                        return Err(e);
                     };
 
                     break;
@@ -99,11 +112,9 @@ impl RichClient {
                 }
             };
 
-            std::thread::sleep(Duration::from_millis(initial_interval));
+            std::thread::sleep(Duration::from_millis(interval));
         }
 
         self.is_reconnecting.store(false, Ordering::SeqCst);
-
-        Ok(())
     }
 }

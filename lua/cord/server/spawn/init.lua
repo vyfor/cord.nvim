@@ -7,9 +7,7 @@ M.spawn = async.wrap(function(config, pipe_path)
     local exec_path = config.advanced.server.executable_path
     local update_strategy = config.advanced.server.update
     local client_id = config.editor.client
-    if not exec_path then
-      exec_path = require('cord.server.fs').get_executable_path()
-    end
+    if not exec_path then exec_path = require('cord.server.fs').get_executable_path() end
 
     local fs = require 'cord.core.uv.fs'
     local stat = fs.stat(exec_path):get()
@@ -35,9 +33,9 @@ M.spawn = async.wrap(function(config, pipe_path)
         '-t',
         config.advanced.server.timeout,
         '-r',
-        config.advanced.discord.reconnect.enabled
-            and config.advanced.discord.reconnect.interval
+        config.advanced.discord.reconnect.enabled and config.advanced.discord.reconnect.interval
           or 0,
+        config.advanced.discord.reconnect.initial and '-i' or nil,
       },
       on_stdout = function(data)
         if data:match 'Ready' then resolve(true, false) end

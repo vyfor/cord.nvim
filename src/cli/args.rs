@@ -16,6 +16,7 @@ pub struct Args {
     pub client_id: u64,
     pub timeout: u64,
     pub reconnect_interval: u64,
+    pub initial_reconnect: bool,
 }
 
 impl Args {
@@ -26,6 +27,7 @@ impl Args {
         let mut client_id = None;
         let mut timeout = None;
         let mut reconnect_interval = None;
+        let mut initial_reconnect = false;
 
         let mut i = 1;
         while i < args.len() {
@@ -72,8 +74,6 @@ impl Args {
                             }
                         }
                         i += 2;
-                    } else {
-                        return Err(CliError::Missing("--timeout").into());
                     }
                 }
                 "--reconnect-interval" | "-r" => {
@@ -89,11 +89,11 @@ impl Args {
                             }
                         }
                         i += 2;
-                    } else {
-                        return Err(
-                            CliError::Missing("--reconnect-interval").into()
-                        );
                     }
+                }
+                "--initial-reconnect" | "-i" => {
+                    initial_reconnect = true;
+                    i += 1;
                 }
                 other => {
                     return Err(CliError::Unknown(other.to_string()).into());
@@ -108,6 +108,7 @@ impl Args {
             timeout: timeout.unwrap_or(DEFAULT_TIMEOUT),
             reconnect_interval: reconnect_interval
                 .unwrap_or(DEFAULT_RECONNECT_INTERVAL),
+            initial_reconnect,
         })
     }
 }

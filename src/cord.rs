@@ -44,21 +44,39 @@ impl Cord {
 
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = Arc::new(SessionManager::default());
-        let rich_client = match RichClient::connect(config.client_id) {
-            Ok(client) => Arc::new(RwLock::new(client)),
-            Err(_) => {
-                return Err(crate::error::CordError::new(
-                    CordErrorKind::Io,
-                    "Failed to connect to Discord",
-                ));
+        let logger = Arc::new(Logger::new(tx.clone(), LogLevel::Off));
+
+        let rich_client =
+            Arc::new(RwLock::new(RichClient::new(config.client_id)));
+        {
+            let mut client = rich_client.write().unwrap();
+            if client.connect().is_err() {
+                if config.reconnect_interval > 0 && config.initial_reconnect {
+                    drop(client);
+                    let client_clone = rich_client.clone();
+                    let tx = tx.clone();
+
+                    std::thread::spawn(move || {
+                        let mut client = client_clone.write().unwrap();
+                        client.reconnect(config.reconnect_interval, tx.clone());
+                    });
+                } else {
+                    return Err(crate::error::CordError::new(
+                        CordErrorKind::Io,
+                        "Failed to connect to Discord",
+                    ));
+                }
+            } else {
+                client.handshake()?;
+                client.start_read_thread(tx.clone())?;
             }
-        };
+        }
+
         let server = PipeServer::new(
             &config.pipe_name,
             tx.clone(),
             Arc::clone(&session_manager),
         );
-        let logger = Arc::new(Logger::new(tx.clone(), LogLevel::Off));
 
         Ok(Cord {
             config,
@@ -74,7 +92,6 @@ impl Cord {
 
     /// Runs the application.
     pub fn run(&mut self) -> crate::Result<()> {
-        self.start_rpc()?;
         self.pipe.start()?;
         self.start_event_loop()?;
 
@@ -114,18 +131,6 @@ impl Cord {
         Ok(())
     }
 
-    /// Starts RPC with Discord.
-    pub fn start_rpc(&mut self) -> crate::Result<()> {
-        let mut rich_client = self
-            .rich_client
-            .write()
-            .expect("Failed to lock rich client");
-        rich_client.handshake()?;
-        rich_client.start_read_thread(self.tx.clone())?;
-
-        Ok(())
-    }
-
     /// Cleans up before shutdown.
     pub fn cleanup(&mut self) {
         if let Some(client) = Arc::get_mut(&mut self.rich_client) {
@@ -151,6 +156,7 @@ pub struct Config {
     pub client_id: u64,
     pub timeout: u64,
     pub reconnect_interval: u64,
+    pub initial_reconnect: bool,
 }
 
 impl Config {
@@ -160,12 +166,14 @@ impl Config {
         client_id: u64,
         timeout: u64,
         reconnect_interval: u64,
+        initial_reconnect: bool,
     ) -> Self {
         Self {
             pipe_name,
             client_id,
             timeout,
             reconnect_interval,
+            initial_reconnect,
         }
     }
 }
