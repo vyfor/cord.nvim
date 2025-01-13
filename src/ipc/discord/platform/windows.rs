@@ -4,7 +4,6 @@ use std::os::windows::ffi::OsStrExt;
 use std::os::windows::io::{AsRawHandle, FromRawHandle};
 use std::sync::atomic::Ordering;
 use std::sync::mpsc::Sender;
-use std::sync::Arc;
 use std::{io, ptr};
 
 use crate::ipc::bindings::{
@@ -22,7 +21,7 @@ use crate::{local_event, server_event};
 
 impl Connection for RichClient {
     /// Pipe path can be under the directory `\\\\.\\pipe\\discord-ipc-{i}` where `i` is a number from 0 to 9.
-    fn connect(client_id: u64) -> crate::Result<Self> {
+    fn connect(&mut self) -> crate::Result<()> {
         for i in 0..10 {
             let pipe_name = format!("\\\\.\\pipe\\discord-ipc-{i}");
             let wide_name: Vec<u16> = OsStr::new(&pipe_name)
@@ -50,16 +49,9 @@ impl Connection for RichClient {
                 }
 
                 let pipe = File::from_raw_handle(handle);
-                let client = RichClient {
-                    client_id,
-                    pipe: Some(Arc::new(pipe)),
-                    pid: std::process::id(),
-                    is_ready: Arc::new(false.into()),
-                    thread_handle: None,
-                    is_reconnecting: Arc::new(false.into()),
-                };
+                self.pipe = Some(pipe.into());
 
-                return Ok(client);
+                return Ok(());
             }
         }
 

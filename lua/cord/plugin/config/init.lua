@@ -84,6 +84,7 @@
 ---@class CordAdvancedDiscordReconnectConfig
 ---@field enabled? boolean Whether reconnection is enabled
 ---@field interval? integer Reconnection interval in milliseconds, 0 to disable
+---@field initial? boolean Whether to reconnect if initial connection fails
 
 ---@alias CordVariablesConfig { [string]: string|fun(opts: CordOpts):string }
 
@@ -175,6 +176,7 @@ M.opts = {
       reconnect = {
         enabled = false,
         interval = 5000,
+        initial = true,
       },
     },
   },
