@@ -20,7 +20,7 @@ require('cord').setup {
 
 ## Available Plugins
 
-### Diagnostics
+### Diagnostics (`cord.plugins.diagnostics`)
 Adds diagnostic information.
 
 #### Configuration
@@ -53,3 +53,17 @@ text = {
   workspace = function(opts) return 'In ' .. opts.workspace_name .. ' - ' .. opts.diagnostics(opts) .. ' problems' end,
 }
 ```
+
+### Local Time (`cord.plugins.local_time`)
+Displays the local clock time as the start timestamp.
+
+#### Configuration
+```lua
+{
+  -- whether to override the timestamp for the idle status
+  affect_idle = true,
+}
+```
+
+It will also add the following variables:
+  - `local_timestamp` - the zeroed timestamp of the current local time
