@@ -170,14 +170,15 @@ require('cord').setup {
 
 ## 🪝 Hooks
 
-| Option                      | Type                       | Description                                                                                                        |
-| --------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `hooks.on_ready`            | `function(manager)`        | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
-| `hooks.on_update`           | `function(opts)`           | Called before building activity ([opts](#options-table))                                                           |
-| `hooks.on_activity`         | `function(opts, activity)` | Called before sending the built regular activity ([opts](#options-table), [activity](#activity-options))           |
-| `hooks.on_idle`             | `function(opts)`           | Called before sending the built idle activity ([opts](#options-table))                                             |
-| `hooks.on_workspace_change` | `function(opts)`           | Called when workspace changes ([opts](#options-table))                                                             |
-| `hooks.on_disconnect`       | `function`                 | Called when server disconnects                                                                                     |
+| Option                   | Type                       | Description                                                                                                        |
+| ------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `hooks.ready`            | `function(manager)`        | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
+| `hooks.shutdown`         | `function()`               | Called when connection to Discord is closed                                                                        |
+| `hooks.pre_activity`     | `function(opts)`           | Called before building activity ([opts](#options-table))                                                           |
+| `hooks.post_activity`    | `function(opts, activity)` | Called after building activity, but before sending it ([opts](#options-table), [activity](#activity))              |
+| `hooks.idle`             | `function(opts)`           | Called when entering idle state ([opts](#options-table))                                                           |
+| `hooks.unidle`           | `function(opts)`           | Called when leaving idle state ([opts](#options-table))                                                            |
+| `hooks.workspace_change` | `function(opts)`           | Called when workspace changes ([opts](#options-table))                                                             |
 
 ## ⚙️ Advanced
 
