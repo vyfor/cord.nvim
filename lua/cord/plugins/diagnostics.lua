@@ -1,5 +1,5 @@
 local M = {
-  diagnostics = 0,
+  diagnostic_count = 0,
   config = {
     scope = nil,
     severity = { min = vim.diagnostic.severity.WARN },
@@ -21,24 +21,31 @@ M.setup = function(config)
     name = 'Diagnostics',
 
     variables = {
-      diagnostics = function() return M.diagnostics end,
+      diagnostic = function() return M.diagnostics end,
+      diagnostics = function() return M.diagnostic_count end,
     },
 
     config = M.config.override and {
       text = {
         workspace = M.config.scope == nil and function(opts)
           local text = 'In ' .. opts.workspace_name
-          if M.diagnostics > 0 then text = text .. ' - ' .. M.diagnostics .. ' problems' end
+          if M.diagnostic_count > 0 then
+            text = text .. ' - ' .. M.diagnostic_count .. ' problems'
+          end
           return text
         end or nil,
         viewing = M.config.scope == 0 and function(opts)
           local text = 'Viewing ' .. opts.filename
-          if M.diagnostics > 0 then text = text .. ' - ' .. M.diagnostics .. ' problems' end
+          if M.diagnostic_count > 0 then
+            text = text .. ' - ' .. M.diagnostic_count .. ' problems'
+          end
           return text
         end or nil,
         editing = M.config.scope == 0 and function(opts)
           local text = 'Editing ' .. opts.filename
-          if M.diagnostics > 0 then text = text .. ' - ' .. M.diagnostics .. ' problems' end
+          if M.diagnostic_count > 0 then
+            text = text .. ' - ' .. M.diagnostic_count .. ' problems'
+          end
           return text
         end or nil,
       },
@@ -70,11 +77,14 @@ M.validate = function(config)
 end
 
 M.get_diagnostics = function()
-  return #vim.diagnostic.get(M.config.scope, { severity = M.config.severity })
+  return vim.diagnostic.get(M.config.scope, { severity = M.config.severity })
 end
 
 vim.api.nvim_create_autocmd('DiagnosticChanged', {
-  callback = function() M.diagnostics = M.get_diagnostics() end,
+  callback = function()
+    M.diagnostics = M.get_diagnostics()
+    M.diagnostic_count = #M.diagnostics
+  end,
   group = vim.api.nvim_create_augroup('CordDiagnosticsPlugin', { clear = true }),
 })
 
