@@ -1,17 +1,13 @@
 local M = {}
 
 M.build = function()
-  require('cord.core.async').run(
-    function() require('cord.server.update').build():await() end
-  )
+  require('cord.core.async').run(function() require('cord.server.update').build():await() end)
 end
 M.fetch = function()
-  require('cord.core.async').run(
-    function() require('cord.server.update').fetch():await() end
-  )
+  require('cord.core.async').run(function() require('cord.server.update').fetch():await() end)
 end
 M.update = function()
-  local mode = require('cord.plugin.config').opts.advanced.server.update
+  local mode = require('cord.plugin.config').advanced.server.update
 
   if mode == 'fetch' then
     M.fetch()
@@ -109,9 +105,7 @@ M.check_version = function()
   )
 end
 M.version = function()
-  require('cord.core.async').run(
-    function() require('cord.server.update').version():await() end
-  )
+  require('cord.core.async').run(function() require('cord.server.update').version():await() end)
 end
 
 M.handle = function(args)

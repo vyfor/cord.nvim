@@ -1,7 +1,7 @@
 local config_utils = require 'cord.plugin.config.util'
 local mappings = require 'cord.plugin.activity.mappings'
 local icons = require 'cord.api.icon'
-local config = require('cord.plugin.config').opts
+local config = require 'cord.plugin.config'
 
 local function get_custom_asset(config, filename, filetype)
   if not config.assets then return end
@@ -20,22 +20,25 @@ local function get_custom_asset(config, filename, filetype)
   if icon then return icon, 'Cord.override' end
 end
 
-local text_config = {
-  workspace = config.text.workspace,
-  viewing = config.text.viewing,
-  editing = config.text.editing,
-  file_browser = config.text.file_browser,
-  plugin_manager = config.text.plugin_manager,
-  lsp = config.text.lsp,
-  docs = config.text.docs,
-  vcs = config.text.vcs,
-  notes = config.text.notes,
-  debug = config.text.debug,
-  test = config.text.test,
-  diagnostics = config.text.diagnostics,
-  games = config.text.games,
-  dashboard = config.text.dashboard,
-}
+local text_config
+local function update_text_config()
+  text_config = {
+    workspace = config.text.workspace,
+    viewing = config.text.viewing,
+    editing = config.text.editing,
+    file_browser = config.text.file_browser,
+    plugin_manager = config.text.plugin_manager,
+    lsp = config.text.lsp,
+    docs = config.text.docs,
+    vcs = config.text.vcs,
+    notes = config.text.notes,
+    debug = config.text.debug,
+    test = config.text.test,
+    diagnostics = config.text.diagnostics,
+    games = config.text.games,
+    dashboard = config.text.dashboard,
+  }
+end
 
 ---@return Activity|boolean
 local function build_activity(opts)
@@ -178,4 +181,5 @@ end
 return {
   build_activity = build_activity,
   build_idle_activity = build_idle_activity,
+  update_text_config = update_text_config,
 }
