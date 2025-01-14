@@ -69,6 +69,7 @@ require('cord').setup {
     on_workspace_change = nil,
     on_disconnect = nil,
   },
+  plugins = nil,
   advanced = {
     plugin = {
       autocmds = true,
@@ -179,6 +180,14 @@ require('cord').setup {
 | `hooks.idle`             | `function(opts)`           | Called when entering idle state ([opts](#options-table))                                                           |
 | `hooks.unidle`           | `function(opts)`           | Called when leaving idle state ([opts](#options-table))                                                            |
 | `hooks.workspace_change` | `function(opts)`           | Called when workspace changes ([opts](#options-table))                                                             |
+
+## 🔌 Plugins
+
+| Option    | Type                               | Description                                                                                             |
+| --------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `plugins` | `string[] \| table<string, table>` | Extend Cord with plugins. See the [Wiki](https://github.com/vyfor/cord.nvim/wiki/Plugins) for more info |
+
+> If you want to develop your own plugin, check out Cord's [Plugin System](https://github.com/vyfor/cord.nvim/wiki/Plugin-System)
 
 ## ⚙️ Advanced
 
