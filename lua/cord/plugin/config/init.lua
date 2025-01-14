@@ -53,12 +53,17 @@
 ---@field type? string|fun(opts: CordOpts):string Asset type
 
 ---@class CordHooksConfig
----@field on_ready? fun(manager: ActivityManager):nil
----@field on_update? fun(opts: CordOpts):nil
----@field on_activity? fun(opts: CordOpts, activity: Activity):nil
----@field on_idle? fun(opts: CordOpts, activity: Activity?):nil
----@field on_workspace_change? fun(opts: CordOpts):nil
----@field on_disconnect? fun():nil
+---@field ready? fun(manager: ActivityManager):nil
+---@field shutdown? fun():nil
+---@field pre_activity? fun(opts: CordOpts):nil
+---@field post_activity? fun(opts: CordOpts, activity: Activity):nil
+---@field idle? fun(opts: CordOpts):nil
+---@field unidle? fun(opts: CordOpts):nil
+---@field workspace_change? fun(opts: CordOpts):nil
+
+---@class CordPluginsConfig
+---@field name string Plugin name
+---@field config? table Plugin configuration
 
 ---@class CordAdvancedConfig
 ---@field plugin? CordAdvancedPluginConfig configuration
@@ -98,12 +103,13 @@
 ---@field assets? CordAssetConfig[] Assets configuration
 ---@field variables? boolean|CordVariablesConfig Variables configuration. If true, uses default options table. If table, extends default table. If false, disables custom variables.
 ---@field hooks? CordHooksConfig Hooks configuration
+---@field plugins? string[]|CordPluginsConfig[] Plugin configuration
 ---@field advanced? CordAdvancedConfig Advanced configuration
 
+---@class CordConfig
 local M = {}
 
----@type CordConfig
-M.opts = {
+local defaults = {
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',
@@ -151,13 +157,15 @@ M.opts = {
   assets = nil,
   variables = nil,
   hooks = {
-    on_ready = nil,
-    on_update = nil,
-    on_activity = nil,
-    on_idle = nil,
-    on_workspace_change = nil,
-    on_disconnect = nil,
+    ready = nil,
+    shutdown = nil,
+    pre_activity = nil,
+    post_activity = nil,
+    idle_enter = nil,
+    idle_leave = nil,
+    workspace_change = nil,
   },
+  plugins = nil,
   advanced = {
     plugin = {
       autocmds = true,
@@ -182,6 +190,9 @@ M.opts = {
   },
 }
 
-M.set_config = function(config) M.opts = config end
+M.get = function() return defaults end
+M.set = function(config) defaults = config end
 
-return M
+return setmetatable(M, {
+  __index = function(_, key) return defaults[key] end,
+})
