@@ -19,6 +19,7 @@ M.setup = function(config)
 
   return {
     name = 'Diagnostics',
+    description = 'Displays diagnostic information',
 
     variables = {
       diagnostic = function() return M.diagnostics end,
