@@ -1,7 +1,7 @@
 local M = {
   diagnostic_count = 0,
   config = {
-    scope = nil,
+    scope = 0,
     severity = { min = vim.diagnostic.severity.WARN },
     override = true,
   },
