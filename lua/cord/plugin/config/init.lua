@@ -74,7 +74,6 @@
 ---@field autocmds? boolean Whether to enable autocmds
 ---@field log_level? integer Logging level (from `vim.log.levels`)
 ---@field cursor_update? string Cursor update mode
----@field variables_in_functions? boolean Whether to use variables in functions
 ---@field match_in_mappings? boolean Whether to match against file extensions in mappings
 
 ---@class CordAdvancedServerConfig
@@ -171,7 +170,6 @@ local defaults = {
       autocmds = true,
       log_level = vim.log.levels.INFO,
       cursor_update = 'on_hold',
-      variables_in_functions = false,
       match_in_mappings = true,
     },
     server = {
