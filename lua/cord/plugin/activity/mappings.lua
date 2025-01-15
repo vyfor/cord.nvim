@@ -1,4 +1,4 @@
-local config = require('cord.plugin.config').opts
+local config = require 'cord.plugin.config'
 
 local M = {}
 

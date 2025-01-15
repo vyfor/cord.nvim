@@ -32,6 +32,7 @@
 - 🧠 **Automated State Handling** — Automatically manages activities across all instances.
 - 💤 **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
 - 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS files without relying on command-line tools.
+- 🔌 **Plugin System** — Extendable with custom plugins, with plenty of built-in ones out of the box.
 - 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
 - 🌸 **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
 - 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.

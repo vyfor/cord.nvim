@@ -65,7 +65,7 @@ function M:run()
           M.tx:initialize(self.config)
 
           local ActivityManager = require 'cord.plugin.activity.manager'
-          local manager, err = ActivityManager.new({ tx = M.tx, config = self.config }):get()
+          local manager, err = ActivityManager.new({ tx = M.tx }):get()
           if not manager or err then
             self.status = 'disconnected'
             self.client:close()
@@ -76,7 +76,7 @@ function M:run()
           M.client.on_close = vim.schedule_wrap(function()
             M.status = 'disconnected'
             if M.manager then M.manager:cleanup() end
-            if self.config.hooks.on_disconnect then self.config.hooks.on_disconnect() end
+            require('cord.plugin.activity.hooks').run 'shutdown'
           end)
 
           manager:run()
@@ -88,7 +88,7 @@ function M:run()
             vim.schedule_wrap(function()
               self.status = 'connected'
               M.manager:cleanup()
-              if self.config.hooks.on_disconnect then self.config.hooks.on_disconnect() end
+              require('cord.plugin.activity.hooks').run 'shutdown'
 
               if self.config.advanced.discord.reconnect.enabled then
                 logger.info 'Reconnecting...'

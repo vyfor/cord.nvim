@@ -93,7 +93,7 @@ text = {
 
 -- or simply hide the activity when in a blacklisted workspace
 hooks = {
-  on_workspace_change = function(opts)
+  workspace_change = function(opts)
     if is_blacklisted(opts) then
       opts.manager:hide()
     else 
@@ -120,7 +120,7 @@ text = {
 }
 
 hooks = {
-  on_workspace_change = function(opts)
+  workspace_change = function(opts)
     git_branch = vim.fn.system('git branch --show-current'):gsub('\n', '')
   end
 }
@@ -146,11 +146,11 @@ text = {
 ### LSP-Aware Status
 ```lua
 local get_errors = function(bufnr) return vim.diagnostic.get(bufnr, { severity = vim.diagnostic.severity.ERROR }) end
-local errors = get_errors(vim.api.nvim_get_current_buf()) -- pass the current buffer; pass nil to get errors for all buffers
+local errors = get_errors(0) -- pass the current buffer; pass nil to get errors for all buffers
 
 vim.api.nvim_create_autocmd('DiagnosticChanged', {
   callback = function()
-    errors = get_errors(vim.api.nvim_get_current_buf())
+    errors = get_errors(0)
   end
 })
 
@@ -245,7 +245,7 @@ local quotes = {
 }
 
 hooks = {
-  on_activity = function(_, activity)
+  post_activity = function(_, activity)
     activity.details = quotes[math.random(#quotes)]
   end
 }

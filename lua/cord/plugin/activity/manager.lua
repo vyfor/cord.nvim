@@ -2,6 +2,8 @@ local async = require 'cord.core.async'
 local activities = require 'cord.plugin.activity'
 local ws_utils = require 'cord.plugin.fs.workspace'
 local config_utils = require 'cord.plugin.config.util'
+local hooks = require 'cord.plugin.activity.hooks'
+local config = require 'cord.plugin.config'
 
 local uv = vim.loop or vim.uv
 
@@ -64,7 +66,6 @@ local mt = { __index = ActivityManager }
 ---@param opts {config: CordConfig, tx: table} Configuration and transmitter options
 ActivityManager.new = async.wrap(function(opts)
   local self = setmetatable({
-    config = opts.config,
     tx = opts.tx,
     is_focused = true,
     is_paused = false,
@@ -72,6 +73,10 @@ ActivityManager.new = async.wrap(function(opts)
     events_enabled = true,
     workspace_cache = {},
   }, mt)
+
+  for k, v in pairs(config.hooks) do
+    hooks.register(k, v, hooks.PRIORITY.HIGHEST)
+  end
 
   local rawdir = vim.fn.expand '%:p:h'
   local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
@@ -90,6 +95,10 @@ ActivityManager.new = async.wrap(function(opts)
 
   self.workspace_cache[rawdir] = cache
 
+  local err = require('cord.api.plugin').init()
+  if err then error(err, 0) end
+  activities.update_text_config()
+
   return self
 end)
 
@@ -99,16 +108,16 @@ function ActivityManager:run()
   self.workspace_name = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.last_updated = uv.now()
 
-  if self.config.hooks.on_ready then self.config.hooks.on_ready(self) end
+  hooks.run('ready', self)
 
   self:queue_update(true)
-  if self.config.advanced.plugin.autocmds then self:setup_autocmds() end
+  if config.advanced.plugin.autocmds then self:setup_autocmds() end
 
-  if self.config.idle.enabled then
+  if config.idle.enabled then
     self.idle_timer = uv.new_timer()
     self.idle_timer:start(
       0,
-      self.config.idle.timeout,
+      config.idle.timeout,
       vim.schedule_wrap(function() self:check_idle() end)
     )
   end
@@ -145,6 +154,7 @@ function ActivityManager:queue_update(force_update)
 
   self.opts = self:build_opts()
   if not self.is_force_idle and (force_update or self:should_update()) then
+    if self.is_idle then hooks.run('idle_leave', self.opts) end
     self:update_activity()
   end
 end
@@ -153,20 +163,17 @@ end
 ---@return nil
 function ActivityManager:check_idle()
   if not self.events_enabled then return end
-  if not self.config.idle.enabled and not self.is_force_idle then return end
+  if not config.idle.enabled and not self.is_force_idle then return end
   if self.is_idle then return end
 
   local time_elapsed = uv.now() - self.last_updated
   if
     self.is_force_idle
-    or (
-      time_elapsed >= self.config.idle.timeout
-      and (self.config.idle.ignore_focus or not self.is_focused)
-    )
+    or (time_elapsed >= config.idle.timeout and (config.idle.ignore_focus or not self.is_focused))
   then
     self:update_idle_activity()
   else
-    local time_remaining = self.config.idle.timeout - time_elapsed
+    local time_remaining = config.idle.timeout - time_elapsed
     self.idle_timer:stop()
     self.idle_timer:start(
       time_remaining,
@@ -174,7 +181,7 @@ function ActivityManager:check_idle()
       vim.schedule_wrap(function()
         self.idle_timer:start(
           0,
-          self.config.idle.timeout,
+          config.idle.timeout,
           vim.schedule_wrap(function() self:check_idle() end)
         )
       end)
@@ -190,18 +197,16 @@ function ActivityManager:update_idle_activity()
   self.is_idle = true
   self.last_updated = uv.now()
 
-  if self.config.idle.show_status then
+  if config.idle.show_status then
     local buttons = config_utils:get_buttons(self.opts)
     self.opts.buttons = buttons
-    if self.config.timestamp.enabled and self.config.timestamp.reset_on_idle then
+    if config.timestamp.enabled and config.timestamp.reset_on_idle then
       self.opts.timestamp = os.time()
     end
 
-    if self.config.hooks.on_update then self.config.hooks.on_update(self.opts) end
-
     local activity = activities.build_idle_activity(self.opts)
 
-    if self.config.hooks.on_idle then self.config.hooks.on_idle(self.opts, activity) end
+    hooks.run('post_activity', self.opts, activity)
 
     if self.should_skip_update then
       self.should_skip_update = false
@@ -209,8 +214,9 @@ function ActivityManager:update_idle_activity()
     end
 
     self.tx:update_activity(activity)
+    hooks.run('idle_enter', self.opts)
   else
-    if self.config.hooks.on_idle then self.config.hooks.on_idle(self.opts) end
+    hooks.run('post_activity', self.opts)
 
     if self.should_skip_update then
       self.should_skip_update = false
@@ -218,6 +224,7 @@ function ActivityManager:update_idle_activity()
     end
 
     self.tx:clear_activity()
+    hooks.run('idle_enter', self.opts)
   end
 end
 
@@ -230,14 +237,13 @@ function ActivityManager:update_activity()
   self.last_updated = uv.now()
   self.opts.is_idle = false
 
-  if self.config.hooks.on_update then self.config.hooks.on_update(self.opts) end
+  hooks.run('pre_activity', self.opts)
 
   local activity = activities.build_activity(self.opts)
   if activity == true then return end
   if activity == false then return self:clear_activity() end
 
-  ---@diagnostic disable-next-line: param-type-mismatch -- ensured to be of type Activity
-  if self.config.hooks.on_activity then self.config.hooks.on_activity(self.opts, activity) end
+  hooks.run('post_activity', self.opts, activity)
 
   if self.should_skip_update then
     self.should_skip_update = false
@@ -271,7 +277,7 @@ function ActivityManager:resume()
     self.idle_timer:stop()
     self.idle_timer:start(
       0,
-      self.config.idle.timeout,
+      config.idle.timeout,
       vim.schedule_wrap(function() self:check_idle() end)
     )
   end
@@ -342,13 +348,13 @@ function ActivityManager:setup_autocmds()
     augroup END
   ]]
 
-  if self.config.advanced.plugin.cursor_update == 'on_hold' then
+  if config.advanced.plugin.cursor_update == 'on_hold' then
     vim.cmd [[
       augroup CordActivityManager
         autocmd CursorHold,CursorHoldI * lua require'cord.server'.manager:on_cursor_update()
       augroup END
     ]]
-  elseif self.config.advanced.plugin.cursor_update == 'on_move' then
+  elseif config.advanced.plugin.cursor_update == 'on_move' then
     vim.cmd [[
       augroup CordActivityManager
         autocmd CursorMoved,CursorMovedI * lua require'cord.server'.manager:on_cursor_update()
@@ -380,8 +386,8 @@ function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
 ---Check if the time should be updated
 ---@return boolean Whether the time should be updated
 function ActivityManager:should_update_time()
-  return self.config.timestamp.enabled
-      and (self.config.timestamp.reset_on_change or self.config.timestamp.reset_on_idle and self.is_idle)
+  return config.timestamp.enabled
+      and (config.timestamp.reset_on_change or config.timestamp.reset_on_idle and self.is_idle)
     or false
 end
 
@@ -399,9 +405,7 @@ function ActivityManager:on_buf_enter()
       self.opts.workspace_name = self.workspace_name
       self.opts.repo_url = self.repo_url
 
-      if self.config.hooks.on_workspace_change then
-        self.config.hooks.on_workspace_change(self.opts)
-      end
+      hooks.run('workspace_change', self.opts)
     end
 
     self:queue_update()
@@ -415,9 +419,7 @@ function ActivityManager:on_buf_enter()
       self.opts.workspace_name = nil
       self.opts.repo_url = nil
 
-      if self.config.hooks.on_workspace_change then
-        self.config.hooks.on_workspace_change(self.opts)
-      end
+      hooks.run('workspace_change', self.opts)
     end
 
     self:queue_update()
@@ -449,9 +451,7 @@ function ActivityManager:on_buf_enter()
       repo_url = self.repo_url,
     }
 
-    if self.config.hooks.on_workspace_change then
-      self.config.hooks.on_workspace_change(self.opts)
-    end
+    hooks.run('workspace_change', self.opts)
 
     self:queue_update()
   end)
@@ -464,7 +464,7 @@ function ActivityManager:on_focus_gained()
   self.is_focused = true
   self.opts.is_focused = true
 
-  if self.config.idle.unidle_on_focus then self:queue_update(true) end
+  if config.idle.unidle_on_focus then self:queue_update(true) end
 end
 
 ---Handle focus lost event
@@ -499,7 +499,7 @@ function ActivityManager:build_opts()
     is_focused = self.is_focused,
     is_idle = self.is_idle,
   }
-  if self.config.timestamp.enabled then
+  if config.timestamp.enabled then
     if self.last_opts and self.last_opts.timestamp then
       opts.timestamp = self.last_opts.timestamp
     else
