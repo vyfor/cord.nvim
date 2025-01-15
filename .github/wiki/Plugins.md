@@ -67,3 +67,26 @@ Displays the local clock time as the start timestamp.
 
 It will also add the following variables:
   - `local_timestamp` - the zeroed timestamp of the current local time
+  
+>[!NOTE]
+> Incompatible with `cord.plugins.scoped_timestamps`
+
+### Scoped Timestamps (`cord.plugins.scoped_timestamps`)
+Tracks elapsed time independently for each buffer, with optional pause/resume functionality when switching between buffers.
+
+#### Configuration
+```lua
+{
+  -- 'buffer', 'workspace', or 'idle'
+  scope = 'buffer',
+  -- If true, time tracking "pauses" when switching buffers and "resumes" where it left off when returning
+  -- If false, timestamps are fixed once set
+  pause = true,
+}
+```
+
+It will also add the following variables:
+  - `get_scoped_timestamp` - a function that returns the timestamp for the current scope
+
+>[!NOTE]
+> Incompatible with `cord.plugins.local_time`
