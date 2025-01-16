@@ -60,6 +60,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Git
+        run: |
+          git checkout client-server
+          git pull
+
       - name: Cache Cargo
         uses: actions/cache@v4
         id: cargo-cache
@@ -181,6 +186,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Git
+        run: |
+          git checkout client-server
+          git pull
+
       - name: Cache Cargo
         uses: actions/cache@v4
         id: cargo-cache
@@ -229,6 +239,11 @@ jobs:
         with:
           fetch-depth: 0
           ref: client-server
+
+      - name: Setup Git
+        run: |
+          git checkout client-server
+          git pull
 
       - name: Set LuaRocks version
         id: set_version
