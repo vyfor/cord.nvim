@@ -111,7 +111,7 @@ function ActivityManager:run()
   hooks.run('ready', self)
 
   self:queue_update(true)
-  if config.advanced.plugin.autocmds then self:setup_autocmds() end
+  if config.advanced.plugin.autocmds then self.setup_autocmds() end
 
   if config.idle.enabled then
     self.idle_timer = uv.new_timer()
@@ -198,7 +198,7 @@ function ActivityManager:update_idle_activity()
   self.last_updated = uv.now()
 
   if config.idle.show_status then
-    local buttons = config_utils:get_buttons(self.opts)
+    local buttons = config_utils.get_buttons(self.opts)
     self.opts.buttons = buttons
     if config.timestamp.enabled and config.timestamp.reset_on_idle then
       self.opts.timestamp = os.time()
@@ -342,7 +342,7 @@ end
 
 ---Setup autocmds
 ---@return nil
-function ActivityManager:setup_autocmds()
+function ActivityManager.setup_autocmds()
   vim.cmd [[
     augroup CordActivityManager
       autocmd!
@@ -511,7 +511,7 @@ function ActivityManager:build_opts()
     end
   end
   if self:should_update_time() then opts.timestamp = os.time() end
-  local buttons = config_utils:get_buttons(opts)
+  local buttons = config_utils.get_buttons(opts)
   opts.buttons = buttons
 
   return opts

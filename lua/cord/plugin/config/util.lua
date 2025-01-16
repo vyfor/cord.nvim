@@ -50,7 +50,7 @@ function M:validate(user_config)
   return final_config
 end
 
-function M:get(option, args)
+function M.get(option, args)
   local ty = type(option)
 
   local variables = config.variables
@@ -75,7 +75,7 @@ function M:get(option, args)
   return ty == 'function' and option(args) or option
 end
 
-function M:get_buttons(opts)
+function M.get_buttons(opts)
   if not config.buttons then return {} end
 
   local buttons = {}

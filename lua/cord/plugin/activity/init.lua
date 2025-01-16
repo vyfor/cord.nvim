@@ -62,12 +62,12 @@ local function build_activity(opts)
     if type(custom_icon) == 'string' then
       opts.icon = custom_icon
     else
-      opts.name = config_utils:get(custom_icon.name, opts)
-      opts.tooltip = config_utils:get(custom_icon.tooltip, opts) or tooltip
+      opts.name = config_utils.get(custom_icon.name, opts)
+      opts.tooltip = config_utils.get(custom_icon.tooltip, opts) or tooltip
       opts.type = custom_icon.type or icon_type
-      opts.text = config_utils:get(custom_icon.text, opts)
+      opts.text = config_utils.get(custom_icon.text, opts)
       opts.filetype = override_type or opts.filetype
-      opts.icon = config_utils:get(custom_icon.icon, opts) or icon
+      opts.icon = config_utils.get(custom_icon.icon, opts) or icon
     end
   end
 
@@ -77,16 +77,16 @@ local function build_activity(opts)
   else
     if opts.type == 'language' then
       if opts.is_read_only then
-        local text = config_utils:get(text_config.viewing, opts)
+        local text = config_utils.get(text_config.viewing, opts)
         if text == true or text == false then return text end
         if text ~= '' then file_text = text end
       else
-        local text = config_utils:get(text_config.editing, opts)
+        local text = config_utils.get(text_config.editing, opts)
         if text == true or text == false then return text end
         if text ~= '' then file_text = text end
       end
     else
-      local text = config_utils:get(text_config[opts.type], opts)
+      local text = config_utils.get(text_config[opts.type], opts)
       if text == true or text == false then return text end
       if text ~= '' then file_text = text end
     end
@@ -94,12 +94,12 @@ local function build_activity(opts)
 
   local details, state
   if config.display.swap_fields then
-    local workspace = config_utils:get(text_config.workspace, opts)
+    local workspace = config_utils.get(text_config.workspace, opts)
     if workspace == true or workspace == false then return workspace end
     if workspace ~= '' then details = workspace end
     state = file_text
   else
-    local workspace = config_utils:get(text_config.workspace, opts)
+    local workspace = config_utils.get(text_config.workspace, opts)
     if workspace == true or workspace == false then return workspace end
     if workspace ~= '' then state = workspace end
     details = file_text
@@ -108,17 +108,17 @@ local function build_activity(opts)
   local large_image, large_text, small_image, small_text
   if opts.filetype == 'Cord.new' then
     large_image = config.editor.icon
-    large_text = config_utils:get(config.editor.tooltip, opts)
+    large_text = config_utils.get(config.editor.tooltip, opts)
   elseif config.display.swap_icons then
     large_image = config.editor.icon
-    large_text = config_utils:get(config.editor.tooltip, opts)
+    large_text = config_utils.get(config.editor.tooltip, opts)
     small_image = opts.icon
     small_text = opts.tooltip or opts.filetype
   else
     large_image = opts.icon
     large_text = opts.tooltip or opts.filetype
     small_image = config.editor.icon
-    small_text = config_utils:get(config.editor.tooltip, opts)
+    small_text = config_utils.get(config.editor.tooltip, opts)
   end
 
   return {
@@ -141,24 +141,24 @@ end
 local function build_idle_activity(opts)
   local details, state
   if config.display.swap_fields then
-    details = config_utils:get(config.idle.state, opts)
-    state = config_utils:get(config.idle.details, opts)
+    details = config_utils.get(config.idle.state, opts)
+    state = config_utils.get(config.idle.details, opts)
   else
-    details = config_utils:get(config.idle.details, opts)
-    state = config_utils:get(config.idle.state, opts)
+    details = config_utils.get(config.idle.details, opts)
+    state = config_utils.get(config.idle.state, opts)
   end
 
   local large_image, large_text, small_image, small_text
   if config.display.swap_icons then
     large_image = config.editor.icon
-    large_text = config_utils:get(config.editor.tooltip, opts)
-    small_image = config_utils:get(config.idle.icon, opts)
-    small_text = config_utils:get(config.idle.tooltip, opts)
+    large_text = config_utils.get(config.editor.tooltip, opts)
+    small_image = config_utils.get(config.idle.icon, opts)
+    small_text = config_utils.get(config.idle.tooltip, opts)
   else
-    large_image = config_utils:get(config.idle.icon, opts)
-    large_text = config_utils:get(config.idle.tooltip, opts)
+    large_image = config_utils.get(config.idle.icon, opts)
+    large_text = config_utils.get(config.idle.tooltip, opts)
     small_image = config.editor.icon
-    small_text = config_utils:get(config.editor.tooltip, opts)
+    small_text = config_utils.get(config.editor.tooltip, opts)
   end
 
   return {
