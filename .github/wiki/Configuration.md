@@ -335,6 +335,13 @@ require('cord').setup {
 
 ### User Commands
 
+>[!NOTE]
+> Autocompletion is fully supported.
+> To see the list of all available features, hit `<Tab>` after typing `:Cord enable`
+
+- `:Cord enable <feature>` - Enable a feature
+- `:Cord disable <feature>` - Disable a feature
+- `:Cord toggle <feature>` - Toggle a feature
 - `:Cord presence` - Toggle presence display
   - `:Cord presence toggle` - Toggle presence display
   - `:Cord presence show` - Show presence
@@ -348,8 +355,11 @@ require('cord').setup {
 - `:Cord update` - Update the server executable using the configured update mode (fetch by default)
   - `:Cord update fetch` - Fetch the server executable from GitHub using `curl`
   - `:Cord update build` - Build the server executable using `cargo`
+- `:Cord status` - Show connection status
+- `:Cord check` - Check for server updates
+- `:Cord version` - Show current server version
+- `:Cord restart` - Restart the server
 - `:Cord shutdown` - Disconnect from Discord and shutdown the server
-- `:Cord restart` - Restart the server executable
 
 ### Cursor Update Mode
 
