@@ -4,9 +4,27 @@ augroup Cord
 augroup END
 
 function! CordCompleteList(ArgLead, CmdLine, CmdPos)
-    let completions = ['version', 'check_version', 'status', 'update', 'build', 'fetch', 'show_presence', 'hide_presence', 'toggle_presence', 'clear_presence', 'idle', 'unidle', 'toggle_idle', 'restart', 'shutdown']
+    let l:starting_new_arg = a:ArgLead == '' && a:CmdLine[a:CmdPos-1] =~ '\s'
+    let l:args = split(a:CmdLine[:a:CmdPos-1], '\s\+')
     
-    return filter(completions, 'v:val =~ "^" . a:ArgLead')
+    if len(l:args) <= 1 || (len(l:args) == 2 && !l:starting_new_arg)
+        let l:commands = luaeval('require("cord.api.usercmd").get_commands()')
+        return filter(l:commands, 'stridx(v:val, a:ArgLead) == 0')
+    endif
+    
+    let l:main_cmd = l:args[1]
+    
+    if len(l:args) == 2 || (len(l:args) == 3 && !l:starting_new_arg)
+        if l:main_cmd =~ '^enable\|^disable\|^toggle'
+            let l:features = luaeval('require("cord.api.usercmd").get_features()')
+            return filter(l:features, 'stridx(v:val, a:ArgLead) == 0')
+        else
+            let l:subcommands = luaeval('require("cord.api.usercmd").get_subcommands(_A)', l:main_cmd)
+            return filter(l:subcommands, 'stridx(v:val, a:ArgLead) == 0')
+        endif
+    endif
+    
+    return []
 endfunction
 
-command! -nargs=1 -complete=customlist,CordCompleteList Cord lua require'cord.api.usercmd'.handle({<f-args>})
+command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.usercmd'.handle(<q-args>)

@@ -34,11 +34,15 @@ M.toggle_presence = function()
 end
 M.idle = function()
   local cord = require 'cord.server'
+  if cord.manager then cord.manager:idle() end
+end
+M.force_idle = function()
+  local cord = require 'cord.server'
   if cord.manager then cord.manager:force_idle() end
 end
 M.unidle = function()
   local cord = require 'cord.server'
-  if cord.manager then cord.manager:unforce_idle() end
+  if cord.manager then cord.manager:unidle() end
 end
 M.toggle_idle = function()
   local cord = require 'cord.server'
@@ -99,7 +103,7 @@ M.status = function()
     require('cord.plugin.log').info 'Status: Disconnected'
   end
 end
-M.check_version = function()
+M.check = function()
   require('cord.core.async').run(
     function() require('cord.server.update').check_version():await() end
   )
@@ -108,15 +112,147 @@ M.version = function()
   require('cord.core.async').run(function() require('cord.server.update').version():await() end)
 end
 
-M.handle = function(args)
-  local command = M[args[1]]
+M.features = {
+  idle = { path = { 'idle', 'enabled' }, on_disable = function() M.unidle() end },
+}
 
-  if command then
-    command()
+local function handle_feature(feature, enable)
+  local feat = M.features[feature]
+  if not feat then
+    require('cord.plugin.log').log_raw(
+      vim.log.levels.ERROR,
+      'Unknown feature: \'' .. feature .. '\''
+    )
+    return
+  end
+
+  local config = require 'cord.plugin.config'
+  local target = config
+  for i = 1, #feat.path - 1 do
+    target = target[feat.path[i]]
+  end
+
+  local last = feat.path[#feat.path]
+  if enable == true then
+    target[last] = true
+    if feat.on_disable then feat.on_disable() end
+  elseif enable == false then
+    target[last] = false
+    if feat.on_disable then feat.on_disable() end
+  else
+    target[last] = not target[last]
+    if target[last] then
+      if feat.on_enable then feat.on_enable() end
+    else
+      if feat.on_disable then feat.on_disable() end
+    end
+  end
+end
+
+M.commands = {
+  presence = {
+    default = M.toggle_presence,
+    subcommands = {
+      show = M.show_presence,
+      hide = M.hide_presence,
+      toggle = M.toggle_presence,
+      clear = M.clear_presence,
+    },
+  },
+  idle = {
+    default = M.toggle_idle,
+    subcommands = {
+      show = M.idle,
+      hide = M.unidle,
+      toggle = M.toggle_idle,
+      force = M.force_idle,
+    },
+  },
+  update = {
+    default = M.update,
+    subcommands = {
+      fetch = M.fetch,
+      build = M.build,
+    },
+  },
+  status = M.status,
+  check = M.check,
+  version = M.version,
+  restart = M.restart,
+  shutdown = M.shutdown,
+  enable = function(feature) handle_feature(feature, true) end,
+  disable = function(feature) handle_feature(feature, false) end,
+  toggle = function(feature) handle_feature(feature) end,
+}
+
+M.get_commands = function()
+  local cmds = {}
+  for cmd, _ in pairs(M.commands) do
+    table.insert(cmds, cmd)
+  end
+  return cmds
+end
+
+M.get_subcommands = function(cmd)
+  local command = M.commands[cmd]
+  if not command or not command.subcommands then return {} end
+
+  local subcmds = {}
+  for subcmd, _ in pairs(command.subcommands) do
+    table.insert(subcmds, subcmd)
+  end
+  return subcmds
+end
+
+M.get_features = function()
+  local feats = {}
+  for feat, _ in pairs(M.features) do
+    table.insert(feats, feat)
+  end
+  return feats
+end
+
+M.handle = function(q_args)
+  local args = vim.split(q_args, '%s+')
+  local args_len = #args
+  if args_len == 0 then
+    require('cord.plugin.log').log_raw(vim.log.levels.ERROR, 'No command provided')
+    return
+  end
+
+  local cmd = args[1]
+  local command = M.commands[cmd]
+
+  if not command then
+    require('cord.plugin.log').log_raw(vim.log.levels.ERROR, 'Unknown command: \'' .. cmd .. '\'')
+    return
+  end
+
+  local execute
+  if type(command) == 'function' then
+    execute = command
+  else
+    execute = command.default
+  end
+
+  if args_len == 1 then
+    execute()
+    return
+  end
+
+  local subcmd = args[2]
+
+  if cmd == 'enable' or cmd == 'disable' or cmd == 'toggle' then
+    execute(subcmd)
+    return
+  end
+
+  if command.subcommands and command.subcommands[subcmd] then
+    command.subcommands[subcmd]()
   else
     require('cord.plugin.log').log_raw(
       vim.log.levels.ERROR,
-      'Unknown command: ' .. '\'' .. args[1] .. '\''
+      'Unknown subcommand: \'' .. subcmd .. '\' for command \'' .. cmd .. '\''
     )
   end
 end

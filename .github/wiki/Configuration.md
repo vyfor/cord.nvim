@@ -335,16 +335,20 @@ require('cord').setup {
 
 ### User Commands
 
-- `:Cord toggle_presence` - Toggle presence visibility
-- `:Cord show_presence` - Show presence
-- `:Cord hide_presence` - Hide presence
-- `:Cord toggle_idle` - Toggle idle status
-- `:Cord idle` - Show idle status
-- `:Cord unidle` - Hide idle status
-- `:Cord clear_presence` - Clear the rich presence for all sessions
-- `:Cord build` - Build the server executable using `cargo`
-- `:Cord fetch` - Fetch the server executable from GitHub using `curl`
-- `:Cord update` - Update the server executable using the configured update mode
+- `:Cord presence` - Toggle presence display
+  - `:Cord presence toggle` - Toggle presence display
+  - `:Cord presence show` - Show presence
+  - `:Cord presence hide` - Hide presence
+  - `:Cord presence clear` - Clear the rich presence for all sessions
+- `:Cord idle` - Toggle idle state
+  - `:Cord idle toggle` - Toggle idle state
+  - `:Cord idle show` - Show idle state
+  - `:Cord idle hide` - Hide idle state
+  - `:Cord idle force` - Force idle state
+- `:Cord update` - Update the server executable using the configured update mode (fetch by default)
+  - `:Cord update fetch` - Fetch the server executable from GitHub using `curl`
+  - `:Cord update build` - Build the server executable using `cargo`
+- `:Cord shutdown` - Disconnect from Discord and shutdown the server
 - `:Cord restart` - Restart the server executable
 
 ### Cursor Update Mode

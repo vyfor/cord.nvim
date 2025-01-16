@@ -295,6 +295,10 @@ function ActivityManager:resume_events()
   self:queue_update(true)
 end
 
+---Set idle state
+---@return nil
+function ActivityManager:idle() self:update_idle_activity() end
+
 ---Force idle state
 ---@return nil
 function ActivityManager:force_idle()
@@ -304,7 +308,7 @@ end
 
 ---Unforce idle state
 ---@return nil
-function ActivityManager:unforce_idle()
+function ActivityManager:unidle()
   self.is_force_idle = false
   self:queue_update(true)
 end
@@ -312,10 +316,10 @@ end
 ---Toggle idle state
 ---@return nil
 function ActivityManager:toggle_idle()
-  if self.is_force_idle then
-    self:unforce_idle()
+  if self.is_force_idle or self.is_idle then
+    self:unidle()
   else
-    self:force_idle()
+    self:idle()
   end
 end
 
