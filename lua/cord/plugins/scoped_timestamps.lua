@@ -23,7 +23,7 @@ local function get_key(opts)
   elseif M.config.scope == 'workspace' then
     return opts.workspace_dir
   elseif M.config.scope == 'idle' then
-    if not opts.is_idle then return end
+    if not opts.is_idle then return 'Cord.active' end
     return 'Cord.idle'
   end
 end
@@ -101,11 +101,17 @@ M.setup = function(config)
         priority = 0,
       },
       idle_enter = user_config.timestamp.reset_on_idle and {
-        fn = function() M.timestamps['Cord.idle'] = os.time() end,
+        fn = function()
+          M.timestamps['Cord.idle'] = nil
+          M.timestamps['Cord.active'] = nil
+        end,
         priority = 0,
       } or nil,
       idle_leave = user_config.timestamp.reset_on_idle and {
-        fn = function() M.timestamps['Cord.idle'] = os.time() end,
+        fn = function()
+          M.timestamps['Cord.idle'] = nil
+          M.timestamps['Cord.active'] = nil
+        end,
         priority = 0,
       } or nil,
     } or nil,
