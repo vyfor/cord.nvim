@@ -9,7 +9,7 @@ local M = {
 
 M.setup = function(config)
   if config then
-    local err = require('cord.plugin.config.util'):validate(config)
+    local err = M.validate(config)
     if err then
       error(err, 0)
     else
