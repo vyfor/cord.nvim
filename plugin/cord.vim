@@ -27,4 +27,4 @@ function! CordCompleteList(ArgLead, CmdLine, CmdPos)
     return []
 endfunction
 
-command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.usercmd'.handle(<q-args>)
+command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.usercmd'.handle('<q-args>')

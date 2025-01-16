@@ -213,7 +213,7 @@ M.get_features = function()
 end
 
 M.handle = function(q_args)
-  local args = vim.split(q_args, '%s+')
+  local args = vim.split(q_args:gsub('"', ''), '%s+')
   local args_len = #args
   if args_len == 0 then
     require('cord.plugin.log').log_raw(vim.log.levels.ERROR, 'No command provided')
@@ -247,7 +247,7 @@ M.handle = function(q_args)
     return
   end
 
-  if command.subcommands and command.subcommands[subcmd] then
+  if type(command) == 'table' and command.subcommands and command.subcommands[subcmd] then
     command.subcommands[subcmd]()
   else
     require('cord.plugin.log').log_raw(
