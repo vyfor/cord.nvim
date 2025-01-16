@@ -26,20 +26,20 @@
 ---@field icon? string|fun(opts: CordOpts):string Idle icon
 
 ---@class CordTextConfig
----@field workspace? string|fun(opts: CordOpts):string|boolean Text for workspace activity
----@field viewing? string|fun(opts: CordOpts):string|boolean Text for viewing activity
----@field editing? string|fun(opts: CordOpts):string|boolean Text for editing activity
----@field file_browser? string|fun(opts: CordOpts):string|boolean Text for file browser activity
----@field plugin_manager? string|fun(opts: CordOpts):string|boolean Text for plugin manager activity
----@field lsp? string|fun(opts: CordOpts):string|boolean Text for LSP manager activity
----@field docs? string|fun(opts: CordOpts):string|boolean Text for documentation activity
----@field vcs? string|fun(opts: CordOpts):string|boolean Text for VCS activity
----@field notes? string|fun(opts: CordOpts):string|boolean Text for notes activity
----@field debug? string|fun(opts: CordOpts):string|boolean Text for debugging-related plugin activity
----@field test? string|fun(opts: CordOpts):string|boolean Text for testing-related plugin activity
----@field games? string|fun(opts: CordOpts):string|boolean Text for games activity
----@field diagnostics? string|fun(opts: CordOpts):string|boolean Text for diagnostics activity
----@field dashboard? string|fun(opts: CordOpts):string|boolean Text for dashboard activity
+---@field workspace? string|fun(opts: CordOpts):string|boolean|nil Text for workspace activity
+---@field viewing? string|fun(opts: CordOpts):string|boolean|nil Text for viewing activity
+---@field editing? string|fun(opts: CordOpts):string|boolean|nil Text for editing activity
+---@field file_browser? string|fun(opts: CordOpts):string|boolean|nil Text for file browser activity
+---@field plugin_manager? string|fun(opts: CordOpts):string|boolean|nil Text for plugin manager activity
+---@field lsp? string|fun(opts: CordOpts):string|boolean|nil Text for LSP manager activity
+---@field docs? string|fun(opts: CordOpts):string|boolean|nil Text for documentation activity
+---@field vcs? string|fun(opts: CordOpts):string|boolean|nil Text for VCS activity
+---@field notes? string|fun(opts: CordOpts):string|boolean|nil Text for notes activity
+---@field debug? string|fun(opts: CordOpts):string|boolean|nil Text for debugging-related plugin activity
+---@field test? string|fun(opts: CordOpts):string|boolean|nil Text for testing-related plugin activity
+---@field games? string|fun(opts: CordOpts):string|boolean|nil Text for games activity
+---@field diagnostics? string|fun(opts: CordOpts):string|boolean|nil Text for diagnostics activity
+---@field dashboard? string|fun(opts: CordOpts):string|boolean|nil Text for dashboard activity
 
 ---@class CordButtonConfig
 ---@field label string|fun(opts: CordOpts):string? Button label
@@ -53,13 +53,18 @@
 ---@field type? string|fun(opts: CordOpts):string Asset type
 
 ---@class CordHooksConfig
----@field ready? fun(manager: ActivityManager):nil
----@field shutdown? fun():nil
----@field pre_activity? fun(opts: CordOpts):nil
----@field post_activity? fun(opts: CordOpts, activity: Activity):nil
----@field idle? fun(opts: CordOpts):nil
----@field unidle? fun(opts: CordOpts):nil
----@field workspace_change? fun(opts: CordOpts):nil
+---@field ready? CordReadyHook
+---@field shutdown? CordShutdownHook
+---@field pre_activity? CordHook
+---@field post_activity? CordActivityHook
+---@field idle_enter? CordHook
+---@field idle_leave? CordHook
+---@field workspace_change? CordHook
+
+---@alias CordHook fun(opts: CordOpts):nil | {fun: fun(opts: CordOpts):nil, priority: number}
+---@alias CordReadyHook fun(manager: ActivityManager):nil | {fun: fun(manager: ActivityManager):nil, priority: number}
+---@alias CordShutdownHook fun():nil | {fun: fun():nil, priority: number}
+---@alias CordActivityHook fun(opts: CordOpts, activity: Activity):nil | {fun: fun(opts: CordOpts, activity: Activity):nil, priority: number}
 
 ---@class CordPluginsConfig
 ---@field name string Plugin name

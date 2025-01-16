@@ -62,12 +62,13 @@ require('cord').setup {
   assets = nil,
   variables = nil,
   hooks = {
-    on_ready = nil,
-    on_update = nil,
-    on_activity = nil,
-    on_idle = nil,
-    on_workspace_change = nil,
-    on_disconnect = nil,
+    ready = nil,
+    shutdown = nil,
+    pre_activity = nil,
+    post_activity = nil,
+    idle_enter = nil,
+    idle_leave = nil,
+    workspace_change = nil,
   },
   plugins = nil,
   advanced = {
@@ -170,15 +171,15 @@ require('cord').setup {
 
 ## 🪝 Hooks
 
-| Option                   | Type                       | Description                                                                                                        |
-| ------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `hooks.ready`            | `function(manager)`        | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
-| `hooks.shutdown`         | `function()`               | Called when connection to Discord is closed                                                                        |
-| `hooks.pre_activity`     | `function(opts)`           | Called before building activity ([opts](#options-table))                                                           |
-| `hooks.post_activity`    | `function(opts, activity)` | Called after building activity, but before sending it ([opts](#options-table), [activity](#activity))              |
-| `hooks.idle`             | `function(opts)`           | Called when entering idle state ([opts](#options-table))                                                           |
-| `hooks.unidle`           | `function(opts)`           | Called when leaving idle state ([opts](#options-table))                                                            |
-| `hooks.workspace_change` | `function(opts)`           | Called when workspace changes ([opts](#options-table))                                                             |
+| Option                   | Type                                                                                 | Description                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `hooks.ready`            | `function(manager) \| table<fun: function(manager), priority: number>`               | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
+| `hooks.shutdown`         | `function() \| table<fun: function(), priority: number>`                             | Called when connection to Discord is closed                                                                        |
+| `hooks.pre_activity`     | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called before building activity ([opts](#options-table))                                                           |
+| `hooks.post_activity`    | `function(opts, activity) \| table<fun: function(opts, activity), priority: number>` | Called after building activity, but before sending it ([opts](#options-table), [activity](#activity))              |
+| `hooks.idle_enter`       | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when entering idle state ([opts](#options-table))                                                           |
+| `hooks.idle_leave`       | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when leaving idle state ([opts](#options-table))                                                            |
+| `hooks.workspace_change` | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when workspace changes ([opts](#options-table))                                                             |
 
 ## 🔌 Plugins
 
