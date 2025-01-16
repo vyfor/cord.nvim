@@ -19,8 +19,8 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 - Many of the icons have been redesigned, and a new theme has been introduced. The previous style, now called "Pastel" has been replaced with the new default style, "Onyx" which features a sleek and modern dark theme. You can switch between themes by using the `display.theme` option.
 
 > [!IMPORTANT]
-> The Rust compiler is no longer required. Cord's server can now be downloaded from GitHub via the `:Cord fetch` command.
-> However, if you wish to build Cord from source, make sure to have **Rust >= 1.85.0 nightly** installed, and run the `:Cord build` command.
+> The Rust compiler is no longer required. Cord's server can now be downloaded from GitHub via the `:Cord update` command.
+> However, if you wish to build Cord from source, make sure to have **Rust >= 1.85.0 nightly** installed, and run the `:Cord update build` command.
 
 ## 🔧 Configuration Changes
 

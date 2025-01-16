@@ -44,7 +44,7 @@
 <summary>Expand</summary>
 
 Cord requires the server executables to be present. To get it, you can either:
-- **Fetch from GitHub**: Invoking `:Cord fetch` (async, recommended). Make sure you have **[`curl`](https://curl.se)** installed.
+- **Fetch from GitHub**: Invoking `:Cord build [fetch]` (async, recommended). Make sure you have **[`curl`](https://curl.se)** installed.
 - **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
 - [**Build from source**](#️-build-from-source)
 
@@ -153,9 +153,13 @@ Have questions or issues?
 >[!NOTE]
 > Make sure you have **[Rust](https://www.rust-lang.org/tools/install)** >= 1.85.0 installed.
 
-To build Cord from source, you can either:
-- Run `cargo b --release` and then manually move the resulting binary to `nvim-data-dir/cord/bin`
-- Run `:Cord build` to build and install the binary from crates.io (async)
+To build Cord from source, you can run `:Cord update build` (async) which will install the server binary from crates.io by running the following command:
+
+```bash
+cargo install --path . --root path/to/nvim-data-dir/cord/bin --force
+```
+
+Alternatively, you can use `cargo b --release` to build the binary, then place it under `nvim-data-dir/cord/bin`.
 
 ---
 
