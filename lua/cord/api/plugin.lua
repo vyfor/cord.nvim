@@ -13,7 +13,7 @@ local configs = {}
 ---@field name string Plugin name
 ---@field description? string Plugin description
 ---@field variables? table<string,function> Variables to add
----@field hooks? table<string,function|{fn:function,priority:number}> Hooks to register
+---@field hooks? table<string,function>|{fun: function, priority: number} Hooks to register
 ---@field assets? table<string,string|CordAssetConfig> Assets to add
 ---@field config? table Configuration to merge
 
@@ -38,7 +38,7 @@ function M.register(plugin)
       if type(hook) == 'function' then
         hooks.register(event, hook, hooks.PRIORITY.NORMAL)
       elseif type(hook) == 'table' then
-        hooks.register(event, hook.fn, hook.priority)
+        hooks.register(event, hook[1] or hook.fun, hook.priority)
       end
     end
   end

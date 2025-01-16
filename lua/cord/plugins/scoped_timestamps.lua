@@ -94,21 +94,21 @@ M.setup = function(config)
 
     hooks = user_config.timestamp.enabled and {
       post_activity = {
-        fn = function(opts, activity)
+        function(opts, activity)
           local timestamp = opts.get_scoped_timestamp(opts)
           if timestamp then activity.timestamps.start = timestamp end
         end,
         priority = 0,
       },
       idle_enter = user_config.timestamp.reset_on_idle and {
-        fn = function()
+        function()
           M.timestamps['Cord.idle'] = nil
           M.timestamps['Cord.active'] = nil
         end,
         priority = 0,
       } or nil,
       idle_leave = user_config.timestamp.reset_on_idle and {
-        fn = function()
+        function()
           M.timestamps['Cord.idle'] = nil
           M.timestamps['Cord.active'] = nil
         end,

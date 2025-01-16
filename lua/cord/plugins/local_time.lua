@@ -23,7 +23,7 @@ M.setup = function(config)
 
     hooks = {
       post_activity = {
-        fn = function(opts, activity)
+        function(opts, activity)
           if not M.config.affect_idle and opts.is_idle then return end
           activity.timestamps.start = M.time
         end,

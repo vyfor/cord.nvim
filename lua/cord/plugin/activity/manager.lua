@@ -74,8 +74,14 @@ ActivityManager.new = async.wrap(function(opts)
     workspace_cache = {},
   }, mt)
 
-  for k, v in pairs(config.hooks) do
-    hooks.register(k, v, hooks.PRIORITY.HIGHEST)
+  if config.hooks then
+    for event, hook in pairs(config.hooks) do
+      if type(hook) == 'function' then
+        hooks.register(event, hook, 200)
+      elseif type(hook) == 'table' then
+        hooks.register(event, hook[1] or hook.fun, hook.priority or 200)
+      end
+    end
   end
 
   local rawdir = vim.fn.expand '%:p:h'
