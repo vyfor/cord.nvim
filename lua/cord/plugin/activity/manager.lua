@@ -103,7 +103,6 @@ ActivityManager.new = async.wrap(function(opts)
 
   local err = require('cord.api.plugin').init()
   if err then error(err, 0) end
-  activities.update_text_config()
 
   return self
 end)
@@ -500,6 +499,7 @@ function ActivityManager:build_opts()
     manager = self,
     filename = vim.fn.expand '%:t',
     filetype = vim.bo.filetype,
+    buftype = vim.bo.buftype,
     is_read_only = vim.bo.readonly,
     cursor_line = cursor_position[1],
     cursor_char = cursor_position[2],

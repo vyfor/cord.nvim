@@ -39,6 +39,7 @@
 ---@field test? string|fun(opts: CordOpts):string|boolean|nil Text for testing-related plugin activity
 ---@field games? string|fun(opts: CordOpts):string|boolean|nil Text for games activity
 ---@field diagnostics? string|fun(opts: CordOpts):string|boolean|nil Text for diagnostics activity
+---@field terminal? string|fun(opts: CordOpts):string|boolean|nil Text for terminal activity
 ---@field dashboard? string|fun(opts: CordOpts):string|boolean|nil Text for dashboard activity
 
 ---@class CordButtonConfig
@@ -155,6 +156,7 @@ local defaults = {
     test = function(opts) return 'Testing in ' .. opts.tooltip end,
     diagnostics = function(opts) return 'Fixing problems in ' .. opts.tooltip end,
     games = function(opts) return 'Playing ' .. opts.tooltip end,
+    terminal = function(opts) return 'Running commands in ' .. opts.tooltip end,
     dashboard = 'Home',
   },
   buttons = nil,

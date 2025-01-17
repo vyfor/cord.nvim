@@ -14,6 +14,7 @@ M.default_icons = {
   test = 'tests',
   diagnostics = 'diagnostics',
   games = 'controller',
+  terminal = 'shell',
   dashboard = 'dashboard',
 }
 
@@ -42,7 +43,7 @@ M.filetype_mappings = {
   dart = { 'language', 'dart', 'Dart' },
   django = { 'language', 'django', 'Django' },
   dockerfile = { 'language', 'docker', 'Docker' },
-  dosbatch = { 'language', 'shell', 'Batch' },
+  dosbatch = { 'language', M.default_icons.terminal, 'Batch' },
   dosini = { 'language', 'gear', 'INI' },
   editorconfig = { 'language', 'editorconfig', 'EditorConfig' },
   elixir = { 'language', 'elixir', 'Elixir' },
@@ -111,9 +112,9 @@ M.filetype_mappings = {
   scala = { 'language', 'scala', 'Scala' },
   sass = { 'language', 'scss', 'Sass' },
   scss = { 'language', 'scss', 'Sass' },
-  sh = { 'language', 'shell', 'Shell script' },
-  sshconfig = { 'language', 'shell', 'SSH Config' },
-  sshdconfig = { 'language', 'shell', 'SSH Config' },
+  sh = { 'language', M.default_icons.terminal, 'Shell script' },
+  sshconfig = { 'language', M.default_icons.terminal, 'SSH Config' },
+  sshdconfig = { 'language', M.default_icons.terminal, 'SSH Config' },
   sql = { 'language', 'sql', 'SQL' },
   squirrel = { 'language', 'squirrel', 'Squirrel' },
   svelte = { 'language', 'svelte', 'Svelte' },
@@ -133,12 +134,12 @@ M.filetype_mappings = {
   vim = { 'language', 'viml', 'VimL' },
   viminfo = { 'language', 'viml', 'VimL' },
   vue = { 'language', 'vue', 'Vue' },
-  winbatch = { 'language', 'shell', 'Batch' },
+  winbatch = { 'language', M.default_icons.terminal, 'Batch' },
   xhtml = { 'language', 'html', 'XHTML' },
   xml = { 'language', 'xml', 'XML' },
   yaml = { 'language', 'yaml', 'YAML' },
   zig = { 'language', 'zig', 'Zig' },
-  zsh = { 'language', 'shell', 'Zsh' },
+  zsh = { 'language', M.default_icons.terminal, 'Zsh' },
 
   -- File Browsers
   carbon = { 'file_browser', M.default_icons.file_browser, 'Carbon' },
@@ -259,6 +260,20 @@ M.filetype_mappings = {
   -- Games
   sudoku = { 'games', M.default_icons.games, 'Sudoku' },
   tetris = { 'games', M.default_icons.games, 'Tetris' },
+
+  -- Terminal
+  FTerm = { 'terminal', M.default_icons.terminal, 'FTerm' },
+  fterm_gitui = { 'terminal', M.default_icons.terminal, 'Fterm' },
+  kitty = { 'terminal', M.default_icons.terminal, 'Kitty' },
+  neaterm = { 'terminal', M.default_icons.terminal, 'NeaTerm' },
+  nterm = { 'terminal', M.default_icons.terminal, 'Nterm' },
+  oneterm = { 'terminal', M.default_icons.terminal, 'OneTerm' },
+  snacks_terminal = { 'terminal', M.default_icons.terminal, 'Snacks Terminal' },
+  terminal = { 'terminal', M.default_icons.terminal, 'Terminal' },
+  toggleterm = { 'terminal', M.default_icons.terminal, 'ToggleTerm' },
+  ['kitty-scrollback'] = { 'terminal', M.default_icons.terminal, 'Kitty' },
+  ['neo-term'] = { 'terminal', M.default_icons.terminal, 'NeoTerm' },
+  ['yeet-cache'] = { 'terminal', M.default_icons.terminal, 'Yeet' },
 }
 
 M.filename_mappings = {
@@ -341,7 +356,9 @@ M.cord_related = {
 
 M.get_default_icon = function(type) return M.default_icons[type] or M.default_icons.language end
 
-M.get = function(filetype, filename)
+M.get = function(filetype, filename, buftype)
+  if buftype == 'terminal' then return 'terminal', M.default_icons.terminal, 'Terminal' end
+
   local result = M.filename_mappings[filename:lower()]
   if result then return result[1], result[2], result[3] end
 

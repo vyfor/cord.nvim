@@ -56,6 +56,7 @@ require('cord').setup {
     test = function(opts) return 'Testing in ' .. opts.tooltip end,
     diagnostics = function(opts) return 'Fixing problems in ' .. opts.tooltip end,
     games = function(opts) return 'Playing ' .. opts.tooltip end,
+    terminal = function(opts) return 'Running commands in ' .. opts.tooltip end,
     dashboard = 'Home',
   },
   buttons = nil,
@@ -152,6 +153,7 @@ require('cord').setup {
 | `test`           | `string \| function(opts) \| boolean` | `Testing in {tooltip}`            | Text shown when in a testing-related plugin buffer |
 | `diagnostics`    | `string \| function(opts) \| boolean` | `Fixing problems in {tooltip}`    | Text shown when in a diagnostics buffer            |
 | `games`          | `string \| function(opts) \| boolean` | `Playing {tooltip}`               | Text shown when in a game buffer                   |
+| `terminal`       | `string \| function(opts) \| boolean` | `Running commands in {tooltip}`   | Text shown when in a terminal buffer               |
 | `dashboard`      | `string \| function(opts) \| boolean` | `'Home'`                          | `Home`                                             | Text shown when in a dashboard buffer |
 
 > Also see [Text Options](#text-options)
@@ -380,6 +382,7 @@ The `opts` parameter passed to all functions and hooks contains the following in
     -- File Information
     filename          = string,           -- Current buffer's filename
     filetype          = string,           -- Current buffer's filetype
+    buftype           = string,           -- Current buffer's buftype
     is_read_only      = boolean,          -- Whether the current buffer is read-only
 
     -- Cursor Information
@@ -422,8 +425,9 @@ The `ActivityManager` contains useful methods:
 | `manager:skip_update()`              | Skips the next update once.                                                                                        |
 | `manager:hide()`                     | Pauses events and clears the current activity.                                                                     |
 | `manager:toggle()`                   | Toggles between pausing and resuming the activity updates.                                                         |
-| `manager:force_idle()`               | Forcibly sets the session to idle.                                                                                 |
-| `manager:unforce_idle()`             | Clears the idle state and resumes normal activity.                                                                 |
+| `manager:idle()`                     | Sets the session to idle.                                                                                          |
+| `manager:force_idle()`               | Forcibly sets the session to idle until unforced.                                                                  |
+| `manager:unidle()`                   | Clears the idle state and resumes normal activity.                                                                 |
 | `manager:toggle_idle()`              | Toggles between idle and normal activity.                                                                          |
 | `manager:set_activity(activity)`     | Sets the rich presence to the provided [activity](#activity-options), offering complete control over the presence. |
 | `manager:clear_activity(force)`      | Clears the current activity from the server. If `force` is true, it completely clears the presence.                |

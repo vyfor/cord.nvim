@@ -20,26 +20,6 @@ local function get_custom_asset(config, filename, filetype)
   if icon then return icon, 'Cord.override' end
 end
 
-local text_config
-local function update_text_config()
-  text_config = {
-    workspace = config.text.workspace,
-    viewing = config.text.viewing,
-    editing = config.text.editing,
-    file_browser = config.text.file_browser,
-    plugin_manager = config.text.plugin_manager,
-    lsp = config.text.lsp,
-    docs = config.text.docs,
-    vcs = config.text.vcs,
-    notes = config.text.notes,
-    debug = config.text.debug,
-    test = config.text.test,
-    diagnostics = config.text.diagnostics,
-    games = config.text.games,
-    dashboard = config.text.dashboard,
-  }
-end
-
 ---@return Activity|boolean
 local function build_activity(opts)
   if opts.filetype == '' then
@@ -51,7 +31,7 @@ local function build_activity(opts)
     end
   end
 
-  local icon_type, icon, tooltip = mappings.get(opts.filetype, opts.filename)
+  local icon_type, icon, tooltip = mappings.get(opts.filetype, opts.filename, opts.buftype)
   opts.type = icon_type or 'language'
   opts.icon = icons.get(icon or mappings.get_default_icon(opts.type))
   opts.tooltip = tooltip
@@ -77,16 +57,16 @@ local function build_activity(opts)
   else
     if opts.type == 'language' then
       if opts.is_read_only then
-        local text = config_utils.get(text_config.viewing, opts)
+        local text = config_utils.get(config.text.viewing, opts)
         if text == true or text == false then return text end
         if text ~= '' then file_text = text end
       else
-        local text = config_utils.get(text_config.editing, opts)
+        local text = config_utils.get(config.text.editing, opts)
         if text == true or text == false then return text end
         if text ~= '' then file_text = text end
       end
     else
-      local text = config_utils.get(text_config[opts.type], opts)
+      local text = config_utils.get(config.text[opts.type], opts)
       if text == true or text == false then return text end
       if text ~= '' then file_text = text end
     end
@@ -94,12 +74,12 @@ local function build_activity(opts)
 
   local details, state
   if config.display.swap_fields then
-    local workspace = config_utils.get(text_config.workspace, opts)
+    local workspace = config_utils.get(config.text.workspace, opts)
     if workspace == true or workspace == false then return workspace end
     if workspace ~= '' then details = workspace end
     state = file_text
   else
-    local workspace = config_utils.get(text_config.workspace, opts)
+    local workspace = config_utils.get(config.text.workspace, opts)
     if workspace == true or workspace == false then return workspace end
     if workspace ~= '' then state = workspace end
     details = file_text
@@ -181,5 +161,4 @@ end
 return {
   build_activity = build_activity,
   build_idle_activity = build_idle_activity,
-  update_text_config = update_text_config,
 }
