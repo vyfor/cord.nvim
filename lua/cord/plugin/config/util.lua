@@ -54,13 +54,15 @@ function M.get(option, args)
   local ty = type(option)
 
   local variables = config.variables
-  if type(variables) == 'table' then
+  local vars_is_table = type(variables) == 'table'
+  if vars_is_table then
+    ---@cast variables table
     for k, v in pairs(variables) do
       args[k] = v
     end
   end
 
-  if ty == 'string' then
+  if ty == 'string' and (vars_is_table or variables == true) then
     option = option:gsub('%${(.-)}', function(var)
       local arg = args[var]
       if type(arg) == 'function' then
