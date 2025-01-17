@@ -171,12 +171,12 @@ M.commands = {
   update = {
     default = M.update,
     subcommands = {
+      check = M.check,
       fetch = M.fetch,
       build = M.build,
     },
   },
   status = M.status,
-  check = M.check,
   version = M.version,
   restart = M.restart,
   shutdown = M.shutdown,

@@ -356,10 +356,10 @@ require('cord').setup {
   - `:Cord idle hide` - Hide idle state
   - `:Cord idle force` - Force idle state
 - `:Cord update` - Update the server executable using the configured update mode (fetch by default)
+  - `:Cord update check` - Check for server updates
   - `:Cord update fetch` - Fetch the server executable from GitHub using `curl`
   - `:Cord update build` - Build the server executable using `cargo`
 - `:Cord status` - Show connection status
-- `:Cord check` - Check for server updates
 - `:Cord version` - Show current server version
 - `:Cord restart` - Restart the server
 - `:Cord shutdown` - Disconnect from Discord and shutdown the server
