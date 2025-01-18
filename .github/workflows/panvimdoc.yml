@@ -20,13 +20,14 @@ jobs:
       - uses: actions/checkout@v2
 
       - run: |
-          INCLUDES="\`\`\`{.include}\n.github/wiki/Configuration.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/File-Icons.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Plugins.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Examples.md\n\`\`\`\n\n"
+          INCLUDES="\`\`\`{.include}\n.github/wiki/Configuration.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Assets.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Plugins.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Examples.md\n\`\`\`\n\n"
           echo -e "$INCLUDES$(cat README.md)" > _README.md
 
       - uses: kdheepak/panvimdoc@main
         with:
           vimdoc: cord
           pandoc: _README.md
+          version: "NVIM v0.6.0"
           demojify: true
 
       - uses: stefanzweifel/git-auto-commit-action@v4

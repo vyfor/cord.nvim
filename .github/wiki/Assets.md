@@ -1,8 +1,8 @@
-# 📂 Assets and File Icons
+# 📂 Custom Assets
 
-## Configuration Structure
+## Structure
 
-Cord allows the customization of the appearance of a file icon. To do so, you need to modify the `assets` table in the setup configuration of the plugin:
+Cord allows the customization and addition of custom assets. To do so, you need to modify the `assets` table in the setup configuration of the plugin:
 
 ```lua
 require('cord').setup {
@@ -12,7 +12,7 @@ require('cord').setup {
 }
 ```
 
-## Icon Configuration Options
+## Asset Configuration
 
 | Option      | Type                  | Description                                                                                                  |
 | ----------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -34,6 +34,11 @@ Available types:
 - `workspace`
 - `dashboard`
 - `notes`
+- `debug`
+- `test`
+- `diagnostics`
+- `games`
+- `terminal`
 
 **Examples**:
 ```lua
@@ -72,7 +77,7 @@ vim.filetype.add {
 }
 ```
 
-## Overriding Default Icons
+## Overriding Defaults
 
 In addition to setting icons for specific filetypes or extensions, you can also define icons for generic scenarios:
 

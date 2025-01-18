@@ -298,7 +298,7 @@ assets = {
 ```
 
 > [!TIP]
-> A detailed guide can be found in the [Wiki](./File-Icons.md).
+> A detailed guide can be found in the [Wiki](./Assets.md).
 
 Some languages cannot be identified solely by their filename or extension. In such cases, we can utilize the `vim.filetype.add` function to add extra patterns for filetype detection:
 

@@ -4,7 +4,7 @@ Welcome to the **cord.nvim** wiki!
 - [Configuration](./Configuration.md)
 - [Examples](./Examples.md)
 - [Available Plugins](./Plugins.md)
-- [Add or Change File Icons](./File-Icons.md)
+- [Add or Change Assets](./Assets.md)
 - [Troubleshooting](./Troubleshooting.md)
 - [Contributing](./Contributing.md)
 - [Plugin System](./Plugin-System.md)
