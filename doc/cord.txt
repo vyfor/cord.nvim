@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.8.0            Last change: 2025 January 18
+*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 18
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -14,10 +14,10 @@ Table of Contents                                     *cord-table-of-contents*
   - Hooks                                           |cord-configuration-hooks|
   - Plugins                                       |cord-configuration-plugins|
   - Advanced                                     |cord-configuration-advanced|
-2. Assets and File Icons                          |cord-assets-and-file-icons|
-  - Configuration Structure|cord-assets-and-file-icons-configuration-structure|
-  - Icon Configuration Options|cord-assets-and-file-icons-icon-configuration-options|
-  - Overriding Default Icons|cord-assets-and-file-icons-overriding-default-icons|
+2. Custom Assets                                          |cord-custom-assets|
+  - Structure                                   |cord-custom-assets-structure|
+  - Asset Configuration               |cord-custom-assets-asset-configuration|
+  - Overriding Defaults               |cord-custom-assets-overriding-defaults|
 3. Built-in Plugins                                    |cord-built-in-plugins|
   - Available Plugins                |cord-built-in-plugins-available-plugins|
 4. Customization Examples                        |cord-customization-examples|
@@ -458,7 +458,7 @@ options also support functions.
 <
 
 
-  [!TIP] A detailed guide can be found in the Wiki <./File-Icons.md>.
+  [!TIP] A detailed guide can be found in the Wiki <./Assets.md>.
 Some languages cannot be identified solely by their filename or extension. In
 such cases, we can utilize the `vim.filetype.add` function to add extra
 patterns for filetype detection:
@@ -655,13 +655,13 @@ USEFUL FUNCTIONS ~
 
 
 ==============================================================================
-2. Assets and File Icons                          *cord-assets-and-file-icons*
+2. Custom Assets                                          *cord-custom-assets*
 
 
-CONFIGURATION STRUCTURE   *cord-assets-and-file-icons-configuration-structure*
+STRUCTURE                                       *cord-custom-assets-structure*
 
-Cord allows the customization of the appearance of a file icon. To do so, you
-need to modify the `assets` table in the setup configuration of the plugin:
+Cord allows the customization and addition of custom assets. To do so, you need
+to modify the `assets` table in the setup configuration of the plugin:
 
 >lua
     require('cord').setup {
@@ -672,7 +672,7 @@ need to modify the `assets` table in the setup configuration of the plugin:
 <
 
 
-ICON CONFIGURATION OPTIONS*cord-assets-and-file-icons-icon-configuration-options*
+ASSET CONFIGURATION                   *cord-custom-assets-asset-configuration*
 
   -------------------------------------------------------------------------------------
   Option    Type                 Description
@@ -697,7 +697,8 @@ ICON CONFIGURATION OPTIONS*cord-assets-and-file-icons-icon-configuration-options
   type      string               Specifies the context of the asset.
   -------------------------------------------------------------------------------------
 Available types: - `language` (default) - `docs` - `plugin_manager` -
-`lsp_manager` - `file_browser` - `vcs` - `workspace` - `dashboard` - `notes`
+`lsp_manager` - `file_browser` - `vcs` - `workspace` - `dashboard` - `notes` -
+`debug` - `test` - `diagnostics` - `games` - `terminal`
 
 **Examples**
 
@@ -746,7 +747,7 @@ patterns for filetype detection:
 <
 
 
-OVERRIDING DEFAULT ICONS *cord-assets-and-file-icons-overriding-default-icons*
+OVERRIDING DEFAULTS                   *cord-custom-assets-overriding-defaults*
 
 In addition to setting icons for specific filetypes or extensions, you can also
 define icons for generic scenarios:
