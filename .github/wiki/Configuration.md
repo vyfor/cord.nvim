@@ -1,4 +1,4 @@
-# ⚡ Cord Configuration
+# ⚡ Configuration
 
 A comprehensive guide to configuring the Cord plugin to your liking. All options are set through the `setup()` function:
 
@@ -185,11 +185,11 @@ require('cord').setup {
 
 ## 🔌 Plugins
 
-| Option    | Type                               | Description                                                                                             |
-| --------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `plugins` | `string[] \| table<string, table>` | Extend Cord with plugins. See the [Wiki](https://github.com/vyfor/cord.nvim/wiki/Plugins) for more info |
+| Option    | Type                               | Description                                                          |
+| --------- | ---------------------------------- | -------------------------------------------------------------------- |
+| `plugins` | `string[] \| table<string, table>` | Extend Cord with plugins. See the [Wiki](./Plugins.md) for more info |
 
-> If you want to develop your own plugin, check out Cord's [Plugin System](https://github.com/vyfor/cord.nvim/wiki/Plugin-System)
+> If you want to develop your own plugin, check out Cord's [Plugin System](./Plugin-System.md)
 
 ## ⚙️ Advanced
 
@@ -298,7 +298,7 @@ assets = {
 ```
 
 > [!TIP]
-> A detailed guide can be found in the [Wiki](https://github.com/vyfor/cord.nvim/wiki/File-Icons).
+> A detailed guide can be found in the [Wiki](./File-Icons.md).
 
 Some languages cannot be identified solely by their filename or extension. In such cases, we can utilize the `vim.filetype.add` function to add extra patterns for filetype detection:
 

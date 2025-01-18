@@ -135,9 +135,9 @@ Cord features over 120 beautifully designed icons for languages and components w
 👉 [**Explore the Showcase**](https://github.com/vyfor/icons#showcase)  
 
 ## 📖 Documentation  
-- [**Configuration Guide**](https://github.com/vyfor/cord.nvim/wiki/Configuration): Everything you need to customize Cord.  
-- [**Examples**](https://github.com/vyfor/cord.nvim/wiki/Examples): Creative ways to customize your Discord presence.
-- [**Migration Guide**](https://github.com/vyfor/cord.nvim/wiki/Migration): Smooth migration from Cord v1.
+- [**Configuration Guide**](./.github/wiki/Configuration.md): Everything you need to customize Cord.  
+- [**Examples**](./.github/wiki/Examples.md): Creative ways to customize your Discord presence.
+- [**Migration Guide**](./.github/wiki/Migration.md): Smooth migration from Cord v1.
 - [**Wiki**](https://github.com/vyfor/cord.nvim/wiki): Examples, best practices, and FAQs.
 
 ## 🤝 Contributing  
@@ -146,8 +146,7 @@ We welcome contributions to make Cord even better!
 
 ## ❓ FAQ  
 Have questions or issues?  
-- [**FAQ**](https://github.com/vyfor/cord.nvim/wiki/FAQ)  
-- [**Troubleshooting Guide**](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)  
+- [**Troubleshooting Guide**](./.github/wiki/Troubleshooting)  
 
 ## 🛠️ Build From Source
 >[!NOTE]

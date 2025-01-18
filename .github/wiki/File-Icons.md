@@ -1,3 +1,5 @@
+# 📂 Assets and File Icons
+
 ## Configuration Structure
 
 Cord allows the customization of the appearance of a file icon. To do so, you need to modify the `assets` table in the setup configuration of the plugin:

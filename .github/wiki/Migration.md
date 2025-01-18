@@ -27,7 +27,7 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 The config structure has been updated to be more flexible. Most notably, the majority of string options now support functions, giving you full control over the Rich Presence display. Additionally, a new `variables` option has been introduced to allow custom dynamic values in text templates.
 
 > [!NOTE]
-> Full configuration options can be found [here](https://github.com/vyfor/cord.nvim/wiki/Configuration).
+> Full configuration options can be found [here](./Configuration.md).
 
 ### Changed Options
 ```lua
@@ -71,7 +71,7 @@ Several built-in features have been removed in favor of customization through fu
 - Problem count
 - ToggleTerm handling
 
-These can now be implemented using hooks and custom functions. See [examples](https://github.com/vyfor/cord.nvim/wiki/Examples).
+These can now be implemented using hooks and custom functions. See [examples](./Examples.md).
 
 ## 🎨 Function-Based Customization
 
@@ -115,4 +115,4 @@ assets = {
 }
 ```
 
-More information can be found in the [Configuration Guide](https://github.com/vyfor/cord.nvim/wiki/Configuration).
+More information can be found in the [Configuration Guide](./Configuration.md).

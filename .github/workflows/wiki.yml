@@ -20,7 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Andrew-Chen-Wang/github-wiki-action@v4
+      # TODO: Switch to v5 once it's released
+      - uses: Andrew-Chen-Wang/github-wiki-action@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: .github/wiki

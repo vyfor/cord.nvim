@@ -57,16 +57,16 @@ return M
 - **`description`**:
   An optional description of the plugin.
 
-- [**`variables`**](https://github.com/vyfor/cord.nvim/wiki/Configuration#custom-variables):
+- [**`variables`**](./Configuration.md#custom-variables):
   An optional table of variables that will be merged with the default options. Do note that overriding existing variables is only allowed for built-in variables.
 
-- [**`hooks`**](https://github.com/vyfor/cord.nvim/wiki/Configuration#-hooks):
+- [**`hooks`**](./Configuration.md#-hooks):
   An optional table of hooks that will be added to the existing list of hooks. Hooks can optionally define a priority that will be used to determine the order of execution. User-defined hooks are prioritized by default.
 
-- [**`assets`**](https://github.com/vyfor/cord.nvim/wiki/Configuration#assets):
+- [**`assets`**](./Configuration.md#assets):
   An optional table of assets that will be merged with the default assets.
 
-- [**`config`**](https://github.com/vyfor/cord.nvim/wiki/Configuration#default-config):
+- [**`config`**](./Configuration.md#default-config):
   An optional table of configuration options that will be merged with other plugins' configuration options, and then with the user's configuration which takes precedence.
 
 ## 🎯 Best Practices

@@ -1,0 +1,37 @@
+name: Panvimdoc
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, client-server]
+    paths:
+      - README.md
+      - .github/wiki/**
+      - .github/workflows/panvimdoc.yml 
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    name: Generate Panvimdoc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: |
+          INCLUDES="\`\`\`{.include}\n.github/wiki/Configuration.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/File-Icons.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Plugins.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Examples.md\n\`\`\`\n\n"
+          echo -e "$INCLUDES$(cat README.md)" > _README.md
+
+      - uses: kdheepak/panvimdoc@main
+        with:
+          vimdoc: cord
+          pandoc: _README.md
+          demojify: true
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore(docs): update vimdoc [skip ci]"
+          branch: ${{ github.head_ref }}
+          skip_dirty_check: true
+          file_pattern: doc/cord.txt
