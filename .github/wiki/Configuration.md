@@ -209,7 +209,7 @@ require('cord').setup {
 
 ---
 
-### Text Options
+## Text Options
 
 The `text` table allows you to customize the displayed text for different states. You can customize it in three different ways:
 
@@ -262,7 +262,7 @@ text = {
 ```
 
 
-### Buttons
+## Buttons
 
 Buttons can have static or dynamic labels and URLs:
 
@@ -279,7 +279,7 @@ buttons = {
 }
 ```
 
-### Assets
+## Assets
 
 Override icons and text for specific filetypes or filenames. Most of the options also support functions.
 
@@ -312,13 +312,13 @@ vim.filetype.add {
 }
 ```
 
-### Smart Idle
+## Smart Idle
 
 Smart idle ensures that:
 - When an instance goes idle, it switches to show the most recent active one
 - You're only shown as idle when all instances are actually idle
 
-### Custom Variables
+## Custom Variables
 
 The `variables` option allows you to define custom variables to be used in string templates. These variables can be static values or functions that dynamically generate values based on the current context. By default, the table is populated with the [options table](#options-table) but they can be overridden by user-defined variables.
 
@@ -336,7 +336,7 @@ require('cord').setup {
 }
 ```
 
-### User Commands
+## User Commands
 
 >[!NOTE]
 > Autocompletion is fully supported.
@@ -363,15 +363,16 @@ require('cord').setup {
 - `:Cord version` - Show current server version
 - `:Cord restart` - Restart the server
 - `:Cord shutdown` - Disconnect from Discord and shutdown the server
+- `:Cord health` - Validate user configuration
 
-### Cursor Update Mode
+## Cursor Update Mode
 
 The `advanced.cursor_update_mode` option controls how cursor position updates are handled:
 - `'on_move'` - Uses `CursorMoved[I]` autocmd, updating on every cursor movement. Most accurate but triggered very often
 - `'on_hold'` - Uses `CursorHold[I]` autocmd, updating only after the cursor has been stationary for `'updatetime'` milliseconds. Better performance but less accurate
 - `'none'` - Disables cursor position updates entirely
 
-### Options Table
+## Options Table
 
 The `opts` parameter passed to all functions and hooks contains the following information:
 
@@ -413,7 +414,7 @@ The `opts` parameter passed to all functions and hooks contains the following in
 
 The `ActivityManager` contains useful methods:
 
-### ActivityManager Methods
+## ActivityManager Methods
 
 | Method                               | Description                                                                                                        |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
@@ -432,7 +433,7 @@ The `ActivityManager` contains useful methods:
 | `manager:set_activity(activity)`     | Sets the rich presence to the provided [activity](#activity-options), offering complete control over the presence. |
 | `manager:clear_activity(force)`      | Clears the current activity from the server. If `force` is true, it completely clears the presence.                |
 
-### Activity Options
+## Activity Options
 
 | Parameter    | Type      | Description                                                                                          |
 | ------------ | --------- | ---------------------------------------------------------------------------------------------------- |
@@ -444,7 +445,7 @@ The `ActivityManager` contains useful methods:
 | `buttons`    | `array`   | Array of objects, each with `label` and `url`, defining interactive buttons in the presence.         |
 | `is_idle`    | `boolean` | Whether the activity should be considered as idle.                                                   |
 
-### Useful Functions
+## Useful Functions
 
 - `require('cord.api.icon').get(name: string, theme?: string): string`
   - Returns the URL for the specified icon name and optional theme, falling back to the configured theme.

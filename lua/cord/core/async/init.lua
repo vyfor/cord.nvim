@@ -9,27 +9,19 @@ function Async.wrap(fn)
       local current = coroutine.running()
       if not current then
         require('cord.plugin.log').errorcb(
-          function()
-            return 'async.wrap must be called within a coroutine\n'
-              .. debug.traceback()
-          end
+          function() return 'async.wrap must be called within a coroutine\n' .. debug.traceback() end
         )
         return
       end
 
       local success, result = pcall(function()
         ---@diagnostic disable-next-line: deprecated
-        local unpack = table.unpack or unpack
+        local unpack = unpack or table.unpack
         return fn(unpack(args))
       end)
       if not success then
         require('cord.plugin.log').tracecb(
-          function()
-            return 'Error in async.wrap: '
-              .. result
-              .. '\n'
-              .. debug.traceback()
-          end
+          function() return 'Error in async.wrap: ' .. result .. '\n' .. debug.traceback() end
         )
         reject(result)
         return

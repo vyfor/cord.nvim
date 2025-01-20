@@ -1,5 +1,5 @@
 ---@diagnostic disable-next-line: deprecated
-local unpack = table.unpack or unpack
+local unpack = unpack or table.unpack
 
 local M = {}
 

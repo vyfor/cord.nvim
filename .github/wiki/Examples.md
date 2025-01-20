@@ -1,4 +1,4 @@
-# 🎨 Customization Examples
+# 🎨 Examples
 
 Learn how to customize your Discord presence in countless ways using Cord's robust configuration system. The possibilities are endless, and the only limit is your creativity!
 
