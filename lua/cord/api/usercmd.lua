@@ -28,9 +28,17 @@ M.hide_presence = function()
   local cord = require 'cord.server'
   if cord.manager then cord.manager:hide() end
 end
+M.suppress_presence = function()
+  local cord = require 'cord.server'
+  if cord.manager then cord.manager:suppress() end
+end
 M.toggle_presence = function()
   local cord = require 'cord.server'
   if cord.manager then cord.manager:toggle() end
+end
+M.toggle_presence_suppress = function()
+  local cord = require 'cord.server'
+  if cord.manager then cord.manager:toggle_suppress() end
 end
 M.idle = function()
   local cord = require 'cord.server'
@@ -47,10 +55,6 @@ end
 M.toggle_idle = function()
   local cord = require 'cord.server'
   if cord.manager then cord.manager:toggle_idle() end
-end
-M.clear_presence = function()
-  local cord = require 'cord.server'
-  if cord.manager then cord.manager:clear_activity(true) end
 end
 M.restart = function()
   vim.schedule(function()
@@ -178,7 +182,7 @@ M.commands = {
     action = function(feature) handle_feature(feature, true) end,
   },
   disable = {
-    default = function() M.clear_presence() end,
+    default = function() M.hide_presence() end,
     action = function(feature) handle_feature(feature, false) end,
   },
   toggle = {
@@ -190,8 +194,9 @@ M.commands = {
     subcommands = {
       show = M.show_presence,
       hide = M.hide_presence,
+      suppress = M.suppress_presence,
       toggle = M.toggle_presence,
-      clear = M.clear_presence,
+      toggle_suppress = M.toggle_presence_suppress,
     },
   },
   idle = {

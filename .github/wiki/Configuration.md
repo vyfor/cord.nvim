@@ -158,13 +158,6 @@ require('cord').setup {
 
 > Also see [Text Options](#text-options)
 
-## 📂 Assets
-
-| Option    | Type           | Default | Description                                |
-| --------- | -------------- | ------- | ------------------------------------------ |
-| `buttons` | `table \| nil` | `nil`   | Configure [presence buttons](#buttons)     |
-| `assets`  | `table \| nil` | `nil`   | Custom [file icons](#assets) configuration |
-
 ## 🧩 Variables
 
 | Option      | Type                      | Default | Description                                                                                                                                                                                                                                                               |
@@ -342,14 +335,18 @@ require('cord').setup {
 > Autocompletion is fully supported.
 > To see the list of all available features, hit `<Tab>` after typing `:Cord enable`
 
-- `:Cord enable <feature>` - Enable a feature
-- `:Cord disable <feature>` - Disable a feature
-- `:Cord toggle <feature>` - Toggle a feature
+- `:Cord enable` - Show presence
+  - `:Cord enable <feature>` - Enable a feature
+- `:Cord disable` - Hide presence
+  - `:Cord disable <feature>` - Disable a feature
+- `:Cord toggle` - Toggle presence
+  - `:Cord toggle <feature>` - Toggle a feature
 - `:Cord presence` - Toggle presence display
-  - `:Cord presence toggle` - Toggle presence display
   - `:Cord presence show` - Show presence
   - `:Cord presence hide` - Hide presence
-  - `:Cord presence clear` - Clear the rich presence for all sessions
+  - `:Cord presence suppress` - Suppress presence for current Neovim session
+  - `:Cord presence toggle` - Toggle presence
+  - `:Cord presence toggle_suppress` - Toggle presence suppression
 - `:Cord idle` - Toggle idle state
   - `:Cord idle toggle` - Toggle idle state
   - `:Cord idle show` - Show idle state
@@ -424,8 +421,10 @@ The `ActivityManager` contains useful methods:
 | `manager:pause_events()`             | Disables event handling without affecting the idle timer.                                                          |
 | `manager:resume_events()`            | Enables event handling and queues an immediate update.                                                             |
 | `manager:skip_update()`              | Skips the next update once.                                                                                        |
-| `manager:hide()`                     | Pauses events and clears the current activity.                                                                     |
+| `manager:hide()`                     | Pauses events and clears rich presence.                                                                            |
+| `manager:suppress()`                 | Pauses events and suppresses sending presence updates for the current Neovim session.                              |
 | `manager:toggle()`                   | Toggles between pausing and resuming the activity updates.                                                         |
+| `manager:toggle_suppress()`          | Toggles between suppressing and resuming sending presence updates for the current Neovim session.                  |
 | `manager:idle()`                     | Sets the session to idle.                                                                                          |
 | `manager:force_idle()`               | Forcibly sets the session to idle until unforced.                                                                  |
 | `manager:unidle()`                   | Clears the idle state and resumes normal activity.                                                                 |

@@ -332,6 +332,13 @@ end
 ---@return nil
 function ActivityManager:hide()
   self:pause()
+  self:clear_activity(true)
+end
+
+---Suppress the activity for current Neovim instance
+---@return nil
+function ActivityManager:suppress()
+  self:pause()
   self:clear_activity()
 end
 
@@ -342,6 +349,16 @@ function ActivityManager:toggle()
     self:resume()
   else
     self:hide()
+  end
+end
+
+---Toggle suppress state
+---@return nil
+function ActivityManager:toggle_suppress()
+  if self.is_paused then
+    self:resume()
+  else
+    self:suppress()
   end
 end
 
