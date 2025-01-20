@@ -521,7 +521,7 @@ function ActivityManager:build_opts()
     filename = vim.fn.expand '%:t',
     filetype = vim.bo.filetype,
     buftype = vim.bo.buftype,
-    is_read_only = vim.bo.readonly,
+    is_read_only = vim.bo.readonly or not vim.bo.modifiable,
     cursor_line = cursor_position[1],
     cursor_char = cursor_position[2],
     workspace_dir = self.workspace_dir,
