@@ -35,6 +35,7 @@ local function build_activity(opts)
   opts.type = icon_type or 'language'
   opts.icon = icons.get(icon or mappings.get_default_icon(opts.type))
   opts.tooltip = tooltip
+  opts.name = tooltip
 
   local custom_icon, override_type = get_custom_asset(config, opts.filename, opts.filetype)
 
