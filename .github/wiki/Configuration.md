@@ -46,19 +46,19 @@ require('cord').setup {
     workspace = function(opts) return 'In ' .. opts.workspace_name end,
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
     editing = function(opts) return 'Editing ' .. opts.filename end,
-    file_browser = function(opts) return 'Browsing files in ' .. opts.tooltip end,
-    plugin_manager = function(opts) return 'Managing plugins in ' .. opts.tooltip end,
-    lsp = function(opts) return 'Configuring LSP in ' .. opts.tooltip end,
-    docs = function(opts) return 'Reading ' .. opts.tooltip end,
-    vcs = function(opts) return 'Committing changes in ' .. opts.tooltip end,
-    notes = function(opts) return 'Taking notes in ' .. opts.tooltip end,
-    debug = function(opts) return 'Debugging in ' .. opts.tooltip end,
-    test = function(opts) return 'Testing in ' .. opts.tooltip end,
-    diagnostics = function(opts) return 'Fixing problems in ' .. opts.tooltip end,
-    games = function(opts) return 'Playing ' .. opts.tooltip end,
-    terminal = function(opts) return 'Running commands in ' .. opts.tooltip end,
+    file_browser = function(opts) return 'Browsing files in ' .. opts.name end,
+    plugin_manager = function(opts) return 'Managing plugins in ' .. opts.name end,
+    lsp = function(opts) return 'Configuring LSP in ' .. opts.name end,
+    docs = function(opts) return 'Reading ' .. opts.name end,
+    vcs = function(opts) return 'Committing changes in ' .. opts.name end,
+    notes = function(opts) return 'Taking notes in ' .. opts.name end,
+    debug = function(opts) return 'Debugging in ' .. opts.name end,
+    test = function(opts) return 'Testing in ' .. opts.name end,
+    diagnostics = function(opts) return 'Fixing problems in ' .. opts.name end,
+    games = function(opts) return 'Playing ' .. opts.name end,
+    terminal = function(opts) return 'Running commands in ' .. opts.name end,
     dashboard = 'Home',
-  },
+  }, 
   buttons = nil,
   assets = nil,
   variables = nil,
@@ -138,23 +138,23 @@ require('cord').setup {
 
 ## 📝 Text
 
-| Option           | Type                                  | Default                           | Description                                        |
-| ---------------- | ------------------------------------- | --------------------------------- | -------------------------------------------------- |
-| `workspace`      | `string \| function(opts) \| boolean` | `In {workspace_name}`             | Text shown when in a workspace                     |
-| `viewing`        | `string \| function(opts) \| boolean` | `Viewing {filename}`              | Text shown when viewing a file                     |
-| `editing`        | `string \| function(opts) \| boolean` | `Editing {filename}`              | Text shown when editing a file                     |
-| `file_browser`   | `string \| function(opts) \| boolean` | `Browsing files in {tooltip}`     | Text shown when in a file browser                  |
-| `plugin_manager` | `string \| function(opts) \| boolean` | `Managing plugins in {tooltip}`   | Text shown when in a plugin manager                |
-| `lsp`            | `string \| function(opts) \| boolean` | `Configuring LSP in {tooltip}`    | Text shown when in an LSP manager                  |
-| `docs`           | `string \| function(opts) \| boolean` | `Reading {tooltip}`               | Text shown when in a docs buffer                   |
-| `vcs`            | `string \| function(opts) \| boolean` | `Committing changes in {tooltip}` | Text shown when in a VCS buffer                    |
-| `notes`          | `string \| function(opts) \| boolean` | `Taking notes in {tooltip}`       | Text shown when in a notes buffer                  |
-| `debug`          | `string \| function(opts) \| boolean` | `Debugging in {tooltip}`          | Text shown when in a debug-related plugin buffer   |
-| `test`           | `string \| function(opts) \| boolean` | `Testing in {tooltip}`            | Text shown when in a testing-related plugin buffer |
-| `diagnostics`    | `string \| function(opts) \| boolean` | `Fixing problems in {tooltip}`    | Text shown when in a diagnostics buffer            |
-| `games`          | `string \| function(opts) \| boolean` | `Playing {tooltip}`               | Text shown when in a game buffer                   |
-| `terminal`       | `string \| function(opts) \| boolean` | `Running commands in {tooltip}`   | Text shown when in a terminal buffer               |
-| `dashboard`      | `string \| function(opts) \| boolean` | `'Home'`                          | `Home`                                             | Text shown when in a dashboard buffer |
+| Option           | Type                                  | Default                        | Description                                        |
+| ---------------- | ------------------------------------- | ------------------------------ | -------------------------------------------------- |
+| `workspace`      | `string \| function(opts) \| boolean` | `In {workspace_name}`          | Text shown when in a workspace                     |
+| `viewing`        | `string \| function(opts) \| boolean` | `Viewing {filename}`           | Text shown when viewing a file                     |
+| `editing`        | `string \| function(opts) \| boolean` | `Editing {filename}`           | Text shown when editing a file                     |
+| `file_browser`   | `string \| function(opts) \| boolean` | `Browsing files in {name}`     | Text shown when in a file browser                  |
+| `plugin_manager` | `string \| function(opts) \| boolean` | `Managing plugins in {name}`   | Text shown when in a plugin manager                |
+| `lsp`            | `string \| function(opts) \| boolean` | `Configuring LSP in {name}`    | Text shown when in an LSP manager                  |
+| `docs`           | `string \| function(opts) \| boolean` | `Reading {name}`               | Text shown when in a docs buffer                   |
+| `vcs`            | `string \| function(opts) \| boolean` | `Committing changes in {name}` | Text shown when in a VCS buffer                    |
+| `notes`          | `string \| function(opts) \| boolean` | `Taking notes in {name}`       | Text shown when in a notes buffer                  |
+| `debug`          | `string \| function(opts) \| boolean` | `Debugging in {name}`          | Text shown when in a debug-related plugin buffer   |
+| `test`           | `string \| function(opts) \| boolean` | `Testing in {name}`            | Text shown when in a testing-related plugin buffer |
+| `diagnostics`    | `string \| function(opts) \| boolean` | `Fixing problems in {name}`    | Text shown when in a diagnostics buffer            |
+| `games`          | `string \| function(opts) \| boolean` | `Playing {name}`               | Text shown when in a game buffer                   |
+| `terminal`       | `string \| function(opts) \| boolean` | `Running commands in {name}`   | Text shown when in a terminal buffer               |
+| `dashboard`      | `string \| function(opts) \| boolean` | `'Home'`                       | `Home`                                             | Text shown when in a dashboard buffer |
 
 > Also see [Text Options](#text-options)
 
@@ -375,37 +375,37 @@ The `opts` parameter passed to all functions and hooks contains the following in
 
 ```lua
 {
-    manager           = ActivityManager,  -- Reference to the ActivityManager instance
+  manager           = ActivityManager,  -- Reference to the ActivityManager instance
 
-    -- File Information
-    filename          = string,           -- Current buffer's filename
-    filetype          = string,           -- Current buffer's filetype
-    buftype           = string,           -- Current buffer's buftype
-    is_read_only      = boolean,          -- Whether the current buffer is read-only
+  -- File Information
+  name              = string?,          -- Name associated with the current mapping, if any
+  tooltip           = string?,          -- Tooltip associated with the current mapping, if any
+  filename          = string,           -- Current buffer's filename
+  filetype          = string,           -- Current buffer's filetype
+  buftype           = string,           -- Current buffer's buftype
+  is_read_only      = boolean,          -- Whether the current buffer is read-only
 
-    -- Cursor Information
-    cursor_line       = number,           -- Current cursor line number
-    cursor_char       = number,           -- Current cursor character number
+  -- Cursor Information
+  cursor_line       = number,           -- Current cursor line number
+  cursor_char       = number,           -- Current cursor character number
 
-    -- Timestamp Information
-    timestamp         = number,           -- Timestamp passed to the Rich Presence in milliseconds
+  -- Timestamp Information
+  timestamp         = number,           -- Timestamp passed to the Rich Presence in milliseconds
 
-    -- Workspace Information
-    workspace_dir     = string,           -- Current workspace directory
-    workspace_name    = string,           -- Current workspace name
-    repo_url          = string,           -- Current Git repository URL, if any
+  -- Workspace Information
+  workspace_dir     = string?,          -- Current workspace directory
+  workspace_name    = string?,          -- Current workspace name
+  repo_url          = string?,          -- Current Git repository URL, if any
 
-    -- Editor Information
-    is_focused        = boolean,          -- Whether Neovim is focused
-    is_idle           = boolean,          -- Whether the session is idle
-    buttons           = table,            -- List of configured presence buttons
+  -- Editor Information
+  is_focused        = boolean,          -- Whether Neovim is focused
+  is_idle           = boolean,          -- Whether the session is idle
+  buttons           = table?,           -- List of configured presence buttons
 
-    -- Asset Information
-    type              = string,           -- Which category the asset belongs to, e.g. 'language' or 'docs'
-    name              = string,           -- Asset name, if any
-    icon              = string,           -- Asset icon URL or name, if any
-    tooltip           = string,           -- Hover text for the asset, if any
-    text              = string,           -- Custom text to display, if any
+  -- Asset Information
+  type              = string,           -- Which category the asset belongs to, e.g. 'language' or 'docs'
+  icon              = string?,          -- Asset icon URL or name, if any
+  text              = string?,          -- Custom text to display, if any
 }
 ```
 
