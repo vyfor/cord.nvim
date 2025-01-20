@@ -9,7 +9,6 @@ Table of Contents                                     *cord-table-of-contents*
   - Timestamp                                   |cord-configuration-timestamp|
   - Idle                                             |cord-configuration-idle|
   - Text                                             |cord-configuration-text|
-  - Assets                                         |cord-configuration-assets|
   - Variables                                   |cord-configuration-variables|
   - Hooks                                           |cord-configuration-hooks|
   - Plugins                                       |cord-configuration-plugins|
@@ -277,16 +276,6 @@ TEXT                                                 *cord-configuration-text*
 
   Also see |cord-text-options|
 
-ASSETS                                             *cord-configuration-assets*
-
-  ----------------------------------------------------------------------------
-  Option    Type           Default   Description
-  --------- -------------- --------- -----------------------------------------
-  buttons   table \| nil   nil       Configure presence buttons
-
-  assets    table \| nil   nil       Custom file icons configuration
-  ----------------------------------------------------------------------------
-
 VARIABLES                                       *cord-configuration-variables*
 
   -------------------------------------------------------------------------------------------------------------
@@ -520,14 +509,18 @@ USER COMMANDS                               *cord-configuration-user-commands*
 
   [!NOTE] Autocompletion is fully supported. To see the list of all available
   features, hit `<Tab>` after typing `:Cord enable`
-- `:Cord enable <feature>` - Enable a feature
-- `:Cord disable <feature>` - Disable a feature
-- `:Cord toggle <feature>` - Toggle a feature
+- `:Cord enable` - Show presence
+    - `:Cord enable <feature>` - Enable a feature
+- `:Cord disable` - Hide presence
+    - `:Cord disable <feature>` - Disable a feature
+- `:Cord toggle` - Toggle presence
+    - `:Cord toggle <feature>` - Toggle a feature
 - `:Cord presence` - Toggle presence display
-    - `:Cord presence toggle` - Toggle presence display
     - `:Cord presence show` - Show presence
     - `:Cord presence hide` - Hide presence
-    - `:Cord presence clear` - Clear the rich presence for all sessions
+    - `:Cord presence suppress` - Suppress presence for current Neovim session
+    - `:Cord presence toggle` - Toggle presence
+    - `:Cord presence toggle_suppress` - Toggle presence suppression
 - `:Cord idle` - Toggle idle state
     - `:Cord idle toggle` - Toggle idle state
     - `:Cord idle show` - Show idle state
@@ -618,10 +611,16 @@ ACTIVITYMANAGER METHODS           *cord-configuration-activitymanager-methods*
 
   manager:skip_update()                Skips the next update once.
 
-  manager:hide()                       Pauses events and clears the current activity.
+  manager:hide()                       Pauses events and clears rich presence.
+
+  manager:suppress()                   Pauses events and suppresses sending presence updates
+                                       for the current Neovim session.
 
   manager:toggle()                     Toggles between pausing and resuming the activity
                                        updates.
+
+  manager:toggle_suppress()            Toggles between suppressing and resuming sending
+                                       presence updates for the current Neovim session.
 
   manager:idle()                       Sets the session to idle.
 
