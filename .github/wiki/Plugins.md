@@ -50,7 +50,7 @@ text = {
   editing = 'Editing ${filename} - ${diagnostics} problems',
 
   -- In functions
-  workspace = function(opts) return 'In ' .. opts.workspace_name .. ' - ' .. opts.diagnostics(opts) .. ' problems' end,
+  workspace = function(opts) return 'In ' .. opts.workspace .. ' - ' .. opts.diagnostics(opts) .. ' problems' end,
 }
 ```
 

@@ -143,7 +143,7 @@ local defaults = {
     icon = nil,
   },
   text = {
-    workspace = function(opts) return 'In ' .. opts.workspace_name end,
+    workspace = function(opts) return 'In ' .. opts.workspace end,
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
     editing = function(opts) return 'Editing ' .. opts.filename end,
     file_browser = function(opts) return 'Browsing files in ' .. opts.name end,

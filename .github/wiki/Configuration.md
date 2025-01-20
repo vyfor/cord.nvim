@@ -43,7 +43,7 @@ require('cord').setup {
     icon = nil,
   },
   text = {
-    workspace = function(opts) return 'In ' .. opts.workspace_name end,
+    workspace = function(opts) return 'In ' .. opts.workspace end,
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
     editing = function(opts) return 'Editing ' .. opts.filename end,
     file_browser = function(opts) return 'Browsing files in ' .. opts.name end,
@@ -140,7 +140,7 @@ require('cord').setup {
 
 | Option           | Type                                  | Default                        | Description                                        |
 | ---------------- | ------------------------------------- | ------------------------------ | -------------------------------------------------- |
-| `workspace`      | `string \| function(opts) \| boolean` | `In {workspace_name}`          | Text shown when in a workspace                     |
+| `workspace`      | `string \| function(opts) \| boolean` | `In {workspace}`               | Text shown when in a workspace                     |
 | `viewing`        | `string \| function(opts) \| boolean` | `Viewing {filename}`           | Text shown when viewing a file                     |
 | `editing`        | `string \| function(opts) \| boolean` | `Editing {filename}`           | Text shown when editing a file                     |
 | `file_browser`   | `string \| function(opts) \| boolean` | `Browsing files in {name}`     | Text shown when in a file browser                  |
@@ -393,8 +393,8 @@ The `opts` parameter passed to all functions and hooks contains the following in
   timestamp         = number,           -- Timestamp passed to the Rich Presence in milliseconds
 
   -- Workspace Information
+  workspace         = string?,          -- Current workspace name
   workspace_dir     = string?,          -- Current workspace directory
-  workspace_name    = string?,          -- Current workspace name
   repo_url          = string?,          -- Current Git repository URL, if any
 
   -- Editor Information

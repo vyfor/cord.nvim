@@ -75,7 +75,7 @@ local blacklist = {
 }
 
 local is_blacklisted = function(opts)
-  return vim.tbl_contains(blacklist, opts.workspace_name)
+  return vim.tbl_contains(blacklist, opts.workspace)
 end
 
 -- use a custom text for the activity
@@ -203,7 +203,7 @@ buttons = {
 ```lua
 idle = {
   details = function(opts)
-    return string.format('Taking a break from %s', opts.workspace_name)
+    return string.format('Taking a break from %s', opts.workspace)
   end
 }
 ```
@@ -294,7 +294,7 @@ return {
   text = {
     workspace = function(opts)
       if song then return ('🎶 Playing ' .. song) end
-      return opts.workspace_name
+      return opts.workspace
     end,
   },
 }

@@ -29,7 +29,7 @@ M.setup = function(config)
     config = M.config.override and {
       text = {
         workspace = M.config.scope == nil and function(opts)
-          local text = 'In ' .. opts.workspace_name
+          local text = 'In ' .. opts.workspace
           if M.diagnostic_count > 0 then
             text = text .. ' - ' .. M.diagnostic_count .. ' problems'
           end
