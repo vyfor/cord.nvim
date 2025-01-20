@@ -153,8 +153,6 @@ M.validate = function(user_config)
     for k, v in pairs(config) do
       local full_path = prefix == '' and k or (prefix .. '.' .. k)
       local base_path = vim.split(full_path, '.', { plain = true })[1]
-
-      local parts = vim.split(full_path, '.', { plain = true })
       local is_plugin_config = base_path == 'plugins' and type(k) == 'number'
 
       if
