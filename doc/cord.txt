@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 18
+*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 20
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -14,20 +14,31 @@ Table of Contents                                     *cord-table-of-contents*
   - Hooks                                           |cord-configuration-hooks|
   - Plugins                                       |cord-configuration-plugins|
   - Advanced                                     |cord-configuration-advanced|
+  - Text Options                             |cord-configuration-text-options|
+  - Buttons                                       |cord-configuration-buttons|
+  - Assets                                         |cord-configuration-assets|
+  - Smart Idle                                 |cord-configuration-smart-idle|
+  - Custom Variables                     |cord-configuration-custom-variables|
+  - User Commands                           |cord-configuration-user-commands|
+  - Cursor Update Mode                 |cord-configuration-cursor-update-mode|
+  - Options Table                           |cord-configuration-options-table|
+  - ActivityManager Methods       |cord-configuration-activitymanager-methods|
+  - Activity Options                     |cord-configuration-activity-options|
+  - Useful Functions                     |cord-configuration-useful-functions|
 2. Custom Assets                                          |cord-custom-assets|
   - Structure                                   |cord-custom-assets-structure|
   - Asset Configuration               |cord-custom-assets-asset-configuration|
   - Overriding Defaults               |cord-custom-assets-overriding-defaults|
 3. Built-in Plugins                                    |cord-built-in-plugins|
   - Available Plugins                |cord-built-in-plugins-available-plugins|
-4. Customization Examples                        |cord-customization-examples|
-  - Features                            |cord-customization-examples-features|
-  - Install                              |cord-customization-examples-install|
-  - Themes                                |cord-customization-examples-themes|
-  - Documentation                  |cord-customization-examples-documentation|
-  - Contributing                    |cord-customization-examples-contributing|
-  - FAQ                                      |cord-customization-examples-faq|
-  - Build From Source          |cord-customization-examples-build-from-source|
+4. Examples                                                    |cord-examples|
+  - Features                                          |cord-examples-features|
+  - Install                                            |cord-examples-install|
+  - Themes                                              |cord-examples-themes|
+  - Documentation                                |cord-examples-documentation|
+  - Contributing                                  |cord-examples-contributing|
+  - FAQ                                                    |cord-examples-faq|
+  - Build From Source                        |cord-examples-build-from-source|
 
 ==============================================================================
 1. Configuration                                          *cord-configuration*
@@ -363,7 +374,7 @@ ADVANCED                                         *cord-configuration-advanced*
   -------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 
-TEXT OPTIONS ~
+TEXT OPTIONS                                 *cord-configuration-text-options*
 
 The `text` table allows you to customize the displayed text for different
 states. You can customize it in three different ways:
@@ -420,7 +431,7 @@ It is also possible to use boolean values to completely disable a category:
 <
 
 
-BUTTONS ~
+BUTTONS                                           *cord-configuration-buttons*
 
 Buttons can have static or dynamic labels and URLs:
 
@@ -438,7 +449,7 @@ Buttons can have static or dynamic labels and URLs:
 <
 
 
-ASSETS ~
+ASSETS                                             *cord-configuration-assets*
 
 Override icons and text for specific filetypes or filenames. Most of the
 options also support functions.
@@ -474,14 +485,14 @@ patterns for filetype detection:
 <
 
 
-SMART IDLE ~
+SMART IDLE                                     *cord-configuration-smart-idle*
 
 Smart idle ensures that: - When an instance goes idle, it switches to show the
 most recent active one - You’re only shown as idle when all instances are
 actually idle
 
 
-CUSTOM VARIABLES ~
+CUSTOM VARIABLES                         *cord-configuration-custom-variables*
 
 The `variables` option allows you to define custom variables to be used in
 string templates. These variables can be static values or functions that
@@ -504,7 +515,7 @@ Example configuration:
 <
 
 
-USER COMMANDS ~
+USER COMMANDS                               *cord-configuration-user-commands*
 
 
   [!NOTE] Autocompletion is fully supported. To see the list of all available
@@ -530,9 +541,10 @@ USER COMMANDS ~
 - `:Cord version` - Show current server version
 - `:Cord restart` - Restart the server
 - `:Cord shutdown` - Disconnect from Discord and shutdown the server
+- `:Cord health` - Validate user configuration
 
 
-CURSOR UPDATE MODE ~
+CURSOR UPDATE MODE                     *cord-configuration-cursor-update-mode*
 
 The `advanced.cursor_update_mode` option controls how cursor position updates
 are handled: - `'on_move'` - Uses `CursorMoved[I]` autocmd, updating on every
@@ -542,7 +554,7 @@ cursor movement. Most accurate but triggered very often - `'on_hold'` - Uses
 Disables cursor position updates entirely
 
 
-OPTIONS TABLE ~
+OPTIONS TABLE                               *cord-configuration-options-table*
 
 The `opts` parameter passed to all functions and hooks contains the following
 information:
@@ -586,7 +598,7 @@ information:
 The `ActivityManager` contains useful methods:
 
 
-ACTIVITYMANAGER METHODS ~
+ACTIVITYMANAGER METHODS           *cord-configuration-activitymanager-methods*
 
   ------------------------------------------------------------------------------------------
   Method                               Description
@@ -626,7 +638,7 @@ ACTIVITYMANAGER METHODS ~
                                        is true, it completely clears the presence.
   ------------------------------------------------------------------------------------------
 
-ACTIVITY OPTIONS ~
+ACTIVITY OPTIONS                         *cord-configuration-activity-options*
 
   ---------------------------------------------------------------------------------
   Parameter    Type      Description
@@ -648,7 +660,7 @@ ACTIVITY OPTIONS ~
   is_idle      boolean   Whether the activity should be considered as idle.
   ---------------------------------------------------------------------------------
 
-USEFUL FUNCTIONS ~
+USEFUL FUNCTIONS                         *cord-configuration-useful-functions*
 
 - `require('cord.api.icon').get(name: string, theme?: string): string`
     - Returns the URL for the specified icon name and optional theme, falling back to the configured theme.
@@ -876,7 +888,7 @@ that returns the timestamp for the current scope
   [!NOTE] Incompatible with `cord.plugins.local_time`
 
 ==============================================================================
-4. Customization Examples                        *cord-customization-examples*
+4. Examples                                                    *cord-examples*
 
 Learn how to customize your Discord presence in countless ways using Cord’s
 robust configuration system. The possibilities are endless, and the only limit
@@ -1215,7 +1227,7 @@ LAST.FM INTEGRATION ~
   [!IMPORTANT] Cord no longer requires Rust to be installed. Rust component will
   be automatically downloaded from GitHub Releases.
 
-FEATURES                                *cord-customization-examples-features*
+FEATURES                                              *cord-examples-features*
 
 - **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
 - **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
@@ -1231,7 +1243,7 @@ FEATURES                                *cord-customization-examples-features*
 - **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
 
 
-INSTALL                                  *cord-customization-examples-install*
+INSTALL                                                *cord-examples-install*
 
 
 CONSIDERATIONS ~
@@ -1316,7 +1328,7 @@ Make sure you call the following function somewhere in your configuration:
 Invoke `:Cord update` whenever the plugin is updated.
 
 
-THEMES                                    *cord-customization-examples-themes*
+THEMES                                                  *cord-examples-themes*
 
 Cord features over 120 beautifully designed icons for languages and components
 with distinct themes, with more to come!
@@ -1324,7 +1336,7 @@ with distinct themes, with more to come!
 **Explore the Showcase** <https://github.com/vyfor/icons#showcase>
 
 
-DOCUMENTATION                      *cord-customization-examples-documentation*
+DOCUMENTATION                                    *cord-examples-documentation*
 
 - **Configuration Guide** <./.github/wiki/Configuration.md>Everything you need to customize Cord.
 - **Examples** <./.github/wiki/Examples.md>Creative ways to customize your Discord presence.
@@ -1332,20 +1344,20 @@ DOCUMENTATION                      *cord-customization-examples-documentation*
 - **Wiki** <https://github.com/vyfor/cord.nvim/wiki>Examples, best practices, and FAQs.
 
 
-CONTRIBUTING                        *cord-customization-examples-contributing*
+CONTRIBUTING                                      *cord-examples-contributing*
 
 We welcome contributions to make Cord even better! - Check out our
 **Contribution Guidelines**
 <https://github.com/vyfor/cord.nvim/wiki/Contributing>.
 
 
-FAQ                                          *cord-customization-examples-faq*
+FAQ                                                        *cord-examples-faq*
 
 Have questions or issues? - **Troubleshooting Guide**
 <./.github/wiki/Troubleshooting>
 
 
-BUILD FROM SOURCE              *cord-customization-examples-build-from-source*
+BUILD FROM SOURCE                            *cord-examples-build-from-source*
 
 
   [!NOTE] Make sure you have **Rust** >= 1.85.0 installed.
