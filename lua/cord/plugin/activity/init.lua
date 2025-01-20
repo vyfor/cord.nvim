@@ -29,6 +29,8 @@ local function build_activity(opts)
     else
       opts.filetype = 'Cord.unknown'
     end
+  elseif opts.filetype == 'checkhealth' then
+    opts.filename = 'checkhealth'
   end
 
   local icon_type, icon, tooltip = mappings.get(opts.filetype, opts.filename, opts.buftype)

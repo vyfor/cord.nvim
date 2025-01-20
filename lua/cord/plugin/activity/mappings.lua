@@ -30,6 +30,7 @@ M.filetype_mappings = {
   astro = { 'language', 'astro', 'Astro' },
   awk = { 'language', 'awk', 'Awk' },
   c = { 'language', 'c', 'C ' },
+  checkhealth = { 'language', 'health', 'Health Check' },
   clojure = { 'language', 'clojure', 'Clojure' },
   conf = { 'language', 'gear', 'Config' },
   config = { 'language', 'gear', 'Config' },
