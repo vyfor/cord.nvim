@@ -144,7 +144,7 @@ local function handle_feature(feature, enable)
   if not feat then
     require('cord.plugin.log').log_raw(
       vim.log.levels.ERROR,
-      'Unknown feature: \'' .. feature .. '\''
+      'Unknown option: \'' .. feature .. '\''
     )
     return
   end
@@ -173,6 +173,18 @@ local function handle_feature(feature, enable)
 end
 
 M.commands = {
+  enable = {
+    default = function() M.show_presence() end,
+    action = function(feature) handle_feature(feature, true) end,
+  },
+  disable = {
+    default = function() M.clear_presence() end,
+    action = function(feature) handle_feature(feature, false) end,
+  },
+  toggle = {
+    default = function() M.toggle_presence() end,
+    action = function(feature) handle_feature(feature) end,
+  },
   presence = {
     default = M.toggle_presence,
     subcommands = {
@@ -204,9 +216,6 @@ M.commands = {
   restart = M.restart,
   shutdown = M.shutdown,
   health = M.health,
-  enable = function(feature) handle_feature(feature, true) end,
-  disable = function(feature) handle_feature(feature, false) end,
-  toggle = function(feature) handle_feature(feature) end,
 }
 
 M.get_commands = function()
@@ -265,14 +274,22 @@ M.handle = function(q_args)
   end
 
   local subcmd = args[2]
-
-  if cmd == 'enable' or cmd == 'disable' or cmd == 'toggle' then
-    execute(subcmd)
+  if not subcmd then
+    require('cord.plugin.log').log_raw(vim.log.levels.ERROR, 'Additional arguments required')
     return
   end
 
-  if type(command) == 'table' and command.subcommands and command.subcommands[subcmd] then
-    command.subcommands[subcmd]()
+  if type(command) == 'table' then
+    if command.subcommands and command.subcommands[subcmd] then
+      command.subcommands[subcmd]()
+    elseif command.action then
+      command.action(subcmd)
+    else
+      require('cord.plugin.log').log_raw(
+        vim.log.levels.ERROR,
+        'Unknown option: \'' .. subcmd .. '\' for command \'' .. cmd .. '\''
+      )
+    end
   else
     require('cord.plugin.log').log_raw(
       vim.log.levels.ERROR,
