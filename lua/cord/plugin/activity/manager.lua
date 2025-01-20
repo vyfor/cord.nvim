@@ -44,23 +44,23 @@ local mt = { __index = ActivityManager }
 
 ---@class CordOpts
 ---@field manager ActivityManager Reference to the ActivityManager instance
+---@field name? string Name associated with the current mapping
+---@field tooltip? string Tooltip associated with the current mapping
 ---@field filename string Current buffer's filename
 ---@field filetype string Current buffer's filetype
 ---@field is_read_only boolean Whether the current buffer is read-only
 ---@field cursor_line integer Current cursor line
 ---@field cursor_char integer Current cursor character
 ---@field timestamp number Timestamp passed to the Rich Presence in milliseconds
----@field workspace_dir string Current workspace directory
----@field workspace_name string Current workspace name
+---@field workspace_dir? string Current workspace directory
+---@field workspace_name? string Current workspace name
 ---@field repo_url? string Current Git repository URL, if any
 ---@field is_focused boolean Whether Neovim is focused
 ---@field is_idle boolean Whether the session is idle
----@field buttons CordButtonConfig[] Buttons configuration
+---@field buttons? CordButtonConfig[] Buttons configuration
 ---@field type string Which category the asset belongs to, e.g. 'language' or 'docs'
----@field name? string Asset name, if any
----@field icon string Asset icon URL or name, if any
----@field tooltip string Asset tooltip text, if any
----@field text string Asset text, if any
+---@field icon? string Asset icon URL or name, if any
+---@field text? string Asset text, if any
 
 ---Create a new ActivityManager instance
 ---@param opts {config: CordConfig, tx: table} Configuration and transmitter options
