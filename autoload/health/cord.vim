@@ -1,3 +1,3 @@
 function! health#cord#check()
-  lua require 'cord.api.usercmd'.health()
+  lua require 'cord.api.config'.check()
 endfunction

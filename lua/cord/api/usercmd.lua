@@ -115,29 +115,7 @@ end
 M.version = function()
   require('cord.core.async').run(function() require('cord.server.update').version():await() end)
 end
-M.health = function()
-  local health = vim.health or require 'cord.api.config'
-  local start = health.start or health.report_start
-  local ok = health.ok or health.report_ok
-  local warn = health.warn or health.report_warn
-  local err = health.error or health.report_error
-
-  start 'cord.nvim'
-  local results =
-    require('cord.api.config').validate(require('cord.plugin.config.util').user_config)
-
-  if results.is_valid then
-    ok 'Health check passed'
-  else
-    for _, error in ipairs(results.errors) do
-      err(error.msg, error.hint)
-    end
-
-    for _, warning in ipairs(results.warnings) do
-      warn(warning)
-    end
-  end
-end
+M.health = function() vim.cmd 'checkhealth cord' end
 
 M.features = {
   idle = { path = { 'idle', 'enabled' }, on_disable = function() M.unidle() end },
