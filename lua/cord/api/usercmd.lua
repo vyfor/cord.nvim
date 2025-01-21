@@ -229,7 +229,20 @@ M.get_features = function()
 end
 
 M.handle = function(q_args)
-  local args = vim.split(q_args:gsub('"', ''), '%s+')
+  if not q_args then
+    require('cord.plugin.log').log_raw(vim.log.levels.ERROR, 'No command provided')
+    return
+  end
+
+  if type(q_args) ~= 'string' then
+    require('cord.plugin.log').log_raw(
+      vim.log.levels.ERROR,
+      'Invalid input: expected string, got ' .. tostring(q_args)
+    )
+    return
+  end
+
+  local args = vim.split(string.gsub(q_args, '"', ''), '%s+')
   local args_len = #args
   if args_len == 0 then
     require('cord.plugin.log').log_raw(vim.log.levels.ERROR, 'No command provided')
