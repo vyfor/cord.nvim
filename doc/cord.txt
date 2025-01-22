@@ -1221,6 +1221,14 @@ LAST.FM INTEGRATION ~
 <
 
 
+KEYMAPPINGS ~
+
+>lua
+    vim.keymap.set('n', '<leader>Ct', function() require('cord.api.command').toggle_presence() end)
+    vim.keymap.set('n', '<leader>Ci', function() require('cord.api.command').toggle_idle_force() end)
+<
+
+
 
 
   [!IMPORTANT] Cord no longer requires Rust to be installed. Rust component will
