@@ -56,6 +56,10 @@ M.toggle_idle = function()
   local cord = require 'cord.server'
   if cord.manager then cord.manager:toggle_idle() end
 end
+M.toggle_idle_force = function()
+  local cord = require 'cord.server'
+  if cord.manager then cord.manager:toggle_idle(true) end
+end
 M.restart = function()
   vim.schedule(function()
     local cord = require 'cord.server'

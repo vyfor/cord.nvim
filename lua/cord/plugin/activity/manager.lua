@@ -321,9 +321,11 @@ end
 
 ---Toggle idle state
 ---@return nil
-function ActivityManager:toggle_idle()
+function ActivityManager:toggle_idle(force)
   if self.is_force_idle or self.is_idle then
     self:unidle()
+  elseif force == true then
+    self:force_idle()
   else
     self:idle()
   end
