@@ -20,6 +20,7 @@ function M:connect(path, retried)
     if not err then
       self.status = 'connected'
       logger.debug 'Connected to pipe'
+
       return M:run():await()
     end
 
@@ -50,11 +51,8 @@ end
 
 function M:run()
   return async.wrap(function()
-    local EventSender = require 'cord.server.event.sender'
-    local EventReceiver = require 'cord.server.event.receiver'
-    M.tx = EventSender.new(M.client)
-    M.rx = EventReceiver.new(M.client)
-
+    M.tx = require('cord.server.event.sender').new(M.client)
+    M.rx = require('cord.server.event.receiver').new(M.client)
     M.rx:register(
       'ready',
       true,

@@ -63,6 +63,25 @@ local mt = { __index = ActivityManager }
 ---@field icon? string Asset icon URL or name, if any
 ---@field text? string Asset text, if any
 
+local has_initialized = false
+
+---Meant to be called only once throughout the entire lifetime of the program
+---@return nil
+local function setup()
+  if config.hooks then
+    for event, hook in pairs(config.hooks) do
+      if type(hook) == 'function' then
+        hooks.register(event, hook, 200)
+      elseif type(hook) == 'table' then
+        hooks.register(event, hook[1] or hook.fun, hook.priority or 200)
+      end
+    end
+  end
+
+  local err = require('cord.api.plugin').init()
+  if err then error(err, 0) end
+end
+
 ---Create a new ActivityManager instance
 ---@param opts {config: CordConfig, tx: table} Configuration and transmitter options
 ActivityManager.new = async.wrap(function(opts)
@@ -74,16 +93,6 @@ ActivityManager.new = async.wrap(function(opts)
     events_enabled = true,
     workspace_cache = {},
   }, mt)
-
-  if config.hooks then
-    for event, hook in pairs(config.hooks) do
-      if type(hook) == 'function' then
-        hooks.register(event, hook, 200)
-      elseif type(hook) == 'table' then
-        hooks.register(event, hook[1] or hook.fun, hook.priority or 200)
-      end
-    end
-  end
 
   local rawdir = vim.fn.expand '%:p:h'
   local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
@@ -102,8 +111,10 @@ ActivityManager.new = async.wrap(function(opts)
 
   self.workspace_cache[rawdir] = cache
 
-  local err = require('cord.api.plugin').init()
-  if err then error(err, 0) end
+  if not has_initialized then
+    setup()
+    has_initialized = true
+  end
 
   return self
 end)

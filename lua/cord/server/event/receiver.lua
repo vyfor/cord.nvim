@@ -41,6 +41,7 @@ function Handler:run()
 
   local buffer = ''
   self.client:read_start(function(data)
+    logger.trace('Received data: ' .. tostring(data))
     buffer = buffer .. data
 
     while #buffer >= 4 do
@@ -56,9 +57,7 @@ function Handler:run()
 
       local ok, event = pcall(vim.mpack.decode, message)
       if not ok then
-        logger.error(
-          'Failed to decode event: ' .. event .. '; data: ' .. message
-        )
+        logger.error('Failed to decode event: ' .. event .. '; data: ' .. message)
         goto continue
       end
 
