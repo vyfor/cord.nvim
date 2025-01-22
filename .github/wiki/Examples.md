@@ -299,3 +299,9 @@ return {
   },
 }
 ```
+
+### Keymappings
+```lua
+vim.keymap.set('n', '<leader>Ct', function() require('cord.api.command').toggle_presence() end)
+vim.keymap.set('n', '<leader>Ci', function() require('cord.api.command').toggle_idle_force() end)
+```
