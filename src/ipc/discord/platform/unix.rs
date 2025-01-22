@@ -148,11 +148,13 @@ impl Connection for RichClient {
                                 }
                             }
                         }
-                        Err(e) => {
+                        Err(_) => {
                             tx.send(local_event!(
                                 0,
                                 Error,
-                                ErrorEvent::new(Box::new(DiscordError::Io(e)))
+                                ErrorEvent::new(Box::new(
+                                    DiscordError::ConnectionClosed
+                                ))
                             ))
                             .ok();
                             break;
@@ -182,7 +184,7 @@ impl Connection for RichClient {
 
             match pipe.write_all(&payload) {
                 Ok(_) => Ok(()),
-                Err(e) => Err(DiscordError::Io(e).into()),
+                Err(_) => Err(DiscordError::ConnectionClosed.into()),
             }
         })
     }

@@ -77,7 +77,9 @@ pub trait PipeClientImpl {
 /// Sends an error event message when an error occurs, managing broken pipe errors
 /// by sending a disconnect event.
 fn report_error(id: u32, tx: &Sender<Message>, error: io::Error) {
-    if error.kind() == io::ErrorKind::BrokenPipe {
+    if error.kind() == io::ErrorKind::BrokenPipe
+        || error.kind() == io::ErrorKind::ConnectionReset
+    {
         tx.send(client_event!(id, Disconnect)).ok();
         return;
     }
