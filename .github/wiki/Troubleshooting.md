@@ -10,7 +10,7 @@ Lazy may be unable to update to the new branch from the `master` branch, in whic
 
 - **Windows:**
     ```pwsh
-    rm \"$env:LOCALAPPDATA/nvim-data/lazy/cord.nvim\" -r -force
+    rm "$env:LOCALAPPDATA/nvim-data/lazy/cord.nvim" -r -force
     ```
 
 ### Rich Presence is not shown in Discord
@@ -36,6 +36,9 @@ Lazy may be unable to update to the new branch from the `master` branch, in whic
 
 ### Rich Presence timer is stuck at 00:00
 - This issue is usually resolved by syncing your system date and timezone
+
+### Using Discord in browser
+- Discord doesn't expose the IPC pipe when running in the browser. Luckily, you can use [arrpc](https://github.com/OpenAsar/arrpc) to create a bridge and send presence updates
 
 ### Running inside WSL
 - WSL doesn't expose Windows pipes by default. In order to do so, install [socat](https://www.kali.org/tools/socat) and [npiperelay](https://github.com/jstarks/npiperelay/), then alias nvim to expose the pipe as done in this [guide](https://gist.github.com/mousebyte/af45cbecaf0028ea78d0c882c477644a#aliasing-nvim):

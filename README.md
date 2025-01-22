@@ -32,10 +32,14 @@
 - 🧠 **Automated State Handling** — Automatically manages activities across all instances.
 - 💤 **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
 - 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS files without relying on command-line tools.
-- 🔌 **Plugin System** — Extendable with custom plugins, with plenty of built-in ones out of the box.
-- 🌍 **Cross-Platform** — Supports Windows, Linux (Flatpak/Snap), macOS, and BSD.
+- 🗃️ **Custom Assets** — Extendable with fully customizable assets for any file/buffer type.
+- ⚙️ **Robust User Commands** - Quickly manage Cord and its features through user commands and easily create your own keybindings.
+- 🔌 **Plugin System** — Extendable with custom plugins, with a plethora of built-in ones out of the box.
+- 📦 **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside [WSL](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#running-inside-wsl) and [Discord in browser](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#using-discord-in-browser).
+- 🌍 **Cross-Platform** — Supports Windows, Linux, macOS, and FreeBSD.
 - 🌸 **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
 - 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
+
 
 ## 📦 Install 
 
