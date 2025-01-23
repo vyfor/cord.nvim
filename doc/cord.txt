@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 22
+*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 23
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -59,6 +59,7 @@ Default values ~
   specify will use their default values.
 >lua
     {
+      enabled = true,
       editor = {
         client = 'neovim',
         tooltip = 'The Superior Text Editor',
@@ -1277,7 +1278,7 @@ Using lazy.nvim ~
       'vyfor/cord.nvim',
       branch = 'client-server',
       build = ':Cord update',
-      opts = {}, -- calls require('cord').setup()
+      -- opts = {}
     }
 <
 
@@ -1288,9 +1289,9 @@ Using packer.nvim ~
       'vyfor/cord.nvim',
       branch = 'client-server',
       run = ':Cord update',
-      config = function()
-        require('cord').setup()
-      end
+      -- config = function()
+      --   require('cord').setup {}
+      -- end
     }
 <
 
@@ -1302,8 +1303,7 @@ Cord is available on LuaRocks <https://luarocks.org/modules/vyfor/cord.nvim>.
     :Rocks install cord.nvim
 <
 
-Do not forget to call `require('cord').setup()` to initialize the plugin, or
-set `config = true`. Invoke `:Cord update` whenever the plugin is updated.
+Invoke `:Cord update` whenever the plugin is updated.
 
 Using Vim packages ~
 
@@ -1319,21 +1319,9 @@ Using Vim packages ~
     git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 <
 
-Then call the following function somewhere in your configuration:
-
->lua
-    require('cord').setup()
-<
-
 Invoke `:Cord update` whenever the plugin is updated.
 
 Other ~
-
-Make sure you call the following function somewhere in your configuration:
-
->lua
-    require('cord').setup()
-<
 
 Invoke `:Cord update` whenever the plugin is updated.
 
