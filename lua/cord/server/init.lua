@@ -1,4 +1,5 @@
 local async = require 'cord.core.async'
+local config = require 'cord.plugin.config'
 local logger = require 'cord.plugin.log'
 
 local M = {}
@@ -39,7 +40,7 @@ function M:connect(path, retried)
     ::spawn::
     logger.debug 'Pipe not found. Spawning server executable...'
 
-    local process = require('cord.server.spawn').spawn(self.config, path)
+    local process = require('cord.server.spawn').spawn(config.get(), path)
     local should_continue, retry = process:await()
     if not should_continue then return end
 
@@ -60,7 +61,7 @@ function M:run()
         self.status = 'ready'
         async.run(function()
           logger.info 'Connected to Discord'
-          M.tx:initialize(self.config)
+          M.tx:initialize(config.get())
 
           local ActivityManager = require 'cord.plugin.activity.manager'
           local manager, err = ActivityManager.new({ tx = M.tx }):get()
@@ -88,7 +89,7 @@ function M:run()
               M.manager:cleanup()
               require('cord.plugin.activity.hooks').run 'shutdown'
 
-              if self.config.advanced.discord.reconnect.enabled then
+              if config.advanced.discord.reconnect.enabled then
                 logger.info 'Reconnecting...'
               end
 
@@ -112,13 +113,12 @@ function M:run()
   end)()
 end
 
-function M:initialize(config)
+function M:initialize()
   self.status = 'connecting'
-  self.config = config or self.config
   async.run(function()
     logger.debug 'Initializing server...'
 
-    local path = self.config.advanced.server.pipe_path
+    local path = config.advanced.server.pipe_path
       or require('cord.plugin.constants').get_pipe_path()
 
     local _, err = M:connect(path):get()

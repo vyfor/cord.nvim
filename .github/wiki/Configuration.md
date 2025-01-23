@@ -15,6 +15,7 @@ require('cord').setup {
 
 ```lua
 {
+  enabled = true,
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',

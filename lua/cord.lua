@@ -1,10 +1,10 @@
-local M = {}
+local M
 
----@param opts? CordConfig Configuration options for Cord
----@return nil
-function M.setup(opts)
-  local config = require('cord.plugin.config.util'):validate(opts or {})
-  if config then require('cord.server'):initialize(config) end
-end
+M = {
+  ---@param opts? CordConfig Configuration options for Cord
+  setup = function(opts)
+    if opts then M.user_config = opts end
+  end,
+}
 
 return M

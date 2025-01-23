@@ -104,8 +104,7 @@ function M.init()
     end
   end
 
-  local config_manager = require 'cord.plugin.config'
-  local user_config = config_manager.user_config or {}
+  local user_config = require('cord').user_config or {}
 
   local plugin_configs = {}
   for _, plugin_config in pairs(configs) do

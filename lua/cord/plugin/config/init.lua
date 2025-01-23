@@ -99,6 +99,7 @@
 ---@alias CordVariablesConfig { [string]: string|fun(opts: CordOpts):string }
 
 ---@class CordConfig
+---@field enabled? boolean Whether Cord plugin is enabled
 ---@field editor? CordEditorConfig Editor configuration
 ---@field display? CordDisplayConfig Display configuration
 ---@field timestamp? CordTimestampConfig Timestamp configuration
@@ -115,6 +116,7 @@
 local M = {}
 
 local defaults = {
+  enabled = true,
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',

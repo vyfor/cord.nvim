@@ -145,6 +145,8 @@ local function get_nested_value(config, path)
 end
 
 M.validate = function(user_config)
+  if not user_config then return { is_valid = true } end
+
   local errors = {}
   local warnings = {}
 
@@ -210,7 +212,7 @@ M.check = function()
   local err = health.error or health.report_error
 
   start 'cord.nvim'
-  local results = M.validate(require('cord.plugin.config.util').user_config)
+  local results = M.validate(require('cord').user_config)
   if results.is_valid then
     ok 'Health check passed'
   else
