@@ -26,7 +26,7 @@ command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.ap
 
 lua << EOF
     vim.schedule(function()
-        local config = require('cord.plugin.config.util'):validate()
+        local config = require('cord.plugin.config.util').validate()
         if not config then return end
 
         if config.enabled then

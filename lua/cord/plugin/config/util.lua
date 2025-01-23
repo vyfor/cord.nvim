@@ -2,7 +2,7 @@ local config = require 'cord.plugin.config'
 
 local M = {}
 
-function M:validate(user_config)
+function M.validate(user_config)
   local logger = require 'cord.plugin.log'
   local icons = require 'cord.api.icon'
 
