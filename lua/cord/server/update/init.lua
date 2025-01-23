@@ -184,7 +184,6 @@ M.fetch = async.wrap(function()
       .. '-'
       .. (os_info.name == 'windows' and 'cord.exe' or 'cord')
 
-    local cord = require 'cord.server'
     local function initialize()
       async.run(function()
         process
@@ -213,7 +212,7 @@ M.fetch = async.wrap(function()
             async.run(function()
               server.is_updating = false
               require('cord.core.uv.fs').chmod(executable_path, '755'):await()
-              cord:initialize()
+              server:initialize()
             end)
           end, function(err)
             server.is_updating = false
@@ -222,19 +221,19 @@ M.fetch = async.wrap(function()
       end)
     end
 
-    if cord.manager then cord.manager:cleanup() end
-    if not cord.tx then return initialize() end
-    if not cord.client then return initialize() end
-    if cord.client:is_closing() then return initialize() end
+    if server.manager then server.manager:cleanup() end
+    if not server.tx then return initialize() end
+    if not server.client then return initialize() end
+    if server.client:is_closing() then return initialize() end
 
-    if cord.client.on_close then cord.client.on_close() end
+    if server.client.on_close then server.client.on_close() end
 
-    cord.client.on_close = function()
-      cord.client.on_close = nil
+    server.client.on_close = function()
+      server.client.on_close = nil
       initialize()
     end
 
-    cord.tx:shutdown()
+    server.tx:shutdown()
   end)
 
   async.run(function()
@@ -245,6 +244,8 @@ M.fetch = async.wrap(function()
       if latest == current then
         server.is_updating = false
         logger.info('Already on latest server version ' .. latest)
+
+        if not server.client or server.client:is_closing() then server:initialize() end
       else
         fetch_executable(latest)
       end
