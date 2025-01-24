@@ -236,9 +236,15 @@ M.check = function()
   info('Lua version: `' .. tostring(_VERSION) .. (jit and ' (with LuaJIT)`' or '`'))
   info('Cord connection status: `' .. tostring(require('cord.server').status) .. '`\n')
 
+  if vim.fn.executable 'curl' == 1 then
+    ok '`curl` is installed'
+  else
+    warn '`curl` is not installed or not in PATH'
+  end
+
   local results = M.validate(require('cord').user_config)
   if results.is_valid then
-    ok 'Health check passed'
+    ok 'No configuration issues found'
   else
     for _, error in ipairs(results.errors) do
       err(error.msg, error.hint)
