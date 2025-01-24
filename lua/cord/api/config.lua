@@ -208,10 +208,34 @@ M.check = function()
   local health = vim.health or require 'cord.api.config'
   local start = health.start or health.report_start
   local ok = health.ok or health.report_ok
+  local info = health.info or health.report_info
   local warn = health.warn or health.report_warn
   local err = health.error or health.report_error
 
   start 'cord.nvim'
+
+  local os_info = vim.loop.os_uname()
+  local wsl_info = os.getenv 'WSL_DISTRO_NAME'
+  info(
+    'System information:\n'
+      .. '  Sysname: `'
+      .. os_info.sysname
+      .. '`\n'
+      .. '  Architecture: `'
+      .. os_info.machine
+      .. '`\n'
+      .. '  Release: `'
+      .. os_info.release
+      .. '`\n'
+      .. '  Version: `'
+      .. os_info.version
+      .. '`'
+      .. (wsl_info and ('\n  Running inside WSL (`' .. wsl_info .. '`)') or '')
+  )
+  info('Neovim version: `' .. tostring(vim.version()) .. '`')
+  info('Lua version: `' .. tostring(_VERSION) .. (jit and ' (with LuaJIT)`' or '`'))
+  info('Cord connection status: `' .. tostring(require('cord.server').status) .. '`\n')
+
   local results = M.validate(require('cord').user_config)
   if results.is_valid then
     ok 'Health check passed'
