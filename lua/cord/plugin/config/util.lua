@@ -8,12 +8,41 @@ function M.validate(user_config)
 
   local config_manager = require 'cord.plugin.config'
   local final_config = vim.tbl_deep_extend('force', config_manager.get(), user_config or require('cord').user_config or {})
-  logger.set_level(final_config.log_level)
+
+  local log_level = final_config.log_level
+  if type(log_level) == 'string' then
+    local level = vim.log.levels[string.upper(log_level)]
+    if not level then
+      logger.error('Unknown log level: ' .. log_level)
+      return
+    end
+    log_level = level
+  elseif type(log_level) ~= 'number' then
+    logger.error('Log level must be a string or `vim.log.levels.*`')
+    return
+  end
+
+  final_config.log_level = log_level
+  logger.set_level(log_level)
   icons.set_theme(final_config.display.theme)
 
-  if final_config.buttons and #final_config.buttons > 2 then
-    logger.error 'There cannot be more than 2 buttons'
-    return
+  if final_config.buttons then
+    if #final_config.buttons > 2 then
+      logger.error 'There cannot be more than 2 buttons'
+      return
+    end
+
+    for _, button in ipairs(final_config.buttons) do
+      if not button.label or not button.url then
+        logger.error 'Each button must have a label and a URL'
+        return
+      end
+
+      if type(button.url) == 'string' and not button.url:match '^https?://[^%s]+$' then
+        logger.error('`' .. button.url .. '` is not a valid button URL')
+        return
+      end
+    end
   end
 
   if type(final_config.editor.client) == 'string' then

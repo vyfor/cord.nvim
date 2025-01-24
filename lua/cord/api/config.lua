@@ -5,7 +5,7 @@ local M = {}
 
 local validation_rules = {
   ['enabled'] = { 'boolean' },
-  ['log_level'] = { 'number' },
+  ['log_level'] = { 'string', 'number' },
 
   ['editor'] = { 'table' },
   ['editor.client'] = { 'string' },

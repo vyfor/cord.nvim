@@ -99,7 +99,7 @@
 
 ---@class CordConfig
 ---@field enabled? boolean Whether Cord plugin is enabled
----@field log_level? integer Log level (from `vim.log.levels`)
+---@field log_level? string|integer Log level (from `vim.log.levels`)
 ---@field editor? CordEditorConfig Editor configuration
 ---@field display? CordDisplayConfig Display configuration
 ---@field timestamp? CordTimestampConfig Timestamp configuration
