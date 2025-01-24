@@ -78,7 +78,6 @@
 
 ---@class CordAdvancedPluginConfig
 ---@field autocmds? boolean Whether to enable autocmds
----@field log_level? integer Logging level (from `vim.log.levels`)
 ---@field cursor_update? string Cursor update mode
 ---@field match_in_mappings? boolean Whether to match against file extensions in mappings
 
@@ -100,6 +99,7 @@
 
 ---@class CordConfig
 ---@field enabled? boolean Whether Cord plugin is enabled
+---@field log_level? integer Log level (from `vim.log.levels`)
 ---@field editor? CordEditorConfig Editor configuration
 ---@field display? CordDisplayConfig Display configuration
 ---@field timestamp? CordTimestampConfig Timestamp configuration
@@ -117,6 +117,7 @@ local M = {}
 
 local defaults = {
   enabled = true,
+  log_level = vim.log.levels.INFO,
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',
@@ -177,7 +178,6 @@ local defaults = {
   advanced = {
     plugin = {
       autocmds = true,
-      log_level = vim.log.levels.INFO,
       cursor_update = 'on_hold',
       match_in_mappings = true,
     },

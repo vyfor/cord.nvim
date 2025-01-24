@@ -17,7 +17,7 @@ end
 function Producer:initialize(config)
   self:send_event(
     'initialize',
-    { log_level = config.advanced.plugin.log_level }
+    { log_level = config.log_level }
   )
 end
 

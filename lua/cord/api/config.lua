@@ -4,6 +4,9 @@ local unpack = unpack or table.unpack
 local M = {}
 
 local validation_rules = {
+  ['enabled'] = { 'boolean' },
+  ['log_level'] = { 'number' },
+
   ['editor'] = { 'table' },
   ['editor.client'] = { 'string' },
   ['editor.tooltip'] = { 'string' },
@@ -67,7 +70,6 @@ local validation_rules = {
   ['advanced'] = { 'table' },
   ['advanced.plugin'] = { 'table' },
   ['advanced.plugin.autocmds'] = { 'boolean' },
-  ['advanced.plugin.log_level'] = { 'number' },
   ['advanced.plugin.cursor_update'] = { 'string' },
   ['advanced.plugin.match_in_mappings'] = { 'boolean' },
   ['advanced.server'] = { 'table' },

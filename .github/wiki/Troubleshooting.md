@@ -17,7 +17,7 @@ Lazy may be unable to update to the new branch from the `master` branch, in whic
 1. Confirm that you're not using the web version of Discord or a custom client, or have taken measures to expose the pipe.
 2. Ensure that `cord.nvim` is loaded (try running a user command, e.g. `:Cord status`)
 4. Check your [Activity Privacy](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce) settings
-5. Set [`advanced.plugin.log_level`](./Configuration.md#️-advanced) to `vim.log.levels.TRACE` and check `:messages` for logs
+5. Set [`log_level`](./Configuration.md) to `vim.log.levels.TRACE` and check `:messages` for logs
 6. Verify that the Discord IPC pipe exists:
 
    **Windows:**

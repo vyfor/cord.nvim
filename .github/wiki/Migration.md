@@ -55,13 +55,6 @@ idle = {
   details = 'Idling',     -- was idle.text
   ignore_focus = false,   -- was idle.disable_on_focus (inverted)
 }
-
--- Moved Options
-advanced = {
-  plugin = {
-    log_level = vim.log.levels.INFO, -- was log_level (now uses vim.log.levels)
-  }
-}
 ```
 
 ### Removed Features

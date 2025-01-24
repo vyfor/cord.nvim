@@ -16,6 +16,7 @@ require('cord').setup {
 ```lua
 {
   enabled = true,
+  log_level = vim.log.levels.INFO,
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',
@@ -76,7 +77,6 @@ require('cord').setup {
   advanced = {
     plugin = {
       autocmds = true,
-      log_level = vim.log.levels.INFO,
       cursor_update = 'on_hold',
       match_in_mappings = true,
     },
@@ -187,19 +187,18 @@ require('cord').setup {
 
 ## ⚙️ Advanced
 
-| Option                                | Type            | Default               | Description                                                                                                                                                                                        |
-| ------------------------------------- | --------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `advanced.plugin.autocmds`            | `boolean`       | `true`                | Enable autocmds                                                                                                                                                                                    |
-| `advanced.plugin.log_level`           | `number`        | `vim.log.levels.INFO` | Logging level for the plugin                                                                                                                                                                       |
-| `advanced.plugin.cursor_update`       | `string`        | `'on_hold'`           | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                                               |
-| `advanced.plugin.match_in_mappings`   | `boolean`       | `true`                | Whether to match against file extensions in mappings                                                                                                                                               |
-| `advanced.server.update`              | `string`        | `'fetch'`             | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
-| `advanced.server.pipe_path`           | `string \| nil` | `nil`                 | Custom IPC pipe path                                                                                                                                                                               |
-| `advanced.server.executable_path`     | `string \| nil` | `nil`                 | Custom server executable path                                                                                                                                                                      |
-| `advanced.server.timeout`             | `number`        | `300000`              | Server shutdown timeout (ms)                                                                                                                                                                       |
-| `advanced.discord.reconnect.enabled`  | `boolean`       | `false`               | Whether reconnection is enabled. Has minimal impact on performance                                                                                                                                 |
-| `advanced.discord.reconnect.interval` | `number`        | `5000`                | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
-| `advanced.discord.reconnect.initial`  | `boolean`       | `true`                | Whether to reconnect if initial connection fails                                                                                                                                                   |
+| Option                                | Type            | Default     | Description                                                                                                                                                                                        |
+| ------------------------------------- | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `advanced.plugin.autocmds`            | `boolean`       | `true`      | Enable autocmds                                                                                                                                                                                    |
+| `advanced.plugin.cursor_update`       | `string`        | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                                               |
+| `advanced.plugin.match_in_mappings`   | `boolean`       | `true`      | Whether to match against file extensions in mappings                                                                                                                                               |
+| `advanced.server.update`              | `string`        | `'fetch'`   | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
+| `advanced.server.pipe_path`           | `string \| nil` | `nil`       | Custom IPC pipe path                                                                                                                                                                               |
+| `advanced.server.executable_path`     | `string \| nil` | `nil`       | Custom server executable path                                                                                                                                                                      |
+| `advanced.server.timeout`             | `number`        | `300000`    | Server shutdown timeout (ms)                                                                                                                                                                       |
+| `advanced.discord.reconnect.enabled`  | `boolean`       | `false`     | Whether reconnection is enabled. Has minimal impact on performance                                                                                                                                 |
+| `advanced.discord.reconnect.interval` | `number`        | `5000`      | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
+| `advanced.discord.reconnect.initial`  | `boolean`       | `true`      | Whether to reconnect if initial connection fails                                                                                                                                                   |
 
 ---
 

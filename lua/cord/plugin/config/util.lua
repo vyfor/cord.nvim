@@ -8,7 +8,7 @@ function M.validate(user_config)
 
   local config_manager = require 'cord.plugin.config'
   local final_config = vim.tbl_deep_extend('force', config_manager.get(), user_config or require('cord').user_config or {})
-  logger.set_level(final_config.advanced.plugin.log_level)
+  logger.set_level(final_config.log_level)
   icons.set_theme(final_config.display.theme)
 
   if final_config.buttons and #final_config.buttons > 2 then
