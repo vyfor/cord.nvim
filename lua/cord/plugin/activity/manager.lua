@@ -383,6 +383,7 @@ function ActivityManager.setup_autocmds()
     augroup CordActivityManager
       autocmd!
       autocmd BufEnter * lua require'cord.server'.manager:on_buf_enter()
+      autocmd TermOpen * lua require'cord.server'.manager:on_buf_enter()
       autocmd FocusGained * lua require'cord.server'.manager:on_focus_gained()
       autocmd FocusLost * lua require'cord.server'.manager:on_focus_lost()
     augroup END
