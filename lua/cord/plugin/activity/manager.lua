@@ -95,7 +95,7 @@ ActivityManager.new = async.wrap(function(opts)
   }, mt)
 
   local rawdir = vim.fn.expand '%:p:h'
-  local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
+  local dir = ws_utils.find(rawdir, vim.bo.buftype):get() or vim.fn.getcwd()
   self.workspace_dir = dir
 
   local cache = {
@@ -103,7 +103,7 @@ ActivityManager.new = async.wrap(function(opts)
     name = vim.fn.fnamemodify(dir, ':t'),
   }
 
-  local repo_url = ws_utils.find_git_repository(dir):get()
+  local repo_url = ws_utils.find_git_repository(dir, vim.bo.buftype):get()
   if repo_url then
     self.repo_url = repo_url
     cache.repo_url = repo_url
@@ -470,8 +470,7 @@ function ActivityManager:on_buf_enter()
   end
 
   async.run(function()
-    local ws_utils = require 'cord.plugin.fs.workspace'
-    local dir = ws_utils.find(vim.fn.expand '%:p:h'):get() or vim.fn.getcwd()
+    local dir = ws_utils.find(vim.fn.expand '%:p:h', vim.bo.buftype):get() or vim.fn.getcwd()
 
     if not dir then
       self.workspace_cache[rawdir] = false
@@ -485,7 +484,7 @@ function ActivityManager:on_buf_enter()
     self.opts.workspace_name = self.workspace
     self.opts.workspace = self.workspace
 
-    local repo_url = ws_utils.find_git_repository(self.workspace_dir):get()
+    local repo_url = ws_utils.find_git_repository(self.workspace_dir, vim.bo.buftype):get()
     self.repo_url = repo_url
     self.opts.repo_url = repo_url
 

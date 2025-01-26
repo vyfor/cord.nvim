@@ -17,8 +17,14 @@ local check_vcs_marker = async.wrap(function(curr_dir, marker)
   return (stat.type == 'directory' and curr_dir)
 end)
 
-M.find = async.wrap(function(initial_path)
+local function parse_term_cwd(term_filename)
+  local cwd = term_filename:match '^term://(.-)//%d+:'
+  return cwd
+end
+
+M.find = async.wrap(function(initial_path, buftype)
   if not initial_path or initial_path == '' then return end
+  if buftype == 'terminal' then initial_path = parse_term_cwd(initial_path) end
 
   initial_path = initial_path:gsub('^%w+://+', '')
   local curr_dir = initial_path
@@ -60,8 +66,7 @@ M.find_git_repository = async.wrap(function(workspace_path)
   local content = fs.readfile(config_path):get()
   if not content then return end
 
-  local origin_url =
-    content:match '%[remote "origin"%]%s*\n%s*url%s*=%s*([^\n]+)'
+  local origin_url = content:match '%[remote "origin"%]%s*\n%s*url%s*=%s*([^\n]+)'
   if origin_url then return format_url(vim.trim(origin_url)) end
 
   local first_url = content:match '%[remote "[^"]+"%]%s*\n%s*url%s*=%s*([^\n]+)'
