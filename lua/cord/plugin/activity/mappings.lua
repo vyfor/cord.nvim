@@ -358,8 +358,6 @@ M.cord_related = {
 M.get_default_icon = function(type) return M.default_icons[type] or M.default_icons.language end
 
 M.get = function(filetype, filename, buftype)
-  if buftype == 'terminal' then return 'terminal', M.default_icons.terminal, 'Terminal' end
-
   local result = M.filename_mappings[filename:lower()]
   if result then return result[1], result[2], result[3] end
 
@@ -373,6 +371,8 @@ M.get = function(filetype, filename, buftype)
 
   local result = M.filetype_mappings[filetype]
   if result then return result[1], result[2], result[3] end
+
+  if buftype == 'terminal' then return 'terminal', M.default_icons.terminal, 'Terminal' end
 
   local result = M.cord_related[filetype]
   if result then return result[1], result[2], result[3] end
