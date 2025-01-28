@@ -1,0 +1,8 @@
+max_width = 80
+tab_spaces = 4
+edition = "2021"
+imports_granularity = "Module"
+group_imports = "StdExternalCrate"
+use_field_init_shorthand = true
+use_try_shorthand = true
+format_strings = true
