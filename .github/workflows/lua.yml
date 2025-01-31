@@ -20,21 +20,3 @@ jobs:
 
       - name: Lint Lua
         uses: lunarmodules/luacheck@v1
-      
-      - name: Format Lua
-        if: github.event_name == 'push'
-        uses: JohnnyMorganz/stylua-action@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          version: latest
-          args: lua --color always
-
-      - name: Apply changes
-        if: github.event_name == 'push'
-        run: |
-          git pull
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "style(lua): reformat code" || echo "No changes to commit"
-          git push
