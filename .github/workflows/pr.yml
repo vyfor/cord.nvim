@@ -2,7 +2,7 @@ name: Conventional Commits Validation
 
 on:
   pull_request:
-    branches: [master, client-server]
+    branches: [master]
     types: [opened, synchronize, reopened, edited]
 
 jobs:

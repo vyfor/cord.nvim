@@ -101,7 +101,7 @@ local function check_versions()
       .spawn({
         cmd = 'curl',
         args = {
-          'https://raw.githubusercontent.com/vyfor/cord.nvim/refs/heads/client-server/.github/server-version.txt',
+          'https://raw.githubusercontent.com/vyfor/cord.nvim/refs/heads/master/.github/server-version.txt',
           '--fail',
         },
       })

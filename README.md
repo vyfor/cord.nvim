@@ -61,7 +61,6 @@ Cord requires the server executables to be present. To get it, you can either:
 ```lua
 {
   'vyfor/cord.nvim',
-  branch = 'client-server',
   build = ':Cord update',
   -- opts = {}
 }
@@ -75,7 +74,6 @@ Cord requires the server executables to be present. To get it, you can either:
 ```lua
 use {
   'vyfor/cord.nvim',
-  branch = 'client-server',
   run = ':Cord update',
   -- config = function()
   --   require('cord').setup {}
@@ -103,12 +101,12 @@ Invoke `:Cord update` whenever the plugin is updated.
 
 **Unix:**
 ```bash
-git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
+git clone --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
 ```
 
 **Windows:**
 ```powershell
-git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
+git clone --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 ```
 
 Invoke `:Cord update` whenever the plugin is updated.

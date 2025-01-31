@@ -3,7 +3,7 @@ name: Panvimdoc
 on:
   workflow_dispatch:
   push:
-    branches: [master, client-server]
+    branches: [master]
     paths:
       - README.md
       - .github/wiki/**

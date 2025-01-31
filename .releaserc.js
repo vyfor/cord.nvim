@@ -2,7 +2,7 @@ module.exports = {
   "branches": [
     "master",
     {
-      "name": "client-server",
+      "name": "next",
       "prerelease": "beta",
       "channel": "beta"
     }

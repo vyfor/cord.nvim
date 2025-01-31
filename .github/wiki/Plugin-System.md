@@ -80,4 +80,4 @@ return M
 - In plugin runtime, use `require('cord.plugin.log')` to log messages and errors
 - Use function-based configuration over string templates wherever possible. You can still provide custom variables as they are only evaluated when needed
 
-> Example plugin: [`diagnostics.lua`](https://github.com/vyfor/cord.nvim/blob/client-server/lua/cord/plugins/diagnostics.lua)
+> Example plugin: [`diagnostics.lua`](https://github.com/vyfor/cord.nvim/blob/master/lua/cord/plugins/diagnostics.lua)
