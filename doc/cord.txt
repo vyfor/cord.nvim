@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 24
+*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 31
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -28,8 +28,8 @@ Table of Contents                                     *cord-table-of-contents*
   - Structure                                   |cord-custom-assets-structure|
   - Asset Configuration               |cord-custom-assets-asset-configuration|
   - Overriding Defaults               |cord-custom-assets-overriding-defaults|
-3. Built-in Plugins                                    |cord-built-in-plugins|
-  - Available Plugins                |cord-built-in-plugins-available-plugins|
+3. Plugins                                                      |cord-plugins|
+  - Available Plugins                         |cord-plugins-available-plugins|
 4. Examples                                                    |cord-examples|
   - Features                                          |cord-examples-features|
   - Install                                            |cord-examples-install|
@@ -60,7 +60,7 @@ Default values ~
 >lua
     {
       enabled = true,
-      log_level = vim.log.levels.INFO,
+      log_level = vim.log.levels.OFF,
       editor = {
         client = 'neovim',
         tooltip = 'The Superior Text Editor',
@@ -106,6 +106,12 @@ Default values ~
         dashboard = 'Home',
       }, 
       buttons = nil,
+      -- buttons = {
+      --   {
+      --     label = 'View Repository',
+      --     url = function(opts) return opts.repo_url end,
+      --   },
+      -- },
       assets = nil,
       variables = nil,
       hooks = {
@@ -775,7 +781,7 @@ define icons for generic scenarios:
 
 
 ==============================================================================
-3. Built-in Plugins                                    *cord-built-in-plugins*
+3. Plugins                                                      *cord-plugins*
 
 Cord comes with several built-in plugins that can be configured in your setup.
 To use a plugin, simply add its `require` path to the `plugins` table in your
@@ -786,19 +792,16 @@ cord setup:
       plugins = {
         'cord.plugins.diagnostics',
     
-        -- optionally, provide a custom configuration
-        {
-          'cord.plugins.diagnostics',
-          config = {
-            severity = vim.diagnostic.severity.ERROR,
-          }
+        -- optionally, configure the plugin
+        ['cord.plugins.diagnostics'] = {
+          severity = vim.diagnostic.severity.ERROR,
         }
       }
     }
 <
 
 
-AVAILABLE PLUGINS                    *cord-built-in-plugins-available-plugins*
+AVAILABLE PLUGINS                             *cord-plugins-available-plugins*
 
 
 DIAGNOSTICS (CORD.PLUGINS.DIAGNOSTICS) ~
