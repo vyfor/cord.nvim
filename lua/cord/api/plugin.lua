@@ -56,13 +56,13 @@ function M.init()
 
     if type(ty) == 'number' then
       name = def
-      cfg = plugin
       logger.debug('Loading plugin: ' .. name)
       local ok, mod = pcall(require, name)
       if not ok then return 'Failed to load plugin \'' .. name .. '\': ' .. mod end
       plugin = mod
     elseif type(ty) == 'string' and type(def) == 'table' then
       name = ty
+      cfg = def
       logger.debug('Loading plugin with config: ' .. name)
       local ok, mod = pcall(require, name)
       if not ok then return 'Failed to load plugin \'' .. name .. '\': ' .. mod end
