@@ -16,7 +16,7 @@ require('cord').setup {
 ```lua
 {
   enabled = true,
-  log_level = vim.log.levels.INFO,
+  log_level = vim.log.levels.OFF,
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',

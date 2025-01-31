@@ -39,7 +39,7 @@ M.build = async.wrap(function()
               if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
               return
             end
-            logger.info 'Successfully built executable. Restarting...'
+            logger.log_raw(vim.log.levels.INFO, 'Successfully built executable. Restarting...')
 
             async.run(function()
               server.is_updating = false
@@ -209,7 +209,7 @@ M.fetch = async.wrap(function()
               if res.stderr then logger.error('curl\'s stderr: ' .. res.stderr) end
               return
             end
-            logger.info 'Successfully updated executable. Restarting...'
+            logger.log_raw(vim.log.levels.INFO, 'Successfully updated executable. Restarting...')
 
             async.run(function()
               server.is_updating = false

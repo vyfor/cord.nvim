@@ -13,12 +13,12 @@ function M.validate(user_config)
   if type(log_level) == 'string' then
     local level = vim.log.levels[string.upper(log_level)]
     if not level then
-      logger.error('Unknown log level: ' .. log_level)
+      logger.log_raw(vim.log.levels.ERROR, 'Unknown log level: ' .. log_level)
       return
     end
     log_level = level
   elseif type(log_level) ~= 'number' then
-    logger.error('Log level must be a string or `vim.log.levels.*`')
+    logger.log_raw(vim.log.levels.ERROR, 'Log level must be a string or `vim.log.levels.*`')
     return
   end
 
@@ -28,18 +28,18 @@ function M.validate(user_config)
 
   if final_config.buttons then
     if #final_config.buttons > 2 then
-      logger.error 'There cannot be more than 2 buttons'
+      logger.log_raw(vim.log.levels.ERROR, 'There cannot be more than 2 buttons')
       return
     end
 
     for _, button in ipairs(final_config.buttons) do
       if not button.label or not button.url then
-        logger.error 'Each button must have a label and a URL'
+        logger.log_raw(vim.log.levels.ERROR, 'Each button must have a label and a URL')
         return
       end
 
       if type(button.url) == 'string' and not button.url:match '^https?://[^%s]+$' then
-        logger.error('`' .. button.url .. '` is not a valid button URL')
+        logger.log_raw(vim.log.levels.ERROR, '`' .. button.url .. '` is not a valid button URL')
         return
       end
     end
@@ -57,7 +57,7 @@ function M.validate(user_config)
         goto continue
       end
 
-      logger.error('Unknown client: ' .. final_config.editor.client)
+      logger.log_raw(vim.log.levels.ERROR, 'Unknown client: ' .. final_config.editor.client)
       return
     end
 

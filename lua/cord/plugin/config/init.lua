@@ -4,12 +4,12 @@
 ---@field reset_on_change? boolean Whether to reset timestamp when changing activities
 
 ---@class CordEditorConfig
----@field client? string Editor client name, one of 'vim', 'neovim', 'lunarvim', 'nvchad', 'astronvim', 'lazyvim' or a custom Discord application ID
+---@field client? 'vim'|'neovim'|'lunarvim'|'nvchad'|'astronvim'|'lazyvim'|string Editor client name, one of 'vim', 'neovim', 'lunarvim', 'nvchad', 'astronvim', 'lazyvim' or a custom Discord application ID
 ---@field tooltip? string Editor tooltip text
 ---@field icon? string Optional editor icon
 
 ---@class CordDisplayConfig
----@field theme? string Set icon theme
+---@field theme? 'onyx'|'pastel'|string Set icon theme
 ---@field swap_fields? boolean Whether to swap activity fields
 ---@field swap_icons? boolean Whether to swap activity icons
 
@@ -78,7 +78,7 @@
 ---@field match_in_mappings? boolean Whether to match against file extensions in mappings
 
 ---@class CordAdvancedServerConfig
----@field update? string How to acquire the server executable: 'fetch' or 'build' or 'none'
+---@field update? 'fetch'|'build'|'none'|string How to acquire the server executable: 'fetch' or 'build' or 'none'
 ---@field pipe_path? string Path to the server's pipe
 ---@field executable_path? string Path to the server's executable
 ---@field timeout? integer Timeout in milliseconds
@@ -113,7 +113,7 @@ local M = {}
 
 local defaults = {
   enabled = true,
-  log_level = vim.log.levels.INFO,
+  log_level = vim.log.levels.OFF,
   editor = {
     client = 'neovim',
     tooltip = 'The Superior Text Editor',
