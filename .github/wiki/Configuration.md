@@ -62,6 +62,12 @@ require('cord').setup {
     dashboard = 'Home',
   }, 
   buttons = nil,
+  -- buttons = {
+  --   {
+  --     label = 'View Repository',
+  --     url = function(opts) return opts.repo_url end,
+  --   },
+  -- },
   assets = nil,
   variables = nil,
   hooks = {
