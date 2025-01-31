@@ -1,217 +1,159 @@
->[!IMPORTANT]
-> **This is the legacy version of Cord. It has been deprecated and is unlikely to receive further updates. We encourage you to migrate to Cord v2 and assist us in hunting down any bugs or issues before the merge.**
-> - [Cord v2](https://github.com/vyfor/cord.nvim/tree/client-server)
-> - [Migration Guide](https://github.com/vyfor/cord.nvim/blob/client-server/wiki/MIGRATION.md)
-> - [Tracking Issue](https://github.com/vyfor/cord.nvim/issues/133)
-> - [Tracking Discussion](https://github.com/vyfor/cord.nvim/discussions/143)
-
 <div align="center">
-  <h1>🧩 <strong>Cord</strong></h1>
+  <h1>🧩 <strong>Cord</strong> – Tailor Your Presence Like Never Before</h1>
   <div>
-    <a href="https://github.com/vyfor/cord.nvim/stargazers"><img src="https://img.shields.io/github/stars/vyfor/cord.nvim?style=for-the-badge" alt="Stargazers"></a>
-    <a href="https://github.com/vyfor/cord.nvim/blob/master/LICENSE"><img src="https://img.shields.io/github/license/vyfor/cord.nvim?style=for-the-badge" alt="Apache-2.0 License"></a>
-    <a href="https://github.com/vyfor/cord.nvim/forks"><img src="https://img.shields.io/github/forks/vyfor/cord.nvim?style=for-the-badge" alt="Forks"></a>
+    <a href="https://github.com/vyfor/cord.nvim/stargazers"><img src="https://img.shields.io/github/stars/vyfor/cord.nvim?style=for-the-badge&color=8281f3&labelColor=242529&logo=data:image/svg%2bxml;base64,PHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJtMTEuMDc1IDMuMjU1OGMwLjMzOTMtMC44MjczOCAxLjUxMTEtMC44MjczOCAxLjg1MDQgMGwxLjcyNDEgNC4yMDM3YzAuMTQzNyAwLjM1MDI0IDAuNDcyOCAwLjU4OTM0IDAuODUwMiAwLjYxNzcybDQuNTMwOCAwLjM0MDcxYzAuODkxNyAwLjA2NzA2IDEuMjUzOCAxLjE4MTQgMC41NzE4IDEuNzU5OGwtMy40NjUyIDIuOTM4OGMtMC4yODg3IDAuMjQ0OC0wLjQxNDQgMC42MzE3LTAuMzI0NyAwLjk5OTVsMS4wNzYgNC40MTQzYzAuMjExOCAwLjg2ODgtMC43MzYyIDEuNTU3NS0xLjQ5NyAxLjA4NzZsLTMuODY1Ny0yLjM4NzVjLTAuMzIyMS0wLjE5ODktMC43Mjg5LTAuMTk4OS0xLjA1MSAwbC0zLjg2NTcgMi4zODc1Yy0wLjc2MDg1IDAuNDY5OS0xLjcwODgtMC4yMTg4LTEuNDk3LTEuMDg3NmwxLjA3Ni00LjQxNDNjMC4wODk2NS0wLjM2NzgtMC4wMzYwNS0wLjc1NDctMC4zMjQ3Ni0wLjk5OTVsLTMuNDY1Mi0yLjkzODhjLTAuNjgyMDItMC41NzgzOC0wLjMxOTk0LTEuNjkyOCAwLjU3MTgxLTEuNzU5OGw0LjUzMDgtMC4zNDA3MWMwLjM3NzQ4LTAuMDI4MzggMC43MDY1OC0wLjI2NzQ4IDAuODUwMjItMC42MTc3MmwxLjcyNDEtNC4yMDM3eiIgc3Ryb2tlPSIjODI4MWYzIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=" alt="Stargazers"></a>
+    <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-%20%3E%3D%200.6.0-ffffff?style=for-the-badge&logo=neovim&color=8281f3&labelColor=242529&logoColor=8281f3" alt="Neovim Logo"></a>
+    <a href="https://github.com/vyfor/cord.nvim/forks"><img src="https://img.shields.io/github/forks/vyfor/cord.nvim?style=for-the-badge&color=8281f3&labelColor=242529&logo=data:image/svg%2bxml;base64,PHN2ZyBmaWxsPSIjODI4MWYzIiB2aWV3Qm94PSItNCAtMiAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNOCAxOGExIDEgMCAxIDAgMC0yIDEgMSAwIDAgMCAwIDJ6bTEuMDMzLTMuODE3QTMuMDAxIDMuMDAxIDAgMSAxIDcgMTQuMTd2LTEuMDQ3YzAtLjA3NC4wMDMtLjE0OC4wMDgtLjIyMWExIDEgMCAwIDAtLjQ2Mi0uNjM3TDMuNDYgMTAuNDJBMyAzIDAgMCAxIDIgNy44NDVWNS44MjlhMy4wMDEgMy4wMDEgMCAxIDEgMiAwdjIuMDE2YTEgMSAwIDAgMCAuNDg3Ljg1OGwzLjA4NiAxLjg0NmEzIDMgMCAwIDEgLjQ0My4zMjQgMyAzIDAgMCAxIC40NDQtLjMyNGwzLjA4Ni0xLjg0NmExIDEgMCAwIDAgLjQ4Ny0uODU4VjUuODQxQTMuMDAxIDMuMDAxIDAgMCAxIDEzIDBhMyAzIDAgMCAxIDEuMDMzIDUuODE3djIuMDI4YTMgMyAwIDAgMS0xLjQ2IDIuNTc1bC0zLjA4NiAxLjg0NmExIDEgMCAwIDAtLjQ2Mi42MzdjLjAwNS4wNzMuMDA4LjE0Ny4wMDguMjJ2MS4wNnpNMyA0YTEgMSAwIDEgMCAwLTIgMSAxIDAgMCAwIDAgMnptMTAgMGExIDEgMCAxIDAgMC0yIDEgMSAwIDAgMCAwIDJ6Ii8+PC9zdmc+" alt="Forks"></a>
   </div>
-  <h3>🚀 <strong>Cord</strong> is a Discord Rich Presence plugin designed for Neovim, written in Rust.</h3>
-  <img src="https://github.com/vyfor/cord.nvim/assets/92883017/d2e46243-2bef-4c73-bb3f-6d10edc2a2f4" alt="Cord Banner">
+  <br/>
+  <img src="https://github.com/user-attachments/assets/8e684058-f3ea-4010-817e-529b47730abb" alt="Cord Logo" width="200px">
+  <h3>🚀 The most extensible Discord Rich Presence plugin for Neovim, powered by Rust.
+  </h3>
+  <img src="https://github.com/user-attachments/assets/df73221e-565b-49e5-9dad-1c60aed6f9c3" alt="Cord Banner">
 </div>
 
-## 💎 Features
-- Lightweight and dependency-free
-- Cross-platform support (Windows, Linux, macOS)
-- Blazingly fast startup with minimal overhead due to asynchronous nature
-- Highly [configurable](#-configuration) in Lua
-- Offers more than 70 icons for languages and components, each with custom design
-- Automatically detects working directory and repository based on VCS
-- Identifies problems across active buffers
-- Supports configurable idle status detection
-- Provides [user commands](#%EF%B8%8F-user-commands) for managing the presence
-- Supports Flatpak and Snap installations on Linux
-- Is written in native code and uses Lua FFI for integration
+<div align="center">
+  <a href="#-install">Installation</a>
+  <span> • </span>
+  <a href="#-documentation">Documentation</a>
+  <span> • </span>
+  <a href="https://discord.gg/q9rC4bjCHv">Discord</a>
+</div>
 
-## 🔌 Requirements
-- **Neovim >= 0.5.0 (compiled with LuaJIT)**
-- **[Rust compiler](https://www.rust-lang.org/tools/install)**
+>[!IMPORTANT]
+> Cord no longer requires Rust to be installed. Rust component will be automatically downloaded from GitHub Releases.
 
-## 📦 Installation
+## 💎 Features  
+- 🌐 **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
+- ⚡ **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
+- 🚀 **Event-Driven Architecture** — Instant presence updates with zero delays.  
+- 🎨 **Customizable Templates** — Dynamic string templates with custom variables.
+- 🔧 **Unmatched Configurability** — Function-based configuration for infinite customization possibilities.
+- 🧠 **Automated State Handling** — Automatically manages activities across all instances.
+- 💤 **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
+- 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS files without relying on command-line tools.
+- 🗃️ **Custom Assets** — Extendable with fully customizable assets for any file/buffer type.
+- ⚙️ **Robust User Commands** - Quickly manage Cord and its features through user commands and easily create your own keybindings.
+- 🔌 **Plugin System** — Extendable with custom plugins, with a plethora of built-in ones out of the box.
+- 📦 **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside [WSL](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#running-inside-wsl) and [Discord in browser](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#using-discord-in-browser).
+- 🌍 **Cross-Platform** — Supports Windows, Linux, macOS, and FreeBSD.
+- 🌸 **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
+- 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
+
+
+## 📦 Install 
+
+### Considerations
 <details>
-  <summary>lazy.nvim</summary>
+<summary>Expand</summary>
 
-  ```lua
-  {
-    'vyfor/cord.nvim',
-    build = './build || .\\build',
-    event = 'VeryLazy',
-    opts = {}, -- calls require('cord').setup()
-  }
-  ```
+Cord requires the server executables to be present. To get it, you can either:
+- **Fetch from GitHub**: Invoking `:Cord build [fetch]` (async, recommended). Make sure you have **[`curl`](https://curl.se)** installed.
+- **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
+- [**Build from source**](#️-build-from-source)
+
 </details>
 
+### Installation
 <details>
-  <summary>pckr.nvim</summary>
+<summary>Using <strong>lazy.nvim</strong></summary>
 
-  ```lua
-  {
-    'vyfor/cord.nvim',
-    run = './build || .\\build',
-    config = function()
-      require('cord').setup()
-    end,
-  }
-  ```
-</details>
-
-<details>
-  <summary>other</summary>
-  <p>Same steps apply to other plugin managers. Just make sure to run <code>build.sh</code> or <code>build.bat</code> (depending on your OS) after the plugin is loaded</p>
-</details>
-
-## 🔧 Configuration
-> Note: `setup()` has to be called to initialize the plugin.
 ```lua
-require('cord').setup {
-  usercmds = true,                              -- Enable user commands
-  log_level = 'error',                          -- One of 'trace', 'debug', 'info', 'warn', 'error', 'off'
-  timer = {
-    interval = 1500,                            -- Interval between presence updates in milliseconds (min 500)
-    reset_on_idle = false,                      -- Reset start timestamp on idle
-    reset_on_change = false,                    -- Reset start timestamp on presence change
-  },
-  editor = {
-    image = nil,                                -- Image ID or URL in case a custom client id is provided
-    client = 'neovim',                          -- vim, neovim, lunarvim, nvchad, astronvim or your application's client id
-    tooltip = 'The Superior Text Editor',       -- Text to display when hovering over the editor's image
-  },
-  display = {
-    show_time = true,                           -- Display start timestamp
-    show_repository = true,                     -- Display 'View repository' button linked to repository url, if any
-    show_cursor_position = false,               -- Display line and column number of cursor's position
-    swap_fields = false,                        -- If enabled, workspace is displayed first
-    swap_icons = false,                         -- If enabled, editor is displayed on the main image
-    workspace_blacklist = {},                   -- List of workspace names that will hide rich presence
-  },
-  lsp = {
-    show_problem_count = false,                 -- Display number of diagnostics problems
-    severity = 1,                               -- 1 = Error, 2 = Warning, 3 = Info, 4 = Hint
-    scope = 'workspace',                        -- buffer or workspace
-  },
-  idle = {
-    enable = true,                              -- Enable idle status
-    show_status = true,                         -- Display idle status, disable to hide the rich presence on idle
-    timeout = 300000,                           -- Timeout in milliseconds after which the idle status is set, 0 to display immediately
-    disable_on_focus = false,                   -- Do not display idle status when neovim is focused
-    text = 'Idle',                              -- Text to display when idle
-    tooltip = '💤',                             -- Text to display when hovering over the idle image
-    icon = nil,                                 -- Replace the default idle icon; either an asset ID or a URL
-  },
-  text = {
-    viewing = 'Viewing {}',                     -- Text to display when viewing a readonly file
-    editing = 'Editing {}',                     -- Text to display when editing a file
-    file_browser = 'Browsing files in {}',      -- Text to display when browsing files (Empty string to disable)
-    plugin_manager = 'Managing plugins in {}',  -- Text to display when managing plugins (Empty string to disable)
-    lsp_manager = 'Configuring LSP in {}',      -- Text to display when managing LSP servers (Empty string to disable)
-    vcs = 'Committing changes in {}',           -- Text to display when using Git or Git-related plugin (Empty string to disable)
-    workspace = 'In {}',                        -- Text to display when in a workspace (Empty string to disable)
-  },
-  buttons = {
-    {
-      label = 'View Repository',                -- Text displayed on the button
-      url = 'git',                              -- URL where the button leads to ('git' = automatically fetch Git repository URL)
-    },
-    -- {
-    --   label = 'View Plugin',
-    --   url = 'https://github.com/vyfor/cord.nvim',
-    -- }
-  },
-  assets = nil,                                 -- Custom file icons, see the wiki*
-  -- assets = {
-  --   lazy = {                                 -- Vim filetype or file name or file extension = table or string
-  --     name = 'Lazy',                         -- Optional override for the icon name, redundant for language types
-  --     icon = 'https://example.com/lazy.png', -- Rich Presence asset name or URL
-  --     tooltip = 'lazy.nvim',                 -- Text to display when hovering over the icon
-  --     type = 'plugin_manager',               -- One of 'language', 'file_browser', 'plugin_manager', 'lsp_manager', 'vcs' or respective ordinals; defaults to 'language'
-  --   },
-  --   ['Cargo.toml'] = 'crates',
-  -- },
+{
+  'vyfor/cord.nvim',
+  build = ':Cord update',
+  -- opts = {}
 }
 ```
 
-<details>
-  <summary>hide comments</summary>
-
-  ```lua
-  {
-    usercmds = true,
-    log_level = 'error',
-    timer = {
-      interval = 1500,
-      reset_on_idle = false,
-      reset_on_change = false,
-    },
-    editor = {
-      image = nil,
-      client = 'neovim',
-      tooltip = 'The Superior Text Editor',
-    },
-    display = {
-      show_time = true,
-      show_repository = true,
-      show_cursor_position = false,
-      swap_fields = false,
-      swap_icons = false,
-      workspace_blacklist = {},
-    },
-    lsp = {
-      show_problem_count = false,
-      severity = 1,
-      scope = 'workspace',
-    },
-    idle = {
-      enable = true,
-      show_status = true,
-      timeout = 300000,
-      disable_on_focus = false,
-      text = 'Idle',
-      tooltip = '💤',
-      icon = nil,
-    },
-    text = {
-      viewing = 'Viewing {}',
-      editing = 'Editing {}',
-      file_browser = 'Browsing files in {}',
-      plugin_manager = 'Managing plugins in {}',
-      lsp_manager = 'Configuring LSP in {}',
-      vcs = 'Committing changes in {}',
-      workspace = 'In {}',
-    },
-    buttons = {
-      {
-        label = 'View Repository',
-        url = 'git',
-      },
-    },
-    assets = nil,
-  }
-  ```
 </details>
 
-> \* [Wiki: Add or change file icons](https://github.com/vyfor/cord.nvim/wiki/Add-or-change-file-icons)
+<details>
+<summary>Using <strong>packer.nvim</strong></summary>
 
-### ⌨️ User commands
-- `:CordConnect`          - Initialize presence client internally and connect to Discord
-- `:CordReconnect`        - Reconnect to Discord
-- `:CordDisconnect`       - Disconnect from Discord
-- `:CordTogglePresence`   - Toggle presence
-- `:CordShowPresence`     - Show presence
-- `:CordHidePresence`     - Hide presence
-- `:CordToggleIdle`       - Toggle idle status
-- `:CordIdle`             - Show idle status
-- `:CordUnidle`           - Hide idle status and reset the timeout
-- `:CordWorkspace <name>` - Change the name of the workspace (visually)
+```lua
+use {
+  'vyfor/cord.nvim',
+  run = ':Cord update',
+  -- config = function()
+  --   require('cord').setup {}
+  -- end
+}
+```
 
-## 🌱 Contributing
-This project is in beta. Contributions of any kind are welcome, just make sure you read the [Contribution Guidelines](./.github/CONTRIBUTING.md) first. You can also contact me directly on Discord (**[vyfor](https://discord.com/users/446729269872427018)**) if you have any questions.
+</details>
 
-[**❓ FAQ**](https://github.com/vyfor/cord.nvim/wiki/FAQ)
+<details>
+<summary>Using <strong>rocks.nvim</strong></summary>
 
-[**🔧 Troubleshooting**](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)
+Cord is available on [LuaRocks](https://luarocks.org/modules/vyfor/cord.nvim).
+
+```vim
+:Rocks install cord.nvim
+```
+
+Invoke `:Cord update` whenever the plugin is updated.
+
+</details>
+
+<details>
+<summary>Using <strong>Vim packages</strong></summary>
+
+**Unix:**
+```bash
+git clone --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
+```
+
+**Windows:**
+```powershell
+git clone --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
+```
+
+Invoke `:Cord update` whenever the plugin is updated.
+
+</details>
+
+<details>
+<summary>Other</summary>
+
+Invoke `:Cord update` whenever the plugin is updated.
+
+</details>
+
+## 🎨 Themes  
+Cord features over 120 beautifully designed icons for languages and components with distinct themes, with more to come!
+
+👉 [**Explore the Showcase**](https://github.com/vyfor/icons#showcase)  
+
+## 📖 Documentation  
+- [**Configuration Guide**](./.github/wiki/Configuration.md): Everything you need to customize Cord.  
+- [**Examples**](./.github/wiki/Examples.md): Creative ways to customize your Discord presence.
+- [**Migration Guide**](./.github/wiki/Migration.md): Smooth migration from Cord v1.
+- [**Wiki**](https://github.com/vyfor/cord.nvim/wiki): Examples, best practices, and FAQs.
+
+## 🤝 Contributing  
+We welcome contributions to make Cord even better!
+- Check out our [**Contribution Guidelines**](https://github.com/vyfor/cord.nvim/wiki/Contributing).  
+
+## ❓ FAQ  
+Have questions or issues?  
+- [**Troubleshooting Guide**](./.github/wiki/Troubleshooting)  
+
+## 🛠️ Build From Source
+>[!NOTE]
+> Make sure you have **[Rust](https://www.rust-lang.org/tools/install)** >= 1.85.0 installed.
+
+To build Cord from source, you can run `:Cord update build` (async) which will install the server binary from crates.io by running the following command:
+
+```bash
+cargo install --path . --root path/to/nvim-data-dir/cord/bin --force
+```
+
+Alternatively, you can use `cargo b --release` to build the binary, then place it under `nvim-data-dir/cord/bin`.
+
+---
+
+<div align="center">  
+  <p>💬 Questions? Post in <a href="https://github.com/vyfor/cord.nvim/discussions">Discussions</a> or reach me out on Discord: <a href="https://discord.com/users/446729269872427018"><strong>vyfor</strong></a></p>
+  <div><a href="https://discord.gg/q9rC4bjCHv"><img src="https://discord.com/api/guilds/1322899307925602366/widget.png?style=banner3" alt="cord.nvim"/></a></div>
+</div>

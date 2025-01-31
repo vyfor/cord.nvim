@@ -1,0 +1,1376 @@
+*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 31
+
+==============================================================================
+Table of Contents                                     *cord-table-of-contents*
+
+1. Configuration                                          |cord-configuration|
+  - Editor                                         |cord-configuration-editor|
+  - Display                                       |cord-configuration-display|
+  - Timestamp                                   |cord-configuration-timestamp|
+  - Idle                                             |cord-configuration-idle|
+  - Text                                             |cord-configuration-text|
+  - Variables                                   |cord-configuration-variables|
+  - Hooks                                           |cord-configuration-hooks|
+  - Plugins                                       |cord-configuration-plugins|
+  - Advanced                                     |cord-configuration-advanced|
+  - Text Options                             |cord-configuration-text-options|
+  - Buttons                                       |cord-configuration-buttons|
+  - Assets                                         |cord-configuration-assets|
+  - Smart Idle                                 |cord-configuration-smart-idle|
+  - Custom Variables                     |cord-configuration-custom-variables|
+  - User Commands                           |cord-configuration-user-commands|
+  - Cursor Update Mode                 |cord-configuration-cursor-update-mode|
+  - Options Table                           |cord-configuration-options-table|
+  - ActivityManager Methods       |cord-configuration-activitymanager-methods|
+  - Activity Options                     |cord-configuration-activity-options|
+  - Useful Functions                     |cord-configuration-useful-functions|
+2. Custom Assets                                          |cord-custom-assets|
+  - Structure                                   |cord-custom-assets-structure|
+  - Asset Configuration               |cord-custom-assets-asset-configuration|
+  - Overriding Defaults               |cord-custom-assets-overriding-defaults|
+3. Plugins                                                      |cord-plugins|
+  - Available Plugins                         |cord-plugins-available-plugins|
+4. Examples                                                    |cord-examples|
+  - Features                                          |cord-examples-features|
+  - Install                                            |cord-examples-install|
+  - Themes                                              |cord-examples-themes|
+  - Documentation                                |cord-examples-documentation|
+  - Contributing                                  |cord-examples-contributing|
+  - FAQ                                                    |cord-examples-faq|
+  - Build From Source                        |cord-examples-build-from-source|
+
+==============================================================================
+1. Configuration                                          *cord-configuration*
+
+A comprehensive guide to configuring the Cord plugin to your liking. All
+options are set through the `setup()` function:
+
+>lua
+    require('cord').setup {
+        -- your options here
+    }
+<
+
+Default values ~
+
+
+  Note: You only need to specify the values you want to change. Your
+  configuration will be merged with the default config, so any fields you don’t
+  specify will use their default values.
+>lua
+    {
+      enabled = true,
+      log_level = vim.log.levels.OFF,
+      editor = {
+        client = 'neovim',
+        tooltip = 'The Superior Text Editor',
+        icon = nil,
+      },
+      display = {
+        theme = 'onyx',
+        swap_fields = false,
+        swap_icons = false,
+      },
+      timestamp = {
+        enabled = true,
+        reset_on_idle = false,
+        reset_on_change = false,
+      },
+      idle = {
+        enabled = true,
+        timeout = 300000,
+        show_status = true,
+        ignore_focus = true,
+        unidle_on_focus = true,
+        smart_idle = true,
+        details = 'Idling',
+        state = nil,
+        tooltip = '💤',
+        icon = nil,
+      },
+      text = {
+        workspace = function(opts) return 'In ' .. opts.workspace end,
+        viewing = function(opts) return 'Viewing ' .. opts.filename end,
+        editing = function(opts) return 'Editing ' .. opts.filename end,
+        file_browser = function(opts) return 'Browsing files in ' .. opts.name end,
+        plugin_manager = function(opts) return 'Managing plugins in ' .. opts.name end,
+        lsp = function(opts) return 'Configuring LSP in ' .. opts.name end,
+        docs = function(opts) return 'Reading ' .. opts.name end,
+        vcs = function(opts) return 'Committing changes in ' .. opts.name end,
+        notes = function(opts) return 'Taking notes in ' .. opts.name end,
+        debug = function(opts) return 'Debugging in ' .. opts.name end,
+        test = function(opts) return 'Testing in ' .. opts.name end,
+        diagnostics = function(opts) return 'Fixing problems in ' .. opts.name end,
+        games = function(opts) return 'Playing ' .. opts.name end,
+        terminal = function(opts) return 'Running commands in ' .. opts.name end,
+        dashboard = 'Home',
+      }, 
+      buttons = nil,
+      -- buttons = {
+      --   {
+      --     label = 'View Repository',
+      --     url = function(opts) return opts.repo_url end,
+      --   },
+      -- },
+      assets = nil,
+      variables = nil,
+      hooks = {
+        ready = nil,
+        shutdown = nil,
+        pre_activity = nil,
+        post_activity = nil,
+        idle_enter = nil,
+        idle_leave = nil,
+        workspace_change = nil,
+      },
+      plugins = nil,
+      advanced = {
+        plugin = {
+          autocmds = true,
+          cursor_update = 'on_hold',
+          match_in_mappings = true,
+        },
+        server = {
+          update = 'fetch',
+          pipe_path = nil,
+          executable_path = nil,
+          timeout = 300000,
+        },
+        discord = {
+          reconnect = {
+            enabled = false,
+            interval = 5000,
+            initial = true,
+          },
+        },
+      },
+    }
+<
+
+
+EDITOR                                             *cord-configuration-editor*
+
+  ---------------------------------------------------------------------------------------------------------------
+  Option           Type            Default                      Description
+  ---------------- --------------- ---------------------------- -------------------------------------------------
+  editor.client    string          'neovim'                     Client identifier. Can be 'vim', 'neovim',
+                                                                'lunarvim', 'nvchad', 'astronvim', 'lazyvim', or
+                                                                a custom Discord application ID
+
+  editor.tooltip   string          'The Superior Text Editor'   Tooltip shown when hovering over editor icon
+
+  editor.icon      string \| nil   nil                          Custom icon URL or asset ID when using custom
+                                                                client ID
+  ---------------------------------------------------------------------------------------------------------------
+
+DISPLAY                                           *cord-configuration-display*
+
+  ------------------------------------------------------------------------------------------
+  Option                Type      Default   Description
+  --------------------- --------- --------- ------------------------------------------------
+  display.theme         string    onyx      Choose between different icon themes; one of
+                                            ‘onyx’ (dark) or ‘pastel’ (accent)
+
+  display.swap_fields   boolean   false     Show workspace name before filename
+
+  display.swap_icons    boolean   false     Use editor icon as large image
+  ------------------------------------------------------------------------------------------
+
+TIMESTAMP                                       *cord-configuration-timestamp*
+
+  ----------------------------------------------------------------------------------
+  Option                      Type      Default   Description
+  --------------------------- --------- --------- ----------------------------------
+  timestamp.enabled           boolean   true      Show elapsed time in presence
+
+  timestamp.reset_on_idle     boolean   false     Reset timestamp when entering idle
+                                                  state
+
+  timestamp.reset_on_change   boolean   false     Reset timestamp when presence
+                                                  changes
+  ----------------------------------------------------------------------------------
+
+IDLE                                                 *cord-configuration-idle*
+
+  --------------------------------------------------------------------------------------------------------
+  Option                 Type                       Default                         Description
+  ---------------------- -------------------------- ------------------------------- ----------------------
+  idle.enabled           boolean                    true                            Enable idle status
+                                                                                    detection
+
+  idle.timeout           number                     300000                          Milliseconds before
+                                                                                    marking the session as
+                                                                                    idle
+
+  idle.show_status       boolean                    true                            Show idle status in
+                                                                                    presence, or hide the
+                                                                                    presence if false
+
+  idle.ignore_focus      boolean                    true                            Show idle despite
+                                                                                    Neovim having focus
+
+  idle.unidle_on_focus   boolean                    true                            Unidle the session
+                                                                                    when Neovim gains
+                                                                                    focus
+
+  idle.smart_idle        boolean                    true                            Enable smart idle
+                                                                                    feature
+
+  idle.details           string \| function(opts)   'Idling'                        Details shown when
+                                                                                    idle
+
+  idle.state             string \| function(opts)   nil                             State shown when idle
+
+  idle.tooltip           string \| function(opts)   '💤'                            Tooltip shown when
+                                                                                    hovering over idle
+                                                                                    icon
+
+  idle.icon              string \| function(opts)   default idle icon               Custom icon URL or
+                                                                                    asset ID
+  --------------------------------------------------------------------------------------------------------
+
+TEXT                                                 *cord-configuration-text*
+
+  ----------------------------------------------------------------------------------------------------------------
+  Option           Type                                  Default                        Description
+  ---------------- ------------------------------------- ------------------------------ --------------------------
+  workspace        string \| function(opts) \| boolean   In {workspace}                 Text shown when in a
+                                                                                        workspace
+
+  viewing          string \| function(opts) \| boolean   Viewing {filename}             Text shown when viewing a
+                                                                                        file
+
+  editing          string \| function(opts) \| boolean   Editing {filename}             Text shown when editing a
+                                                                                        file
+
+  file_browser     string \| function(opts) \| boolean   Browsing files in {name}       Text shown when in a file
+                                                                                        browser
+
+  plugin_manager   string \| function(opts) \| boolean   Managing plugins in {name}     Text shown when in a
+                                                                                        plugin manager
+
+  lsp              string \| function(opts) \| boolean   Configuring LSP in {name}      Text shown when in an LSP
+                                                                                        manager
+
+  docs             string \| function(opts) \| boolean   Reading {name}                 Text shown when in a docs
+                                                                                        buffer
+
+  vcs              string \| function(opts) \| boolean   Committing changes in {name}   Text shown when in a VCS
+                                                                                        buffer
+
+  notes            string \| function(opts) \| boolean   Taking notes in {name}         Text shown when in a notes
+                                                                                        buffer
+
+  debug            string \| function(opts) \| boolean   Debugging in {name}            Text shown when in a
+                                                                                        debug-related plugin
+                                                                                        buffer
+
+  test             string \| function(opts) \| boolean   Testing in {name}              Text shown when in a
+                                                                                        testing-related plugin
+                                                                                        buffer
+
+  diagnostics      string \| function(opts) \| boolean   Fixing problems in {name}      Text shown when in a
+                                                                                        diagnostics buffer
+
+  games            string \| function(opts) \| boolean   Playing {name}                 Text shown when in a game
+                                                                                        buffer
+
+  terminal         string \| function(opts) \| boolean   Running commands in {name}     Text shown when in a
+                                                                                        terminal buffer
+
+  dashboard        string \| function(opts) \| boolean   'Home'                         Home
+  ----------------------------------------------------------------------------------------------------------------
+
+  Also see |cord-text-options|
+
+VARIABLES                                       *cord-configuration-variables*
+
+  -------------------------------------------------------------------------------------------------------------
+  Option      Type                      Default   Description
+  ----------- ------------------------- --------- -------------------------------------------------------------
+  variables   table \| boolean \| nil   nil       Define custom variables for use in string templates.
+                                                  Functions can be used to dynamically generate values. If
+                                                  true, uses the default options table, if table, extends the
+                                                  default table, if false, disables custom variables
+
+  -------------------------------------------------------------------------------------------------------------
+
+HOOKS                                               *cord-configuration-hooks*
+
+  --------------------------------------------------------------------------------------------------------------------------------------------------
+  Option                   Type                                                                                 Description
+  ------------------------ ------------------------------------------------------------------------------------ ------------------------------------
+  hooks.ready              function(manager) \| table<fun: function(manager), priority: number>                 Called when connected to the server
+                                                                                                                and ready for communication with
+                                                                                                                Discord (manager)
+
+  hooks.shutdown           function() \| table<fun: function(), priority: number>                               Called when connection to Discord is
+                                                                                                                closed
+
+  hooks.pre_activity       function(opts) \| table<fun: function(opts), priority: number>                       Called before building activity
+                                                                                                                (opts)
+
+  hooks.post_activity      function(opts, activity) \| table<fun: function(opts, activity), priority: number>   Called after building activity, but
+                                                                                                                before sending it (opts, activity)
+
+  hooks.idle_enter         function(opts) \| table<fun: function(opts), priority: number>                       Called when entering idle state
+                                                                                                                (opts)
+
+  hooks.idle_leave         function(opts) \| table<fun: function(opts), priority: number>                       Called when leaving idle state
+                                                                                                                (opts)
+
+  hooks.workspace_change   function(opts) \| table<fun: function(opts), priority: number>                       Called when workspace changes (opts)
+  --------------------------------------------------------------------------------------------------------------------------------------------------
+
+PLUGINS                                           *cord-configuration-plugins*
+
+  ----------------------------------------------------------------------------------------
+  Option    Type                               Description
+  --------- ---------------------------------- -------------------------------------------
+  plugins   string[] \| table<string, table>   Extend Cord with plugins. See the Wiki for
+                                               more info
+
+  ----------------------------------------------------------------------------------------
+
+  If you want to develop your own plugin, check out Cord’s Plugin System
+  <./Plugin-System.md>
+
+ADVANCED                                         *cord-configuration-advanced*
+
+  -----------------------------------------------------------------------------------------------------------------------
+  Option                                Type            Default     Description
+  ------------------------------------- --------------- ----------- -----------------------------------------------------
+  advanced.plugin.autocmds              boolean         true        Enable autocmds
+
+  advanced.plugin.cursor_update         string          'on_hold'   When to update cursor position: 'on_move', 'on_hold',
+                                                                    or 'none'. See Cursor Update Mode
+
+  advanced.plugin.match_in_mappings     boolean         true        Whether to match against file extensions in mappings
+
+  advanced.server.update                string          'fetch'     Default way to acquire the server executable either
+                                                                    if the executable is not found or a manual update is
+                                                                    requested: 'fetch' - fetch from GitHub, 'build' -
+                                                                    build from source, 'none' - no-op
+
+  advanced.server.pipe_path             string \| nil   nil         Custom IPC pipe path
+
+  advanced.server.executable_path       string \| nil   nil         Custom server executable path
+
+  advanced.server.timeout               number          300000      Server shutdown timeout (ms)
+
+  advanced.discord.reconnect.enabled    boolean         false       Whether reconnection is enabled. Has minimal impact
+                                                                    on performance
+
+  advanced.discord.reconnect.interval   number          5000        Reconnection interval in milliseconds, 0 to disable
+
+  advanced.discord.reconnect.initial    boolean         true        Whether to reconnect if initial connection fails
+  -----------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+TEXT OPTIONS                                 *cord-configuration-text-options*
+
+The `text` table allows you to customize the displayed text for different
+states. You can customize it in three different ways:
+
+1. Using simple strings:
+
+>lua
+    text = {
+        editing = 'Editing a file',
+        viewing = 'Viewing a file',
+    }
+<
+
+1. Using functions for dynamic text:
+
+>lua
+    text = {
+        editing = function(opts)
+            return string.format('Editing %s', opts.filename)
+        end,
+    }
+<
+
+1. Using string templates (requires enabling variables):
+
+>lua
+    {
+        text = {
+            editing = 'Editing ${filename}',
+            file_browser = 'Browsing files in ${tooltip}',
+        },
+        variables = true, -- Enable string templates
+    }
+<
+
+
+  To see all available options, refer to the |cord-default-configuration|.
+It is also possible to use boolean values to completely disable a category:
+
+>lua
+    text = {
+        workspace = '',         -- Omit the text from the activity, meaning it will only have one row of text
+        games = function() end, -- Returning `nil` is the same as above
+    
+        file_browser = true,    -- Ignore these types of buffers and the current activity will remain unchanged
+        plugin_manager = false, -- Hide the activity for these types of buffers
+    
+        -- Also applicable to functions
+        diagnostics = function(opts)
+            -- Only show diagnostics activity if there are problems, otherwise do nothing
+            return #vim.diagnostics.get(vim.api.nvim_get_current_buf()) > 0 and 'Fixing problems in ' .. opts.tooltip or true
+        end,
+    }
+<
+
+
+BUTTONS                                           *cord-configuration-buttons*
+
+Buttons can have static or dynamic labels and URLs:
+
+>lua
+    buttons = {
+        {
+            label = function(opts)
+                return opts.repo_url and 'View Repository' or 'Website'
+            end,
+            url = function(opts)
+                return opts.repo_url or 'https://example.com'
+            end
+        }
+    }
+<
+
+
+ASSETS                                             *cord-configuration-assets*
+
+Override icons and text for specific filetypes or filenames. Most of the
+options also support functions.
+
+>lua
+    assets = {
+        ['.rs'] = {
+            icon = 'rust',              -- Asset name or URL
+            tooltip = 'Rust',           -- Hover text
+            text = 'Writing in Rust'    -- Override entire text
+        },
+        netrw = {
+            name = 'Netrw',             -- Override asset name only
+            type = 'file_browser'       -- Set asset type
+        }
+    }
+<
+
+
+  [!TIP] A detailed guide can be found in the Wiki <./Assets.md>.
+Some languages cannot be identified solely by their filename or extension. In
+such cases, we can utilize the `vim.filetype.add` function to add extra
+patterns for filetype detection:
+
+>lua
+    vim.filetype.add {
+      pattern = {
+        ['.*/waybar/config'] = 'jsonc',
+        ['.*/hypr/.*%.conf'] = 'hyprlang',
+        -- ...
+      },
+    }
+<
+
+
+SMART IDLE                                     *cord-configuration-smart-idle*
+
+Smart idle ensures that: - When an instance goes idle, it switches to show the
+most recent active one - You’re only shown as idle when all instances are
+actually idle
+
+
+CUSTOM VARIABLES                         *cord-configuration-custom-variables*
+
+The `variables` option allows you to define custom variables to be used in
+string templates. These variables can be static values or functions that
+dynamically generate values based on the current context. By default, the table
+is populated with the |cord-options-table| but they can be overridden by
+user-defined variables.
+
+Example configuration:
+
+>lua
+    require('cord').setup {
+        variables = {
+            filename = 'a file',
+            problems = function(opts) return #vim.diagnostic.get(0) end,
+        },
+        text = {
+            viewing = 'Viewing ${filename} - ${problems} problems',
+        }
+    }
+<
+
+
+USER COMMANDS                               *cord-configuration-user-commands*
+
+
+  [!NOTE] Autocompletion is fully supported. To see the list of all available
+  features, hit `<Tab>` after typing `:Cord enable`
+- `:Cord enable` - Show presence
+    - `:Cord enable <feature>` - Enable a feature
+- `:Cord disable` - Hide presence
+    - `:Cord disable <feature>` - Disable a feature
+- `:Cord toggle` - Toggle presence
+    - `:Cord toggle <feature>` - Toggle a feature
+- `:Cord presence` - Toggle presence display
+    - `:Cord presence show` - Show presence
+    - `:Cord presence hide` - Hide presence
+    - `:Cord presence suppress` - Suppress presence for current Neovim session
+    - `:Cord presence toggle` - Toggle presence
+    - `:Cord presence toggle_suppress` - Toggle presence suppression
+- `:Cord idle` - Toggle idle state
+    - `:Cord idle toggle` - Toggle idle state
+    - `:Cord idle show` - Show idle state
+    - `:Cord idle hide` - Hide idle state
+    - `:Cord idle force` - Force idle state
+- `:Cord update` - Update the server executable using the configured update mode (fetch by default)
+    - `:Cord update check` - Check for server updates
+    - `:Cord update fetch` - Fetch the server executable from GitHub using `curl`
+    - `:Cord update build` - Build the server executable using `cargo`
+- `:Cord status` - Show connection status
+- `:Cord version` - Show current server version
+- `:Cord restart` - Restart the server
+- `:Cord shutdown` - Disconnect from Discord and shutdown the server
+- `:Cord health` - Validate user configuration
+
+
+CURSOR UPDATE MODE                     *cord-configuration-cursor-update-mode*
+
+The `advanced.cursor_update_mode` option controls how cursor position updates
+are handled: - `'on_move'` - Uses `CursorMoved[I]` autocmd, updating on every
+cursor movement. Most accurate but triggered very often - `'on_hold'` - Uses
+`CursorHold[I]` autocmd, updating only after the cursor has been stationary for
+`'updatetime'` milliseconds. Better performance but less accurate - `'none'` -
+Disables cursor position updates entirely
+
+
+OPTIONS TABLE                               *cord-configuration-options-table*
+
+The `opts` parameter passed to all functions and hooks contains the following
+information:
+
+>lua
+    {
+      manager           = ActivityManager,  -- Reference to the ActivityManager instance
+    
+      -- File Information
+      name              = string?,          -- Name associated with the current mapping, if any
+      tooltip           = string?,          -- Tooltip associated with the current mapping, if any
+      filename          = string,           -- Current buffer's filename
+      filetype          = string,           -- Current buffer's filetype
+      buftype           = string,           -- Current buffer's buftype
+      is_read_only      = boolean,          -- Whether the current buffer is read-only
+    
+      -- Cursor Information
+      cursor_line       = number,           -- Current cursor line number
+      cursor_char       = number,           -- Current cursor character number
+    
+      -- Timestamp Information
+      timestamp         = number,           -- Timestamp passed to the Rich Presence in milliseconds
+    
+      -- Workspace Information
+      workspace         = string?,          -- Current workspace name
+      workspace_dir     = string?,          -- Current workspace directory
+      repo_url          = string?,          -- Current Git repository URL, if any
+    
+      -- Editor Information
+      is_focused        = boolean,          -- Whether Neovim is focused
+      is_idle           = boolean,          -- Whether the session is idle
+      buttons           = table?,           -- List of configured presence buttons
+    
+      -- Asset Information
+      type              = string,           -- Which category the asset belongs to, e.g. 'language' or 'docs'
+      icon              = string?,          -- Asset icon URL or name, if any
+      text              = string?,          -- Custom text to display, if any
+    }
+<
+
+The `ActivityManager` contains useful methods:
+
+
+ACTIVITYMANAGER METHODS           *cord-configuration-activitymanager-methods*
+
+  ------------------------------------------------------------------------------------------
+  Method                               Description
+  ------------------------------------ -----------------------------------------------------
+  manager:queue_update(force_update)   Schedules an update to the activity. If force_update
+                                       is true, it bypasses checks and updates immediately.
+
+  manager:pause()                      Pauses all events and stops the idle timer.
+
+  manager:resume()                     Resumes events and restarts the idle timer.
+
+  manager:pause_events()               Disables event handling without affecting the idle
+                                       timer.
+
+  manager:resume_events()              Enables event handling and queues an immediate
+                                       update.
+
+  manager:skip_update()                Skips the next update once.
+
+  manager:hide()                       Pauses events and clears rich presence.
+
+  manager:suppress()                   Pauses events and suppresses sending presence updates
+                                       for the current Neovim session.
+
+  manager:toggle()                     Toggles between pausing and resuming the activity
+                                       updates.
+
+  manager:toggle_suppress()            Toggles between suppressing and resuming sending
+                                       presence updates for the current Neovim session.
+
+  manager:idle()                       Sets the session to idle.
+
+  manager:force_idle()                 Forcibly sets the session to idle until unforced.
+
+  manager:unidle()                     Clears the idle state and resumes normal activity.
+
+  manager:toggle_idle()                Toggles between idle and normal activity.
+
+  manager:set_activity(activity)       Sets the rich presence to the provided activity,
+                                       offering complete control over the presence.
+
+  manager:clear_activity(force)        Clears the current activity from the server. If force
+                                       is true, it completely clears the presence.
+  ------------------------------------------------------------------------------------------
+
+ACTIVITY OPTIONS                         *cord-configuration-activity-options*
+
+  ---------------------------------------------------------------------------------
+  Parameter    Type      Description
+  ------------ --------- ----------------------------------------------------------
+  type         number    One of ‘playing’, ‘listening’, ‘watching’
+
+  state        string    The user’s current state (e.g., “Editing a file”).
+
+  details      string    Detailed information about what the user is doing.
+
+  timestamps   table     Contains start and end timestamps for the activity.
+
+  assets       table     Defines images and tooltips, including large_image,
+                         large_text, small_image, and small_text.
+
+  buttons      array     Array of objects, each with label and url, defining
+                         interactive buttons in the presence.
+
+  is_idle      boolean   Whether the activity should be considered as idle.
+  ---------------------------------------------------------------------------------
+
+USEFUL FUNCTIONS                         *cord-configuration-useful-functions*
+
+- `require('cord.api.icon').get(name: string, theme?: string): string`
+    - Returns the URL for the specified icon name and optional theme, falling back to the configured theme.
+
+
+==============================================================================
+2. Custom Assets                                          *cord-custom-assets*
+
+
+STRUCTURE                                       *cord-custom-assets-structure*
+
+Cord allows the customization and addition of custom assets. To do so, you need
+to modify the `assets` table in the setup configuration of the plugin:
+
+>lua
+    require('cord').setup {
+      assets = {
+        -- key: string = value: string or table
+      },
+    }
+<
+
+
+ASSET CONFIGURATION                   *cord-custom-assets-asset-configuration*
+
+  -------------------------------------------------------------------------------------
+  Option    Type                 Description
+  --------- -------------------- ------------------------------------------------------
+  (key)     string               The key can be a Vim filetype (like lua), a filename
+                                 (like Cargo.toml), or a file extension (like .rs)
+
+  (value)   string \| table      This can either be a string pointing to the icon or a
+                                 table with options below
+
+  icon      string \| function   A direct URL to the icon image or the name of the rich
+                                 presence asset (in case you use your own application)
+
+  tooltip   string \| function   Text that appears when hovering over the icon
+
+  name      string \| function   An optional override for the icon name. Redundant for
+                                 language types
+
+  text      string \| function   An optional override for the icon text. Unlike other
+                                 options, this will fully override the text
+
+  type      string               Specifies the context of the asset.
+  -------------------------------------------------------------------------------------
+Available types: - `language` (default) - `docs` - `plugin_manager` -
+`lsp_manager` - `file_browser` - `vcs` - `workspace` - `dashboard` - `notes` -
+`debug` - `test` - `diagnostics` - `games` - `terminal`
+
+**Examples**
+
+>lua
+    ['.rs'] = 'rust_icon'
+<
+
+>lua
+    lazy = {
+      name = 'Lazy', -- `config.text.plugin_manager + name` = "Managing plugins in Lazy"
+      icon = 'https://example.com/lazy.png',
+      tooltip = 'lazy.nvim',
+      type = 'plugin_manager'
+    }
+<
+
+
+  UseCord’s existing icon
+>lua
+    ['.settings'] = require('cord.api.icon').get('gear') -- or { icon = require(...) }
+<
+
+
+  In the below configuration, only the tooltip for Lua files is changed, while
+  the icon and name remain as provided by Cord’s defaults.
+>lua
+    lua = {
+      -- Overrides default tooltip and text only
+      tooltip = '.lua file',
+      text = 'Writing in Lua' -- `config.text.editing` is ignored
+    }
+<
+
+Some languages cannot be identified solely by their filename or extension. In
+such cases, we can utilize the `vim.filetype.add` function to add extra
+patterns for filetype detection:
+
+>lua
+    vim.filetype.add {
+      pattern = {
+        ['.*/waybar/config'] = 'jsonc',
+        ['.*/hypr/.*%.conf'] = 'hyprlang',
+        -- ...
+      },
+    }
+<
+
+
+OVERRIDING DEFAULTS                   *cord-custom-assets-overriding-defaults*
+
+In addition to setting icons for specific filetypes or extensions, you can also
+define icons for generic scenarios:
+
+- `['Cord.new']`Sets the icon for a new buffer when Neovim is opened without any file arguments.
+- `['Cord.unknown']`Used when the filetype is not detected by the editor or not supported in Cord at the moment.
+- `['Cord.override']`Overrides all of the existing icons.
+
+**Example**
+
+>lua
+    ['Cord.new'] = 'default_icon'
+    ['Cord.unknown'] = 'unknown_icon'
+    ['Cord.override'] = 'rust' -- Rust... Rust everywhere...
+<
+
+
+==============================================================================
+3. Plugins                                                      *cord-plugins*
+
+Cord comes with several built-in plugins that can be configured in your setup.
+To use a plugin, simply add its `require` path to the `plugins` table in your
+cord setup:
+
+>lua
+    require('cord').setup {
+      plugins = {
+        'cord.plugins.diagnostics',
+    
+        -- optionally, configure the plugin
+        ['cord.plugins.diagnostics'] = {
+          severity = vim.diagnostic.severity.ERROR,
+        }
+      }
+    }
+<
+
+
+AVAILABLE PLUGINS                             *cord-plugins-available-plugins*
+
+
+DIAGNOSTICS (CORD.PLUGINS.DIAGNOSTICS) ~
+
+Adds diagnostic information.
+
+
+CONFIGURATION
+
+>lua
+    {
+      -- 'buffer' or 'workspace'
+      scope = 'buffer',
+      -- https://neovim.io/doc/user/diagnostic.html#diagnostic-quickstart
+      severity = { min = vim.diagnostic.severity.WARN },
+      -- whether to override the default configuration if no user configuration is provided
+      override = true,
+    }
+<
+
+- On `buffer` scope, diagnostics are only shown for the current buffer. `text.viewing` and `text.editing` are overriden to display the diagnostics count.
+- On `workspace` scope, diagnostics are shown for all buffers. `text.workspace` is overriden to display the diagnostics count.
+
+It will also add the following variables: - `diagnostic` - a table containing
+the scoped diagnostics - `diagnostics` - the number of diagnostics in the
+current buffer or workspace
+
+
+USAGE EXAMPLE (OPTIONAL)
+
+>lua
+    text = {
+      -- In string templates
+      editing = 'Editing ${filename} - ${diagnostics} problems',
+    
+      -- In functions
+      workspace = function(opts) return 'In ' .. opts.workspace .. ' - ' .. opts.diagnostics(opts) .. ' problems' end,
+    }
+<
+
+
+LOCAL TIME (CORD.PLUGINS.LOCAL_TIME) ~
+
+Displays the local clock time as the start timestamp.
+
+
+CONFIGURATION
+
+>lua
+    {
+      -- whether to override the timestamp for the idle status
+      affect_idle = true,
+    }
+<
+
+It will also add the following variables: - `local_timestamp` - the zeroed
+timestamp of the current local time
+
+
+  [!NOTE] Incompatible with `cord.plugins.scoped_timestamps`
+
+SCOPED TIMESTAMPS (CORD.PLUGINS.SCOPED_TIMESTAMPS) ~
+
+Tracks elapsed time independently for each buffer, with optional pause/resume
+functionality when switching between buffers.
+
+
+CONFIGURATION
+
+>lua
+    {
+      -- 'buffer', 'workspace', or 'idle'
+      scope = 'buffer',
+      -- If true, time tracking "pauses" when switching buffers and "resumes" where it left off when returning
+      -- If false, timestamps are fixed once set
+      pause = true,
+    }
+<
+
+It will also add the following variables: - `get_scoped_timestamp` - a function
+that returns the timestamp for the current scope
+
+
+  [!NOTE] Incompatible with `cord.plugins.local_time`
+
+==============================================================================
+4. Examples                                                    *cord-examples*
+
+Learn how to customize your Discord presence in countless ways using Cord’s
+robust configuration system. The possibilities are endless, and the only limit
+is your creativity!
+
+
+CUSTOMIZING ICONS ~
+
+
+  [!IMPORTANT] If you use a plugin manager, avoid using `require` directly in
+  tables; instead, use them within function initializers.
+>lua
+    opts = function()
+      return {
+        display = {
+          theme = 'pastel',
+        },
+        lazy = {
+          -- change default idle icon for 'pastel' theme to keyboard
+          icon = require('cord.api.icon').get('keyboard'),
+          -- or use another theme's idle icon
+          icon = require('cord.api.icon').get('idle', 'onyx'),
+        }
+      }
+    end
+<
+
+
+CURSOR POSITION ~
+
+>lua
+    text = {
+      editing = function(opts)
+        return string.format('Editing %s - %s:%s', opts.filename, opts.cursor_line, opts.cursor_char)
+      end
+    }
+<
+
+
+OMITTING FIELDS ~
+
+>lua
+    text = {
+      workspace = '',
+      -- or
+      workspace = function() end,
+      -- or
+      workspace = function() return '' end
+    }
+<
+
+
+LOCAL TIME AS TIMESTAMP ~
+
+>lua
+    hooks = {
+      on_activity = function(opts, activity)
+        local date = os.date('*t')
+        date.hour, date.min, date.sec = 0, 0, 0
+        activity.timestamps.start = os.time(date)
+      end,
+    
+      -- optionally, you can do one of the two:
+      -- A. also set local time for idle status, or
+      on_idle = function(opts, activity)
+        local date = os.date('*t')
+        date.hour, date.min, date.sec = 0, 0, 0
+        activity.timestamps.start = os.time(date)
+      end
+    }
+    
+    -- B. reset the timestamp for idle activity, regular activity is not affected in this case
+    timestamp = {
+      reset_on_idle = true
+    }
+<
+
+
+WORKSPACE BLACKLIST ~
+
+>lua
+    local blacklist = {
+      'blacklisted_workspace',
+      'another_blacklisted_workspace'
+    }
+    
+    local is_blacklisted = function(opts)
+      return vim.tbl_contains(blacklist, opts.workspace)
+    end
+    
+    -- use a custom text for the activity
+    text = {
+      viewing = function(opts)
+        return is_blacklisted(opts) and 'Viewing a file' or ('Viewing ' .. opts.filename)
+      end,
+      editing = function(opts)
+        return is_blacklisted(opts) and 'Editing a file' or ('Editing ' .. opts.filename)
+      end,
+      workspace = function(opts)
+        return is_blacklisted(opts) and 'In a secret workspace' or ('Working on ' .. opts.filename)
+      end
+    }
+    
+    -- or simply hide the activity when in a blacklisted workspace
+    hooks = {
+      workspace_change = function(opts)
+        if is_blacklisted(opts) then
+          opts.manager:hide()
+        else 
+          opts.manager:resume()
+        end
+      end
+    }
+<
+
+
+GIT BRANCH & STATUS ~
+
+>lua
+    local git_branch = vim.fn.system('git branch --show-current'):gsub('\n', '')
+    
+    variables = {
+      git_status = function(opts)
+        return git_branch
+      end
+    }
+    
+    text = {
+      editing = function(opts)
+        return string.format('Editing %s - on branch %s', opts.filename, opts.git_status)
+      end
+    }
+    
+    hooks = {
+      workspace_change = function(opts)
+        git_branch = vim.fn.system('git branch --show-current'):gsub('\n', '')
+      end
+    }
+<
+
+
+TIME-BASED STATUS ~
+
+>lua
+    text = {
+      workspace = function(opts)
+        local hour = tonumber(os.date('%H'))
+        local status = 
+          hour >= 22 and '🌙 Late night coding' or
+          hour >= 18 and '🌆 Evening session' or
+          hour >= 12 and '☀️ Afternoon coding' or
+          hour >= 5 and '🌅 Morning productivity' or
+          '🌙 Midnight hacking'
+        
+        return string.format('%s: %s', status, opts.filename)
+      end
+    }
+<
+
+
+LSP-AWARE STATUS ~
+
+>lua
+    local get_errors = function(bufnr) return vim.diagnostic.get(bufnr, { severity = vim.diagnostic.severity.ERROR }) end
+    local errors = get_errors(0) -- pass the current buffer; pass nil to get errors for all buffers
+    
+    vim.api.nvim_create_autocmd('DiagnosticChanged', {
+      callback = function()
+        errors = get_errors(0)
+      end
+    })
+    
+    text = {
+      editing = function(opts)
+        return string.format('Editing %s - %s errors', opts.filename, #errors)
+      end
+    }
+<
+
+
+DYNAMIC BUTTONS ~
+
+>lua
+    buttons = {
+      {
+        label = function(opts)
+          return opts.repo_url and 'View Repository' or 'My Website'
+        end
+        url = function(opts)
+          return opts.repo_url or 'https://example.com'
+        end
+      }
+    }
+<
+
+
+DOCUMENTATION LINKS ~
+
+>lua
+    buttons = {
+      {
+        label = function(opts)
+          local docs = {
+            rust = 'Rust Docs',
+            typescript = "TS Docs',
+            lua = 'Lua Reference',
+          }
+          return docs[opts.filetype] or 'Documentation'
+        end,
+        url = function(opts)
+          local urls = {
+            rust = 'https://doc.rust-lang.org/std/',
+            typescript = 'https://www.typescriptlang.org/docs/',
+            lua = 'https://www.lua.org/manual/5.1/',
+          }
+          return urls[opts.filetype] or 'https://devdocs.io'
+        end
+      }
+    }
+<
+
+
+PROJECT-BASED IDLE MESSAGES ~
+
+>lua
+    idle = {
+      details = function(opts)
+        return string.format('Taking a break from %s', opts.workspace)
+      end
+    }
+<
+
+
+HIDE BUTTONS ON IDLE ~
+
+>lua
+    buttons = {
+      {
+        label = 'View Repository',
+        url = function(opts)
+          if not opts.is_idle then return opts.repo_url end
+        end
+      }
+    }
+<
+
+
+INDICATE MODIFIED BUFFERS ~
+
+>lua
+    text = {
+      editing = function(opts)
+        local text = 'Editing ' .. opts.filename
+        if vim.bo.modified then text = text .. '[+]' end
+        return text
+      end,
+    }
+<
+
+
+RANDOM QUOTES ~
+
+>lua
+    local quotes = {
+      'GTA VI came out before my Rust program finished compiling. ⏳',
+      'When your code works on the first try. 😱',
+      'It’s not a bug, it’s a feature. 🐛✨',
+      'I don’t always test my code, but when I do, I do it in production. 💥',
+      'My code works, I have no idea why. 🤷‍♂️',
+      'Hello from the other side... of a merge conflict. 🔀',
+      'If it works, don’t touch it. 🛑',
+      'May your code never compile on the first try. 🤞',
+    }
+    
+    hooks = {
+      post_activity = function(_, activity)
+        activity.details = quotes[math.random(#quotes)]
+      end
+    }
+<
+
+
+LAST.FM INTEGRATION ~
+
+>lua
+    local user, api_key, song = 'YOUR_USERNAME', 'YOUR_API_KEY'
+    local timer = vim.uv.new_timer()
+    timer:start(
+      0,
+      15000, -- look for new song every 15 seconds (default ratelimit on most Discord clients)
+      vim.schedule_wrap(function()
+        vim.system(
+          { 'curl', 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' .. user .. '&api_key=' .. api_key .. '&format=json&limit=1, '-s', '--fail' },
+          { text = true },
+          vim.schedule_wrap(function(opts)
+            if opts.code ~= 0 or not opts.stdout then
+              print 'Failed to fetch data from last.fm'
+              timer:close()
+              return
+            end
+    
+            local data = vim.fn.json_decode(opts.stdout)
+            local recenttracks = data.recenttracks
+            if not recenttracks then
+              print 'Failed to fetch recenttracks from last.fm'
+              timer:close()
+              return
+            end
+    
+            local track = recenttracks.track[1]
+            if not track or not track['@attr'] then
+              song = nil
+              return
+            end
+    
+            song = track.name
+            if song == '' then song = nil end
+          end)
+        )
+      end)
+    )
+    
+    return {
+      text = {
+        workspace = function(opts)
+          if song then return ('🎶 Playing ' .. song) end
+          return opts.workspace
+        end,
+      },
+    }
+<
+
+
+KEYMAPPINGS ~
+
+>lua
+    vim.keymap.set('n', '<leader>Ct', function() require('cord.api.command').toggle_presence() end)
+    vim.keymap.set('n', '<leader>Ci', function() require('cord.api.command').toggle_idle_force() end)
+<
+
+
+
+
+  [!IMPORTANT] Cord no longer requires Rust to be installed. Rust component will
+  be automatically downloaded from GitHub Releases.
+
+FEATURES                                              *cord-examples-features*
+
+- **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
+- **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
+- **Event-Driven Architecture** — Instant presence updates with zero delays.
+- **Customizable Templates** — Dynamic string templates with custom variables.
+- **Unmatched Configurability** — Function-based configuration for infinite customization possibilities.
+- **Automated State Handling** — Automatically manages activities across all instances.
+- **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
+- **Built-in Git Integration** — Detects repositories and workspaces based on VCS files without relying on command-line tools.
+- **Custom Assets** — Extendable with fully customizable assets for any file/buffer type.
+- **Robust User Commands** - Quickly manage Cord and its features through user commands and easily create your own keybindings.
+- **Plugin System** — Extendable with custom plugins, with a plethora of built-in ones out of the box.
+- **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside WSL <https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#running-inside-wsl> and Discord in browser <https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#using-discord-in-browser>.
+- **Cross-Platform** — Supports Windows, Linux, macOS, and FreeBSD.
+- **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
+- **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
+
+
+INSTALL                                                *cord-examples-install*
+
+
+CONSIDERATIONS ~
+
+Expand ~
+
+Cord requires the server executables to be present. To get it, you can either:
+- **Fetch from GitHub**Invoking `:Cord build [fetch]` (async, recommended).
+Make sure you have **curl** installed. - **Download from GitHub**Get latest
+release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to
+cord[.exe] and place it under `nvim-data-dir/cord/bin` -
+|cord-**build-from-source**|
+
+
+INSTALLATION ~
+
+Using lazy.nvim ~
+
+>lua
+    {
+      'vyfor/cord.nvim',
+      branch = 'client-server',
+      build = ':Cord update',
+      -- opts = {}
+    }
+<
+
+Using packer.nvim ~
+
+>lua
+    use {
+      'vyfor/cord.nvim',
+      branch = 'client-server',
+      run = ':Cord update',
+      -- config = function()
+      --   require('cord').setup {}
+      -- end
+    }
+<
+
+Using rocks.nvim ~
+
+Cord is available on LuaRocks <https://luarocks.org/modules/vyfor/cord.nvim>.
+
+>vim
+    :Rocks install cord.nvim
+<
+
+Invoke `:Cord update` whenever the plugin is updated.
+
+Using Vim packages ~
+
+**Unix:**
+
+>bash
+    git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
+<
+
+**Windows:**
+
+>powershell
+    git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
+<
+
+Invoke `:Cord update` whenever the plugin is updated.
+
+Other ~
+
+Invoke `:Cord update` whenever the plugin is updated.
+
+
+THEMES                                                  *cord-examples-themes*
+
+Cord features over 120 beautifully designed icons for languages and components
+with distinct themes, with more to come!
+
+**Explore the Showcase** <https://github.com/vyfor/icons#showcase>
+
+
+DOCUMENTATION                                    *cord-examples-documentation*
+
+- **Configuration Guide** <./.github/wiki/Configuration.md>Everything you need to customize Cord.
+- **Examples** <./.github/wiki/Examples.md>Creative ways to customize your Discord presence.
+- **Migration Guide** <./.github/wiki/Migration.md>Smooth migration from Cord v1.
+- **Wiki** <https://github.com/vyfor/cord.nvim/wiki>Examples, best practices, and FAQs.
+
+
+CONTRIBUTING                                      *cord-examples-contributing*
+
+We welcome contributions to make Cord even better! - Check out our
+**Contribution Guidelines**
+<https://github.com/vyfor/cord.nvim/wiki/Contributing>.
+
+
+FAQ                                                        *cord-examples-faq*
+
+Have questions or issues? - **Troubleshooting Guide**
+<./.github/wiki/Troubleshooting>
+
+
+BUILD FROM SOURCE                            *cord-examples-build-from-source*
+
+
+  [!NOTE] Make sure you have **Rust** >= 1.85.0 installed.
+To build Cord from source, you can run `:Cord update build` (async) which will
+install the server binary from crates.io by running the following command:
+
+>bash
+    cargo install --path . --root path/to/nvim-data-dir/cord/bin --force
+<
+
+Alternatively, you can use `cargo b --release` to build the binary, then place
+it under `nvim-data-dir/cord/bin`.
+
+------------------------------------------------------------------------------
+
+Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
+
+vim:tw=78:ts=8:noet:ft=help:norl:

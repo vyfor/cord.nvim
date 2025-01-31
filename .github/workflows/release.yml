@@ -1,11 +1,7 @@
-name: Release
+name: Semantic Release
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - client-server
 
 permissions:
   contents: write
@@ -18,38 +14,256 @@ concurrency:
 jobs:
   get-next-version:
     uses: semantic-release-action/next-release-version/.github/workflows/next-release-version.yml@v4
+      
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs:
+      - get-next-version
+      - check-server
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+          - os: ubuntu-latest
+            target: i686-unknown-linux-musl
+          - os: ubuntu-latest
+            target: x86_64-unknown-freebsd
+          - os: ubuntu-latest
+            target: i686-unknown-freebsd
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+          - os: windows-latest
+            target: i686-pc-windows-msvc
 
-  release:
+    steps:
+      - name: Echo version
+        run: |
+          echo "Detected version: ${{ needs.get-next-version.outputs.new-release-version }}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git pull
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        id: cargo-cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        
+      - name: Set up Rust
+        run: |
+          rustup default nightly
+          
+      - name: Install additional targets
+        run: rustup target add ${{ matrix.target }}
+        
+      - name: Build and copy (Windows)
+        if: contains(matrix.target, 'windows')
+        shell: pwsh
+        run: |
+          if (!(Get-Command cross -ErrorAction SilentlyContinue)) {
+            cargo install cross
+          }
+          cross build --release --target ${{ matrix.target }}
+          New-Item -ItemType Directory -Force -Path dist
+          $ARCH = "${{ matrix.target }}" -split '-' | Select-Object -First 1
+          Copy-Item "target/${{ matrix.target }}/release/cord.exe" -Destination "dist/${ARCH}-windows-cord.exe"
+          
+      - name: Build and copy (Non-Windows)
+        if: contains(matrix.target, 'windows') != true
+        run: |
+          if ! command -v cross &> /dev/null; then
+            cargo install cross
+          fi
+          cross build --release --target ${{ matrix.target }}
+          mkdir -p dist
+          ARCH=$(echo ${{ matrix.target }} | cut -d '-' -f 1)
+          if [[ "${{ matrix.target }}" == *"linux"* ]]; then
+            cp target/${{ matrix.target }}/release/cord dist/${ARCH}-linux-cord
+          elif [[ "${{ matrix.target }}" == *"darwin"* ]]; then
+            cp target/${{ matrix.target }}/release/cord dist/${ARCH}-darwin-cord
+          elif [[ "${{ matrix.target }}" == *"freebsd"* ]]; then
+            cp target/${{ matrix.target }}/release/cord dist/${ARCH}-bsd-cord
+          fi
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cord-server-${{ matrix.target }}
+          path: dist/*
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: binaries
+          pattern: cord-server-*
+
+  check-server:
     runs-on: ubuntu-latest
     if: needs.get-next-version.outputs.new-release-published == 'true'
-    needs: [get-next-version]
+    needs:
+      - get-next-version
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        id: cargo-cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: x86_64-unknown-linux-musl-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install semantic-release-cargo
+        uses: taiki-e/install-action@v2
+        with:
+          tool: semantic-release-cargo@2
+
+      - name: Prepare semantic-release for Rust
+        run: semantic-release-cargo prepare ${{ needs.get-next-version.outputs.new-release-version }}
+
+      - name: Check Server Version
+        run: |
+          CARGO_VERSION="${{ needs.get-next-version.outputs.new-release-version }}"
+
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add Cargo.toml Cargo.lock
+          git commit -m "build: bump project version to $CARGO_VERSION [skip ci]" || echo "nothing to commit"
+
+          changes=$(git diff --name-only $(git describe --tags --abbrev=0)..HEAD -- src/)
+
+          if [ -n "$changes" ]; then
+            SERVER_VERSION=$(cat .github/server-version.txt | tr -d '\n')
+            if [ "$CARGO_VERSION" != "$SERVER_VERSION" ]; then
+              echo "Server version needs to be updated"
+              echo "$CARGO_VERSION" > .github/server-version.txt
+              
+              git add .github/server-version.txt
+              git commit -m "chore: update server version to $CARGO_VERSION [skip ci]" || echo "nothing to commit"
+            fi
+          fi
+
+          git push || echo "nothing to commit"
+
+  release:
+    runs-on: ubuntu-latest
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs: [get-next-version, build, check-server, merge]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git pull
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        id: cargo-cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: x86_64-unknown-linux-musl-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install semantic-release-cargo
+        uses: taiki-e/install-action@v2
+        with:
+          tool: semantic-release-cargo@2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries
+          path: dist
+
       - name: Invoke semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
+          git pull
           npm install -g semantic-release
           npm install -g @semantic-release/changelog
           npm install -g @semantic-release/git
           npm install -g @semantic-release/github
-          npx semantic-release
+          npm install -g @semantic-release/exec
+          npm install -g @semantic-release-cargo/semantic-release-cargo
+          npx semantic-release --repository-url https://github.com/vyfor/cord.nvim
 
   luarocks:
     name: LuaRocks Publish
     runs-on: ubuntu-latest
     if: needs.get-next-version.outputs.new-release-published == 'true'
-    needs: [get-next-version]
+    needs: [get-next-version, release]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git pull
+
+      - name: Set LuaRocks version
+        id: set_version
+        run: |
+          VERSION="${{ needs.get-next-version.outputs.new-release-version }}"
+          if [[ $VERSION == *"-beta"* ]]; then
+            # Convert 2.0.0-beta.1 to 2.0.0beta-1
+            BASE_VERSION=$(echo $VERSION | cut -d'-' -f1)
+            BETA_NUM=$(echo $VERSION | grep -oP '(?<=beta\.)\d+')
+            echo "version=${BASE_VERSION}beta" >> $GITHUB_OUTPUT
+            echo "rockspec_revision=$BETA_NUM" >> $GITHUB_OUTPUT
+          else
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "rockspec_revision=1" >> $GITHUB_OUTPUT
+          fi
+
       - uses: nvim-neorocks/luarocks-tag-release@v7
         with:
-          # version: ${{ needs.get-next-version.outputs.new-release-version }}
-          version: "scm"
+          copy_directories: "plugin"
+          version: ${{ steps.set_version.outputs.version }}
+          specrev: ${{ steps.set_version.outputs.rockspec_revision }}
           detailed_description: |
             Meet the future of rich presence with Cord, the most extensible Discord Rich Presence plugin for Neovim, powered by Rust. 
             Cord offers a wide range of customization options allowing you to create custom and dynamic experiences that adapt to your needs.

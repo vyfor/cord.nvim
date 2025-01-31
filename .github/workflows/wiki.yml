@@ -1,0 +1,28 @@
+name: Publish wiki
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - .github/wiki/**
+      - .github/workflows/wiki.yml
+
+concurrency:
+  group: publish-wiki
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # TODO: Switch to v5 once it's released
+      - uses: Andrew-Chen-Wang/github-wiki-action@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: .github/wiki
+          strategy: init
