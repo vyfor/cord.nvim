@@ -1,4 +1,4 @@
-# 📦 Built-in Plugins
+# 📦 Plugins
 
 Cord comes with several built-in plugins that can be configured in your setup. To use a plugin, simply add its `require` path to the `plugins` table in your cord setup:
 
@@ -7,12 +7,9 @@ require('cord').setup {
   plugins = {
     'cord.plugins.diagnostics',
 
-    -- optionally, provide a custom configuration
-    {
-      'cord.plugins.diagnostics',
-      config = {
-        severity = vim.diagnostic.severity.ERROR,
-      }
+    -- optionally, configure the plugin
+    ['cord.plugins.diagnostics'] = {
+      severity = vim.diagnostic.severity.ERROR,
     }
   }
 }

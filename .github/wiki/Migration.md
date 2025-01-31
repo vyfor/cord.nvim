@@ -61,7 +61,7 @@ idle = {
 Several built-in features have been removed in favor of customization through functions:
 - Workspace blacklist
 - Cursor position display
-- Problem count
+- Problem count (The [diagnostics plugin](./Plugins.md#diagnostics-cordpluginsdiagnostics) should be used instead)
 - ToggleTerm handling
 
 These can now be implemented using hooks and custom functions. See [examples](./Examples.md).

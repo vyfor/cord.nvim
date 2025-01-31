@@ -16,6 +16,7 @@ For basic plugins that don't need initialization:
 -- plugin.lua
 return {
   name = "MyPlugin",
+  description = "...",
   variables = { ... },
   hooks = { ... },
   assets = { ... },
@@ -39,6 +40,7 @@ M.setup = function(config)
 
   return {
     name = "MyPlugin",
+    description = "...",
     variables = { ... },
     hooks = { ... },
     assets = { ... },

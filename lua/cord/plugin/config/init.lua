@@ -67,10 +67,6 @@
 ---@alias CordShutdownHook fun():nil | {fun: fun():nil, priority: number}
 ---@alias CordActivityHook fun(opts: CordOpts, activity: Activity):nil | {fun: fun(opts: CordOpts, activity: Activity):nil, priority: number}
 
----@class CordPluginsConfig
----@field name string Plugin name
----@field config? table Plugin configuration
-
 ---@class CordAdvancedConfig
 ---@field plugin? CordAdvancedPluginConfig configuration
 ---@field server? CordAdvancedServerConfig configuration
@@ -109,7 +105,7 @@
 ---@field assets? CordAssetConfig[] Assets configuration
 ---@field variables? boolean|CordVariablesConfig Variables configuration. If true, uses default options table. If table, extends default table. If false, disables custom variables.
 ---@field hooks? CordHooksConfig Hooks configuration
----@field plugins? string[]|CordPluginsConfig[] Plugin configuration
+---@field plugins? string[]|table<string, table>[] Plugin configuration
 ---@field advanced? CordAdvancedConfig Advanced configuration
 
 ---@class CordConfig

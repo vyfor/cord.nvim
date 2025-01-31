@@ -51,38 +51,37 @@ end
 function M.init()
   if not config.plugins or #config.plugins == 0 then return end
 
-  for _, plugin in ipairs(config.plugins) do
-    local plugin_name
-    local plugin_config
+  for ty, def in pairs(config.plugins) do
+    local plugin, name, cfg
 
-    if type(plugin) == 'string' then
-      plugin_name = plugin
-      logger.debug('Loading plugin: ' .. plugin_name)
-      local ok, mod = pcall(require, plugin_name)
-      if not ok then return 'Failed to load plugin \'' .. plugin_name .. '\': ' .. mod end
+    if type(ty) == 'number' then
+      name = def
+      cfg = plugin
+      logger.debug('Loading plugin: ' .. name)
+      local ok, mod = pcall(require, name)
+      if not ok then return 'Failed to load plugin \'' .. name .. '\': ' .. mod end
       plugin = mod
-    elseif type(plugin) == 'table' then
-      plugin_name = plugin[1] or plugin.name
-      plugin_config = plugin.config
-      logger.debug('Loading plugin with config: ' .. plugin_name)
-      local ok, mod = pcall(require, plugin_name)
-      if not ok then return 'Failed to load plugin \'' .. plugin_name .. '\': ' .. mod end
+    elseif type(ty) == 'string' and type(def) == 'table' then
+      name = ty
+      logger.debug('Loading plugin with config: ' .. name)
+      local ok, mod = pcall(require, name)
+      if not ok then return 'Failed to load plugin \'' .. name .. '\': ' .. mod end
       plugin = mod
     else
-      return 'Plugin must be a string or table'
+      return 'Plugin entry must be a string or table'
     end
 
     if plugin.setup then
-      logger.debug('Setting up plugin: ' .. plugin_name)
-      local success, result = pcall(plugin.setup, plugin_config)
-      if not success then return 'Plugin \'' .. plugin_name .. '\' setup failed: ' .. result end
+      logger.debug('Setting up plugin: ' .. name)
+      local success, result = pcall(plugin.setup, cfg)
+      if not success then return 'Plugin \'' .. name .. '\' setup failed: ' .. result end
       if type(result) ~= 'table' then
-        return 'Plugin \'' .. plugin_name .. '\' setup must return a table'
+        return 'Plugin \'' .. name .. '\' setup must return a table'
       end
       plugin = result
     end
 
-    logger.debug('Registering plugin: ' .. plugin_name)
+    logger.debug('Registering plugin: ' .. name)
     M.register(plugin)
   end
 
