@@ -4,10 +4,9 @@ local M = {}
 
 M.spawn = async.wrap(function(config, pipe_path)
   return Future.new(function(resolve, reject)
-    local exec_path = config.advanced.server.executable_path
     local update_strategy = config.advanced.server.update
     local client_id = config.editor.client
-    if not exec_path then exec_path = require('cord.server.fs').get_executable_path() end
+    local exec_path = require('cord.server.fs').get_executable_path(config)
 
     local fs = require 'cord.core.uv.fs'
     local stat = fs.stat(exec_path):get()
