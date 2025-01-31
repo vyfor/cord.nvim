@@ -53,7 +53,6 @@ local mt = { __index = ActivityManager }
 ---@field cursor_char integer Current cursor character
 ---@field timestamp number Timestamp passed to the Rich Presence in milliseconds
 ---@field workspace? string Current workspace name
----@field workspace_name? string Current workspace name (DEPRECATED)
 ---@field workspace_dir? string Current workspace directory
 ---@field repo_url? string Current Git repository URL, if any
 ---@field is_focused boolean Whether Neovim is focused
@@ -443,7 +442,6 @@ function ActivityManager:on_buf_enter()
       self.workspace = cached.name
       self.repo_url = cached.repo_url
       self.opts.workspace_dir = self.workspace_dir
-      self.opts.workspace_name = self.workspace
       self.opts.workspace = self.workspace
       self.opts.repo_url = self.repo_url
 
@@ -458,7 +456,6 @@ function ActivityManager:on_buf_enter()
       self.workspace = nil
       self.repo_url = nil
       self.opts.workspace_dir = nil
-      self.opts.workspace_name = nil
       self.opts.workspace = nil
       self.opts.repo_url = nil
 
@@ -481,7 +478,6 @@ function ActivityManager:on_buf_enter()
     self.workspace_dir = dir
     self.workspace = vim.fn.fnamemodify(self.workspace_dir, ':t')
     self.opts.workspace_dir = self.workspace_dir
-    self.opts.workspace_name = self.workspace
     self.opts.workspace = self.workspace
 
     local repo_url = ws_utils.find_git_repository(self.workspace_dir, vim.bo.buftype):get()
@@ -538,7 +534,6 @@ function ActivityManager:build_opts()
     cursor_line = cursor_position[1],
     cursor_char = cursor_position[2],
     workspace_dir = self.workspace_dir,
-    workspace_name = self.workspace,
     workspace = self.workspace,
     repo_url = self.repo_url,
     is_focused = self.is_focused,
