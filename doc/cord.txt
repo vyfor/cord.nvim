@@ -1276,7 +1276,6 @@ Using lazy.nvim ~
 >lua
     {
       'vyfor/cord.nvim',
-      branch = 'client-server',
       build = ':Cord update',
       -- opts = {}
     }
@@ -1287,7 +1286,6 @@ Using packer.nvim ~
 >lua
     use {
       'vyfor/cord.nvim',
-      branch = 'client-server',
       run = ':Cord update',
       -- config = function()
       --   require('cord').setup {}
@@ -1310,13 +1308,13 @@ Using Vim packages ~
 **Unix:**
 
 >bash
-    git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
+    git clone --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
 <
 
 **Windows:**
 
 >powershell
-    git clone -b client-server --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
+    git clone --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 <
 
 Invoke `:Cord update` whenever the plugin is updated.
