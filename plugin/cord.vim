@@ -26,6 +26,7 @@ command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.ap
 
 lua << EOF
     vim.schedule(function()
+        require("cord.plugin.log").log_raw(vim.log.levels.WARN, "`client-server` branch is no longer supported.\nPlease switch to `master` branch.")
         local config = require('cord.plugin.config.util').validate()
         if not config then return end
 
