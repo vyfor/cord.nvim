@@ -50,7 +50,9 @@ local function build_activity(opts)
       opts.type = custom_icon.type or icon_type
       opts.text = config_utils.get(custom_icon.text, opts)
       opts.filetype = override_type or opts.filetype
-      opts.icon = config_utils.get(custom_icon.icon, opts) or icon
+      opts.icon = config_utils.get(custom_icon.icon, opts)
+        or (custom_icon.type and icons.get(mappings.get_default_icon(custom_icon.type)))
+        or opts.icon
     end
   end
 
