@@ -134,14 +134,17 @@ M.check_version = async.wrap(function()
   end
 
   async.run(function()
-    logger.info 'Checking for updates...'
+    logger.log_raw(vim.log.levels.INFO, 'Checking for updates...')
     local current, latest = check_versions()
 
     if current and latest then
       if latest == current then
-        logger.info('You are on the latest server version ' .. latest)
+        logger.log_raw(vim.log.levels.INFO, 'You are on the latest server version ' .. latest)
       else
-        logger.info('New version available: ' .. latest .. ' (current: ' .. current .. ')')
+        logger.log_raw(
+          vim.log.levels.INFO,
+          'New version available: ' .. latest .. ' (current: ' .. current .. ')'
+        )
       end
     end
   end)
@@ -150,7 +153,7 @@ end)
 M.version = async.wrap(function()
   async.run(function()
     local version = get_local_version():await()
-    if version then logger.info('Server version: ' .. version) end
+    if version then logger.log_raw(vim.log.levels.INFO, 'Server version: ' .. version) end
   end)
 end)
 

@@ -64,7 +64,10 @@ M.restart = function()
   vim.schedule(function()
     local cord = require 'cord.server'
     if cord.is_updating then
-      require('cord.plugin.log').info 'Operation canceled: Server is updating'
+      require('cord.plugin.log').log_raw(
+        vim.log.levels.WARN,
+        'Operation cancelled: Server is updating'
+      )
       return
     end
 
@@ -91,24 +94,24 @@ M.shutdown = function()
   local cord = require 'cord.server'
 
   if not cord.client or cord.client:is_closing() then
-    return require('cord.plugin.log').info 'Server is not running'
+    return require('cord.plugin.log').log_raw(vim.log.levels.INFO, 'Server is not running')
   end
 
   cord.is_updating = false
   if cord.manager then cord.manager:cleanup() end
   cord.tx:shutdown()
-  require('cord.plugin.log').info 'Stopped server'
+  require('cord.plugin.log').log_raw(vim.log.levels.INFO, 'Stopped server')
 end
 M.status = function()
   local cord = require 'cord.server'
   if cord.status == 'ready' then
-    require('cord.plugin.log').info 'Status: Connected to Discord'
+    require('cord.plugin.log').log_raw(vim.log.levels.INFO, 'Status: Connected to Discord')
   elseif cord.status == 'connecting' then
-    require('cord.plugin.log').info 'Status: Connecting to server'
+    require('cord.plugin.log').log_raw(vim.log.levels.INFO, 'Status: Connecting to Cord server')
   elseif cord.status == 'connected' then
-    require('cord.plugin.log').info 'Status: Connecting to Discord'
+    require('cord.plugin.log').log_raw(vim.log.levels.INFO, 'Status: Connecting to Discord')
   else
-    require('cord.plugin.log').info 'Status: Disconnected'
+    require('cord.plugin.log').log_raw(vim.log.levels.INFO, 'Status: Disconnected')
   end
 end
 M.check = function()
