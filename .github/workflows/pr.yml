@@ -15,11 +15,11 @@ jobs:
         with:
           task_types: '["feat","fix","docs","test","ci","refactor","perf","chore","revert","build","style"]'
 
-#   validate-commits:
-#     name: Validate PR Commits
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: webiny/action-conventional-commits@v1.3.0
-#         with:
-#           allowed-commit-types: "feat,fix,docs,test,ci,refactor,perf,chore,revert,build,style,release"
+  validate-commits:
+    name: Validate PR Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webiny/action-conventional-commits@v1.3.0
+        with:
+          allowed-commit-types: "feat,fix,docs,test,ci,refactor,perf,chore,revert,build,style,release"
