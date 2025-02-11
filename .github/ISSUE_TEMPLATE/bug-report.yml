@@ -4,6 +4,15 @@ labels: [bug]
 body:
   - type: textarea
     attributes:
+      label: "Checklist"
+      value: |
+        - [ ] My problem isn't listed in the [Troubleshooting](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting) section of the wiki
+        - [ ] I have looked through [existing issues](https://github.com/vyfor/cord.nvim/issues)
+        - [ ] I am aware of the recent [announcements](https://github.com/vyfor/cord.nvim/discussions/categories/announcements)
+    validations:
+      required: true
+  - type: textarea
+    attributes:
       label: "Description"
       description: "Description of the problem you are facing. You may include any relevant logs, screenshots, etc."
     validations:
