@@ -215,7 +215,7 @@ end
 
 M.get_subcommands = function(cmd)
   local command = M.commands[cmd]
-  if not command or not command.subcommands then return {} end
+  if type(command) ~= 'table' or not command.subcommands then return {} end
 
   local subcmds = {}
   for subcmd, _ in pairs(command.subcommands) do
