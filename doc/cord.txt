@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0            Last change: 2025 January 31
+*cord.txt*            For NVIM v0.6.0            Last change: 2025 February 14
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -36,7 +36,7 @@ Table of Contents                                     *cord-table-of-contents*
   - Themes                                              |cord-examples-themes|
   - Documentation                                |cord-examples-documentation|
   - Contributing                                  |cord-examples-contributing|
-  - FAQ                                                    |cord-examples-faq|
+  - Support the Project                    |cord-examples-support-the-project|
   - Build From Source                        |cord-examples-build-from-source|
 
 ==============================================================================
@@ -1338,6 +1338,7 @@ DOCUMENTATION                                    *cord-examples-documentation*
 - **Examples** <./.github/wiki/Examples.md>Creative ways to customize your Discord presence.
 - **Migration Guide** <./.github/wiki/Migration.md>Smooth migration from Cord v1.
 - **Wiki** <https://github.com/vyfor/cord.nvim/wiki>Examples, best practices, and FAQs.
+- **Troubleshooting Guide** <./.github/wiki/Troubleshooting>Solutions to common scenarios and issues.
 
 
 CONTRIBUTING                                      *cord-examples-contributing*
@@ -1347,10 +1348,13 @@ We welcome contributions to make Cord even better! - Check out our
 <https://github.com/vyfor/cord.nvim/wiki/Contributing>.
 
 
-FAQ                                                        *cord-examples-faq*
+SUPPORT THE PROJECT                        *cord-examples-support-the-project*
 
-Have questions or issues? - **Troubleshooting Guide**
-<./.github/wiki/Troubleshooting>
+I’m the sole maintainer of cord.nvim and dedicate much of my free time to
+this project. If you find Cord helpful, you can show your support by giving the
+repo a star or sponsoring me on GitHub <https://github.com/sponsors/vyfor>.
+Every bit of support helps me continue to improve and maintain Cord for
+everyone. Thank you!
 
 
 BUILD FROM SOURCE                            *cord-examples-build-from-source*
