@@ -13,7 +13,7 @@
 </div>
 
 <div align="center">
-  <a href="#-install">Installation</a>
+  <a href="#-quick-start">Installation</a>
   <span> • </span>
   <a href="#-documentation">Documentation</a>
   <span> • </span>
@@ -41,7 +41,17 @@
 - 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
 
 
-## 📦 Install 
+## 📦 Quick Start
+
+For most users, the quickest way to get started is using **lazy.nvim**:
+
+```lua
+{
+  'vyfor/cord.nvim',
+  build = ':Cord update',
+  -- opts = {}
+}
+```
 
 ### Considerations
 <details>
@@ -120,19 +130,31 @@ Invoke `:Cord update` whenever the plugin is updated.
 
 </details>
 
-## 🎨 Themes  
-Cord features over 120 beautifully designed icons for languages and components with distinct themes, with more to come!
+## 🎨 Themes
 
-👉 [**Explore the Showcase**](https://github.com/vyfor/icons#showcase)  
+Cord boasts over 120 meticulously crafted icons for languages and tools, available in distinct themes to match your style.
 
-## 📖 Documentation  
-- [**Configuration Guide**](./.github/wiki/Configuration.md): Everything you need to customize Cord.  
-- [**Examples**](./.github/wiki/Examples.md): Creative ways to customize your Discord presence.
-- [**Migration Guide**](./.github/wiki/Migration.md): Smooth migration from Cord v1.
-- [**Wiki**](https://github.com/vyfor/cord.nvim/wiki): Examples, best practices, and FAQs.
-- [**Troubleshooting Guide**](./.github/wiki/Troubleshooting): Solutions to common scenarios and issues.
+👉 **Explore the Icon Showcase**: [vyfor/icons](https://github.com/vyfor/icons#showcase)
 
-## 🤝 Contributing  
+Currently, Cord offers two themes:
+
+- **Onyx**: A sleek, modern dark theme (default).
+- **Pastel**: A vibrant, accent-colored theme.
+
+Choose your theme in the `display.theme` configuration option. More themes are coming soon!
+
+## 📖 Documentation
+
+Dive deeper into Cord's features and customization options:
+
+- 📘 **[Configuration Guide](./.github/wiki/Configuration.md)**:  Master all the settings to tailor Cord to your exact needs.
+- 💡 **[Examples](./.github/wiki/Examples.md)**: Get inspired with creative ways to customize your Discord presence.
+- ⚙️ **[Migration Guide](./.github/wiki/Migration.md)**:  Upgrade smoothly from Cord v1.
+- 📚 **[Wiki](https://github.com/vyfor/cord.nvim/wiki)**: Explore in-depth guides, best practices, and FAQs.
+- 🚑 **[Troubleshooting Guide](./.github/wiki/Troubleshooting)**: Find solutions to common issues and scenarios.
+
+## 🤝 Contributing
+
 We welcome contributions to make Cord even better!
 - Check out our [**Contribution Guidelines**](https://github.com/vyfor/cord.nvim/wiki/Contributing).  
 

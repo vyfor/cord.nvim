@@ -4,14 +4,16 @@ A comprehensive guide to configuring the Cord plugin to your liking. All options
 
 ```lua
 require('cord').setup {
-    -- your options here
+    -- Your configuration options go here
 }
 ```
 
-<details id="default-config">
-  <summary>Default values</summary>
+If you prefer to start with a clean slate, you can copy the [Default Configuration](#default-configuration) below and modify it to your liking. Remember, you only need to specify the options you want to change; any unspecified options will use their default values.
 
-  > Note: You only need to specify the values you want to change. Your configuration will be merged with the default config, so any fields you don't specify will use their default values.
+Here's the complete default configuration for Cord. You can use this as a starting point for your own setup.
+
+<details id="default-config">
+  <summary>Expand to view default configuration</summary>
 
 ```lua
 {
@@ -453,4 +455,4 @@ The `ActivityManager` contains useful methods:
 ## Useful Functions
 
 - `require('cord.api.icon').get(name: string, theme?: string): string`
-  - Returns the URL for the specified icon name and optional theme, falling back to the configured theme.
+  - **Get Icon URL:** Returns the URL for the specified icon `name` and optional `theme`. If `theme` is not provided, it defaults to the configured `display.theme`. Useful for referencing Cord's built-in icons in your custom configurations.

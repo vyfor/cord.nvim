@@ -22,90 +22,73 @@ The plugin in question, **cord.nvim**, has been rewritten from scratch with a ne
 > The Rust compiler is no longer required. Cord's server can now be downloaded from GitHub via the `:Cord update` command.
 > However, if you wish to build Cord from source, make sure to have **Rust >= 1.85.0 nightly** installed, and run the `:Cord update build` command.
 
-## 🔧 Configuration Changes
+| v1 Option                      | v2 Option                      | Notes                                                               |
+| ------------------------------ | ------------------------------ | ------------------------------------------------------------------- |
+| `timer.interval`               | *(Removed - now event-driven)* | Presence updates are now real-time, no interval needed.             |
+| `display.show_repository`      | *(Removed)*                    | Repository display is now handled through text customization.       |
+| `display.show_cursor_position` | *(Removed)*                    | Cursor position is now handled through text customization.          |
+| `display.workspace_blacklist`  | *(Removed)*                    | Workspace blacklisting is now handled through hooks/functions.      |
+| `lsp`                          | *(Removed)*                    | LSP integration is now handled through plugins (e.g., diagnostics). |
+| `usercmds`                     | *(Always available)*           | User commands are now always available under `:Cord <command>`.     |
+| `timer`                        | `timestamp`                    | Renamed for clarity.                                                |
+| `timer.enabled`                | `timestamp.enabled`            |                                                                     |
+| `timer.reset_on_idle`          | `timestamp.reset_on_idle`      |                                                                     |
+| `timer.reset_on_change`        | `timestamp.reset_on_change`    |                                                                     |
+| `editor.image`                 | `editor.icon`                  | Renamed for consistency.                                            |
+| `idle.enable`                  | `idle.enabled`                 |                                                                     |
+| `idle.text`                    | `idle.details`                 | Renamed for clarity.                                                |
+| `idle.disable_on_focus`        | `idle.ignore_focus`            | Inverted logic - now `ignore_focus` (more intuitive).               |
 
-The config structure has been updated to be more flexible. Most notably, the majority of string options now support functions, giving you full control over the Rich Presence display. Additionally, a new `variables` option has been introduced to allow custom dynamic values in text templates.
+The biggest change in v2 is the shift towards function-based configuration.  **Almost every string option can now be a Lua function!** This unlocks powerful dynamic customization:
 
-> [!NOTE]
-> Full configuration options can be found [here](./Configuration.md).
+- **Dynamic Text**:  Use functions in `text` options to create context-aware presence messages based on filetype, workspace, time, and more (see [Examples](./Examples.md)).
+- **Dynamic Buttons**:  Create buttons with labels and URLs that change based on the current Neovim state.
+- **Dynamic Assets**:  Customize icons and asset text dynamically using functions in the `assets` table.
+- **Hooks for Advanced Logic**:  Use hooks to execute custom Lua code at various points in Cord's update cycle, enabling complex integrations and behaviors.
 
-### Changed Options
-```lua
--- Removed Options
--- timer.interval (now event-driven)
--- display.show_repository
--- display.show_cursor_position
--- display.workspace_blacklist
--- lsp
--- usercmds (now always available under 'Cord <command>')
-
--- Renamed Options
-timestamp = {             -- was timer
-  enabled = true,         -- was display.show_time
-  reset_on_idle = true,   -- was timer.reset_on_idle
-  reset_on_change = true, -- was timer.reset_on_change
-}
-
-editor = {
-  icon = nil,             -- was editor.image
-}
-
-idle = {
-  enabled = true,         -- was idle.enable
-  details = 'Idling',     -- was idle.text
-  ignore_focus = false,   -- was idle.disable_on_focus (inverted)
-}
-```
-
-### Removed Features
-Several built-in features have been removed in favor of customization through functions:
-- Workspace blacklist
-- Cursor position display
-- Problem count (The [diagnostics plugin](./Plugins.md#diagnostics-cordpluginsdiagnostics) should be used instead)
-- ToggleTerm handling
-
-These can now be implemented using hooks and custom functions. See [examples](./Examples.md).
-
-## 🎨 Function-Based Customization
-
-The new version moves most of the functionality handled in Rust, to the Lua side, giving you unprecedented control over your Rich Presence. Almost every string option can now be a function that receives contextual information:
+**Example: Dynamic Editing Text based on Filetype**
 
 ```lua
 text = {
-    -- Example of dynamic text based on file type
     editing = function(opts)
         if opts.filetype == 'rust' then
-            return '🦀 Crafting in Rust'
+            return '🦀 Crafting in Rust' -- Fun Rust-specific text
+        else
+            return 'Editing ' .. opts.filename -- Default editing text
         end
-        return 'Editing ' .. opts.filename
     end,
-
-    -- New types of mappings
-    docs = 'Reading docs', -- Shown when in docs buffers
-    dashboard = 'Home',    -- Shown when in dashboard buffers
 }
+```
 
--- Modify buttons dynamically
+**Example: Dynamic Button Label**
+
+```lua
 buttons = {
     {
         label = function(opts)
-            if opts.repo_url then
-                return 'View Repository'
-            end
-            return 'My Website'
+            return opts.repo_url and 'View Repository' or 'View cord.nvim'
         end,
         url = function(opts)
-            return opts.repo_url or 'https://example.com'
+            return opts.repo_url or 'https://github.com/vyfor/cord.nvim'
         end
-    }
-}
-
--- New 'text' option that will override the entire text
-assets = {
-    ['Cargo.toml'] = {
-        text = 'Managing dependencies' -- As opposed to 'Editing Cargo.toml'
     }
 }
 ```
 
-More information can be found in the [Configuration Guide](./Configuration.md).
+## 🚀 Upgrade Steps: Get Started with v2
+
+1. **Update Cord Plugin**: Use your plugin manager to update `cord.nvim`.
+2. **Run `:Cord update`**:  In Neovim, run `:Cord update` to download the new server executable.
+3. **Review Your Configuration**:  Carefully review your `cord.setup()` configuration and update it to the v2 structure, taking into account the renamed and removed options.
+4. **Explore Examples & Documentation**:  Check out the [Examples](./Examples.md) page and the [Configuration Guide](./Configuration.md) to learn about the new customization options and how to use functions and hooks.
+5. **Test and Customize**:  Start using Cord v2 and customize your presence to your liking! Use `:checkhealth cord` to verify your configuration.
+
+**Need Help?**
+
+If you encounter any issues during migration or have questions, please don't hesitate to:
+
+- **Check the [Troubleshooting Guide](./Troubleshooting.md)**
+- **Join our [Discord Community](https://discord.gg/q9rC4bjCHv)**
+- **Start a [Discussion on GitHub](https://github.com/vyfor/cord.nvim/discussions)**
+
+Welcome to the future of Neovim Rich Presence with Cord v2! We're confident you'll love the enhanced power and flexibility. Happy coding!
