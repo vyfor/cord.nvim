@@ -1,17 +1,21 @@
 # 🔌 Plugin System
 
-## 📖 Introduction
-The Cord plugin system provides a simple way to extend and customize your Discord presence without complex manual configuration. It allows:
-- Providing common presence configurations out of the box
-- Sharing presence configurations among the community
-- Avoiding the hassle of manually configuring Cord for basic features
+Cord's plugin system allows you to extend its functionality and customize your Discord Rich Presence in modular and reusable ways. Plugins are ideal for:
 
-## 🛠️ Plugin Definition
+- **Encapsulating complex configurations**: Bundle variables, hooks, assets, and settings into self-contained units.
+- **Sharing customizations**: Easily share your Cord enhancements with the community.
+- **Creating reusable features**: Develop plugins for common use cases and avoid repetitive configuration.
 
-Plugins must return a table with at least a `name` field.
+This guide will walk you through creating Cord plugins.
 
-### Simple Table
-For basic plugins that don't need initialization:
+## 🛠️ Plugin Structure: Building Blocks
+
+A Cord plugin is essentially a Lua module that returns a table defining its components. There are two main ways to structure your plugin:
+
+### 1. Simple Table Plugin: For Basic Extensions
+
+For plugins that don't require complex initialization or state management, a simple table is sufficient.  This is great for adding variables, hooks, assets, or default configurations.
+
 ```lua
 -- plugin.lua
 return {
@@ -24,8 +28,10 @@ return {
 }
 ```
 
-### Class
-For more complex plugins that need initialization:
+### 2. Class-Based Plugin: For Stateful & Configurable Plugins
+
+For more advanced plugins that need to manage internal state, handle user configurations, or perform initialization logic, use a class-based structure. This involves creating a Lua module with a `setup()` function that returns the plugin definition.
+
 ```lua
 -- plugin_with_config.lua
 local M = {
