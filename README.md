@@ -132,12 +132,12 @@ Choose your theme in the `display.theme` configuration option. More themes are c
 
 ## 📖 Documentation
 
-Dive deeper into Cord's features and customization options:
+Dive deeper into Cord's features and customization options in the [**Wiki**](https://github.com/vyfor/cord.nvim/wiki):
 
 - 📘 **[Configuration Guide](./.github/wiki/Configuration.md)**:  Master all the settings to tailor Cord to your exact needs.
 - 💡 **[Examples](./.github/wiki/Examples.md)**: Get inspired with creative ways to customize your Discord presence.
 - ⚙️ **[Migration Guide](./.github/wiki/Migration.md)**:  Upgrade smoothly from Cord v1.
-- 📚 **[Wiki](https://github.com/vyfor/cord.nvim/wiki)**: Explore in-depth guides, best practices, and FAQs.
+- ❓ **[FAQ](./.github/wiki/FAQ.md)**: Frequently asked questions about Cord.
 - 🚑 **[Troubleshooting Guide](./.github/wiki/Troubleshooting)**: Find solutions to common issues and scenarios.
 
 ## 🤝 Contributing

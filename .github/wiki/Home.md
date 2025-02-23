@@ -16,6 +16,7 @@ This wiki is your central hub for all things **cord.nvim**, the powerful Discord
 - 📖 **[Migration Guide](./Migration.md)**:  Smoothly upgrade from Cord v1 to the latest version.
 - 🛠️ **[Plugin System](./Plugin-System.md)**: Develop your own plugins to extend Cord's capabilities.
 - 🚑 **[Troubleshooting](./Troubleshooting.md)**: Find solutions to common issues and get help.
+- ❓ **[FAQ](./FAQ.md)**: Frequently asked questions about Cord.
 - 🤝 **[Contributing](./Contributing.md)**:  Learn how you can contribute to the Cord project.
 
 **Need Help or Have Questions?**

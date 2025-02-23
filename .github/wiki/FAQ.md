@@ -1,0 +1,33 @@
+## ❓ FAQ
+
+**Got questions? We've got answers!**  Here are some common questions about cord.nvim that nobody asked, yet we answered anyway! If you don't find your answer here or in the [Troubleshooting Guide](./Troubleshooting.md), don't hesitate to ask in our [Discord community](https://discord.gg/q9rC4bjCHv) or [GitHub Discussions](https://github.com/vyfor/cord.nvim/discussions)!
+
+> ### Q: What is the minimum required version of Neovim?
+
+Cord is tested with Neovim **0.6.0** or later. Although, we encourage you to use the latest stable version of Neovim, as it provides the best experience and performance. However, if you're running an older version, and find that Cord is not working as expected, please open an issue and we'll try to help you out.
+
+> ### Q: Do I need to install Rust to use Cord?
+
+Nope, you don't need Rust anymore!  We made it easier. Cord will automatically download the necessary server component from GitHub. Just run `:Cord update` after installing the plugin, and you're good to go! If you *want* to build from source (maybe you're a Rustacean!), you can still do `:Cord update build`, but it's totally optional.
+
+> ### Q: Why do I still see Cord's server running in background, even after I've closed Neovim?
+
+Cord's server keeps running intentionally. In fact, this is one of the key design features that sets it apart from similar plugins. It remains active in the background to maintain a continuous connection to Discord, which helps avoid hitting Discord's rate limits on reconnections—especially useful if you often restart Neovim rather than maintaining a single long session. If you prefer not to have it running, you can adjust the `advanced.server.timeout` setting.
+
+> ### Q: Rich Presence updates take a long time to appear in Discord. Why?
+
+Rich Presence updates now take longer to appear because Discord enforces a rate limit on how frequently these updates can be sent. Originally, Discord's documentation allowed one update every 15 seconds—a limit that mostly affected mobile and web clients while desktop users saw instantaneous changes. However, after a recent overhaul of Discord's rich presence interface, this, or a similar rate limit appears to be strictly applied across all platforms, causing the delays you're noticing. From my point of view, this rate limit is ridiculously high, and should be drastically reduced. Perhaps a collaborative effort from the community could make them reconsider their decision, but there's nothing I can do on my end, I'm afraid. See the relevant [discussion](https://github.com/vyfor/cord.nvim/discussions/196).
+
+> ### Q: I'm using a custom Discord client. Will Cord work with it?
+
+Yes, although we do not endorse custom clients, and cannot guarantee that they will work. The main issue is that custom clients often cannot/do not expose the IPC pipe at the same path as the official client, so you might need to create a symlink to make it work.
+
+> ### Q: Why can't I disable timestamps in my Rich Presence? Why are they misbehaving?
+
+It used to work as expected, but I suspect that Discord introduced a bug in recent updates. When you omit timestamps in your activity payload, the absence of a timer is expected at first. However, within seconds the timer reappears and resets to zero on every new activity update. In my testing, this reappearance has been inconsistent—sometimes happening immediately, and other times after a couple of seconds. Interestingly, during the brief period without the timer, updates go through instantly without any apparent rate limiting on the client side. This behavior appears to be due to changes in how Discord handles rich presence updates internally, rather than an issue with the plugin itself. See the relevant [discussion](https://github.com/vyfor/cord.nvim/discussions/196#discussioncomment-12221577).
+
+> ### Q: Is X plugin or X language supported?
+
+Cord detects different buffers based on current buffer's filetype, and on rare occasions, its filename. See the list of supported filetypes [here](https://github.com/vyfor/cord.nvim/blob/master/lua/cord/plugin/activity/mappings.lua). If it's not listed, it's either:
+- Not yet added to Cord. If this is the case, please open an issue and we'll add it.
+- Cannot be detected by Cord. In case it's a plugin, before opening an issue, make sure it overrides the buffer's filetype option so that it can be detected.
