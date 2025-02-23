@@ -58,26 +58,13 @@ For most users, the quickest way to get started is using **lazy.nvim**:
 <summary>Expand</summary>
 
 Cord requires the server executables to be present. To get it, you can either:
-- **Fetch from GitHub**: Invoking `:Cord build [fetch]` (async, recommended). Make sure you have **[`curl`](https://curl.se)** installed.
+- **Fetch from GitHub**: Invoking `:Cord update [fetch]` (async, recommended). Make sure you have **[`curl`](https://curl.se)** installed.
 - **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
 - [**Build from source**](#️-build-from-source)
 
 </details>
 
 ### Installation
-<details>
-<summary>Using <strong>lazy.nvim</strong></summary>
-
-```lua
-{
-  'vyfor/cord.nvim',
-  build = ':Cord update',
-  -- opts = {}
-}
-```
-
-</details>
-
 <details>
 <summary>Using <strong>packer.nvim</strong></summary>
 
@@ -111,12 +98,12 @@ Invoke `:Cord update` whenever the plugin is updated.
 
 **Unix:**
 ```bash
-git clone --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
+git clone https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
 ```
 
 **Windows:**
 ```powershell
-git clone --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
+git clone https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 ```
 
 Invoke `:Cord update` whenever the plugin is updated.
@@ -168,7 +155,7 @@ I'm the sole maintainer of cord.nvim and dedicate much of my free time to this p
 To build Cord from source, you can run `:Cord update build` (async) which will install the server binary from crates.io by running the following command:
 
 ```bash
-cargo install --path . --root path/to/nvim-data-dir/cord/bin --force
+cargo install --path . --root path/to/nvim-data-dir/cord --force
 ```
 
 Alternatively, you can use `cargo b --release` to build the binary, then place it under `nvim-data-dir/cord/bin`.

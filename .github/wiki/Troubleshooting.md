@@ -34,8 +34,8 @@ If Cord is loaded but your Rich Presence is not appearing in Discord, try these 
 - **Problem**: You've configured buttons in your `cord.setup()`, but they are not visible in Discord.
 - **Solution**:
     - **Discord UI Bug**: There's a known client-side bug in Discord related to user profiles. *You may not be able to see buttons on your own Rich Presence*.
-    - **Verify with Others**: Ask a friend or someone else to check your Discord profile to see if they can see the buttons on your Rich Presence. Buttons often *are* visible to others even if you can't see them yourself.
-    - **Voice Channel Hover**:  Another workaround to check buttons yourself is to join a voice channel in Discord and hover over your name in the voice channel list. Buttons may appear in the hover tooltip.
+    - **Verify with Others**: Ask a friend or someone else to check your Discord profile to see if they can see the buttons on your Rich Presence. Buttons *are* visible to others even if you can't see them yourself.
+    - **Voice Channel Hover**:  Another workaround to check buttons yourself is to join a voice channel in Discord and hover over your name in the voice channel list. Buttons appear in the hover tooltip.
 
 ## ⏱️ Rich Presence Timer Stuck at 00:00
 
@@ -54,7 +54,7 @@ If Cord is loaded but your Rich Presence is not appearing in Discord, try these 
 ### 🐧 Running Inside WSL (Windows Subsystem for Linux)
 
 - **Challenge**: WSL (Windows Subsystem for Linux) does not directly expose Windows pipes by default, which are needed for Discord IPC.
-- **Solution**: **socat and npiperelay**: Use `socat` and `npiperelay` to create a bridge that exposes the Windows Discord IPC pipe to WSL.
+- **Solution**: **socat and npiperelay**: Refer to [this guide](https://gist.github.com/mousebyte/af45cbecaf0028ea78d0c882c477644a#aliasing-nvim). Use `socat` and `npiperelay` to create a bridge that exposes the Windows Discord IPC pipe to WSL.
     1.  **Install `socat` in WSL**: `sudo apt-get install socat` (or your distribution's package manager command).
     2.  **Download `npiperelay.exe`**: Download `npiperelay.exe` from [https://github.com/jstarks/npiperelay/releases](https://github.com/jstarks/npiperelay/releases) and place it in a directory accessible from WSL (e.g., `/mnt/c/path/to/npiperelay.exe`).
     3.  **Alias `nvim` with Pipe Relay**: Add an alias to your WSL shell configuration file (`~/.bashrc`, `~/.zshrc`, etc.) to launch `nvim` with the pipe relay setup. Example alias:
@@ -78,7 +78,7 @@ If Cord is loaded but your Rich Presence is not appearing in Discord, try these 
         **Adjust the path to `npiperelay.exe` in the alias if needed.**
     4.  **Use `nvim` Alias**:  Always launch Neovim using the `nvim` alias you defined in WSL.
 
-### Remote Server (SSH)
+### 🖥️ Remote Server (SSH)
 
 - **Challenge**: Running Neovim on a remote server via SSH and displaying Rich Presence on your local Discord client.
 - **Solution**: **SSH Port Forwarding**: Use SSH port forwarding to tunnel the Discord IPC socket over SSH. Follow the guide in this article: [https://carlosbecker.com/posts/discord-rpc-ssh/](https://carlosbecker.com/posts/discord-rpc-ssh/)

@@ -87,7 +87,7 @@ text = {
     return is_blacklisted(opts) and 'Editing a file' or ('Editing ' .. opts.filename)
   end,
   workspace = function(opts)
-    return is_blacklisted(opts) and 'In a secret workspace' or ('Working on ' .. opts.filename)
+    return is_blacklisted(opts) and 'In a secret workspace' or ('Working on ' .. opts.workspace)
   end
 }
 
@@ -160,6 +160,9 @@ text = {
   end
 }
 ```
+
+> [!NOTE]
+> Consider using the built-in [diagnostics plugin](./Plugins.md#diagnostics-cordpluginsdiagnostics).
 
 ### Dynamic Buttons
 ```lua

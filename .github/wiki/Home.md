@@ -1,6 +1,6 @@
 # Welcome to the Cord.nvim Wiki! 🏠
 
-This wiki is your central hub for all things **cord.nvim**, the powerful Discord Rich Presence plugin for Neovim. Whether you're just getting started or looking to master advanced customizations, you'll find the information you need here.
+This wiki is your central hub for all things **cord.nvim**, the powerful Discord Rich Presence plugin for Neovim. Whether you're just getting started or looking to master advanced customizations, you'll find the information you need here. Do note that this documentation is still a work in progress, so if you find something missing, incorrect or unintuitive, please don't hesitate to let us know!
 
 **New to Cord? Start Here:**
 
