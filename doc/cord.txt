@@ -1,4 +1,4 @@
-*cord.txt*            For NVIM v0.6.0            Last change: 2025 February 22
+*cord.txt*            For NVIM v0.6.0            Last change: 2025 February 23
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -1105,7 +1105,7 @@ WORKSPACE BLACKLIST ~
         return is_blacklisted(opts) and 'Editing a file' or ('Editing ' .. opts.filename)
       end,
       workspace = function(opts)
-        return is_blacklisted(opts) and 'In a secret workspace' or ('Working on ' .. opts.filename)
+        return is_blacklisted(opts) and 'In a secret workspace' or ('Working on ' .. opts.workspace)
       end
     }
     
@@ -1185,6 +1185,9 @@ LSP-AWARE STATUS ~
     }
 <
 
+
+  [!NOTE] Consider using the built-in diagnostics plugin
+  <./Plugins.md#diagnostics-cordpluginsdiagnostics>.
 
 DYNAMIC BUTTONS ~
 
@@ -1389,7 +1392,7 @@ CONSIDERATIONS ~
 Expand ~
 
 Cordrequires the server executables to be present. To get it, you can either: -
-**Fetch from GitHub**Invoking `:Cord build [fetch]` (async, recommended). Make
+**Fetch from GitHub**Invoking `:Cord update [fetch]` (async, recommended). Make
 sure you have **curl** installed. - **Download from GitHub**Get latest release
 from https://github.com/vyfor/cord.nvim/releases/latest, rename it to
 cord[.exe] and place it under `nvim-data-dir/cord/bin` -
@@ -1397,16 +1400,6 @@ cord[.exe] and place it under `nvim-data-dir/cord/bin` -
 
 
 INSTALLATION ~
-
-Using lazy.nvim ~
-
->lua
-    {
-      'vyfor/cord.nvim',
-      build = ':Cord update',
-      -- opts = {}
-    }
-<
 
 Using packer.nvim ~
 
@@ -1435,13 +1428,13 @@ Using Vim packages ~
 **Unix:**
 
 >bash
-    git clone --single-branch https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
+    git clone https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
 <
 
 **Windows:**
 
 >powershell
-    git clone --single-branch https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
+    git clone https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 <
 
 Invoke `:Cord update` whenever the plugin is updated.
@@ -1470,12 +1463,13 @@ coming soon!
 
 DOCUMENTATION                                    *cord-examples-documentation*
 
-Dive deeper into Cord’s features and customization options:
+Dive deeper into Cord’s features and customization options in the **Wiki**
+<https://github.com/vyfor/cord.nvim/wiki>
 
 - **Configuration Guide**Master all the settings to tailor Cord to your exact needs.
 - **Examples**Get inspired with creative ways to customize your Discord presence.
 - **Migration Guide**Upgrade smoothly from Cord v1.
-- **Wiki**Explore in-depth guides, best practices, and FAQs.
+- **FAQ**Frequently asked questions about Cord.
 - **Troubleshooting Guide**Find solutions to common issues and scenarios.
 
 
@@ -1503,7 +1497,7 @@ To build Cord from source, you can run `:Cord update build` (async) which will
 install the server binary from crates.io by running the following command:
 
 >bash
-    cargo install --path . --root path/to/nvim-data-dir/cord/bin --force
+    cargo install --path . --root path/to/nvim-data-dir/cord --force
 <
 
 Alternatively, you can use `cargo b --release` to build the binary, then place
