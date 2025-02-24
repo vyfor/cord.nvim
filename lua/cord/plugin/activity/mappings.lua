@@ -70,6 +70,7 @@ M.filetype_mappings = {
   hgcommit = { 'language', 'mercurial', 'Mercurial' },
   html = { 'language', 'html', 'HTML' },
   htmlcheetah = { 'language', 'python', 'Python Cheetah' },
+  htmldjango = { 'language', 'django', 'Django HTML' },
   htmlm4 = { 'language', 'html', 'HTML M4' },
   hyprlang = { 'language', 'hyprland', 'Hyprland' },
   java = { 'language', 'java', 'Java' },
