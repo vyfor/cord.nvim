@@ -26,20 +26,18 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: "Steps to reproduce"
+      label: "Steps to reproduce (optional)"
       description: "Steps to reproduce the issue with the minimal configuration"
       placeholder: |
         1. `nvim -nu repro.lua`
         2. ...
-    validations:
-      required: true
   - type: textarea
     attributes:
-      label: "Expected behavior"
+      label: "Expected behavior (optional)"
       description: "What you expected to happen"
   - type: textarea
     attributes:
-      label: "Actual behavior"
+      label: "Actual behavior (optional)"
       description: "What actually happens."
   - type: textarea
     attributes:
