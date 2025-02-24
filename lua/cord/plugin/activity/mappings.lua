@@ -161,6 +161,7 @@ M.filetype_mappings = {
   NNN = { 'file_browser', M.default_icons.file_browser, 'NNN' },
   NvimTree = { 'file_browser', M.default_icons.file_browser, 'nvim-tree' },
   minifiles = { 'file_browser', M.default_icons.file_browser, 'mini.files' },
+  ranger = { 'file_browser', M.default_icons.file_browser, 'Ranger' },
   rnvimr = { 'file_browser', M.default_icons.file_browser, 'Ranger' },
   sfm = { 'file_browser', M.default_icons.file_browser, 'SFM' },
   TelescopePrompt = { 'file_browser', 'telescope', 'Telescope' },
