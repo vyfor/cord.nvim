@@ -73,6 +73,7 @@ M.filetype_mappings = {
   htmldjango = { 'language', 'django', 'Django HTML' },
   htmlm4 = { 'language', 'html', 'HTML M4' },
   hyprlang = { 'language', 'hyprland', 'Hyprland' },
+  image = { 'language', 'picture', 'Image' },
   java = { 'language', 'java', 'Java' },
   javascript = { 'language', 'javascript', 'JavaScript' },
   javascriptreact = { 'language', 'react', 'JSX' },
