@@ -93,8 +93,8 @@ ActivityManager.new = async.wrap(function(opts)
     workspace_cache = {},
   }, mt)
 
-  local rawdir = vim.fn.expand '%:p:h'
-  local dir = ws_utils.find(rawdir, vim.bo.buftype):get() or vim.fn.getcwd()
+  local rawdir = vim.fn.expand '%:p'
+  local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
   self.workspace_dir = dir
 
   local cache = {
@@ -102,13 +102,13 @@ ActivityManager.new = async.wrap(function(opts)
     name = vim.fn.fnamemodify(dir, ':t'),
   }
 
-  local repo_url = ws_utils.find_git_repository(dir, vim.bo.buftype):get()
+  local repo_url = ws_utils.find_git_repository(dir):get()
   if repo_url then
     self.repo_url = repo_url
     cache.repo_url = repo_url
   end
 
-  self.workspace_cache[rawdir] = cache
+  self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = cache
 
   if not has_initialized then
     setup()
@@ -434,8 +434,8 @@ end
 ---Handle buffer enter event
 ---@return nil
 function ActivityManager:on_buf_enter()
-  local rawdir = vim.fn.expand '%:p:h'
-  local cached = self.workspace_cache[rawdir]
+  local rawdir = vim.fn.expand '%:p'
+  local cached = self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')]
   if cached then
     if cached.dir ~= self.workspace_dir then
       self.workspace_dir = cached.dir
@@ -467,10 +467,10 @@ function ActivityManager:on_buf_enter()
   end
 
   async.run(function()
-    local dir = ws_utils.find(vim.fn.expand '%:p:h', vim.bo.buftype):get() or vim.fn.getcwd()
+    local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
 
     if not dir then
-      self.workspace_cache[rawdir] = false
+      self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = false
       self:queue_update()
       return
     end
@@ -480,11 +480,11 @@ function ActivityManager:on_buf_enter()
     self.opts.workspace_dir = self.workspace_dir
     self.opts.workspace = self.workspace
 
-    local repo_url = ws_utils.find_git_repository(self.workspace_dir, vim.bo.buftype):get()
+    local repo_url = ws_utils.find_git_repository(dir):get()
     self.repo_url = repo_url
     self.opts.repo_url = repo_url
 
-    self.workspace_cache[rawdir] = {
+    self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = {
       dir = self.workspace_dir,
       name = self.workspace,
       repo_url = self.repo_url,
