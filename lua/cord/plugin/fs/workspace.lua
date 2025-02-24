@@ -10,6 +10,14 @@ local VCS_MARKERS = {
 
 local M = {}
 
+M.protocol_handlers = {
+  term = function(path)
+    local cwd = path:match '^(.-)//%d+:'
+    if cwd then return vim.fn.expand(cwd), false end
+  end,
+  man = function(path) return path, true end,
+}
+
 local check_vcs_marker = async.wrap(function(curr_dir, marker)
   local marker_path = curr_dir .. '/' .. marker
   local stat = fs.stat(marker_path):get()
@@ -17,16 +25,7 @@ local check_vcs_marker = async.wrap(function(curr_dir, marker)
   return (stat.type == 'directory' and curr_dir)
 end)
 
-local function parse_term_cwd(term_filename)
-  local cwd = term_filename:match '^term://(.-)//%d+:'
-  return cwd
-end
-
-M.find = async.wrap(function(initial_path, buftype)
-  if not initial_path or initial_path == '' then return end
-  if buftype == 'terminal' then initial_path = parse_term_cwd(initial_path) end
-
-  initial_path = initial_path:gsub('^%w+://+', '')
+M.find_vcs_root = async.wrap(function(initial_path)
   local curr_dir = initial_path
 
   while true do
@@ -46,6 +45,26 @@ M.find = async.wrap(function(initial_path, buftype)
     if parent == curr_dir then return initial_path end
     curr_dir = parent
   end
+end)
+
+M.find = async.wrap(function(initial_path)
+  if not initial_path or initial_path == '' then return end
+
+  local protocol, path = initial_path:match '^(%w+)://+(.+)$'
+  if protocol and M.protocol_handlers[protocol] then
+    local extracted_path, is_final = M.protocol_handlers[protocol](path)
+    if not extracted_path or extracted_path == '' or extracted_path == '.' then
+      return M.find_vcs_root(vim.fn.getcwd()):get()
+    end
+
+    if is_final then
+      return extracted_path
+    else
+      return M.find_vcs_root(extracted_path):get()
+    end
+  end
+
+  return M.find_vcs_root(initial_path):get()
 end)
 
 local function format_url(url)
