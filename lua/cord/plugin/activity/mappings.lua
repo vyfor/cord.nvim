@@ -85,6 +85,9 @@ M.filetype_mappings = {
   lisp = { 'language', 'lisp', 'Lisp' },
   logcheck = { 'language', 'logs', 'Logcheck' },
   lua = { 'language', 'lua', 'Lua' },
+  mail = { 'language', 'mail', 'Mail' },
+  mailaliases = { 'language', 'mail', 'Mail Aliases' },
+  mailcap = { 'language', 'mail', 'Mailcap' },
   make = { 'language', 'gnu', 'Makefile' },
   markdown = { 'language', 'markdown', 'Markdown' },
   matlab = { 'language', 'matlab', 'MATLAB' },
@@ -287,6 +290,7 @@ M.filetype_mappings = {
 M.filename_mappings = {
   -- Languages
   ['.gemignore'] = { 'language', 'rubygems', 'RubyGems' },
+  ['.mailmap'] = { 'language', 'git', 'Mailmap' },
   ['.npmrc'] = { 'language', 'npm', 'npm' },
   ['.npmignore'] = { 'language', 'npm', 'npm' },
   ['build.gradle'] = { 'language', 'gradle', 'Gradle' },
