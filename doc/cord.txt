@@ -1,4 +1,4 @@
-*cord.txt*            For NVIM v0.6.0            Last change: 2025 February 23
+*cord.txt*            For NVIM v0.6.0            Last change: 2025 February 28
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -176,8 +176,8 @@ DISPLAY                                           *cord-configuration-display*
   ------------------------------------------------------------------------------------------
   Option                Type      Default   Description
   --------------------- --------- --------- ------------------------------------------------
-  display.theme         string    onyx      Choose between different icon themes; one of
-                                            ‘onyx’ (dark) or ‘pastel’ (accent)
+  display.theme         string    onyx      Choose between different icon themes; ‘onyx’,
+                                            ‘pastel’, ‘catppuccin’, ‘material’
 
   display.swap_fields   boolean   false     Show workspace name before filename
 
@@ -1452,10 +1452,12 @@ available in distinct themes to match your style.
 **Explore the Icon Showcase**vyfor/icons
 <https://github.com/vyfor/icons#showcase>
 
-Currently, Cord offers two themes:
+Currently, Cord offers four themes:
 
 - **Onyx**A sleek, modern dark theme (default).
 - **Pastel**A vibrant, accent-colored theme.
+- **Catppuccin**A soothing pastel theme.
+- **Material**Modern Material Design icons theme.
 
 Choose your theme in the `display.theme` configuration option. More themes are
 coming soon!
