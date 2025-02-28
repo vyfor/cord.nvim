@@ -9,7 +9,7 @@
 ---@field icon? string Optional editor icon
 
 ---@class CordDisplayConfig
----@field theme? 'onyx'|'pastel'|string Set icon theme
+---@field theme? 'onyx'|'pastel'|'catppuccin'|'material'|string Set icon theme
 ---@field swap_fields? boolean Whether to swap activity fields
 ---@field swap_icons? boolean Whether to swap activity icons
 

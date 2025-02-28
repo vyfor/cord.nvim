@@ -123,10 +123,12 @@ Cord boasts over 120 meticulously crafted icons for languages and tools, availab
 
 👉 **Explore the Icon Showcase**: [vyfor/icons](https://github.com/vyfor/icons#showcase)
 
-Currently, Cord offers two themes:
+Currently, Cord offers four themes:
 
 - **Onyx**: A sleek, modern dark theme (default).
 - **Pastel**: A vibrant, accent-colored theme.
+- **Catppuccin**: A soothing pastel theme.
+- **Material**: Modern Material Design icons theme.
 
 Choose your theme in the `display.theme` configuration option. More themes are coming soon!
 
