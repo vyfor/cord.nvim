@@ -13,7 +13,7 @@ end
 
 M.set_theme = function(theme)
   M.ICON_THEME = theme
-  M.DEFAULT_IDLE_ICON = (theme == 'onyx') and 'keyboard' or 'idle'
+  M.DEFAULT_IDLE_ICON = (theme == 'pastel') and 'idle' or 'keyboard'
 end
 
 return M

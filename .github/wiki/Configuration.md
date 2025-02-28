@@ -116,11 +116,11 @@ Here's the complete default configuration for Cord. You can use this as a starti
 
 ## 📊 Display
 
-| Option                | Type      | Default | Description                                                                     |
-| --------------------- | --------- | ------- | ------------------------------------------------------------------------------- |
-| `display.theme`       | `string`  | `onyx`  | Choose between different icon themes; one of 'onyx' (dark) or 'pastel' (accent) |
-| `display.swap_fields` | `boolean` | `false` | Show workspace name before filename                                             |
-| `display.swap_icons`  | `boolean` | `false` | Use editor icon as large image                                                  |
+| Option                | Type      | Default | Description                                                                      |
+| --------------------- | --------- | ------- | -------------------------------------------------------------------------------  |
+| `display.theme`       | `string`  | `onyx`  | Choose between different icon themes; 'onyx', 'pastel', 'catppuccin', 'material' |
+| `display.swap_fields` | `boolean` | `false` | Show workspace name before filename                                              |
+| `display.swap_icons`  | `boolean` | `false` | Use editor icon as large image                                                   |
 
 ## ⏰ Timestamp
 
