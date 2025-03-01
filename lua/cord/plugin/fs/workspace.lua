@@ -64,6 +64,7 @@ M.find = async.wrap(function(initial_path)
     end
   end
 
+  initial_path = vim.fn.fnamemodify(initial_path, ':h')
   return M.find_vcs_root(initial_path):get()
 end)
 
