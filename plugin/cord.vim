@@ -2,7 +2,7 @@ function! CordCompleteList(ArgLead, CmdLine, CmdPos)
     let l:starting_new_arg = a:ArgLead == '' && a:CmdLine[a:CmdPos-1] =~ '\s'
     let l:args = split(a:CmdLine[:a:CmdPos-1], '\s\+')
     
-    if len(l:args) <= 1
+    if len(l:args) <= 1 || (len(l:args) == 2 && a:ArgLead != '')
         let l:commands = luaeval('require("cord.api.command").get_commands()')
         return filter(l:commands, 'stridx(v:val, a:ArgLead) == 0')
     endif
