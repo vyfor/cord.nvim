@@ -5,6 +5,9 @@ on:
     branches: [master]
     types: [opened, synchronize, reopened, edited]
 
+permissions:
+  pull-requests: write
+
 jobs:
   validate-pr-title:
     name: Validate PR Title
