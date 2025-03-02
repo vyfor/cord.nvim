@@ -21,7 +21,8 @@ jobs:
           node-version: '21'
       - run: |
           npm install -g semantic-release
-          npx semantic-release --dry-run --repository-url https://github.com/vyfor/cord.nvim --plugins @semantic-release/commit-analyzer
+          npm install --save-dev semantic-release-export-data
+          npx semantic-release --dry-run --repository-url https://github.com/vyfor/cord.nvim --plugins @felipecrs/semantic-release-export-data @semantic-release/commit-analyzer
         id: get-next-version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
