@@ -1,4 +1,4 @@
-*cord.txt*            For NVIM v0.6.0            Last change: 2025 February 28
+*cord.txt*              For NVIM v0.6.0             Last change: 2025 March 02
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -75,7 +75,8 @@ Expand to view default configuration ~
         icon = nil,
       },
       display = {
-        theme = 'onyx',
+        theme = 'default',
+        flavor = 'dark',
         swap_fields = false,
         swap_icons = false,
       },
@@ -173,16 +174,19 @@ EDITOR                                             *cord-configuration-editor*
 
 DISPLAY                                           *cord-configuration-display*
 
-  ------------------------------------------------------------------------------------------
+  ----------------------------------------------------------------------------------------
   Option                Type      Default   Description
-  --------------------- --------- --------- ------------------------------------------------
-  display.theme         string    onyx      Choose between different icon themes; ‘onyx’,
-                                            ‘pastel’, ‘catppuccin’, ‘material’
+  --------------------- --------- --------- ----------------------------------------------
+  display.theme         string    default   Choose between different icon themes;
+                                            ‘default’, ‘atom’, ‘catppuccin’
+
+  display.flavor        string    dark      Choose between different theme flavors;
+                                            typically ‘dark’, ‘light’, ‘accent’
 
   display.swap_fields   boolean   false     Show workspace name before filename
 
   display.swap_icons    boolean   false     Use editor icon as large image
-  ------------------------------------------------------------------------------------------
+  ----------------------------------------------------------------------------------------
 
 TIMESTAMP                                       *cord-configuration-timestamp*
 
@@ -200,42 +204,42 @@ TIMESTAMP                                       *cord-configuration-timestamp*
 
 IDLE                                                 *cord-configuration-idle*
 
-  --------------------------------------------------------------------------------------------------------
-  Option                 Type                       Default                         Description
-  ---------------------- -------------------------- ------------------------------- ----------------------
-  idle.enabled           boolean                    true                            Enable idle status
-                                                                                    detection
+  ---------------------------------------------------------------------------------------------------------
+  Option                 Type                       Default                           Description
+  ---------------------- -------------------------- --------------------------------- ---------------------
+  idle.enabled           boolean                    true                              Enable idle status
+                                                                                      detection
 
-  idle.timeout           number                     300000                          Milliseconds before
-                                                                                    marking the session as
-                                                                                    idle
+  idle.timeout           number                     300000                            Milliseconds before
+                                                                                      marking the session
+                                                                                      as idle
 
-  idle.show_status       boolean                    true                            Show idle status in
-                                                                                    presence, or hide the
-                                                                                    presence if false
+  idle.show_status       boolean                    true                              Show idle status in
+                                                                                      presence, or hide the
+                                                                                      presence if false
 
-  idle.ignore_focus      boolean                    true                            Show idle despite
-                                                                                    Neovim having focus
+  idle.ignore_focus      boolean                    true                              Show idle despite
+                                                                                      Neovim having focus
 
-  idle.unidle_on_focus   boolean                    true                            Unidle the session
-                                                                                    when Neovim gains
-                                                                                    focus
+  idle.unidle_on_focus   boolean                    true                              Unidle the session
+                                                                                      when Neovim gains
+                                                                                      focus
 
-  idle.smart_idle        boolean                    true                            Enable smart idle
-                                                                                    feature
+  idle.smart_idle        boolean                    true                              Enable smart idle
+                                                                                      feature
 
-  idle.details           string \| function(opts)   'Idling'                        Details shown when
-                                                                                    idle
+  idle.details           string \| function(opts)   'Idling'                          Details shown when
+                                                                                      idle
 
-  idle.state             string \| function(opts)   nil                             State shown when idle
+  idle.state             string \| function(opts)   nil                               State shown when idle
 
-  idle.tooltip           string \| function(opts)   '💤'                            Tooltip shown when
-                                                                                    hovering over idle
-                                                                                    icon
+  idle.tooltip           string \| function(opts)   '💤'                              Tooltip shown when
+                                                                                      hovering over idle
+                                                                                      icon
 
-  idle.icon              string \| function(opts)   default idle icon               Custom icon URL or
-                                                                                    asset ID
-  --------------------------------------------------------------------------------------------------------
+  idle.icon              string \| function(opts)   default idle icon                 Custom icon URL or
+                                                                                      asset ID
+  ---------------------------------------------------------------------------------------------------------
 
 TEXT                                                 *cord-configuration-text*
 
@@ -1021,13 +1025,16 @@ CUSTOMIZING ICONS ~
     opts = function()
       return {
         display = {
-          theme = 'pastel',
+          theme = 'default',
+          flavor = 'dark',
         },
         lazy = {
-          -- change default idle icon for 'pastel' theme to keyboard
+          -- change default idle icon to keyboard
           icon = require('cord.api.icon').get('keyboard'),
           -- or use another theme's idle icon
-          icon = require('cord.api.icon').get('idle', 'onyx'),
+          icon = require('cord.api.icon').get('idle', 'atom'),
+          -- or use another theme's idle icon from a different flavor
+          icon = require('cord.api.icon').get('idle', 'atom', 'light'),
         }
       }
     end
@@ -1452,15 +1459,16 @@ available in distinct themes to match your style.
 **Explore the Icon Showcase**vyfor/icons
 <https://github.com/vyfor/icons#showcase>
 
-Currently, Cord offers four themes:
+Cord currently offers three themes:
 
-- **Onyx**A sleek, modern dark theme (default).
-- **Pastel**A vibrant, accent-colored theme.
-- **Catppuccin**A soothing pastel theme.
-- **Material**Modern Material Design icons theme.
+- **Default**A clean and stylish theme featuring widely recognized icons.
+- **Atom**A sleek theme inspired by Atom Material Icons
+- **Catppuccin**A soothing pastel theme inspired by Catppuccin.
 
-Choose your theme in the `display.theme` configuration option. More themes are
-coming soon!
+Each theme includes multiple flavors, typically `dark`, `light`, and `accent`.
+
+Choose your theme in the `display` configuration option. More themes are coming
+soon!
 
 
 DOCUMENTATION                                    *cord-examples-documentation*
