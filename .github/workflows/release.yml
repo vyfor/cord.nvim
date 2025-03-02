@@ -13,7 +13,21 @@ concurrency:
 
 jobs:
   get-next-version:
-    uses: semantic-release-action/next-release-version/.github/workflows/next-release-version.yml@v4
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+      - run: npm ci
+      - run: npx semantic-release --dry-run
+        id: get-next-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      new-release-published: ${{ steps.get-next-version.outputs.new-release-published }}
+      new-release-version: ${{ steps.get-next-version.outputs.new-release-version }}
+      new-release-git-tag: ${{ steps.get-next-version.outputs.new-release-git-tag }}
       
   build:
     name: Build ${{ matrix.target }}
