@@ -24,7 +24,7 @@ function M.validate(user_config)
 
   final_config.log_level = log_level
   logger.set_level(log_level)
-  icons.set_theme(final_config.display.theme)
+  icons.set(final_config.display.theme, final_config.display.flavor)
 
   if final_config.buttons then
     if #final_config.buttons > 2 then
