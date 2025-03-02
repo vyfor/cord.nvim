@@ -25,7 +25,8 @@ Here's the complete default configuration for Cord. You can use this as a starti
     icon = nil,
   },
   display = {
-    theme = 'onyx',
+    theme = 'default',
+    flavor = 'dark',
     swap_fields = false,
     swap_icons = false,
   },
@@ -116,11 +117,12 @@ Here's the complete default configuration for Cord. You can use this as a starti
 
 ## 📊 Display
 
-| Option                | Type      | Default | Description                                                                      |
-| --------------------- | --------- | ------- | -------------------------------------------------------------------------------  |
-| `display.theme`       | `string`  | `onyx`  | Choose between different icon themes; 'onyx', 'pastel', 'catppuccin', 'material' |
-| `display.swap_fields` | `boolean` | `false` | Show workspace name before filename                                              |
-| `display.swap_icons`  | `boolean` | `false` | Use editor icon as large image                                                   |
+| Option                | Type      | Default   | Description                                                                 |
+| --------------------- | --------- | --------- | --------------------------------------------------------------------------- |
+| `display.theme`       | `string`  | `default` | Choose between different icon themes; 'default', 'atom', 'catppuccin'       |
+| `display.flavor`      | `string`  | `dark`    | Choose between different theme flavors; typically 'dark', 'light', 'accent' |
+| `display.swap_fields` | `boolean` | `false`   | Show workspace name before filename                                         |
+| `display.swap_icons`  | `boolean` | `false`   | Use editor icon as large image                                              |
 
 ## ⏰ Timestamp
 
@@ -132,18 +134,18 @@ Here's the complete default configuration for Cord. You can use this as a starti
 
 ## 💤 Idle
 
-| Option                 | Type                       | Default                                                                               | Description                                                   |
-| ---------------------- | -------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `idle.enabled`         | `boolean`                  | `true`                                                                                | Enable idle status detection                                  |
-| `idle.timeout`         | `number`                   | `300000`                                                                              | Milliseconds before marking the session as idle               |
-| `idle.show_status`     | `boolean`                  | `true`                                                                                | Show idle status in presence, or hide the presence if `false` |
-| `idle.ignore_focus`    | `boolean`                  | `true`                                                                                | Show idle despite Neovim having focus                         |
-| `idle.unidle_on_focus` | `boolean`                  | `true`                                                                                | Unidle the session when Neovim gains focus                    |
-| `idle.smart_idle`      | `boolean`                  | `true`                                                                                | Enable [smart idle](#smart-idle) feature                      |
-| `idle.details`         | `string \| function(opts)` | `'Idling'`                                                                            | Details shown when idle                                       |
-| `idle.state`           | `string \| function(opts)` | `nil`                                                                                 | State shown when idle                                         |
-| `idle.tooltip`         | `string \| function(opts)` | `'💤'`                                                                                 | Tooltip shown when hovering over idle icon                    |
-| `idle.icon`            | `string \| function(opts)` | [`default idle icon`](https://github.com/vyfor/icons/blob/master/icons/onyx/idle.png) | Custom icon URL or asset ID                                   |
+| Option                 | Type                       | Default                                                                                           | Description                                                   |
+| ---------------------- | -------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `idle.enabled`         | `boolean`                  | `true`                                                                                            | Enable idle status detection                                  |
+| `idle.timeout`         | `number`                   | `300000`                                                                                          | Milliseconds before marking the session as idle               |
+| `idle.show_status`     | `boolean`                  | `true`                                                                                            | Show idle status in presence, or hide the presence if `false` |
+| `idle.ignore_focus`    | `boolean`                  | `true`                                                                                            | Show idle despite Neovim having focus                         |
+| `idle.unidle_on_focus` | `boolean`                  | `true`                                                                                            | Unidle the session when Neovim gains focus                    |
+| `idle.smart_idle`      | `boolean`                  | `true`                                                                                            | Enable [smart idle](#smart-idle) feature                      |
+| `idle.details`         | `string \| function(opts)` | `'Idling'`                                                                                        | Details shown when idle                                       |
+| `idle.state`           | `string \| function(opts)` | `nil`                                                                                             | State shown when idle                                         |
+| `idle.tooltip`         | `string \| function(opts)` | `'💤'`                                                                                             | Tooltip shown when hovering over idle icon                    |
+| `idle.icon`            | `string \| function(opts)` | [`default idle icon`](https://github.com/vyfor/icons/blob/master/icons/default/dark/keyboard.png) | Custom icon URL or asset ID                                   |
 
 ## 📝 Text
 

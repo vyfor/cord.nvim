@@ -9,7 +9,8 @@
 ---@field icon? string Optional editor icon
 
 ---@class CordDisplayConfig
----@field theme? 'onyx'|'pastel'|'catppuccin'|'material'|string Set icon theme
+---@field theme? 'default'|'atom'|'catppuccin'|string Set icon theme
+---@field flavor? 'dark'|'light'|'accent'|string Set icon theme flavor
 ---@field swap_fields? boolean Whether to swap activity fields
 ---@field swap_icons? boolean Whether to swap activity icons
 
@@ -120,7 +121,8 @@ local defaults = {
     icon = nil,
   },
   display = {
-    theme = 'onyx',
+    theme = 'default',
+    flavor = 'dark',
     swap_fields = false,
     swap_icons = false,
   },

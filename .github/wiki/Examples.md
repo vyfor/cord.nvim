@@ -11,13 +11,16 @@ Learn how to customize your Discord presence in countless ways using Cord's robu
 opts = function()
   return {
     display = {
-      theme = 'pastel',
+      theme = 'default',
+      flavor = 'dark',
     },
     lazy = {
-      -- change default idle icon for 'pastel' theme to keyboard
+      -- change default idle icon to keyboard
       icon = require('cord.api.icon').get('keyboard'),
       -- or use another theme's idle icon
-      icon = require('cord.api.icon').get('idle', 'onyx'),
+      icon = require('cord.api.icon').get('idle', 'atom'),
+      -- or use another theme's idle icon from a different flavor
+      icon = require('cord.api.icon').get('idle', 'atom', 'light'),
     }
   }
 end
