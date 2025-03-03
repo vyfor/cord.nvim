@@ -9,7 +9,7 @@ If you're experiencing issues, try these general steps first:
 1.  Restart Neovim, ensure that Cord is loaded, and Discord is running. Make sure both Cord and its server (`:Cord update`) are up-to-date.
 2.  Verify your Discord [Activity Privacy settings](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce) are enabled to allow Rich Presence to be displayed.
 3.  Set `log_level = vim.log.levels.TRACE` in your `cord.setup()` configuration. Then check `:messages` for detailed logs that might indicate the problem. Remember to revert to a less verbose log level (e.g., `vim.log.levels.WARN` or `vim.log.levels.OFF`) after troubleshooting.
-4.  This command performs health checks and can identify common configuration or environment issues.
+4. Run `:checkhealth cord`. This command performs health checks and can identify common configuration or environment issues.
 5.  Check if the Discord IPC pipe exists on your system:
     - **Windows (PowerShell):** `Test-Path \\.\pipe\discord-ipc-0`
     - **Unix (Bash):** `find /tmp /var/run /run -type s -name 'discord-ipc-*' 2>/dev/null`
