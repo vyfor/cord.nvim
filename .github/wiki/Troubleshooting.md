@@ -73,7 +73,8 @@ Use SSH port forwarding to tunnel the Discord IPC socket over SSH. Follow the gu
 
 If your problem is not listed here or the solutions don't work, please:
 
-1.  **Search Existing Issues**: Check the [existing issues](https://github.com/vyfor/cord.nvim/issues) on the Cord GitHub repository to see if your issue has already been reported.
-2.  **Open a New Issue**: If you can't find a solution, [open a new issue](https://github.com/vyfor/cord.nvim/issues/new/choose) on GitHub. Be sure to include a clear title and description, along with as much relevant information as possible.
+1.  **Check the FAQ**: See if your issue is listed in the [FAQ](./FAQ.md).
+2.  **Search Existing Issues**: Check the [existing issues](https://github.com/vyfor/cord.nvim/issues) on the Cord GitHub repository to see if your issue has already been reported.
+3.  **Open a New Issue**: If you think your issue is a bug in Cord, [open a new issue](https://github.com/vyfor/cord.nvim/issues/new/choose) on GitHub. Be sure to include a clear title and description, along with as much relevant information as possible. If you're unsure if it's a bug, you can always clarify in Discussions or Discord.
 
 We're here to help! Providing detailed information in your issue will help us diagnose and resolve your problem more quickly.

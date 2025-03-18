@@ -10,6 +10,20 @@ Cord is tested with Neovim **0.6.0** or later. Although, we encourage you to use
 
 Nope, you don't need Rust anymore!  We made it easier. Cord will automatically download the necessary server component from GitHub. Just run `:Cord update` after installing the plugin, and you're good to go! If you *want* to build from source (maybe you're a Rustacean!), you can still do `:Cord update build`, but it's totally optional.
 
+> ### Q: Can I use a custom name in my Rich Presence?
+
+Yes, you will have to create an application with the desired name in the [Discord Developer Portal](https://discord.com/developers/applications).
+Then, copy the application ID and put it in the `editor.client` field in your `cord.nvim` configuration.
+
+Example:
+```lua
+require 'cord'.setup {
+    editor = {
+        client = '01234567890123456789'
+    }
+}
+```
+
 > ### Q: Why do I still see Cord's server running in background, even after I've closed Neovim?
 
 Cord's server keeps running intentionally. In fact, this is one of the key design features that sets it apart from similar plugins. It remains active in the background to maintain a continuous connection to Discord, which helps avoid hitting Discord's rate limits on reconnections—especially useful if you often restart Neovim rather than maintaining a single long session. If you prefer not to have it running, you can adjust the `advanced.server.timeout` setting.
