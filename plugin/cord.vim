@@ -25,6 +25,10 @@ endfunction
 command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.command'.handle('<q-args>')
 
 lua << EOF
+    -- Schedule initialization to next event loop iteration.
+    -- This ensures setup() calls have an effect even if called after this file is sourced.
+    -- Also allows the plugin to start automatically without requiring setup() call.
+    -- This is experimental, do let us know if you're having any issues.
     vim.schedule(function()
         local config = require('cord.plugin.config.util').validate()
         if not config then return end

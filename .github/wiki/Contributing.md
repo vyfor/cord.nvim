@@ -1,49 +1,58 @@
 # 📗 Contribution Guidelines
 
-First off, thank you for your interest in contributing to cord.nvim! We welcome contributions from everyone. This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to cord.nvim! This document provides guidelines for contributing to the project.
 
-## How Can I Contribute?
+## Project Structure
 
-### Reporting Bugs
+cord.nvim consists of several key components:
 
-- Before submitting a bug report, make sure to go through the [**🔧 Troubleshooting**](./Troubleshooting.md) section of the wiki, and check for [existing issues](https://github.com/vyfor/cord.nvim/issues) to see if the problem has already been reported.
-- If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/vyfor/cord.nvim/issues/new). Be sure to include a clear title and description, along with as much relevant information as possible.
+- **Lua Plugin**: The main Neovim plugin code located in `lua/cord/`.
+- **Server Component**: The server responsible for managing multiple Neovim instances and IPC communication located in `src/`.
+- **Documentation**: Wiki pages are pulled from `.github/wiki/`.
+- **Assets**: Icons are now stored in a separate repository, [vyfor/icons](https://github.com/vyfor/icons).
 
-### Suggesting Enhancements
+## Versioning
 
-- Open a new issue with your suggestion, providing as much detail as possible.
-- Explain why this enhancement would be useful and whether it could introduce breaking changes to the codebase.
+We use a modified versioning scheme (MAJOR.MINOR.PATCH):
+
+- **PATCH**: Backward compatible changes (features and fixes)
+- **MINOR**: Breaking changes
+- **MAJOR**: Significant architectural changes
+
+## How to Contribute
+
+### Contributing to the Lua Plugin
+
+Cord detects different buffers based on current buffer's filetype, and on rare occasions, its filename. If it's not listed, it's either:
+- Not yet added to Cord. You can submit a PR, or open an issue and let us handle it.
+    - The code responsible for this is in `lua/cord/plugin/activity/mappings.lua`.
+- Cannot be detected by Cord.
+    - This is often the case for plugins, so make sure the plugin you're contributing overrides current buffer's filetype option so that it can be detected.
+
+If you'd like to contribute a built-in plugin that might be useful for many users, you can add it in `lua/cord/plugins/`.
 
 ### Pull Requests
 
-1. Fork the repo and create your branch from `master`.
-2. Add your changes and give it a proper testing.
-3. Make sure your code is formatted and lints.
-4. Issue that pull request!
-
-## Styleguides
-
-### Git Commit Messages
-
-We use the [Conventional Commits](https://www.conventionalcommits.org/) specification for our commit messages. This leads to more readable messages that are easy to follow when looking through the project history. Please adhere to this convention for your commit messages.
-
-The commit message should be structured as follows:
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-For breaking changes, add a `!` after the type/scope. Make sure to include the details in the commit body.
+1. Fork and create a feature branch from `master`
+2. Follow our code style:
+   - Rust: Use `rustfmt` and `clippy`
+   - Lua: Use `stylua`
+3. Test your changes
+4. Submit a PR with a title following [Conventional Commits](https://www.conventionalcommits.org/)
 
 Examples:
+```
+feat(icons): add support for custom icon themes
 
-`fix: correctly parse Git config`
+fix(server): handle Discord disconnection gracefully
 
-`feat(icons): provide an icon for Rust`
+feat(server)!: change communcation protocol\n\nBREAKING CHANGE: This change requires users to update their configuration.
+```
 
-`docs(readme): fix typo`
+## Getting Help
 
-`refactor!: remove config.timer.enable`
+- Join our [Discord server](https://discord.gg/q9rC4bjCHv)
+- Check the [FAQ](./FAQ.md)
+- Browse [Discussions](https://github.com/vyfor/cord.nvim/discussions)
+
+Thank you for contributing to cord.nvim!
