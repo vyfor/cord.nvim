@@ -456,5 +456,5 @@ The `ActivityManager` contains useful methods:
 
 ## Useful Functions
 
-- `require('cord.api.icon').get(name: string, theme?: string): string`
+- `require('cord.api.icon').get(name: string, theme?: string, flavor?: string): string`
   - **Get Icon URL:** Returns the URL for the specified icon `name` and optional `theme`. If `theme` is not provided, it defaults to the configured `display.theme`. Useful for referencing Cord's built-in icons in your custom configurations.
