@@ -1,4 +1,4 @@
-*cord.txt*              For NVIM v0.6.0             Last change: 2025 March 18
+*cord.txt*              For NVIM v0.6.0             Last change: 2025 March 19
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -677,8 +677,8 @@ ACTIVITY OPTIONS                         *cord-configuration-activity-options*
 
 USEFUL FUNCTIONS                         *cord-configuration-useful-functions*
 
-- `require('cord.api.icon').get(name: string, theme?: string): string`
-    - **Get Icon URL:** Returns the URL for the specified icon `name` and optional `theme`. If `theme` is not provided, it defaults to the configured `display.theme`. Useful for referencing Cord’s built-in icons in your custom configurations.
+- `require('cord.api.icon').get(name: string, theme?: string, flavor?: string): string`
+    - **Get Icon URL:** Returns the URL for the specified icon `name`, optional `theme`, and optional `flavor`. If `theme` or `flavor` is not provided, they default to the configured `display.theme` and `display.flavor`, respectively. Useful for referencing Cord’s built-in icons in your custom configurations.
 
 
 ==============================================================================
