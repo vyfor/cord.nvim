@@ -16,6 +16,7 @@ local validation_rules = {
   ['display.theme'] = { 'string' },
   ['display.swap_fields'] = { 'boolean' },
   ['display.swap_icons'] = { 'boolean' },
+  ['display.flavor'] = { 'string' },  -- Added the missing entry
 
   ['timestamp'] = { 'table' },
   ['timestamp.enabled'] = { 'boolean' },
