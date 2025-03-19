@@ -143,6 +143,16 @@ Dive deeper into Cord's features and customization options in the [**Wiki**](htt
 - ❓ **[FAQ](./.github/wiki/FAQ.md)**: Frequently asked questions about Cord.
 - 🚑 **[Troubleshooting Guide](./.github/wiki/Troubleshooting)**: Find solutions to common issues and scenarios.
 
+## 📜 Versioning
+
+We follow a **modified versioning specification**:
+
+- **PATCH**: Non-breaking changes.
+- **MINOR**: Breaking changes.
+- **MAJOR**: Significant rewrites or fundamental shifts, bumped manually.
+
+All breaking changes will be **announced in [GitHub Discussions](https://github.com/vyfor/cord.nvim/discussions)**.
+
 ## 🤝 Contributing
 
 We welcome contributions to make Cord even better!
