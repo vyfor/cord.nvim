@@ -39,6 +39,7 @@ Table of Contents                                     *cord-table-of-contents*
   - Quick Start                                    |cord-examples-quick-start|
   - Themes                                              |cord-examples-themes|
   - Documentation                                |cord-examples-documentation|
+  - Versioning                                      |cord-examples-versioning|
   - Contributing                                  |cord-examples-contributing|
   - Support the Project                    |cord-examples-support-the-project|
   - Build From Source                        |cord-examples-build-from-source|
@@ -1481,6 +1482,17 @@ Dive deeper into Cord’s features and customization options in the **Wiki**
 - **Migration Guide**Upgrade smoothly from Cord v1.
 - **FAQ**Frequently asked questions about Cord.
 - **Troubleshooting Guide**Find solutions to common issues and scenarios.
+
+
+VERSIONING                                          *cord-examples-versioning*
+
+We follow a **modified versioning specification**
+
+- **PATCH**Non-breaking changes.
+- **MINOR**Breaking changes.
+- **MAJOR**Significant rewrites or fundamental shifts, bumped manually.
+
+All breaking changes will be **announced in GitHub Discussions**.
 
 
 CONTRIBUTING                                      *cord-examples-contributing*
