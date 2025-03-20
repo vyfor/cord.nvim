@@ -24,7 +24,7 @@
 > Cord no longer requires Rust to be installed. Rust component will be automatically downloaded from GitHub Releases.
 
 ## 💎 Features  
-- 🌐 **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
+- 🌐 **Client-Server Design** — Handles multiple Neovim instances while maintaining a single connection to Discord.
 - ⚡ **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
 - 🚀 **Event-Driven Architecture** — Instant presence updates with zero delays.  
 - 🎨 **Customizable Templates** — Dynamic string templates with custom variables.
@@ -37,7 +37,7 @@
 - 🔌 **Plugin System** — Extendable with custom plugins, with a plethora of built-in ones out of the box.
 - 📦 **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside [WSL](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#running-inside-wsl) and [Discord in browser](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#using-discord-in-browser).
 - 🌍 **Cross-Platform** — Supports Windows, Linux, macOS, and FreeBSD.
-- 🌸 **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
+- 🌸 **Rich Icon Collection** — Includes 120+ uniquely designed themed icons for over 200 file types and plugins.
 - 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
 
 
@@ -171,7 +171,7 @@ To build Cord from source, you can run `:Cord update build` (async) which will i
 cargo install --path . --root path/to/nvim-data-dir/cord --force
 ```
 
-Alternatively, you can use `cargo b --release` to build the binary, then place it under `nvim-data-dir/cord/bin`.
+Alternatively, you can use `cargo build --release` to build the binary, then place it under `nvim-data-dir/cord/bin`.
 
 ---
 

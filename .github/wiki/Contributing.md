@@ -27,13 +27,13 @@ Cord detects different buffers based on current buffer's filetype, and on rare o
 - Not yet added to Cord. You can submit a PR, or open an issue and let us handle it.
     - The code responsible for this is in `lua/cord/plugin/activity/mappings.lua`.
 - Cannot be detected by Cord.
-    - This is often the case for plugins, so make sure the plugin you're contributing overrides current buffer's filetype option so that it can be detected.
+    - This is often the case for plugins, so make sure the plugin you're contributing overrides the current buffer's filetype option so that it can be detected.
 
 If you'd like to contribute a built-in plugin that might be useful for many users, you can add it in `lua/cord/plugins/`.
 
 ### Pull Requests
 
-1. Fork and create a feature branch from `master`
+1. Fork the repository and create a new feature branch from `master`
 2. Follow our code style:
    - Rust: Use `rustfmt` and `clippy`
    - Lua: Use `stylua`
@@ -46,7 +46,10 @@ feat(icons): add support for custom icon themes
 
 fix(server): handle Discord disconnection gracefully
 
-feat(server)!: change communcation protocol\n\nBREAKING CHANGE: This change requires users to update their configuration.
+feat(server)!: change communication protocol  
+
+BREAKING CHANGE: This change requires users to update their configuration.
+
 ```
 
 ## Getting Help
