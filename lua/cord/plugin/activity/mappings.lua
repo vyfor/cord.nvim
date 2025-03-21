@@ -74,6 +74,7 @@ M.filetype_mappings = {
   htmlcheetah = { 'language', 'python', 'Python Cheetah' },
   htmldjango = { 'language', 'django', 'Django HTML' },
   htmlm4 = { 'language', 'html', 'HTML M4' },
+  http = { 'language', 'link', 'HTTP' },
   hyprlang = { 'language', 'hyprland', 'Hyprland' },
   image = { 'language', 'picture', 'Image' },
   java = { 'language', 'java', 'Java' },
