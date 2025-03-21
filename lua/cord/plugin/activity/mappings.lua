@@ -85,6 +85,7 @@ M.filetype_mappings = {
   julia = { 'language', 'julia', 'Julia' },
   kotlin = { 'language', 'kotlin', 'Kotlin' },
   lalrpop = { 'language', 'rust', 'LALRPOP' },
+  less = { 'language', 'less', 'Less' },
   lisp = { 'language', 'lisp', 'Lisp' },
   logcheck = { 'language', 'log', 'Logcheck' },
   lua = { 'language', 'lua', 'Lua' },
