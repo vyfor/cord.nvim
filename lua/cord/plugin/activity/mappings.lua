@@ -90,6 +90,7 @@ M.filetype_mappings = {
   lisp = { 'language', 'lisp', 'Lisp' },
   logcheck = { 'language', 'log', 'Logcheck' },
   lua = { 'language', 'lua', 'Lua' },
+  luau = { 'language', 'luau', 'Luau' },
   mail = { 'language', 'mail', 'Mail' },
   mailaliases = { 'language', 'mail', 'Mail Aliases' },
   mailcap = { 'language', 'mail', 'Mailcap' },
