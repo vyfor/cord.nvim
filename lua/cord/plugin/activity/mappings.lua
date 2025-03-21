@@ -154,6 +154,7 @@ M.filetype_mappings = {
   winbatch = { 'language', M.default_icons.terminal, 'Batch' },
   xhtml = { 'language', 'html', 'XHTML' },
   xml = { 'language', 'xml', 'XML' },
+  yagpdbcc = { 'language', 'yagpdb', 'YAGPDB Custom Command' },
   yaml = { 'language', 'yaml', 'YAML' },
   zig = { 'language', 'zig', 'Zig' },
   zsh = { 'language', M.default_icons.terminal, 'Zsh' },
