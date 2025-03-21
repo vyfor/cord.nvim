@@ -70,6 +70,7 @@ M.filetype_mappings = {
   hcl = { 'language', 'hashicorp', 'HCL' },
   heex = { 'language', 'phoenix', 'Phoenix' },
   hgcommit = { 'language', 'mercurial', 'Mercurial' },
+  hlsl = { 'language', 'shader', 'HLSL' },
   html = { 'language', 'html', 'HTML' },
   htmlcheetah = { 'language', 'python', 'Python Cheetah' },
   htmldjango = { 'language', 'django', 'Django HTML' },
