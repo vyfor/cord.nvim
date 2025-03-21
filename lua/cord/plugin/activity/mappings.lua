@@ -310,6 +310,11 @@ M.filename_mappings = {
 
 M.extension_mappings = {
   -- Languages
+  ['.aab'] = { 'language', 'android', 'Android App Bundle' },
+  ['.aar'] = { 'language', 'android', 'Android Archive' },
+  ['.apk'] = { 'language', 'android', 'Android Package Kit' },
+  ['.apks'] = { 'language', 'android', 'Android Package Kit' },
+  ['.avd'] = { 'language', 'android', 'Android Virtual Device' },
   ['.bmp'] = { 'language', 'picture', 'BMP' },
   ['.fs'] = { 'language', 'fsharp', 'F#' },
   ['.fsi'] = { 'language', 'fsharp', 'F#' },
@@ -332,6 +337,7 @@ M.extension_mappings = {
   ['.log'] = { 'language', 'log', 'Logs' },
   ['.module.ts'] = { 'language', 'angular', 'Angular' },
   ['.module.js'] = { 'language', 'angular', 'Angular' },
+  ['.obb'] = { 'language', 'android', 'Android' },
   ['.component.ts'] = { 'language', 'angular', 'Angular' },
   ['.component.js'] = { 'language', 'angular', 'Angular' },
   ['.component.html'] = { 'language', 'angular', 'Angular' },
@@ -360,6 +366,7 @@ M.extension_mappings = {
   ['.vapi'] = { 'language', 'vala', 'Vala' },
   ['.vala'] = { 'language', 'vala', 'Vala' },
   ['.webp'] = { 'language', 'picture', 'WebP' },
+  ['.xapk'] = { 'language', 'android', 'Android Package Kit' },
 }
 
 M.cord_related = {
