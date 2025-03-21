@@ -122,6 +122,7 @@ M.filetype_mappings = {
   ruby = { 'language', 'ruby', 'Ruby' },
   rust = { 'language', 'rust', 'Rust' },
   scala = { 'language', 'scala', 'Scala' },
+  scheme = { 'language', 'scheme', 'Scheme' },
   sass = { 'language', 'sass', 'Sass' },
   scss = { 'language', 'sass', 'Sass' },
   sh = { 'language', M.default_icons.terminal, 'Shell script' },
