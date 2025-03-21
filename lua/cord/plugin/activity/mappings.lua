@@ -32,6 +32,7 @@ M.filetype_mappings = {
   c = { 'language', 'c', 'C ' },
   checkhealth = { 'language', 'health', 'Health Check' },
   clojure = { 'language', 'clojure', 'Clojure' },
+  cmake = { 'language', 'cmake', 'CMake' },
   conf = { 'language', 'settings', 'Config' },
   config = { 'language', 'settings', 'Config' },
   confini = { 'language', 'settings', 'INI' },
