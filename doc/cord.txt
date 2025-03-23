@@ -1,4 +1,4 @@
-*cord.txt*              For NVIM v0.6.0             Last change: 2025 March 19
+*cord.txt*              For NVIM v0.6.0             Last change: 2025 March 23
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -26,8 +26,8 @@ Table of Contents                                     *cord-table-of-contents*
   - Useful Functions                     |cord-configuration-useful-functions|
 2. Custom Assets                                          |cord-custom-assets|
   - Structure                                   |cord-custom-assets-structure|
-  - Asset Keys: Identifying What to Customize|cord-custom-assets-asset-keys:-identifying-what-to-customize|
-  - Asset Options: Fine-Tuning Your Icons|cord-custom-assets-asset-options:-fine-tuning-your-icons|
+  - Asset Keys                                 |cord-custom-assets-asset-keys|
+  - Asset Options                           |cord-custom-assets-asset-options|
   - Examples                                     |cord-custom-assets-examples|
   - Overriding Defaults               |cord-custom-assets-overriding-defaults|
   - Tip                                               |cord-custom-assets-tip|
@@ -704,10 +704,10 @@ call. The basic structure is as follows:
 <
 
 Here, `"key"` is the identifier for the asset, and `"value"` can be either a
-simple string for the icon name or a table for more detailed asset options.
+simple string for the asset icon or a table for more detailed asset options.
 
 
-ASSET KEYS: IDENTIFYING WHAT TO CUSTOMIZE*cord-custom-assets-asset-keys:-identifying-what-to-customize*
+ASSET KEYS                                     *cord-custom-assets-asset-keys*
 
 The `key` in your asset configuration determines what type of file or context
 the custom asset will apply to. You can use the following key types:
@@ -718,7 +718,7 @@ the custom asset will apply to. You can use the following key types:
 - **Special Keys**Cord provides special keys for generic scenarios (see |cord-overriding-defaults|).
 
 
-ASSET OPTIONS: FINE-TUNING YOUR ICONS*cord-custom-assets-asset-options:-fine-tuning-your-icons*
+ASSET OPTIONS                               *cord-custom-assets-asset-options*
 
 When you use a table as the `value` in your asset configuration, you can
 specify these options to fine-tune your custom asset:
@@ -726,9 +726,8 @@ specify these options to fine-tune your custom asset:
   ---------------------------------------------------------------------------------------
   Option    Type                 Description
   --------- -------------------- --------------------------------------------------------
-  icon      string \| function   Required. A direct URL to the icon image or the name of
-                                 a rich presence asset (if using your own Discord
-                                 application).
+  icon      string \| function   A direct URL to the icon image or the name of a rich
+                                 presence asset (if using your own Discord application).
 
   tooltip   string \| function   Text that appears when you hover over the icon in
                                  Discord.
@@ -753,19 +752,15 @@ Available types include: - `language` (default) - `docs` - `plugin_manager` -
 
 EXAMPLES                                         *cord-custom-assets-examples*
 
-Let’s look at some practical examples of custom asset configuration:
-
 **1. Simple Icon Replacement by Extension:**
 
 >lua
     assets = {
-      ['.rs'] = 'rust_icon', -- Use the "rust_icon" for all Rust files
+      ['.rs'] = 'https://...', -- Use this icon URL for all Rust files
     }
 <
 
-This will use the icon named `rust_icon` (which should be defined in your
-Discord Developer Portal if you are using a custom application, or a URL) for
-any file with the `.rs` extension.
+This will use the given icon URL for any file with the `.rs` extension.
 
 **2. Custom Icon and Tooltip for a Filetype:**
 
@@ -785,11 +780,11 @@ This example sets a custom icon and tooltip specifically for Lua files (the
 
 >lua
     assets = {
-      ['.settings'] = require('cord.api.icon').get('gear'),
+      ['.settings'] = require('cord.api.icon').get('settings'),
     }
 <
 
-This makes use of Cord’s default icon library, using the "gear" icon for
+This makes use of Cord’s default icon library, using the "settings" icon for
 files with the `.settings` extension.
 
 **4. Plugin Manager Asset with Custom Text:**
