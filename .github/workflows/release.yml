@@ -32,6 +32,7 @@ jobs:
         id: get-next-version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
     outputs:
       new-release-published: ${{ steps.get-next-version.outputs.new-release-published }}
       new-release-version: ${{ steps.get-next-version.outputs.new-release-version }}
