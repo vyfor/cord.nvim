@@ -50,6 +50,7 @@ module.exports = {
         "verifyConditionsCmd": "semantic-release-cargo verify-conditions",
         "publishCmd": "semantic-release-cargo publish"
       }
-    ]
+    ],
+    "semantic-release-export-data"
   ]
 }
