@@ -14,9 +14,9 @@ require('cord').setup {
 }
 ```
 
-Here, `"key"` is the identifier for the asset, and `"value"` can be either a simple string for the icon name or a table for more detailed asset options.
+Here, `"key"` is the identifier for the asset, and `"value"` can be either a simple string for the asset icon or a table for more detailed asset options.
 
-## 🔑 Asset Keys: Identifying What to Customize
+## 🔑 Asset Keys
 
 The `key` in your asset configuration determines what type of file or context the custom asset will apply to. You can use the following key types:
 
@@ -25,13 +25,13 @@ The `key` in your asset configuration determines what type of file or context th
 - **File Extension**: Use a file extension (e.g., `".rs"`, `".js"`) to apply assets to all files with that extension.
 - **Special Keys**: Cord provides special keys for generic scenarios (see [Overriding Defaults](#overriding-defaults)).
 
-## ⚙️ Asset Options: Fine-Tuning Your Icons
+## ⚙️ Asset Options
 
 When you use a table as the `value` in your asset configuration, you can specify these options to fine-tune your custom asset:
 
 | Option    | Type                  | Description                                                                                                                |
 | --------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `icon`    | `string \| function ` | **Required.** A direct URL to the icon image or the name of a rich presence asset (if using your own Discord application). |
+| `icon`    | `string \| function ` | A direct URL to the icon image or the name of a rich presence asset (if using your own Discord application). |
 | `tooltip` | `string \| function`  | Text that appears when you hover over the icon in Discord.                                                                 |
 | `name`    | `string \| function`  | An optional override for the icon's name. Generally used for types other than `language`.                                  |
 | `text`    | `string \| function`  | An optional override for the icon's text. **Completely replaces** the default text.                                        |
@@ -57,17 +57,15 @@ The `type` option categorizes your asset, influencing how Cord displays it. Avai
 
 ## 🚀 Examples
 
-Let's look at some practical examples of custom asset configuration:
-
 **1. Simple Icon Replacement by Extension:**
 
 ```lua
 assets = {
-  ['.rs'] = 'rust_icon', -- Use the "rust_icon" for all Rust files
+  ['.rs'] = 'https://...', -- Use this icon URL for all Rust files
 }
 ```
 
-This will use the icon named `rust_icon` (which should be defined in your Discord Developer Portal if you are using a custom application, or a URL) for any file with the `.rs` extension.
+This will use the given icon URL for any file with the `.rs` extension.
 
 **2. Custom Icon and Tooltip for a Filetype:**
 
@@ -86,11 +84,11 @@ This example sets a custom icon and tooltip specifically for Lua files (the `lua
 
 ```lua
 assets = {
-  ['.settings'] = require('cord.api.icon').get('gear'),
+  ['.settings'] = require('cord.api.icon').get('settings'),
 }
 ```
 
-This makes use of Cord's default icon library, using the "gear" icon for files with the `.settings` extension.
+This makes use of Cord's default icon library, using the "settings" icon for files with the `.settings` extension.
 
 **4. Plugin Manager Asset with Custom Text:**
 
