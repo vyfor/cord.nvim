@@ -48,6 +48,7 @@ Here's the complete default configuration for Cord. You can use this as a starti
     icon = nil,
   },
   text = {
+    default = nil,
     workspace = function(opts) return 'In ' .. opts.workspace end,
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
     editing = function(opts) return 'Editing ' .. opts.filename end,
@@ -151,6 +152,7 @@ Here's the complete default configuration for Cord. You can use this as a starti
 
 | Option           | Type                                  | Default                        | Description                                        |
 | ---------------- | ------------------------------------- | ------------------------------ | -------------------------------------------------- |
+| `default`        | `string \| function(opts) \| boolean` | `nil`                          | Default text for all unspecified text options      |
 | `workspace`      | `string \| function(opts) \| boolean` | `In {workspace}`               | Text shown when in a workspace                     |
 | `viewing`        | `string \| function(opts) \| boolean` | `Viewing {filename}`           | Text shown when viewing a file                     |
 | `editing`        | `string \| function(opts) \| boolean` | `Editing {filename}`           | Text shown when editing a file                     |
@@ -241,6 +243,15 @@ text = {
         file_browser = 'Browsing files in ${tooltip}',
     },
     variables = true, -- Enable string templates
+}
+```
+
+You can also set a default text for all unspecified options:
+```lua
+text = {
+    default = 'Using Neovim',  -- This will be used for any unspecified text options, you can use functions and boolean values as well
+    workspace = 'In workspace', -- This overrides the default for workspace
+    -- other fields not specified will use the default value
 }
 ```
 
