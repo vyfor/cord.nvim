@@ -1,4 +1,4 @@
-*cord.txt*              For NVIM v0.6.0             Last change: 2025 March 23
+*cord.txt*              For NVIM v0.6.0             Last change: 2025 March 29
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -99,6 +99,7 @@ Expand to view default configuration ~
         icon = nil,
       },
       text = {
+        default = nil,
         workspace = function(opts) return 'In ' .. opts.workspace end,
         viewing = function(opts) return 'Viewing ' .. opts.filename end,
         editing = function(opts) return 'Editing ' .. opts.filename end,
@@ -247,6 +248,9 @@ TEXT                                                 *cord-configuration-text*
   ----------------------------------------------------------------------------------------------------------------
   Option           Type                                  Default                        Description
   ---------------- ------------------------------------- ------------------------------ --------------------------
+  default          string \| function(opts) \| boolean   nil                            Default text for all
+                                                                                        unspecified text options
+
   workspace        string \| function(opts) \| boolean   In {workspace}                 Text shown when in a
                                                                                         workspace
 
@@ -413,6 +417,16 @@ states. You can customize it in three different ways:
             file_browser = 'Browsing files in ${tooltip}',
         },
         variables = true, -- Enable string templates
+    }
+<
+
+You can also set a default text for all unspecified options:
+
+>lua
+    text = {
+        default = 'Using Neovim',  -- This will be used for any unspecified text options, you can use functions and boolean values as well
+        workspace = 'In workspace', -- This overrides the default for workspace
+        -- other fields not specified will use the default value
     }
 <
 
