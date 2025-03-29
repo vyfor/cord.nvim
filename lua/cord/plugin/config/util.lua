@@ -2,12 +2,13 @@ local config = require 'cord.plugin.config'
 
 local M = {}
 
-function M.validate(user_config)
+function M.validate(new_config)
+  local user_config = new_config or require('cord').user_config or {}
   local logger = require 'cord.plugin.log'
   local icons = require 'cord.api.icon'
-
   local config_manager = require 'cord.plugin.config'
-  local final_config = vim.tbl_deep_extend('force', config_manager.get(), user_config or require('cord').user_config or {})
+
+  local final_config = vim.tbl_deep_extend('force', config_manager.get(), user_config)
 
   local log_level = final_config.log_level
   if type(log_level) == 'string' then
@@ -71,6 +72,15 @@ function M.validate(user_config)
 
   if not final_config.idle.icon then
     final_config.idle.icon = icons.get(icons.DEFAULT_IDLE_ICON)
+  end
+
+  if user_config.text and user_config.text.default then
+    local default_text = user_config.text.default
+    for key, _ in pairs(final_config.text) do
+      if key ~= 'default' and not user_config.text[key] then
+        final_config.text[key] = default_text
+      end
+    end
   end
 
   config_manager.set(final_config)

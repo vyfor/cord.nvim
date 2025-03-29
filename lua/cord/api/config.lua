@@ -36,6 +36,7 @@ local validation_rules = {
   ['idle.icon'] = { 'string', 'function' },
 
   ['text'] = { 'table' },
+  ['text.default'] = { 'string', 'boolean', 'function' },
   ['text.workspace'] = { 'string', 'boolean', 'function' },
   ['text.viewing'] = { 'string', 'boolean', 'function' },
   ['text.editing'] = { 'string', 'boolean', 'function' },

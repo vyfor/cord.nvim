@@ -27,6 +27,7 @@
 ---@field icon? string|fun(opts: CordOpts):string Idle icon
 
 ---@class CordTextConfig
+---@field default? string|fun(opts: CordOpts):string|boolean|nil Default text for all activities
 ---@field workspace? string|fun(opts: CordOpts):string|boolean|nil Text for workspace activity
 ---@field viewing? string|fun(opts: CordOpts):string|boolean|nil Text for viewing activity
 ---@field editing? string|fun(opts: CordOpts):string|boolean|nil Text for editing activity
@@ -144,6 +145,7 @@ local defaults = {
     icon = nil,
   },
   text = {
+    default = nil,
     workspace = function(opts) return 'In ' .. opts.workspace end,
     viewing = function(opts) return 'Viewing ' .. opts.filename end,
     editing = function(opts) return 'Editing ' .. opts.filename end,
