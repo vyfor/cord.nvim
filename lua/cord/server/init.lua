@@ -4,6 +4,15 @@ local logger = require 'cord.plugin.log'
 
 local M = {}
 
+-- Utility function to handle error messages
+local function handle_error_message(message, level)
+  if vim.notify then
+    vim.notify(message, level or vim.log.levels.ERROR)
+  else
+    print(message)
+  end
+end
+
 function M:connect(path, retried)
   return async.wrap(function()
     if M.is_updating then
@@ -25,7 +34,10 @@ function M:connect(path, retried)
       return M:run():await()
     end
 
-    if retried then error('Failed to connect to pipe: ' .. err, 0) end
+    if retried then
+      handle_error_message('Failed to connect to pipe: ' .. err)
+      error('Failed to connect to pipe: ' .. err, 0)
+    end
 
     if err ~= 'ENOENT' and err ~= 'ECONNRESET' then
       if err == 'ECONNREFUSED' or err == 'ETIMEDOUT' then
@@ -34,11 +46,16 @@ function M:connect(path, retried)
         goto spawn
       end
 
+      handle_error_message('Failed to connect to pipe: ' .. err)
       error('Failed to connect to pipe: ' .. err, 0)
     end
 
     ::spawn::
     logger.debug 'Pipe not found. Spawning server executable...'
+    handle_error_message(
+      '[cord.nvim] Discord RPC pipe not found. Please ensure Discord is running or disable the plugin temporarily.',
+      vim.log.levels.WARN
+    )
 
     local process = require('cord.server.spawn').spawn(config.get(), path)
     local should_continue, retry = process:await()
@@ -68,6 +85,7 @@ function M:run()
           if not manager or err then
             self.status = 'disconnected'
             self.client:close()
+            handle_error_message(err or 'Failed to initialize activity manager')
             logger.error(err or 'Failed to initialize activity manager')
             return
           end
@@ -124,6 +142,7 @@ function M:initialize()
     local _, err = M:connect(path):get()
     if err then
       self.status = 'disconnected'
+      handle_error_message(err)
       logger.error(err)
     end
   end)
