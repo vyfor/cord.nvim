@@ -41,7 +41,7 @@ Use [arrpc](https://github.com/OpenAsar/arrpc). arrpc creates a communication br
 
 > WSL (Windows Subsystem for Linux) does not directly expose Windows pipes by default, which are needed for Discord IPC.
 
-Refer to [this guide](https://gist.github.com/mousebyte/af45cbecaf0028ea78d0c882c477644a#aliasing-nvim). Use `socat` and `npiperelay` to create a bridge that exposes the Windows Discord IPC pipe to WSL.
+Inspired by [this guide](https://gist.github.com/mousebyte/af45cbecaf0028ea78d0c882c477644a#aliasing-nvim). Use `socat` and `npiperelay` to create a bridge that exposes the Windows Discord IPC pipe to WSL.
 
 1. **Install `socat` in WSL**: `sudo apt-get install socat` (or your distribution's package manager command).
 2. **Download `npiperelay.exe`**: Download `npiperelay.exe` from [https://github.com/jstarks/npiperelay/releases](https://github.com/jstarks/npiperelay/releases) and place it in a directory accessible from WSL (e.g., `/mnt/c/path/to/npiperelay.exe`).
@@ -51,7 +51,7 @@ Refer to [this guide](https://gist.github.com/mousebyte/af45cbecaf0028ea78d0c882
         if ! pidof socat > /dev/null 2>&1; then
             [ -e /tmp/discord-ipc-0 ] && rm -f /tmp/discord-ipc-0
             socat UNIX-LISTEN:/tmp/discord-ipc-0,fork \
-                EXEC:\"/mnt/c/path/to/npiperelay.exe //./pipe/discord-ipc-0\" &
+                EXEC:\"npiperelay.exe //./pipe/discord-ipc-0\" 2>/dev/null &
         fi
 
         if [ $# -eq 0 ]; then
