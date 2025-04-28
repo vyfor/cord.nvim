@@ -1,4 +1,4 @@
-*cord.txt*              For NVIM v0.6.0             Last change: 2025 April 18
+*cord.txt*              For NVIM v0.6.0             Last change: 2025 April 28
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -152,6 +152,13 @@ Expand to view default configuration ~
             enabled = false,
             interval = 5000,
             initial = true,
+          },
+        },
+        workspace = {
+          root_markers = {
+            '.git',
+            '.hg',
+            '.svn',
           },
         },
       },
@@ -381,6 +388,9 @@ ADVANCED                                         *cord-configuration-advanced*
   advanced.discord.reconnect.interval   number          5000        Reconnection interval in milliseconds, 0 to disable
 
   advanced.discord.reconnect.initial    boolean         true        Whether to reconnect if initial connection fails
+
+  advanced.workspace.root_markers       string[]        string[]    List of root markers to use when determining the
+                                                                    workspace directory
   -----------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 
