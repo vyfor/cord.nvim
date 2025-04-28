@@ -160,6 +160,7 @@ Expand to view default configuration ~
             '.hg',
             '.svn',
           },
+          limit_to_cwd = false,
         },
       },
     }
@@ -391,6 +392,11 @@ ADVANCED                                         *cord-configuration-advanced*
 
   advanced.workspace.root_markers       string[]        string[]    List of root markers to use when determining the
                                                                     workspace directory
+
+  advanced.workspace.limit_to_cwd       boolean         false       Limits workspace detection to the working directory
+                                                                    (vim.fn.getcwd()). When true, workspace detection
+                                                                    stops at the CWD if no marker is found, making the
+                                                                    search more efficient
   -----------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 
