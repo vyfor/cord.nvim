@@ -86,6 +86,7 @@ local validation_rules = {
   ['advanced.discord.reconnect.initial'] = { 'boolean', 'table' },
   ['advanced.workspace'] = { 'table' },
   ['advanced.workspace.root_markers'] = { 'table' },
+  ['advanced.workspace.limit_to_cwd'] = { 'boolean' },
 }
 
 local array_paths = {
