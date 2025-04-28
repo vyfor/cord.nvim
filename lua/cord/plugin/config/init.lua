@@ -77,6 +77,7 @@
 
 ---@class CordAdvancedWorkspaceConfig
 ---@field root_markers? string[] Root markers to use for finding workspaces
+---@field limit_to_cwd? boolean Whether to limit workspace detection to the working directory (vim.fn.getcwd()). When true, workspace detection stops at the CWD if no marker is found.
 
 ---@class CordAdvancedPluginConfig
 ---@field autocmds? boolean Whether to enable autocmds
@@ -204,6 +205,7 @@ local defaults = {
         '.hg',
         '.svn',
       },
+      limit_to_cwd = false,
     },
   },
 }

@@ -24,6 +24,9 @@ M.find_vcs_root = async.wrap(function(initial_path)
   if config.advanced.workspace.root_markers == nil then return end
 
   local curr_dir = initial_path
+  local limit_to_cwd, cwd = config.advanced.workspace.limit_to_cwd, nil
+  if limit_to_cwd then cwd = vim.fn.getcwd() end
+
   while true do
     local marker_futures = {}
     for _, marker in ipairs(config.advanced.workspace.root_markers) do
@@ -36,6 +39,8 @@ M.find_vcs_root = async.wrap(function(initial_path)
     for _, result in ipairs(results) do
       if result then return result end
     end
+
+    if limit_to_cwd and curr_dir == cwd then return curr_dir end
 
     local parent = vim.fn.fnamemodify(curr_dir, ':h')
     if parent == curr_dir then return initial_path end

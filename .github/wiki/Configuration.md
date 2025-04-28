@@ -109,6 +109,7 @@ Here's the complete default configuration for Cord. You can use this as a starti
         '.hg',
         '.svn',
       },
+      limit_to_cwd = false,
     },
   },
 }
@@ -219,6 +220,7 @@ Here's the complete default configuration for Cord. You can use this as a starti
 | `advanced.discord.reconnect.interval` | `number`        | `5000`      | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
 | `advanced.discord.reconnect.initial`  | `boolean`       | `true`      | Whether to reconnect if initial connection fails                                                                                                                                                   |
 | `advanced.workspace.root_markers`     | `string[]`      | `string[]`  | List of root markers to use when determining the workspace directory                                                                                                                               |
+| `advanced.workspace.limit_to_cwd`     | `boolean`       | `false`     | Limits workspace detection to the working directory (vim.fn.getcwd()). When true, workspace detection stops at the CWD if no marker is found, making the search more efficient                     |
 
 ---
 
