@@ -73,6 +73,10 @@
 ---@field plugin? CordAdvancedPluginConfig configuration
 ---@field server? CordAdvancedServerConfig configuration
 ---@field discord? CordAdvancedDiscordConfig configuration
+---@field workspace? CordAdvancedWorkspaceConfig configuration
+
+---@class CordAdvancedWorkspaceConfig
+---@field root_markers? string[] Root markers to use for finding workspaces
 
 ---@class CordAdvancedPluginConfig
 ---@field autocmds? boolean Whether to enable autocmds
@@ -192,6 +196,13 @@ local defaults = {
         enabled = false,
         interval = 5000,
         initial = true,
+      },
+    },
+    workspace = {
+      root_markers = {
+        '.git',
+        '.hg',
+        '.svn',
       },
     },
   },

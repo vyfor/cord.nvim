@@ -103,6 +103,13 @@ Here's the complete default configuration for Cord. You can use this as a starti
         initial = true,
       },
     },
+    workspace = {
+      root_markers = {
+        '.git',
+        '.hg',
+        '.svn',
+      },
+    },
   },
 }
 ```
@@ -211,6 +218,7 @@ Here's the complete default configuration for Cord. You can use this as a starti
 | `advanced.discord.reconnect.enabled`  | `boolean`       | `false`     | Whether reconnection is enabled. Has minimal impact on performance                                                                                                                                 |
 | `advanced.discord.reconnect.interval` | `number`        | `5000`      | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
 | `advanced.discord.reconnect.initial`  | `boolean`       | `true`      | Whether to reconnect if initial connection fails                                                                                                                                                   |
+| `advanced.workspace.root_markers`     | `string[]`      | `string[]`  | List of root markers to use when determining the workspace directory                                                                                                                               |
 
 ---
 

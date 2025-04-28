@@ -84,11 +84,14 @@ local validation_rules = {
   ['advanced.discord.reconnect.enabled'] = { 'boolean' },
   ['advanced.discord.reconnect.interval'] = { 'number' },
   ['advanced.discord.reconnect.initial'] = { 'boolean', 'table' },
+  ['advanced.workspace'] = { 'table' },
+  ['advanced.workspace.root_markers'] = { 'table' },
 }
 
 local array_paths = {
   ['buttons'] = true,
   ['plugins'] = true,
+  ['advanced.workspace.root_markers'] = true,
 }
 
 local skip_subtrees = {
@@ -163,7 +166,8 @@ M.validate = function(user_config)
 
       if
         not (
-          (array_paths[base_path] and type(k) == 'number')
+          (array_paths[prefix] and type(k) == 'number')
+          or (array_paths[base_path] and type(k) == 'number')
           or (dict_paths[base_path] and type(k) == 'string')
           or is_plugin_config
         ) and not is_valid_path(full_path)

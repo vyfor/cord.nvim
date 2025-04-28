@@ -1,12 +1,7 @@
 local Future = require 'cord.core.async.future'
 local async = require 'cord.core.async'
 local fs = require 'cord.core.uv.fs'
-
-local VCS_MARKERS = {
-  '.git',
-  '.svn',
-  '.hg',
-}
+local config = require 'cord.plugin.config'
 
 local M = {}
 
@@ -22,15 +17,16 @@ local check_vcs_marker = async.wrap(function(curr_dir, marker)
   local marker_path = curr_dir .. '/' .. marker
   local stat = fs.stat(marker_path):get()
   if not stat then return end
-  return (stat.type == 'directory' and curr_dir)
+  return curr_dir
 end)
 
 M.find_vcs_root = async.wrap(function(initial_path)
-  local curr_dir = initial_path
+  if config.advanced.workspace.root_markers == nil then return end
 
+  local curr_dir = initial_path
   while true do
     local marker_futures = {}
-    for _, marker in ipairs(VCS_MARKERS) do
+    for _, marker in ipairs(config.advanced.workspace.root_markers) do
       table.insert(marker_futures, check_vcs_marker(curr_dir, marker))
     end
 
@@ -48,7 +44,8 @@ M.find_vcs_root = async.wrap(function(initial_path)
 end)
 
 M.find = async.wrap(function(initial_path)
-  if not initial_path or initial_path == '' then return end
+  local has_initial_path = initial_path and initial_path ~= ''
+  if not has_initial_path then initial_path = vim.fn.expand '%:p:h' end
 
   local protocol, path = initial_path:match '^(%w+)://+(.+)$'
   if protocol and M.protocol_handlers[protocol] then
@@ -64,7 +61,7 @@ M.find = async.wrap(function(initial_path)
     end
   end
 
-  initial_path = vim.fn.fnamemodify(initial_path, ':h')
+  if has_initial_path then initial_path = vim.fn.fnamemodify(initial_path, ':h') end
   return M.find_vcs_root(initial_path):get()
 end)
 
