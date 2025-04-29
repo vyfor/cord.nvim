@@ -10,8 +10,25 @@ local M = {
   },
 }
 
+M.validate = function(config)
+  if config.affect_idle ~= nil then
+    if type(config.affect_idle) ~= 'boolean' then
+      return 'Invalid affect_idle value, must be a boolean'
+    end
+  end
+end
+
 M.setup = function(config)
-  if config then M.config = vim.tbl_deep_extend('force', M.config, config) end
+  if config then
+    config = vim.tbl_deep_extend('force', M.config, config)
+
+    local err = M.validate(config)
+    if err then
+      error(err, 0)
+    else
+      M.config = config
+    end
+  end
 
   return {
     name = 'Local Time',

@@ -40,8 +40,29 @@ local function handle_buffer_leave()
   end
 end
 
+M.validate = function(config)
+  if config.scope then
+    if config.scope ~= 'buffer' and config.scope ~= 'workspace' and config.scope ~= 'idle' then
+      return 'Invalid scope value, must be \'buffer\', \'workspace\', or \'idle\''
+    end
+  end
+
+  if config.pause ~= nil then
+    if type(config.pause) ~= 'boolean' then return 'Invalid pause value, must be a boolean' end
+  end
+end
+
 M.setup = function(config)
-  if config then M.config = vim.tbl_deep_extend('force', M.config, config) end
+  if config then
+    config = vim.tbl_deep_extend('force', M.config, config)
+
+    local err = M.validate(config)
+    if err then
+      error(err, 0)
+    else
+      M.config = config
+    end
+  end
 
   if M.config.pause then
     local group = vim.api.nvim_create_augroup('CordScopedTimestampsPlugin', { clear = true })
