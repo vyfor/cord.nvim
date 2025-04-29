@@ -9,6 +9,8 @@ local M = {
 
 M.setup = function(config)
   if config then
+    config = vim.tbl_deep_extend('force', M.config, config)
+
     local err = M.validate(config)
     if err then
       error(err, 0)
@@ -57,8 +59,10 @@ end
 M.validate = function(config)
   if config.scope then
     if config.scope == 'buffer' then
-      M.scope = 0
-    elseif config.scope ~= 'workspace' then
+      config.scope = 0
+    elseif config.scope == 'workspace' then
+      config.scope = nil
+    else
       return 'Invalid scope value, must be \'buffer\' or \'workspace\''
     end
   end
