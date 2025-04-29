@@ -49,7 +49,7 @@ end
 ---Initialize all plugins and merge their variables and configs with user config
 ---@return string? Error message if initialization failed
 function M.init()
-  if not config.plugins or #config.plugins == 0 then return end
+  if not config.plugins or not next(config.plugins) then return end
 
   for ty, def in pairs(config.plugins) do
     local plugin, name, cfg
