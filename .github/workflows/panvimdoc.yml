@@ -17,7 +17,9 @@ jobs:
     name: Generate Panvimdoc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - run: git pull origin master
 
       - run: |
           INCLUDES="\`\`\`{.include}\n.github/wiki/Configuration.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Assets.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Plugins.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Examples.md\n\`\`\`\n\n"
