@@ -46,10 +46,20 @@ text = {
 }
 ```
 
+### Neovim Version in Small Tooltip
+```lua
+hooks = {
+  post_activity = function(opts, activity)
+    local version = vim.version()
+    activity.assets.small_text = string.format('Neovim %s.%s.%s', version.major, version.minor, version.patch)
+  end
+}
+```
+
 ### Local Time as Timestamp
 ```lua
 hooks = {
-  on_activity = function(opts, activity)
+  post_activity = function(opts, activity)
     local date = os.date('*t')
     date.hour, date.min, date.sec = 0, 0, 0
     activity.timestamps.start = os.time(date)
@@ -57,7 +67,7 @@ hooks = {
 
   -- optionally, you can do one of the two:
   -- A. also set local time for idle status, or
-  on_idle = function(opts, activity)
+  idle_enter = function(opts, activity)
     local date = os.date('*t')
     date.hour, date.min, date.sec = 0, 0, 0
     activity.timestamps.start = os.time(date)
@@ -70,6 +80,9 @@ timestamp = {
 }
 ```
 
+> [!NOTE]
+> Consider using the built-in [local time plugin](./Plugins.md#local-time-cordpluginslocal_time).
+
 ### Workspace Blacklist
 ```lua
 local blacklist = {
@@ -81,7 +94,8 @@ local is_blacklisted = function(opts)
   return vim.tbl_contains(blacklist, opts.workspace)
 end
 
--- use a custom text for the activity
+-- EITHER
+-- A. use a custom text for the activity
 text = {
   viewing = function(opts)
     return is_blacklisted(opts) and 'Viewing a file' or ('Viewing ' .. opts.filename)
@@ -94,7 +108,8 @@ text = {
   end
 }
 
--- or simply hide the activity when in a blacklisted workspace
+-- OR
+-- B. simply hide the activity when in a blacklisted workspace
 hooks = {
   workspace_change = function(opts)
     if is_blacklisted(opts) then
@@ -259,7 +274,7 @@ hooks = {
 
 ### Last.fm Integration
 ```lua
-local user, api_key, song = 'YOUR_USERNAME', 'YOUR_API_KEY'
+local user, api_key, song = 'YOUR_USERNAME', 'YOUR_API_KEY', nil
 local timer = vim.uv.new_timer()
 timer:start(
   0,

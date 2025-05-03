@@ -1,80 +1,100 @@
 # 🔧 Troubleshooting
 
-Having trouble with Cord? This guide provides solutions to common problems and scenarios you might encounter.
+Running into issues with Cord? Here are some common problems and how to fix them.
 
-## 🛠️ General Troubleshooting Steps
+## 🛠️ General Steps
 
-If you're experiencing issues, try these general steps first:
+Start here - these steps often resolve most issues:
 
-1.  Restart Neovim, ensure that Cord is loaded, and Discord is running. Make sure both Cord and its server (`:Cord update`) are up-to-date.
-2.  Verify your Discord [Activity Privacy settings](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce) are enabled to allow Rich Presence to be displayed.
-3.  Set `log_level = vim.log.levels.TRACE` in your `cord.setup()` configuration. Then check `:messages` for detailed logs that might indicate the problem. Remember to revert to a less verbose log level (e.g., `vim.log.levels.WARN` or `vim.log.levels.OFF`) after troubleshooting.
-4. Run `:checkhealth cord`. This command performs health checks and can identify common configuration or environment issues.
-5.  Check if the Discord IPC pipe exists on your system:
-    - **Windows (PowerShell):** `Test-Path \\.\pipe\discord-ipc-0`
-    - **Unix (Bash):** `find /tmp /var/run /run -type s -name 'discord-ipc-*' 2>/dev/null`
-    If the command returns nothing or "False", the pipe may not be available.
+1. Make sure Discord is running, restart Neovim, and check whether Cord is fully loaded.
+2. Run `:Cord update` to check for server updates.
+3. Double-check your [Discord Activity Privacy settings](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce) — Rich Presence needs permission to show.
+4. Add `log_level = vim.log.levels.TRACE` to your `cord.setup()` to see debug logs via `:messages`. Don't forget to switch back to a lower level after (e.g. `WARN` or `OFF`).
+5. Run `:checkhealth cord` for a quick config check.
+6. Make sure the Discord IPC pipe exists:
 
-If these general steps don't resolve your issue, look for specific problems and solutions below.
+   * **Windows:** 
+     ```pwsh
+     Test-Path \\.\pipe\discord-ipc-0
+     ```
+   * **Linux/macOS:**
+     ```sh
+     find /tmp ${XDG_RUNTIME_DIR:+$XDG_RUNTIME_DIR} ${TMPDIR:+$TMPDIR} ${TMP:+$TMP} ${TEMP:+$TEMP} -type s -name 'discord-ipc-*' 2>/dev/null
+     ```
 
-## 🎛️ No Buttons Showing in Rich Presence
+   If you get nothing or "False", the pipe may not be available.
 
-There's a known client-side bug in Discord related to user profiles. *You may not be able to see buttons on your own Rich Presence*.
+---
 
-Ask a friend or someone else to check your Discord profile to see if they can see the buttons on your Rich Presence. Buttons *are* visible to others even if you can't see them yourself.
+## 🎛️ No Buttons in Rich Presence
 
-Another workaround to check buttons yourself is to join a voice channel in Discord and hover over your name in the voice channel list. Buttons appear in the hover tooltip.
+Due to a Discord bug, you might not see buttons in your own Rich Presence.
+
+Ask a friend if they can see them — they usually still appear to others.
+
+To see them yourself: join a voice channel and hover over your name. Buttons often show up in the tooltip.
+
+---
 
 ## ⏱️ Rich Presence Timer Stuck at 00:00
 
-This issue is almost always caused by an incorrect system date, time, or timezone setting on your computer.
+This usually means your system clock is off.
 
-Ensure your system date, time, and timezone are set correctly and synchronized** with a reliable time source (e.g., using NTP - Network Time Protocol).  Operating systems usually have settings to automatically sync time.
+Make sure your date, time, and timezone are correct and synced (using automatic time sync is best).
 
-## 💻 Running Cord in Specific Environments
+---
+
+## 💻 Special Environments
 
 ### 🌐 Using Discord in a Browser
 
-Use [arrpc](https://github.com/OpenAsar/arrpc). arrpc creates a communication bridge that allows Cord to send presence updates to web-based Discord. Follow arrpc's setup instructions carefully.
+Cord doesn't support browser Discord out of the box. Use [arrpc](https://github.com/OpenAsar/arrpc) as a bridge. Follow its instructions closely.
 
-### 🐧 Running Inside WSL (Windows Subsystem for Linux)
+---
 
-> WSL (Windows Subsystem for Linux) does not directly expose Windows pipes by default, which are needed for Discord IPC.
+### 🐧 Running inside WSL
 
-Inspired by [this guide](https://gist.github.com/mousebyte/af45cbecaf0028ea78d0c882c477644a#aliasing-nvim). Use `socat` and `npiperelay` to create a bridge that exposes the Windows Discord IPC pipe to WSL.
+WSL doesn't expose Windows named pipes by default, which Discord needs. To work around that, use `socat` and `npiperelay`.
+This method is based on [this gist](https://gist.github.com/mousebyte/af45cbecaf0028ea78d0c882c477644a#aliasing-nvim).
 
-1. **Install `socat` in WSL**: `sudo apt-get install socat` (or your distribution's package manager command).
-2. **Download `npiperelay.exe`**: Download `npiperelay.exe` from [https://github.com/jstarks/npiperelay/releases](https://github.com/jstarks/npiperelay/releases) and place it in a directory accessible from WSL (e.g., `/mnt/c/path/to/npiperelay.exe`).
-3. **Alias `nvim` with Pipe Relay**: Add an alias to your WSL shell configuration file (`~/.bashrc`, `~/.zshrc`, etc.) to launch `nvim` with the pipe relay setup. Example alias:
-    ```sh
-    nvim() {
-        if ! pidof socat > /dev/null 2>&1; then
-            [ -e /tmp/discord-ipc-0 ] && rm -f /tmp/discord-ipc-0
-            socat UNIX-LISTEN:/tmp/discord-ipc-0,fork \
-                EXEC:\"npiperelay.exe //./pipe/discord-ipc-0\" 2>/dev/null &
-        fi
+1. **Install `socat`** in WSL: `sudo apt install socat`
+2. **Get `npiperelay.exe`** from [here](https://github.com/jstarks/npiperelay/releases) and place it in a path accessible from WSL, preferably add it to PATH.
+3. **Add this `nvim` alias** in your `.bashrc`, `.zshrc`, etc.:
 
-        if [ $# -eq 0 ]; then
-            command nvim
-        else
-            command nvim "$@"
-        fi
-    }
-    ```
+   ```sh
+   nvim() {
+       if ! pidof socat > /dev/null 2>&1; then
+           [ -e /tmp/discord-ipc-0 ] && rm -f /tmp/discord-ipc-0
+           socat UNIX-LISTEN:/tmp/discord-ipc-0,fork \
+               EXEC:"npiperelay.exe //./pipe/discord-ipc-0" 2>/dev/null &
+       fi
 
-    > Adjust the path to `npiperelay.exe` in the alias if needed.
-    > Always launch Neovim using the `nvim` alias you defined in WSL.
+       if [ $# -eq 0 ]; then
+           command nvim
+       else
+           command nvim "$@"
+       fi
+   }
+   ```
+
+   > Update the path to `npiperelay.exe` if needed.
+   > Always launch Neovim using this alias in WSL.
+
+---
 
 ### 🖥️ Remote Server (SSH)
 
-Use SSH port forwarding to tunnel the Discord IPC socket over SSH. Follow the guide in this article: [https://carlosbecker.com/posts/discord-rpc-ssh/](https://carlosbecker.com/posts/discord-rpc-ssh/)
+You can forward the Discord IPC socket over SSH. This [article explains how](https://carlosbecker.com/posts/discord-rpc-ssh/).
 
-## ❓ Still Having Issues?
+---
 
-If your problem is not listed here or the solutions don't work, please:
+## ❓ Still Having Trouble?
 
-1.  **Check the FAQ**: See if your issue is listed in the [FAQ](./FAQ.md).
-2.  **Search Existing Issues**: Check the [existing issues](https://github.com/vyfor/cord.nvim/issues) on the Cord GitHub repository to see if your issue has already been reported.
-3.  **Open a New Issue**: If you think your issue is a bug in Cord, [open a new issue](https://github.com/vyfor/cord.nvim/issues/new/choose) on GitHub. Be sure to include a clear title and description, along with as much relevant information as possible. If you're unsure if it's a bug, you can always clarify in Discussions or Discord.
+If nothing above works:
 
-We're here to help! Providing detailed information in your issue will help us diagnose and resolve your problem more quickly.
+1. Check the [FAQ](./FAQ.md) for other common questions.
+2. Look through [existing GitHub issues](https://github.com/vyfor/cord.nvim/issues).
+3. If it seems like a bug, [open a new issue](https://github.com/vyfor/cord.nvim/issues/new/choose).
+   Be clear and include as much detail as possible.
+
+You can also ask in Discussions or Discord if you're unsure.
