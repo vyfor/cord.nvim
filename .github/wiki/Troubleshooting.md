@@ -24,8 +24,6 @@ Start here - these steps often resolve most issues:
 
    If you get nothing or "False", the pipe may not be available.
 
----
-
 ## 🎛️ No Buttons in Rich Presence
 
 Due to a Discord bug, you might not see buttons in your own Rich Presence.
@@ -34,23 +32,17 @@ Ask a friend if they can see them — they usually still appear to others.
 
 To see them yourself: join a voice channel and hover over your name. Buttons often show up in the tooltip.
 
----
-
 ## ⏱️ Rich Presence Timer Stuck at 00:00
 
 This usually means your system clock is off.
 
 Make sure your date, time, and timezone are correct and synced (using automatic time sync is best).
 
----
-
 ## 💻 Special Environments
 
 ### 🌐 Using Discord in a Browser
 
 Cord doesn't support browser Discord out of the box. Use [arrpc](https://github.com/OpenAsar/arrpc) as a bridge. Follow its instructions closely.
-
----
 
 ### 🐧 Running inside WSL
 
@@ -80,13 +72,9 @@ This method is based on [this gist](https://gist.github.com/mousebyte/af45cbecaf
    > Update the path to `npiperelay.exe` if needed.
    > Always launch Neovim using this alias in WSL.
 
----
-
 ### 🖥️ Remote Server (SSH)
 
 You can forward the Discord IPC socket over SSH. This [article explains how](https://carlosbecker.com/posts/discord-rpc-ssh/).
-
----
 
 ## ❓ Still Having Trouble?
 
