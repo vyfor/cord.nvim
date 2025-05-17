@@ -1,5 +1,22 @@
 # ⚡ Configuration
 
+### 📖 Table of Contents
+  - [🎨 Editor](#-editor)
+  - [📊 Display](#-display)
+  - [⏰ Timestamp](#-timestamp)
+  - [💤 Idle](#-idle)
+  - [📝 Text](#-text)
+  - [🕹️ Buttons](#️-buttons)
+  - [🗃️ Assets](#️-assets)
+  - [🧩 Variables](#-variables)
+  - [🪝 Hooks](#-hooks)
+  - [🔌 Plugins](#-plugins)
+  - [⚙️ Advanced](#️-advanced)
+  - [User Commands](#user-commands)
+  - [Options Table](#options-table)
+  - [ActivityManager Methods](#activitymanager-methods)
+  - [Activity Options](#activity-options)
+
 A comprehensive guide to configuring the Cord plugin to your liking. All options are set through the `setup()` function:
 
 ```lua
@@ -116,7 +133,7 @@ Here's the complete default configuration for Cord. You can use this as a starti
 ```
 </details>
 
-## 🕒 Manual Plugin Startup
+### 🕒 Manual Plugin Startup
 
 If you need to delay the initialization of the plugin, you can prevent it from starting automatically by setting a global variable:
 
@@ -125,6 +142,11 @@ vim.g.cord_defer_startup = true
 ```
 
 With this option set to true, the plugin **will not start automatically**. Instead, you'll need to manually initialize it by calling `require('cord').setup()`.
+
+### 🧰 Useful Functions
+
+- `require('cord.api.icon').get(name: string, theme?: string, flavor?: string): string`
+  - **Get Icon URL:** Returns the URL for the specified icon `name`, optional `theme`, and optional `flavor`. If `theme` or `flavor` is not provided, they default to the configured `display.theme` and `display.flavor`, respectively. Useful for referencing Cord's built-in icons in your custom configurations.
 
 ## 🎨 Editor
 
@@ -142,6 +164,9 @@ With this option set to true, the plugin **will not start automatically**. Inste
 | `display.flavor`      | `string`  | `dark`    | Choose between different theme flavors; typically 'dark', 'light', 'accent' |
 | `display.swap_fields` | `boolean` | `false`   | Show workspace name before filename                                         |
 | `display.swap_icons`  | `boolean` | `false`   | Use editor icon as large image                                              |
+
+>[!TIP]
+> Check out our icon [showcase](https://github.com/vyfor/icons#showcase)!
 
 ## ⏰ Timestamp
 
@@ -166,6 +191,10 @@ With this option set to true, the plugin **will not start automatically**. Inste
 | `idle.tooltip`         | `string \| function(opts)` | `'💤'`                                                                                             | Tooltip shown when hovering over idle icon                    |
 | `idle.icon`            | `string \| function(opts)` | [`default idle icon`](https://github.com/vyfor/icons/blob/master/icons/default/dark/keyboard.png) | Custom icon URL or asset ID                                   |
 
+> Smart idle ensures that:
+> - When an instance goes idle, it switches to show the most recent active one
+> - You're only shown as idle when all instances are actually idle
+
 ## 📝 Text
 
 | Option           | Type                                  | Default                        | Description                                        |
@@ -187,54 +216,7 @@ With this option set to true, the plugin **will not start automatically**. Inste
 | `terminal`       | `string \| function(opts) \| boolean` | `Running commands in {name}`   | Text shown when in a terminal buffer               |
 | `dashboard`      | `string \| function(opts) \| boolean` | `'Home'`                       | `Home`                                             | Text shown when in a dashboard buffer |
 
-> Also see [Text Options](#text-options)
-
-## 🧩 Variables
-
-| Option      | Type                      | Default | Description                                                                                                                                                                                                                                                               |
-| ----------- | ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variables` | `table \| boolean \| nil` | `nil`   | Define [custom variables](#custom-variables) for use in string templates. Functions can be used to dynamically generate values. If `true`, uses the default [options table](#options-table), if `table`, extends the default table, if `false`, disables custom variables |
-
-## 🪝 Hooks
-
-| Option                   | Type                                                                                 | Description                                                                                                        |
-| ------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `hooks.ready`            | `function(manager) \| table<fun: function(manager), priority: number>`               | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
-| `hooks.shutdown`         | `function() \| table<fun: function(), priority: number>`                             | Called when connection to Discord is closed                                                                        |
-| `hooks.pre_activity`     | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called before building activity ([opts](#options-table))                                                           |
-| `hooks.post_activity`    | `function(opts, activity) \| table<fun: function(opts, activity), priority: number>` | Called after building activity, but before sending it ([opts](#options-table), [activity](#activity))              |
-| `hooks.idle_enter`       | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when entering idle state ([opts](#options-table))                                                           |
-| `hooks.idle_leave`       | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when leaving idle state ([opts](#options-table))                                                            |
-| `hooks.workspace_change` | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when workspace changes ([opts](#options-table))                                                             |
-
-## 🔌 Plugins
-
-| Option    | Type                               | Description                                                          |
-| --------- | ---------------------------------- | -------------------------------------------------------------------- |
-| `plugins` | `string[] \| table<string, table>` | Extend Cord with plugins. See the [Wiki](./Plugins.md) for more info |
-
-> If you want to develop your own plugin, check out Cord's [Plugin System](./Plugin-System.md)
-
-## ⚙️ Advanced
-
-| Option                                | Type            | Default     | Description                                                                                                                                                                                        |
-| ------------------------------------- | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `advanced.plugin.autocmds`            | `boolean`       | `true`      | Enable autocmds                                                                                                                                                                                    |
-| `advanced.plugin.cursor_update`       | `string`        | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                                               |
-| `advanced.plugin.match_in_mappings`   | `boolean`       | `true`      | Whether to match against file extensions in mappings                                                                                                                                               |
-| `advanced.server.update`              | `string`        | `'fetch'`   | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
-| `advanced.server.pipe_path`           | `string \| nil` | `nil`       | Custom IPC pipe path                                                                                                                                                                               |
-| `advanced.server.executable_path`     | `string \| nil` | `nil`       | Custom server executable path                                                                                                                                                                      |
-| `advanced.server.timeout`             | `number`        | `300000`    | Server shutdown timeout (ms)                                                                                                                                                                       |
-| `advanced.discord.reconnect.enabled`  | `boolean`       | `false`     | Whether reconnection is enabled. Has minimal impact on performance                                                                                                                                 |
-| `advanced.discord.reconnect.interval` | `number`        | `5000`      | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
-| `advanced.discord.reconnect.initial`  | `boolean`       | `true`      | Whether to reconnect if initial connection fails                                                                                                                                                   |
-| `advanced.workspace.root_markers`     | `string[]`      | `string[]`  | List of root markers to use when determining the workspace directory                                                                                                                               |
-| `advanced.workspace.limit_to_cwd`     | `boolean`       | `false`     | Limits workspace detection to the working directory (vim.fn.getcwd()). When true, workspace detection stops at the CWD if no marker is found, making the search more efficient                     |
-
----
-
-## Text Options
+### Text Options
 
 The `text` table allows you to customize the displayed text for different states. You can customize it in three different ways:
 
@@ -295,8 +277,7 @@ text = {
 }
 ```
 
-
-## Buttons
+## 🕹️ Buttons
 
 Buttons can have static or dynamic labels and URLs:
 
@@ -313,7 +294,7 @@ buttons = {
 }
 ```
 
-## Assets
+## 🗃️ Assets
 
 Override icons and text for specific filetypes or filenames. Most of the options also support functions.
 
@@ -346,15 +327,13 @@ vim.filetype.add {
 }
 ```
 
-## Smart Idle
+## 🧩 Variables
 
-Smart idle ensures that:
-- When an instance goes idle, it switches to show the most recent active one
-- You're only shown as idle when all instances are actually idle
+| Option      | Type                      | Default | Description                                                                                                                                                                                                                                                               |
+| ----------- | ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variables` | `table \| boolean \| nil` | `nil`   | Define [custom variables](#custom-variables) for use in string templates. Functions can be used to dynamically generate values. If `true`, uses the default [options table](#options-table), if `table`, extends the default table, if `false`, disables custom variables |
 
-## Custom Variables
-
-The `variables` option allows you to define custom variables to be used in string templates. These variables can be static values or functions that dynamically generate values based on the current context. By default, the table is populated with the [options table](#options-table) but they can be overridden by user-defined variables.
+> The `variables` option allows you to define custom variables to be used in string templates. These variables can be static values or functions that dynamically generate values based on the current context. By default, the table is populated with the [options table](#options-table) but they can be overridden by user-defined variables.
 
 Example configuration:
 
@@ -369,6 +348,50 @@ require('cord').setup {
     }
 }
 ```
+
+## 🪝 Hooks
+
+| Option                   | Type                                                                                 | Description                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `hooks.ready`            | `function(manager) \| table<fun: function(manager), priority: number>`               | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
+| `hooks.shutdown`         | `function() \| table<fun: function(), priority: number>`                             | Called when connection to Discord is closed                                                                        |
+| `hooks.pre_activity`     | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called before building activity ([opts](#options-table))                                                           |
+| `hooks.post_activity`    | `function(opts, activity) \| table<fun: function(opts, activity), priority: number>` | Called after building activity, but before sending it ([opts](#options-table), [activity](#activity))              |
+| `hooks.idle_enter`       | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when entering idle state ([opts](#options-table))                                                           |
+| `hooks.idle_leave`       | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when leaving idle state ([opts](#options-table))                                                            |
+| `hooks.workspace_change` | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when workspace changes ([opts](#options-table))                                                             |
+
+## 🔌 Plugins
+
+| Option    | Type                               | Description                                                          |
+| --------- | ---------------------------------- | -------------------------------------------------------------------- |
+| `plugins` | `string[] \| table<string, table>` | Extend Cord with plugins. See the [Wiki](./Plugins.md) for more info |
+
+> If you want to develop your own plugin, check out Cord's [Plugin System](./Plugin-System.md)
+
+## ⚙️ Advanced
+
+| Option                                | Type            | Default     | Description                                                                                                                                                                                        |
+| ------------------------------------- | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `advanced.plugin.autocmds`            | `boolean`       | `true`      | Enable autocmds                                                                                                                                                                                    |
+| `advanced.plugin.cursor_update`       | `string`        | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                                               |
+| `advanced.plugin.match_in_mappings`   | `boolean`       | `true`      | Whether to match against file extensions in mappings                                                                                                                                               |
+| `advanced.server.update`              | `string`        | `'fetch'`   | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
+| `advanced.server.pipe_path`           | `string \| nil` | `nil`       | Custom IPC pipe path                                                                                                                                                                               |
+| `advanced.server.executable_path`     | `string \| nil` | `nil`       | Custom server executable path                                                                                                                                                                      |
+| `advanced.server.timeout`             | `number`        | `300000`    | Server shutdown timeout (ms)                                                                                                                                                                       |
+| `advanced.discord.reconnect.enabled`  | `boolean`       | `false`     | Whether reconnection is enabled. Has minimal impact on performance                                                                                                                                 |
+| `advanced.discord.reconnect.interval` | `number`        | `5000`      | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
+| `advanced.discord.reconnect.initial`  | `boolean`       | `true`      | Whether to reconnect if initial connection fails                                                                                                                                                   |
+| `advanced.workspace.root_markers`     | `string[]`      | `string[]`  | List of root markers to use when determining the workspace directory                                                                                                                               |
+| `advanced.workspace.limit_to_cwd`     | `boolean`       | `false`     | Limits workspace detection to the working directory (vim.fn.getcwd()). When true, workspace detection stops at the CWD if no marker is found, making the search more efficient                     |
+
+### Cursor Update Mode
+
+The `advanced.cursor_update_mode` option controls how cursor position updates are handled:
+- `'on_move'` - Uses `CursorMoved[I]` autocmd, updating on every cursor movement. Most accurate but triggered very often
+- `'on_hold'` - Uses `CursorHold[I]` autocmd, updating only after the cursor has been stationary for `'updatetime'` milliseconds. Better performance but less accurate
+- `'none'` - Disables cursor position updates entirely
 
 ## User Commands
 
@@ -402,13 +425,6 @@ require('cord').setup {
 - `:Cord restart` - Restart the server
 - `:Cord shutdown` - Disconnect from Discord and shutdown the server
 - `:Cord health` - Validate user configuration
-
-## Cursor Update Mode
-
-The `advanced.cursor_update_mode` option controls how cursor position updates are handled:
-- `'on_move'` - Uses `CursorMoved[I]` autocmd, updating on every cursor movement. Most accurate but triggered very often
-- `'on_hold'` - Uses `CursorHold[I]` autocmd, updating only after the cursor has been stationary for `'updatetime'` milliseconds. Better performance but less accurate
-- `'none'` - Disables cursor position updates entirely
 
 ## Options Table
 
@@ -484,8 +500,3 @@ The `ActivityManager` contains useful methods:
 | `assets`     | `table`   | Defines images and tooltips, including `large_image`, `large_text`, `small_image`, and `small_text`. |
 | `buttons`    | `array`   | Array of objects, each with `label` and `url`, defining interactive buttons in the presence.         |
 | `is_idle`    | `boolean` | Whether the activity should be considered as idle.                                                   |
-
-## Useful Functions
-
-- `require('cord.api.icon').get(name: string, theme?: string, flavor?: string): string`
-  - **Get Icon URL:** Returns the URL for the specified icon `name`, optional `theme`, and optional `flavor`. If `theme` or `flavor` is not provided, they default to the configured `display.theme` and `display.flavor`, respectively. Useful for referencing Cord's built-in icons in your custom configurations.

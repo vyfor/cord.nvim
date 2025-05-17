@@ -43,7 +43,7 @@
 
 ## 📦 Quick Start
 
-For most users, the quickest way to get started is using **lazy.nvim**:
+For most users, the quickest way to get started is by using **lazy.nvim**:
 
 ```lua
 {
@@ -137,15 +137,12 @@ Choose your theme in the `display` configuration option. More themes are coming 
 
 Dive deeper into Cord's features and customization options in the [**Wiki**](https://github.com/vyfor/cord.nvim/wiki):
 
-- 📘 **[Configuration Guide](https://github.com/vyfor/cord.nvim/wiki/Configuration)**:  Master all the settings to tailor Cord to your exact needs.
-- 💡 **[Examples](https://github.com/vyfor/cord.nvim/wiki/Examples)**: Get inspired with creative ways to customize your Discord presence.
-- ⚙️ **[Migration Guide](https://github.com/vyfor/cord.nvim/wiki/Migration)**:  Upgrade smoothly from Cord v1.
-- ❓ **[FAQ](https://github.com/vyfor/cord.nvim/wiki/FAQ)**: Frequently asked questions about Cord.
-- 🚑 **[Troubleshooting Guide](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)**: Find solutions to common issues and scenarios.
+- 📘 **[Configuration Guide](https://github.com/vyfor/cord.nvim/wiki/Configuration)**.
+- 💡 **[Examples](https://github.com/vyfor/cord.nvim/wiki/Examples)**.
+- ❓ **[FAQ](https://github.com/vyfor/cord.nvim/wiki/FAQ)**.
+- 🚑 **[Troubleshooting Guide](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)**.
 
 ## 📜 Versioning
-
-We follow a **modified versioning specification**:
 
 - **PATCH**: Non-breaking changes.
 - **MINOR**: Breaking changes.
@@ -163,7 +160,7 @@ I'm the sole maintainer of cord.nvim and dedicate much of my free time to this p
 
 ## 🛠️ Build From Source
 >[!NOTE]
-> Make sure you have **[Rust](https://www.rust-lang.org/tools/install)** >= 1.85.0 installed.
+> Make sure you have **[Rust](https://www.rust-lang.org/tools/install)** >= 1.85.0 (nightly) installed.
 
 To build Cord from source, you can run `:Cord update build` (async) which will install the server binary from crates.io by running the following command:
 
