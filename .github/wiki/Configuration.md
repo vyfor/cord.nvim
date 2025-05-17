@@ -116,6 +116,16 @@ Here's the complete default configuration for Cord. You can use this as a starti
 ```
 </details>
 
+## 🕒 Manual Plugin Startup
+
+If you need to delay the initialization of the plugin, you can prevent it from starting automatically by setting a global variable:
+
+```lua
+vim.g.cord_defer_startup = true
+```
+
+With this option set to true, the plugin **will not start automatically**. Instead, you'll need to manually initialize it by calling `require('cord').setup()`.
+
 ## 🎨 Editor
 
 | Option           | Type            | Default                      | Description                                                                                                                             |

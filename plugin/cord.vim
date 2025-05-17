@@ -22,9 +22,10 @@ function! CordCompleteList(ArgLead, CmdLine, CmdPos)
     return []
 endfunction
 
-command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.command'.handle('<q-args>')
 
 lua << EOF
+    if vim.g.cord_defer_startup == true then return end
+
     -- Schedule initialization to next event loop iteration.
     -- This ensures setup() calls have an effect even if called after this file is sourced.
     -- Also allows the plugin to start automatically without requiring setup() call.
@@ -39,6 +40,8 @@ lua << EOF
                     autocmd!
                     autocmd VimLeavePre * lua require 'cord.server':cleanup()
                 augroup END
+
+                command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.command'.handle('<q-args>')
             ]]
             
             require('cord.server'):initialize()
