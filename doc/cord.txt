@@ -1,9 +1,10 @@
-*cord.txt*               For NVIM v0.6.0              Last change: 2025 May 03
+*cord.txt*               For NVIM v0.6.0              Last change: 2025 May 17
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
 
 1. Configuration                                          |cord-configuration|
+  - Manual Plugin Startup           |cord-configuration-manual-plugin-startup|
   - Editor                                         |cord-configuration-editor|
   - Display                                       |cord-configuration-display|
   - Timestamp                                   |cord-configuration-timestamp|
@@ -165,6 +166,20 @@ Expand to view default configuration ~
       },
     }
 <
+
+
+MANUAL PLUGIN STARTUP               *cord-configuration-manual-plugin-startup*
+
+If you need to delay the initialization of the plugin, you can prevent it from
+starting automatically by setting a global variable:
+
+>lua
+    vim.g.cord_defer_startup = true
+<
+
+With this option set to true, the plugin **will not start automatically**.
+Instead, you’ll need to manually initialize it by calling
+`require('cord').setup()`.
 
 
 EDITOR                                             *cord-configuration-editor*
