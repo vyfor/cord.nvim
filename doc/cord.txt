@@ -4,27 +4,21 @@
 Table of Contents                                     *cord-table-of-contents*
 
 1. Configuration                                          |cord-configuration|
-  - Manual Plugin Startup           |cord-configuration-manual-plugin-startup|
   - Editor                                         |cord-configuration-editor|
   - Display                                       |cord-configuration-display|
   - Timestamp                                   |cord-configuration-timestamp|
   - Idle                                             |cord-configuration-idle|
   - Text                                             |cord-configuration-text|
+  - Buttons                                       |cord-configuration-buttons|
+  - Assets                                         |cord-configuration-assets|
   - Variables                                   |cord-configuration-variables|
   - Hooks                                           |cord-configuration-hooks|
   - Plugins                                       |cord-configuration-plugins|
   - Advanced                                     |cord-configuration-advanced|
-  - Text Options                             |cord-configuration-text-options|
-  - Buttons                                       |cord-configuration-buttons|
-  - Assets                                         |cord-configuration-assets|
-  - Smart Idle                                 |cord-configuration-smart-idle|
-  - Custom Variables                     |cord-configuration-custom-variables|
   - User Commands                           |cord-configuration-user-commands|
-  - Cursor Update Mode                 |cord-configuration-cursor-update-mode|
   - Options Table                           |cord-configuration-options-table|
   - ActivityManager Methods       |cord-configuration-activitymanager-methods|
   - Activity Options                     |cord-configuration-activity-options|
-  - Useful Functions                     |cord-configuration-useful-functions|
 2. Custom Assets                                          |cord-custom-assets|
   - Structure                                   |cord-custom-assets-structure|
   - Asset Keys                                 |cord-custom-assets-asset-keys|
@@ -47,6 +41,25 @@ Table of Contents                                     *cord-table-of-contents*
 
 ==============================================================================
 1. Configuration                                          *cord-configuration*
+
+
+TABLE OF CONTENTS ~
+
+- |cord-editor|
+- |cord-display|
+- |cord-timestamp|
+- |cord-idle|
+- |cord-text|
+- |cord-buttons|
+- |cord-assets|
+- |cord-variables|
+- |cord-hooks|
+- |cord-plugins|
+- |cord-advanced|
+- |cord-user-commands|
+- |cord-options-table|
+- |cord-activitymanager-methods|
+- |cord-activity-options|
 
 A comprehensive guide to configuring the Cord plugin to your liking. All
 options are set through the `setup()` function:
@@ -168,7 +181,7 @@ Expand to view default configuration ~
 <
 
 
-MANUAL PLUGIN STARTUP               *cord-configuration-manual-plugin-startup*
+MANUAL PLUGIN STARTUP ~
 
 If you need to delay the initialization of the plugin, you can prevent it from
 starting automatically by setting a global variable:
@@ -180,6 +193,12 @@ starting automatically by setting a global variable:
 With this option set to true, the plugin **will not start automatically**.
 Instead, you’ll need to manually initialize it by calling
 `require('cord').setup()`.
+
+
+USEFUL FUNCTIONS ~
+
+- `require('cord.api.icon').get(name: string, theme?: string, flavor?: string): string`
+    - **Get Icon URL:** Returns the URL for the specified icon `name`, optional `theme`, and optional `flavor`. If `theme` or `flavor` is not provided, they default to the configured `display.theme` and `display.flavor`, respectively. Useful for referencing Cord’s built-in icons in your custom configurations.
 
 
 EDITOR                                             *cord-configuration-editor*
@@ -212,6 +231,8 @@ DISPLAY                                           *cord-configuration-display*
 
   display.swap_icons    boolean   false     Use editor icon as large image
   ----------------------------------------------------------------------------------------
+
+  [!TIP] Check out our icon showcase <https://github.com/vyfor/icons#showcase>!
 
 TIMESTAMP                                       *cord-configuration-timestamp*
 
@@ -265,6 +286,10 @@ IDLE                                                 *cord-configuration-idle*
   idle.icon              string \| function(opts)   default idle icon                 Custom icon URL or
                                                                                       asset ID
   ---------------------------------------------------------------------------------------------------------
+
+  Smart idle ensures that: - When an instance goes idle, it switches to show the
+  most recent active one - You’re only shown as idle when all instances are
+  actually idle
 
 TEXT                                                 *cord-configuration-text*
 
@@ -321,101 +346,7 @@ TEXT                                                 *cord-configuration-text*
   dashboard        string \| function(opts) \| boolean   'Home'                         Home
   ----------------------------------------------------------------------------------------------------------------
 
-  Also see |cord-text-options|
-
-VARIABLES                                       *cord-configuration-variables*
-
-  -------------------------------------------------------------------------------------------------------------
-  Option      Type                      Default   Description
-  ----------- ------------------------- --------- -------------------------------------------------------------
-  variables   table \| boolean \| nil   nil       Define custom variables for use in string templates.
-                                                  Functions can be used to dynamically generate values. If
-                                                  true, uses the default options table, if table, extends the
-                                                  default table, if false, disables custom variables
-
-  -------------------------------------------------------------------------------------------------------------
-
-HOOKS                                               *cord-configuration-hooks*
-
-  --------------------------------------------------------------------------------------------------------------------------------------------------
-  Option                   Type                                                                                 Description
-  ------------------------ ------------------------------------------------------------------------------------ ------------------------------------
-  hooks.ready              function(manager) \| table<fun: function(manager), priority: number>                 Called when connected to the server
-                                                                                                                and ready for communication with
-                                                                                                                Discord (manager)
-
-  hooks.shutdown           function() \| table<fun: function(), priority: number>                               Called when connection to Discord is
-                                                                                                                closed
-
-  hooks.pre_activity       function(opts) \| table<fun: function(opts), priority: number>                       Called before building activity
-                                                                                                                (opts)
-
-  hooks.post_activity      function(opts, activity) \| table<fun: function(opts, activity), priority: number>   Called after building activity, but
-                                                                                                                before sending it (opts, activity)
-
-  hooks.idle_enter         function(opts) \| table<fun: function(opts), priority: number>                       Called when entering idle state
-                                                                                                                (opts)
-
-  hooks.idle_leave         function(opts) \| table<fun: function(opts), priority: number>                       Called when leaving idle state
-                                                                                                                (opts)
-
-  hooks.workspace_change   function(opts) \| table<fun: function(opts), priority: number>                       Called when workspace changes (opts)
-  --------------------------------------------------------------------------------------------------------------------------------------------------
-
-PLUGINS                                           *cord-configuration-plugins*
-
-  ----------------------------------------------------------------------------------------
-  Option    Type                               Description
-  --------- ---------------------------------- -------------------------------------------
-  plugins   string[] \| table<string, table>   Extend Cord with plugins. See the Wiki for
-                                               more info
-
-  ----------------------------------------------------------------------------------------
-
-  If you want to develop your own plugin, check out Cord’s Plugin System
-  <./Plugin-System.md>
-
-ADVANCED                                         *cord-configuration-advanced*
-
-  -----------------------------------------------------------------------------------------------------------------------
-  Option                                Type            Default     Description
-  ------------------------------------- --------------- ----------- -----------------------------------------------------
-  advanced.plugin.autocmds              boolean         true        Enable autocmds
-
-  advanced.plugin.cursor_update         string          'on_hold'   When to update cursor position: 'on_move', 'on_hold',
-                                                                    or 'none'. See Cursor Update Mode
-
-  advanced.plugin.match_in_mappings     boolean         true        Whether to match against file extensions in mappings
-
-  advanced.server.update                string          'fetch'     Default way to acquire the server executable either
-                                                                    if the executable is not found or a manual update is
-                                                                    requested: 'fetch' - fetch from GitHub, 'build' -
-                                                                    build from source, 'none' - no-op
-
-  advanced.server.pipe_path             string \| nil   nil         Custom IPC pipe path
-
-  advanced.server.executable_path       string \| nil   nil         Custom server executable path
-
-  advanced.server.timeout               number          300000      Server shutdown timeout (ms)
-
-  advanced.discord.reconnect.enabled    boolean         false       Whether reconnection is enabled. Has minimal impact
-                                                                    on performance
-
-  advanced.discord.reconnect.interval   number          5000        Reconnection interval in milliseconds, 0 to disable
-
-  advanced.discord.reconnect.initial    boolean         true        Whether to reconnect if initial connection fails
-
-  advanced.workspace.root_markers       string[]        string[]    List of root markers to use when determining the
-                                                                    workspace directory
-
-  advanced.workspace.limit_to_cwd       boolean         false       Limits workspace detection to the working directory
-                                                                    (vim.fn.getcwd()). When true, workspace detection
-                                                                    stops at the CWD if no marker is found, making the
-                                                                    search more efficient
-  -----------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------
-
-TEXT OPTIONS                                 *cord-configuration-text-options*
+TEXT OPTIONS ~
 
 The `text` table allows you to customize the displayed text for different
 states. You can customize it in three different ways:
@@ -536,21 +467,23 @@ patterns for filetype detection:
 <
 
 
-SMART IDLE                                     *cord-configuration-smart-idle*
+VARIABLES                                       *cord-configuration-variables*
 
-Smart idle ensures that: - When an instance goes idle, it switches to show the
-most recent active one - You’re only shown as idle when all instances are
-actually idle
+  -------------------------------------------------------------------------------------------------------------
+  Option      Type                      Default   Description
+  ----------- ------------------------- --------- -------------------------------------------------------------
+  variables   table \| boolean \| nil   nil       Define custom variables for use in string templates.
+                                                  Functions can be used to dynamically generate values. If
+                                                  true, uses the default options table, if table, extends the
+                                                  default table, if false, disables custom variables
 
+  -------------------------------------------------------------------------------------------------------------
 
-CUSTOM VARIABLES                         *cord-configuration-custom-variables*
-
-The `variables` option allows you to define custom variables to be used in
-string templates. These variables can be static values or functions that
-dynamically generate values based on the current context. By default, the table
-is populated with the |cord-options-table| but they can be overridden by
-user-defined variables.
-
+  The `variables` option allows you to define custom variables to be used in
+  string templates. These variables can be static values or functions that
+  dynamically generate values based on the current context. By default, the table
+  is populated with the |cord-options-table| but they can be overridden by
+  user-defined variables.
 Example configuration:
 
 >lua
@@ -564,6 +497,95 @@ Example configuration:
         }
     }
 <
+
+
+HOOKS                                               *cord-configuration-hooks*
+
+  --------------------------------------------------------------------------------------------------------------------------------------------------
+  Option                   Type                                                                                 Description
+  ------------------------ ------------------------------------------------------------------------------------ ------------------------------------
+  hooks.ready              function(manager) \| table<fun: function(manager), priority: number>                 Called when connected to the server
+                                                                                                                and ready for communication with
+                                                                                                                Discord (manager)
+
+  hooks.shutdown           function() \| table<fun: function(), priority: number>                               Called when connection to Discord is
+                                                                                                                closed
+
+  hooks.pre_activity       function(opts) \| table<fun: function(opts), priority: number>                       Called before building activity
+                                                                                                                (opts)
+
+  hooks.post_activity      function(opts, activity) \| table<fun: function(opts, activity), priority: number>   Called after building activity, but
+                                                                                                                before sending it (opts, activity)
+
+  hooks.idle_enter         function(opts) \| table<fun: function(opts), priority: number>                       Called when entering idle state
+                                                                                                                (opts)
+
+  hooks.idle_leave         function(opts) \| table<fun: function(opts), priority: number>                       Called when leaving idle state
+                                                                                                                (opts)
+
+  hooks.workspace_change   function(opts) \| table<fun: function(opts), priority: number>                       Called when workspace changes (opts)
+  --------------------------------------------------------------------------------------------------------------------------------------------------
+
+PLUGINS                                           *cord-configuration-plugins*
+
+  ----------------------------------------------------------------------------------------
+  Option    Type                               Description
+  --------- ---------------------------------- -------------------------------------------
+  plugins   string[] \| table<string, table>   Extend Cord with plugins. See the Wiki for
+                                               more info
+
+  ----------------------------------------------------------------------------------------
+
+  If you want to develop your own plugin, check out Cord’s Plugin System
+  <./Plugin-System.md>
+
+ADVANCED                                         *cord-configuration-advanced*
+
+  -----------------------------------------------------------------------------------------------------------------------
+  Option                                Type            Default     Description
+  ------------------------------------- --------------- ----------- -----------------------------------------------------
+  advanced.plugin.autocmds              boolean         true        Enable autocmds
+
+  advanced.plugin.cursor_update         string          'on_hold'   When to update cursor position: 'on_move', 'on_hold',
+                                                                    or 'none'. See Cursor Update Mode
+
+  advanced.plugin.match_in_mappings     boolean         true        Whether to match against file extensions in mappings
+
+  advanced.server.update                string          'fetch'     Default way to acquire the server executable either
+                                                                    if the executable is not found or a manual update is
+                                                                    requested: 'fetch' - fetch from GitHub, 'build' -
+                                                                    build from source, 'none' - no-op
+
+  advanced.server.pipe_path             string \| nil   nil         Custom IPC pipe path
+
+  advanced.server.executable_path       string \| nil   nil         Custom server executable path
+
+  advanced.server.timeout               number          300000      Server shutdown timeout (ms)
+
+  advanced.discord.reconnect.enabled    boolean         false       Whether reconnection is enabled. Has minimal impact
+                                                                    on performance
+
+  advanced.discord.reconnect.interval   number          5000        Reconnection interval in milliseconds, 0 to disable
+
+  advanced.discord.reconnect.initial    boolean         true        Whether to reconnect if initial connection fails
+
+  advanced.workspace.root_markers       string[]        string[]    List of root markers to use when determining the
+                                                                    workspace directory
+
+  advanced.workspace.limit_to_cwd       boolean         false       Limits workspace detection to the working directory
+                                                                    (vim.fn.getcwd()). When true, workspace detection
+                                                                    stops at the CWD if no marker is found, making the
+                                                                    search more efficient
+  -----------------------------------------------------------------------------------------------------------------------
+
+CURSOR UPDATE MODE ~
+
+The `advanced.cursor_update_mode` option controls how cursor position updates
+are handled: - `'on_move'` - Uses `CursorMoved[I]` autocmd, updating on every
+cursor movement. Most accurate but triggered very often - `'on_hold'` - Uses
+`CursorHold[I]` autocmd, updating only after the cursor has been stationary for
+`'updatetime'` milliseconds. Better performance but less accurate - `'none'` -
+Disables cursor position updates entirely
 
 
 USER COMMANDS                               *cord-configuration-user-commands*
@@ -597,16 +619,6 @@ USER COMMANDS                               *cord-configuration-user-commands*
 - `:Cord restart` - Restart the server
 - `:Cord shutdown` - Disconnect from Discord and shutdown the server
 - `:Cord health` - Validate user configuration
-
-
-CURSOR UPDATE MODE                     *cord-configuration-cursor-update-mode*
-
-The `advanced.cursor_update_mode` option controls how cursor position updates
-are handled: - `'on_move'` - Uses `CursorMoved[I]` autocmd, updating on every
-cursor movement. Most accurate but triggered very often - `'on_hold'` - Uses
-`CursorHold[I]` autocmd, updating only after the cursor has been stationary for
-`'updatetime'` milliseconds. Better performance but less accurate - `'none'` -
-Disables cursor position updates entirely
 
 
 OPTIONS TABLE                               *cord-configuration-options-table*
@@ -720,12 +732,6 @@ ACTIVITY OPTIONS                         *cord-configuration-activity-options*
 
   is_idle      boolean   Whether the activity should be considered as idle.
   ---------------------------------------------------------------------------------
-
-USEFUL FUNCTIONS                         *cord-configuration-useful-functions*
-
-- `require('cord.api.icon').get(name: string, theme?: string, flavor?: string): string`
-    - **Get Icon URL:** Returns the URL for the specified icon `name`, optional `theme`, and optional `flavor`. If `theme` or `flavor` is not provided, they default to the configured `display.theme` and `display.flavor`, respectively. Useful for referencing Cord’s built-in icons in your custom configurations.
-
 
 ==============================================================================
 2. Custom Assets                                          *cord-custom-assets*
@@ -1441,7 +1447,7 @@ FEATURES                                              *cord-examples-features*
 
 QUICK START                                        *cord-examples-quick-start*
 
-For most users, the quickest way to get started is using **lazy.nvim**
+For most users, the quickest way to get started is by using **lazy.nvim**
 
 >lua
     {
@@ -1534,16 +1540,13 @@ DOCUMENTATION                                    *cord-examples-documentation*
 Dive deeper into Cord’s features and customization options in the **Wiki**
 <https://github.com/vyfor/cord.nvim/wiki>
 
-- **Configuration Guide**Master all the settings to tailor Cord to your exact needs.
-- **Examples**Get inspired with creative ways to customize your Discord presence.
-- **Migration Guide**Upgrade smoothly from Cord v1.
-- **FAQ**Frequently asked questions about Cord.
-- **Troubleshooting Guide**Find solutions to common issues and scenarios.
+- **Configuration Guide**.
+- **Examples**.
+- **FAQ**.
+- **Troubleshooting Guide**.
 
 
 VERSIONING                                          *cord-examples-versioning*
-
-We follow a **modified versioning specification**
 
 - **PATCH**Non-breaking changes.
 - **MINOR**Breaking changes.
@@ -1571,7 +1574,7 @@ everyone. Thank you!
 BUILD FROM SOURCE                            *cord-examples-build-from-source*
 
 
-  [!NOTE] Make sure you have **Rust** >= 1.85.0 installed.
+  [!NOTE] Make sure you have **Rust** >= 1.85.0 (nightly) installed.
 To build Cord from source, you can run `:Cord update build` (async) which will
 install the server binary from crates.io by running the following command:
 
