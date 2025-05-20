@@ -13,7 +13,7 @@ impl ServerLock {
         let path = Self::get_lock_path()?;
         let file = Self::open_file(&path)?;
 
-        if !file.try_lock()? {
+        if file.try_lock().is_err() {
             return Err(Error::new(
                 ErrorKind::AlreadyExists,
                 "Could not acquire a file lock while another instance is \
