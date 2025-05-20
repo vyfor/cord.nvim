@@ -1418,6 +1418,7 @@ KEYMAPPINGS ~
 
 
 
+
   [!IMPORTANT] Cord no longer requires Rust to be installed. Rust component will
   be automatically downloaded from GitHub Releases.
 
