@@ -13,6 +13,10 @@
 </div>
 
 <div align="center">
+  <div><a href="https://discord.gg/q9rC4bjCHv"><img src="https://discord.com/api/guilds/1322899307925602366/widget.png?style=banner2" alt="cord.nvim"/></a></div>
+</div>
+
+<div align="center">
   <a href="#-quick-start">Installation</a>
   <span> • </span>
   <a href="https://github.com/vyfor/cord.nvim/wiki">Documentation</a>
