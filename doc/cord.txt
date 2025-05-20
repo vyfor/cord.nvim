@@ -1,4 +1,4 @@
-*cord.txt*               For NVIM v0.6.0              Last change: 2025 May 17
+*cord.txt*               For NVIM v0.6.0              Last change: 2025 May 20
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -61,8 +61,8 @@ TABLE OF CONTENTS ~
 - |cord-activitymanager-methods|
 - |cord-activity-options|
 
-A comprehensive guide to configuring the Cord plugin to your liking. All
-options are set through the `setup()` function:
+A comprehensive guide to configuring the plugin to your liking. All options are
+set through the `setup()` function:
 
 >lua
     require('cord').setup {
@@ -70,15 +70,10 @@ options are set through the `setup()` function:
     }
 <
 
-If you prefer to start with a clean slate, you can copy the
-|cord-default-configuration| below and modify it to your liking. Remember, you
-only need to specify the options you want to change; any unspecified options
-will use their default values.
+If you want a fresh start, you can copy the |cord-default-config| and tweak it.
+I suggest only changing what you need, since the rest falls back to defaults.
 
-Here’s the complete default configuration for Cord. You can use this as a
-starting point for your own setup.
-
-Expand to view default configuration ~
+Expand to view default config ~
 
 >lua
     {
@@ -1439,7 +1434,7 @@ FEATURES                                              *cord-examples-features*
 - **Custom Assets** — Extendable with fully customizable assets for any file/buffer type.
 - **Robust User Commands** - Quickly manage Cord and its features through user commands and easily create your own keybindings.
 - **Plugin System** — Extendable with custom plugins, with a plethora of built-in ones out of the box.
-- **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside WSL <https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#running-inside-wsl> and Discord in browser <https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#using-discord-in-browser>.
+- **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside WSL <https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#-running-inside-wsl> and Discord in browser <https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#-using-discord-in-browser>.
 - **Cross-Platform** — Supports Windows, Linux, macOS, and FreeBSD.
 - **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
 - **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
@@ -1523,27 +1518,27 @@ available in distinct themes to match your style.
 **Explore the Icon Showcase**vyfor/icons
 <https://github.com/vyfor/icons#showcase>
 
+------------------------------------------------------------------------------
 Cord currently offers three themes:
 
 - **Default**A clean and stylish theme featuring widely recognized icons.
 - **Atom**A sleek theme inspired by Atom Material Icons
 - **Catppuccin**A soothing pastel theme inspired by Catppuccin.
 
-Each theme includes multiple flavors, typically `dark`, `light`, and `accent`.
 
-Choose your theme in the `display` configuration option. More themes are coming
-soon!
-
+  Each theme includes multiple flavors, typically `dark`, `light`, and `accent`.
+  Choose your theme in the `display` configuration option. More themes are coming
+  soon!
 
 DOCUMENTATION                                    *cord-examples-documentation*
 
-Dive deeper into Cord’s features and customization options in the **Wiki**
+Full documentation is available in the **Wiki**
 <https://github.com/vyfor/cord.nvim/wiki>
 
-- **Configuration Guide**.
-- **Examples**.
-- **FAQ**.
-- **Troubleshooting Guide**.
+- **Configuration Guide**
+- **Examples**
+- **FAQ**
+- **Troubleshooting Guide**
 
 
 VERSIONING                                          *cord-examples-versioning*
