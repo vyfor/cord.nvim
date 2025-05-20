@@ -22,6 +22,7 @@ function! CordCompleteList(ArgLead, CmdLine, CmdPos)
     return []
 endfunction
 
+command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.command'.handle('<q-args>')
 
 lua << EOF
     if vim.g.cord_defer_startup == true then return end
@@ -40,8 +41,6 @@ lua << EOF
                     autocmd!
                     autocmd VimLeavePre * lua require 'cord.server':cleanup()
                 augroup END
-
-                command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.command'.handle('<q-args>')
             ]]
             
             require('cord.server'):initialize()

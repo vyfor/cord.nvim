@@ -15,8 +15,6 @@ M = {
                 autocmd!
                 autocmd VimLeavePre * lua require 'cord.server':cleanup()
             augroup END
-
-            command! -nargs=+ -complete=customlist,CordCompleteList Cord lua require'cord.api.command'.handle('<q-args>')
         ]]
 
         require('cord.server'):initialize()
