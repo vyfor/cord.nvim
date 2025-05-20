@@ -42,6 +42,8 @@ It used to work as expected, but I suspect that Discord introduced a bug in rece
 
 > ### Q: Is X plugin or X language supported?
 
-Cord detects different buffers based on current buffer's filetype, and on rare occasions, its filename. See the list of supported filetypes [here](https://github.com/vyfor/cord.nvim/blob/master/lua/cord/plugin/activity/mappings.lua). If it's not listed, it's either:
-- Not yet added to Cord. If this is the case, please open an issue and we'll add it.
-- Cannot be detected by Cord. In case it's a plugin, before opening an issue, make sure it overrides the buffer's filetype option so that it can be detected.
+Cord detects different buffers based on their filetype, and occasionally their filename. See the list of supported filetypes [here](https://github.com/vyfor/cord.nvim/blob/master/lua/cord/plugin/activity/mappings.lua). If it's not listed, it usually means one of two things:
+- It hasn't been added yet — feel free to [open an issue](https://github.com/vyfor/cord.nvim/issues/new/choose) and we'll add it.
+- It can't be detected:
+  - *Languages* that cannot be detected by filetype or filename alone, have to be configured to be detectable, as explained in [here](https://github.com/vyfor/cord.nvim/wiki/Assets#-tip).
+  - *Plugins* are required to override current buffer's `filetype`, or otherwise Cord will not be able to detect it.

@@ -17,7 +17,7 @@
   - [ActivityManager Methods](#activitymanager-methods)
   - [Activity Options](#activity-options)
 
-A comprehensive guide to configuring the Cord plugin to your liking. All options are set through the `setup()` function:
+A comprehensive guide to configuring the plugin to your liking. All options are set through the `setup()` function:
 
 ```lua
 require('cord').setup {
@@ -25,12 +25,10 @@ require('cord').setup {
 }
 ```
 
-If you prefer to start with a clean slate, you can copy the [Default Configuration](#default-configuration) below and modify it to your liking. Remember, you only need to specify the options you want to change; any unspecified options will use their default values.
-
-Here's the complete default configuration for Cord. You can use this as a starting point for your own setup.
+If you want a fresh start, you can copy the [default config](#default-configuration) and tweak it. I suggest only changing what you need, since the rest falls back to defaults.
 
 <details id="default-config">
-  <summary>Expand to view default configuration</summary>
+  <summary>Expand to view default config</summary>
 
 ```lua
 {

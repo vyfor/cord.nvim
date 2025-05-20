@@ -44,6 +44,9 @@ Make sure your date, time, and timezone are correct and synced (using automatic 
 
 Cord doesn't support browser Discord out of the box. Use [arrpc](https://github.com/OpenAsar/arrpc) as a bridge. Follow its instructions closely.
 
+>[!IMPORTANT]
+> arrpc has been left unmaintained for quite some time.
+
 ### 🐧 Running inside WSL
 
 WSL doesn't expose Windows named pipes by default, which Discord needs. To work around that, use `socat` and `npiperelay`.

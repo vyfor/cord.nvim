@@ -15,7 +15,7 @@
 <div align="center">
   <a href="#-quick-start">Installation</a>
   <span> • </span>
-  <a href="#-documentation">Documentation</a>
+  <a href="https://github.com/vyfor/cord.nvim/wiki">Documentation</a>
   <span> • </span>
   <a href="https://discord.gg/q9rC4bjCHv">Discord</a>
 </div>
@@ -35,7 +35,7 @@
 - 🗃️ **Custom Assets** — Extendable with fully customizable assets for any file/buffer type.
 - ⚙️ **Robust User Commands** - Quickly manage Cord and its features through user commands and easily create your own keybindings.
 - 🔌 **Plugin System** — Extendable with custom plugins, with a plethora of built-in ones out of the box.
-- 📦 **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside [WSL](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#running-inside-wsl) and [Discord in browser](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#using-discord-in-browser).
+- 📦 **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside [WSL](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#-running-inside-wsl) and [Discord in browser](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#-using-discord-in-browser).
 - 🌍 **Cross-Platform** — Supports Windows, Linux, macOS, and FreeBSD.
 - 🌸 **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
 - 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
@@ -123,24 +123,25 @@ Cord boasts over 120 meticulously crafted icons for languages and tools, availab
 
 👉 **Explore the Icon Showcase**: [vyfor/icons](https://github.com/vyfor/icons#showcase)
 
+---
+
 Cord currently offers three themes:
 
 - **Default**: A clean and stylish theme featuring widely recognized icons.
 - **Atom**: A sleek theme inspired by Atom Material Icons
 - **Catppuccin**: A soothing pastel theme inspired by Catppuccin.
 
-Each theme includes multiple flavors, typically `dark`, `light`, and `accent`.
-
-Choose your theme in the `display` configuration option. More themes are coming soon!
+> Each theme includes multiple flavors, typically `dark`, `light`, and `accent`.
+> Choose your theme in the `display` configuration option. More themes are coming soon!
 
 ## 📖 Documentation
 
-Dive deeper into Cord's features and customization options in the [**Wiki**](https://github.com/vyfor/cord.nvim/wiki):
+Full documentation is available in the [**Wiki**](https://github.com/vyfor/cord.nvim/wiki):
 
-- 📘 **[Configuration Guide](https://github.com/vyfor/cord.nvim/wiki/Configuration)**.
-- 💡 **[Examples](https://github.com/vyfor/cord.nvim/wiki/Examples)**.
-- ❓ **[FAQ](https://github.com/vyfor/cord.nvim/wiki/FAQ)**.
-- 🚑 **[Troubleshooting Guide](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)**.
+- 📘 **[Configuration Guide](https://github.com/vyfor/cord.nvim/wiki/Configuration)**
+- 💡 **[Examples](https://github.com/vyfor/cord.nvim/wiki/Examples)**
+- ❓ **[FAQ](https://github.com/vyfor/cord.nvim/wiki/FAQ)**
+- 🚑 **[Troubleshooting Guide](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)**
 
 ## 📜 Versioning
 
