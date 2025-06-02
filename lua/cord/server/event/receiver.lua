@@ -41,7 +41,6 @@ function Handler:run()
 
   local buffer = ''
   self.client:read_start(function(data)
-    logger.trace('Received data: ' .. tostring(data))
     buffer = buffer .. data
 
     while #buffer >= 4 do
