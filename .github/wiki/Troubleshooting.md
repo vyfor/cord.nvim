@@ -26,11 +26,9 @@ Start here - these steps often resolve most issues:
 
 ## 🎛️ No Buttons in Rich Presence
 
-Due to a Discord bug, you might not see buttons in your own Rich Presence.
+You might not be seeing buttons in your own Rich Presence. This is due to a client-sided bug on the app.
 
-Ask a friend if they can see them — they usually still appear to others.
-
-To see them yourself: join a voice channel and hover over your name. Buttons often show up in the tooltip.
+But there is actually a way to see them, join a voice channel and hover over your name. Buttons should show up in the tooltip.
 
 ## ⏱️ Rich Presence Timer Stuck at 00:00
 
