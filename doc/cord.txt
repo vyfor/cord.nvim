@@ -1,4 +1,4 @@
-*cord.txt*              For NVIM v0.6.0              Last change: 2025 June 09
+*cord.txt*             For NVIM v0.6.0             Last change: 2025 August 02
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -708,25 +708,33 @@ ACTIVITYMANAGER METHODS           *cord-configuration-activitymanager-methods*
 
 ACTIVITY OPTIONS                         *cord-configuration-activity-options*
 
-  ---------------------------------------------------------------------------------
-  Parameter    Type      Description
-  ------------ --------- ----------------------------------------------------------
-  type         number    One of ‘playing’, ‘listening’, ‘watching’
+  -----------------------------------------------------------------------------------------
+  Parameter             Type      Description
+  --------------------- --------- ---------------------------------------------------------
+  type                  string    One of ‘playing’, ‘listening’, ‘watching’, ‘competing’
 
-  state        string    The user’s current state (e.g., “Editing a file”).
+  status_display_type   string    One of ‘name’, ‘state’, ‘details’. Controls which field
+                                  is displayed in the user’s status text in the member list
 
-  details      string    Detailed information about what the user is doing.
+  details               string    Detailed information about what the user is doing.
 
-  timestamps   table     Contains start and end timestamps for the activity.
+  details_url           string    URL for the details field to make it clickable.
 
-  assets       table     Defines images and tooltips, including large_image,
-                         large_text, small_image, and small_text.
+  state                 string    The user’s current state (e.g., “Editing a file”).
 
-  buttons      array     Array of objects, each with label and url, defining
-                         interactive buttons in the presence.
+  state_url             string    URL for the state field to make it clickable.
 
-  is_idle      boolean   Whether the activity should be considered as idle.
-  ---------------------------------------------------------------------------------
+  timestamps            table     Contains start and end timestamps for the activity.
+
+  assets                table     Defines images and tooltips, including large_image,
+                                  large_text, large_url, small_image, small_text, and
+                                  small_url.
+
+  buttons               array     Array of objects, each with label and url, defining
+                                  interactive buttons in the presence.
+
+  is_idle               boolean   Whether the activity should be considered as idle.
+  -----------------------------------------------------------------------------------------
 
 ==============================================================================
 2. Custom Assets                                          *cord-custom-assets*
