@@ -7,6 +7,16 @@ local M = {
   },
 }
 
+local function create_problems_suffix(problems_count)
+  local text = ' - ' .. problems_count
+  if problems_count == 1 then
+    text = text .. ' problem'
+  else
+    text = text .. ' problems'
+  end
+  return text
+end
+
 M.setup = function(config)
   if config then
     config = vim.tbl_deep_extend('force', M.config, config)
@@ -33,21 +43,21 @@ M.setup = function(config)
         workspace = M.config.scope == nil and function(opts)
           local text = 'In ' .. opts.workspace
           if M.diagnostic_count > 0 then
-            text = text .. ' - ' .. M.diagnostic_count .. ' problems'
+            text = text .. create_problems_suffix(M.diagnostic_count)
           end
           return text
         end or nil,
         viewing = M.config.scope == 0 and function(opts)
           local text = 'Viewing ' .. opts.filename
           if M.diagnostic_count > 0 then
-            text = text .. ' - ' .. M.diagnostic_count .. ' problems'
+            text = text .. create_problems_suffix(M.diagnostic_count)
           end
           return text
         end or nil,
         editing = M.config.scope == 0 and function(opts)
           local text = 'Editing ' .. opts.filename
           if M.diagnostic_count > 0 then
-            text = text .. ' - ' .. M.diagnostic_count .. ' problems'
+            text = text .. create_problems_suffix(M.diagnostic_count)
           end
           return text
         end or nil,
