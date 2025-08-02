@@ -25,10 +25,13 @@ local mt = { __index = ActivityManager }
 
 ---@class Activity
 ---@field type? string One of 'playing', 'listening', 'watching', 'competing'
+---@field status_display_type? string One of 'name', 'state', 'details'. Controls which field is displayed in the user's status text in the member list
 ---@field details? string Detailed information about what the user is doing
+---@field details_url? string URL for the details field to make it clickable
 ---@field state? string Secondary information about what the user is doing
+---@field state_url? string URL for the state field to make it clickable
 ---@field timestamps? ActivityTimestamps Contains `start` and `end` timestamps for the activity
----@field assets? ActivityAssets Defines images and tooltips, including `large_image`, `large_text`, `small_image`, and `small_text`
+---@field assets? ActivityAssets Defines images and tooltips, including `large_image`, `large_text`, `large_url`, `small_image`, `small_text`, and `small_url`
 ---@field buttons? CordButtonConfig[] Array of objects, each with `label` and `url`, defining interactive buttons in the presence
 ---@field is_idle? boolean Whether the activity should be considered as idle
 
@@ -39,8 +42,10 @@ local mt = { __index = ActivityManager }
 ---@class ActivityAssets
 ---@field large_image? string Large image ID or URL
 ---@field large_text? string Large image text
+---@field large_url? string URL for the large image to make it clickable
 ---@field small_image? string Small image ID or URL
 ---@field small_text? string Small image text
+---@field small_url? string URL for the small image to make it clickable
 
 ---@class CordOpts
 ---@field manager ActivityManager Reference to the ActivityManager instance

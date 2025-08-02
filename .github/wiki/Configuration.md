@@ -489,12 +489,15 @@ The `ActivityManager` contains useful methods:
 
 ## Activity Options
 
-| Parameter    | Type      | Description                                                                                          |
-| ------------ | --------- | ---------------------------------------------------------------------------------------------------- |
-| `type`       | `number`  | One of 'playing', 'listening', 'watching'                                                            |
-| `state`      | `string`  | The user's current state (e.g., "Editing a file").                                                   |
-| `details`    | `string`  | Detailed information about what the user is doing.                                                   |
-| `timestamps` | `table`   | Contains `start` and `end` timestamps for the activity.                                              |
-| `assets`     | `table`   | Defines images and tooltips, including `large_image`, `large_text`, `small_image`, and `small_text`. |
-| `buttons`    | `array`   | Array of objects, each with `label` and `url`, defining interactive buttons in the presence.         |
-| `is_idle`    | `boolean` | Whether the activity should be considered as idle.                                                   |
+| Parameter             | Type      | Description                                                                                                                    |
+| --------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `type`                | `string`  | One of 'playing', 'listening', 'watching', 'competing'                                                                         |
+| `status_display_type` | `string`  | One of 'name', 'state', 'details'. Controls which field is displayed in the user's status text in the member list              |
+| `details`             | `string`  | Detailed information about what the user is doing.                                                                             |
+| `details_url`         | `string`  | URL for the details field to make it clickable.                                                                                |
+| `state`               | `string`  | The user's current state (e.g., "Editing a file").                                                                             |
+| `state_url`           | `string`  | URL for the state field to make it clickable.                                                                                  |
+| `timestamps`          | `table`   | Contains `start` and `end` timestamps for the activity.                                                                        |
+| `assets`              | `table`   | Defines images and tooltips, including `large_image`, `large_text`, `large_url`, `small_image`, `small_text`, and `small_url`. |
+| `buttons`             | `array`   | Array of objects, each with `label` and `url`, defining interactive buttons in the presence.                                   |
+| `is_idle`             | `boolean` | Whether the activity should be considered as idle.                                                                             |
