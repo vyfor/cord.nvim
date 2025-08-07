@@ -4,6 +4,7 @@ local ws_utils = require 'cord.plugin.fs.workspace'
 local config_utils = require 'cord.plugin.config.util'
 local hooks = require 'cord.plugin.activity.hooks'
 local config = require 'cord.plugin.config'
+local logger = require 'cord.plugin.log'
 
 local uv = vim.loop or vim.uv
 
@@ -82,8 +83,7 @@ local function setup()
     end
   end
 
-  local err = require('cord.api.plugin').init()
-  if err then error(err, 0) end
+  return require('cord.api.plugin').init()
 end
 
 ---Create a new ActivityManager instance
@@ -116,7 +116,11 @@ ActivityManager.new = async.wrap(function(opts)
   self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = cache
 
   if not has_initialized then
-    setup()
+    local err = setup()
+    if err then
+      logger.log_raw(vim.log.levels.ERROR, err)
+      error('Failed to initialize ActivityManager', 0)
+    end
     has_initialized = true
   end
 
@@ -158,12 +162,12 @@ end
 ---@return boolean Whether an update is needed
 function ActivityManager:should_update()
   local should_update = not self.last_opts
-    or self.opts.filename ~= self.last_opts.filename
-    or self.opts.filetype ~= self.last_opts.filetype
-    or self.opts.is_read_only ~= self.last_opts.is_read_only
-    or self.opts.cursor_line ~= self.last_opts.cursor_line
-    or self.opts.cursor_char ~= self.last_opts.cursor_char
-    or self.opts.is_focused ~= self.last_opts.is_focused
+      or self.opts.filename ~= self.last_opts.filename
+      or self.opts.filetype ~= self.last_opts.filetype
+      or self.opts.is_read_only ~= self.last_opts.is_read_only
+      or self.opts.cursor_line ~= self.last_opts.cursor_line
+      or self.opts.cursor_char ~= self.last_opts.cursor_char
+      or self.opts.is_focused ~= self.last_opts.is_focused
 
   return should_update
 end
@@ -189,8 +193,8 @@ function ActivityManager:check_idle()
 
   local time_elapsed = uv.now() - self.last_updated
   if
-    self.is_force_idle
-    or (time_elapsed >= config.idle.timeout and (config.idle.ignore_focus or not self.is_focused))
+      self.is_force_idle
+      or (time_elapsed >= config.idle.timeout and (config.idle.ignore_focus or not self.is_focused))
   then
     self:update_idle_activity()
   else
@@ -433,7 +437,7 @@ function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
 function ActivityManager:should_update_time()
   return config.timestamp.enabled
       and (config.timestamp.reset_on_change or config.timestamp.reset_on_idle and self.is_idle)
-    or false
+      or false
 end
 
 ---Handle buffer enter event

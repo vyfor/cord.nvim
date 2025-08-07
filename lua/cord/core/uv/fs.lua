@@ -39,6 +39,50 @@ function M.mkdir(path, mode)
   end)
 end
 
+function M.mkdirp(path, mode)
+  return Future.new(function(resolve, reject)
+    local function create_dirs(dirs, index)
+      if index > #dirs then
+        resolve(true)
+        return
+      end
+
+      local current_path = table.concat(dirs, '/', 1, index)
+
+      uv.fs_stat(current_path, function(stat_err, stat)
+        if not stat_err and stat and stat.type == 'directory' then
+          create_dirs(dirs, index + 1)
+          return
+        end
+
+        uv.fs_mkdir(current_path, mode or 511, function(mk_err)
+          if mk_err and not mk_err:match('EEXIST') then
+            reject(mk_err)
+          else
+            create_dirs(dirs, index + 1)
+          end
+        end)
+      end)
+    end
+
+    local parts = {}
+    for part in path:gmatch('[^/]+') do
+      table.insert(parts, part)
+    end
+
+    if path:sub(1, 1) == '/' then
+      table.insert(parts, 1, '')
+    end
+
+    if #parts == 0 then
+      resolve(true)
+      return
+    end
+
+    create_dirs(parts, 1)
+  end)
+end
+
 function M.rename(old_path, new_path)
   return Future.new(function(resolve, reject)
     uv.fs_rename(old_path, new_path, function(err)
