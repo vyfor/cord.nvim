@@ -37,7 +37,7 @@ require('cord').setup {
 
 Here's a list of the built-in plugins included with Cord, along with their descriptions and configuration options:
 
-### Diagnostics (`cord.plugins.diagnostics`)
+### 🧩 Diagnostics (`cord.plugins.diagnostics`)
 
 **Purpose:**  Adds real-time LSP diagnostics (errors, warnings, hints) information to your Rich Presence. Displays the number of diagnostics in the current buffer or workspace.
 
@@ -81,7 +81,7 @@ text = {
 }
 ```
 
-### Local Time (`cord.plugins.local_time`)
+### 🧩 Local Time (`cord.plugins.local_time`)
 
 **Purpose:**  Sets the Rich Presence timestamp to display the current local clock time (hours, minutes and seconds) instead of elapsed time.
 
@@ -104,7 +104,7 @@ text = {
 > [!NOTE]
 > Incompatible with any other timestamp-related plugins.
 
-### Persistent Timer (`cord.plugins.persistent_timer`)
+### 🧩 Persistent Timer (`cord.plugins.persistent_timer`)
 
 **Purpose:** Provides a persistent timer that tracks the total time spent across multiple Neovim sessions. This timer is scoped and saved to a data file, so that your time spent on a certain scope continues from where it was left off previously, even after restarting Neovim. It's also able to handle multiple simultaneously open clients without data races.
 
@@ -143,7 +143,7 @@ text = {
 > [!NOTE]
 > Incompatible with any other timestamp-related plugins.
 
-### Scoped Timestamps (`cord.plugins.scoped_timestamps`)
+### 🧩 Scoped Timestamps (`cord.plugins.scoped_timestamps`)
 
 **Purpose:** Tracks elapsed time independently for each buffer or workspace.  Optionally "pauses" and "resumes" the timestamp when switching between buffers, providing more context-aware time tracking.
 
