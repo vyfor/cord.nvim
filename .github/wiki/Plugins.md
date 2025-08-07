@@ -25,7 +25,7 @@ require('cord').setup {
   plugins = {
     'cord.plugins.diagnostics', -- Enable diagnostics plugin with default settings
 
-    ['cord.plugins.diagnostics'] = { -- Configure diagnostics plugin
+    ['cord.plugins.diagnostics'] = { -- Enable AND configure diagnostics plugin
       scope = 'workspace', -- Set scope to 'workspace' instead of default 'buffer'
       severity = vim.diagnostic.severity.WARN, -- Show warnings and above
     },
@@ -101,8 +101,47 @@ text = {
 
 - **`local_timestamp`**: A function that returns the zeroed timestamp of the current local time (midnight of the current day).
 
->[!NOTE]
-> Incompatible with `cord.plugins.local_time`
+> [!NOTE]
+> Incompatible with any other timestamp-related plugins.
+
+### Persistent Timer (`cord.plugins.persistent_timer`)
+
+**Purpose:** Provides a persistent timer that tracks the total time spent across multiple Neovim sessions. This timer is scoped and saved to a data file, so that your time spent on a certain scope continues from where it was left off previously, even after restarting Neovim. It's also able to handle multiple simultaneously open clients without data races.
+
+**Configuration Options:**
+
+```lua
+{
+  scope = 'workspace', -- 'workspace', 'file', 'filetype', or 'global'
+  mode = 'all',        -- 'all', 'active', or 'idle'
+  file = vim.fn.stdpath 'data' .. '/cord/plugins/persistent_timer/data.json', -- Path to the timer data file
+  save_on = { 'exit', 'focus_change', 'periodic' }, -- Events that trigger a save
+  save_interval = 30,  -- Interval in seconds for periodic saves
+}
+```
+
+- **`scope`**:
+  - `'workspace'` (default): Track one continuous timer for the entire workspace.
+  - `'file'`: Track a separate timer for each individual file.
+  - `'filetype'`: Track a separate timer for each filetype (e.g., all `lua` files share one timer).
+  - `'global'`: Track a single timer for all activity within Neovim.
+- **`mode`**:
+  - `'all'` (default): Count all time the corresponding scope is active.
+  - `'active'`: Only accumulate time when you are actively moving or typing.
+  - `'idle'`: Only accumulate time when the instance is idle.
+- **`file`**:
+  - Defines the absolute path to the JSON file where time data is stored.
+  - Defaults to a file within Neovim's standard data directory.
+- **`save_on`**:
+  - A table of strings defining when the timer data should be saved to disk.
+  - `'exit'`: Saves when Neovim is closed. **(Recommended)**
+  - `'focus_change'`: Saves when you focus away from the Neovim window. Important for multi-client sync.
+  - `'periodic'`: Saves automatically at the interval defined by `save_interval`.
+- **`save_interval`**:
+  - The number of seconds between automatic saves if `'periodic'` is enabled.
+
+> [!NOTE]
+> Incompatible with any other timestamp-related plugins.
 
 ### Scoped Timestamps (`cord.plugins.scoped_timestamps`)
 
@@ -130,5 +169,5 @@ text = {
 
 - **`get_scoped_timestamp()`**: A function that returns the appropriate timestamp value based on the plugin's `scope` and `pause` settings. This is used internally by the plugin.
 
->[!NOTE]
-> Incompatible with `cord.plugins.local_time`
+> [!NOTE]
+> Incompatible with any other timestamp-related plugins.
