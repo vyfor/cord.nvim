@@ -336,6 +336,7 @@ M.setup = function(config)
 
   return {
     name = 'PersistentTimer',
+    description = 'Persistently track time spent scope-wise across sessions',
     hooks = {
       post_activity = {
         function(opts, activity)
