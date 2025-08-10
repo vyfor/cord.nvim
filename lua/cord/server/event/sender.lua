@@ -15,19 +15,17 @@ function Producer:send_event(type, data)
 end
 
 function Producer:initialize(config)
-  self:send_event(
-    'initialize',
-    { log_level = config.log_level }
-  )
+  self:send_event('initialize', {
+    log_level = config.log_level,
+    timestamp = {
+      shared = config.timestamp.shared,
+    },
+  })
 end
 
-function Producer:update_activity(activity)
-  self:send_event('update_activity', activity)
-end
+function Producer:update_activity(activity) self:send_event('update_activity', activity) end
 
-function Producer:clear_activity(force)
-  self:send_event('clear_activity', force or false)
-end
+function Producer:clear_activity(force) self:send_event('clear_activity', force or false) end
 
 function Producer:disconnect() self:send_event 'disconnect' end
 
