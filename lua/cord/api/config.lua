@@ -22,6 +22,7 @@ local validation_rules = {
   ['timestamp.enabled'] = { 'boolean' },
   ['timestamp.reset_on_idle'] = { 'boolean' },
   ['timestamp.reset_on_change'] = { 'boolean' },
+  ['timestamp.shared'] = { 'boolean' },
 
   ['idle'] = { 'table' },
   ['idle.enabled'] = { 'boolean' },

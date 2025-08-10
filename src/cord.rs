@@ -157,6 +157,7 @@ pub struct Config {
     pub timeout: u64,
     pub reconnect_interval: u64,
     pub initial_reconnect: bool,
+    pub shared_timestamps: bool,
 }
 
 impl Config {
@@ -167,6 +168,7 @@ impl Config {
         timeout: u64,
         reconnect_interval: u64,
         initial_reconnect: bool,
+        shared_timestamps: bool,
     ) -> Self {
         Self {
             pipe_name,
@@ -174,6 +176,7 @@ impl Config {
             timeout,
             reconnect_interval,
             initial_reconnect,
+            shared_timestamps,
         }
     }
 }

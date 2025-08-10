@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
+use std::sync::atomic::AtomicU64;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use crate::ipc::pipe::platform::client::PipeClient;
@@ -100,6 +101,7 @@ impl std::ops::DerefMut for SessionRefMut<'_> {
 #[derive(Default)]
 pub struct SessionManager {
     pub sessions: RwLock<HashMap<u32, Session>>,
+    pub shared_timestamp: AtomicU64,
 }
 
 impl SessionManager {

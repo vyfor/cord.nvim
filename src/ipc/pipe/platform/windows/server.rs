@@ -41,7 +41,7 @@ impl PipeServerImpl for PipeServer {
             session_manager,
             pipe_name: pipe_name.to_string(),
             tx,
-            next_client_id: Arc::new(AtomicU32::new(0)),
+            next_client_id: Arc::new(AtomicU32::new(1)),
             running: Arc::new(AtomicBool::new(false)),
             thread_handle: None,
         }
