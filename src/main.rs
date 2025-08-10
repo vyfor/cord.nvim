@@ -23,6 +23,7 @@ fn main() -> Result<()> {
         args.timeout,
         args.reconnect_interval,
         args.initial_reconnect,
+        false,
     ))?
     .run()
 }

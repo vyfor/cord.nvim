@@ -162,12 +162,12 @@ end
 ---@return boolean Whether an update is needed
 function ActivityManager:should_update()
   local should_update = not self.last_opts
-      or self.opts.filename ~= self.last_opts.filename
-      or self.opts.filetype ~= self.last_opts.filetype
-      or self.opts.is_read_only ~= self.last_opts.is_read_only
-      or self.opts.cursor_line ~= self.last_opts.cursor_line
-      or self.opts.cursor_char ~= self.last_opts.cursor_char
-      or self.opts.is_focused ~= self.last_opts.is_focused
+    or self.opts.filename ~= self.last_opts.filename
+    or self.opts.filetype ~= self.last_opts.filetype
+    or self.opts.is_read_only ~= self.last_opts.is_read_only
+    or self.opts.cursor_line ~= self.last_opts.cursor_line
+    or self.opts.cursor_char ~= self.last_opts.cursor_char
+    or self.opts.is_focused ~= self.last_opts.is_focused
 
   return should_update
 end
@@ -193,8 +193,8 @@ function ActivityManager:check_idle()
 
   local time_elapsed = uv.now() - self.last_updated
   if
-      self.is_force_idle
-      or (time_elapsed >= config.idle.timeout and (config.idle.ignore_focus or not self.is_focused))
+    self.is_force_idle
+    or (time_elapsed >= config.idle.timeout and (config.idle.ignore_focus or not self.is_focused))
   then
     self:update_idle_activity()
   else
@@ -233,6 +233,11 @@ function ActivityManager:update_idle_activity()
 
     hooks.run('post_activity', self.opts, activity)
 
+    if config.timestamp.shared then
+      self.opts.timestamp = nil
+      self.last_opts.timestamp = nil
+    end
+
     if self.should_skip_update then
       self.should_skip_update = false
       return
@@ -242,6 +247,11 @@ function ActivityManager:update_idle_activity()
     hooks.run('idle_enter', self.opts)
   else
     hooks.run('post_activity', self.opts)
+
+    if config.timestamp.shared then
+      self.opts.timestamp = nil
+      self.last_opts.timestamp = nil
+    end
 
     if self.should_skip_update then
       self.should_skip_update = false
@@ -269,6 +279,11 @@ function ActivityManager:update_activity()
   if activity == false then return self:clear_activity() end
 
   hooks.run('post_activity', self.opts, activity)
+
+  if config.timestamp.shared then
+    self.opts.timestamp = nil
+    self.last_opts.timestamp = nil
+  end
 
   if self.should_skip_update then
     self.should_skip_update = false
@@ -437,7 +452,7 @@ function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
 function ActivityManager:should_update_time()
   return config.timestamp.enabled
       and (config.timestamp.reset_on_change or config.timestamp.reset_on_idle and self.is_idle)
-      or false
+    or false
 end
 
 ---Handle buffer enter event
@@ -548,7 +563,7 @@ function ActivityManager:build_opts()
     is_focused = self.is_focused,
     is_idle = self.is_idle,
   }
-  if config.timestamp.enabled then
+  if config.timestamp.enabled and not config.timestamp.shared then
     if self.last_opts and self.last_opts.timestamp then
       opts.timestamp = self.last_opts.timestamp
     else

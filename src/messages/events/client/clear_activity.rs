@@ -1,4 +1,7 @@
+use std::sync::atomic::Ordering;
+
 use crate::messages::events::event::{EventContext, OnEvent};
+use crate::presence::activity::ActivityTimestamps;
 use crate::presence::packet::Packet;
 use crate::protocol::msgpack::Deserialize;
 
@@ -23,14 +26,35 @@ impl OnEvent for ClearActivityEvent {
                         s.1.last_activity.as_ref().is_some_and(|a| !a.is_idle),
                         s.1.last_updated,
                     )
-                });
+                })
+                .map(|(_, s)| s);
 
-            if let Some((_, session)) = latest {
-                let rich_client = ctx.cord.rich_client.read().unwrap();
-                rich_client.update(&Packet::new(
-                    rich_client.pid,
-                    session.last_activity.as_ref(),
-                ))?;
+            if let Some(session) = latest {
+                if let Some(mut activity) = session.last_activity.clone() {
+                    if ctx.cord.config.shared_timestamps {
+                        let shared_ts =
+                            &ctx.cord.session_manager.shared_timestamp;
+                        let ts_ref =
+                            activity.timestamps.get_or_insert_with(|| {
+                                ActivityTimestamps {
+                                    start: Some(
+                                        shared_ts.load(Ordering::SeqCst),
+                                    ),
+                                    end: None,
+                                }
+                            });
+                        if ts_ref.start.is_none() {
+                            ts_ref.start =
+                                Some(shared_ts.load(Ordering::SeqCst));
+                        }
+                    }
+
+                    let rich_client = ctx.cord.rich_client.read().unwrap();
+                    rich_client.update(&Packet::new(
+                        rich_client.pid,
+                        session.last_activity.as_ref(),
+                    ))?;
+                }
             } else {
                 ctx.cord.rich_client.read().unwrap().clear()?;
             }

@@ -49,6 +49,7 @@ If you want a fresh start, you can copy the [default config](#default-configurat
     enabled = true,
     reset_on_idle = false,
     reset_on_change = false,
+    shared = false,
   },
   idle = {
     enabled = true,
@@ -173,6 +174,7 @@ With this option set to true, the plugin **will not start automatically**. Inste
 | `timestamp.enabled`         | `boolean` | `true`  | Show elapsed time in presence            |
 | `timestamp.reset_on_idle`   | `boolean` | `false` | Reset timestamp when entering idle state |
 | `timestamp.reset_on_change` | `boolean` | `false` | Reset timestamp when presence changes    |
+| `timestamp.shared`          | `boolean` | `false` | Synchronize timestamps between clients   |
 
 ## 💤 Idle
 

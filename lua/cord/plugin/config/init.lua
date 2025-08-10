@@ -2,6 +2,7 @@
 ---@field enabled? boolean Whether timestamps are enabled
 ---@field reset_on_idle? boolean Whether to reset timestamp when idle
 ---@field reset_on_change? boolean Whether to reset timestamp when changing activities
+---@field shared? boolean Whether to share timestamps between clients
 
 ---@class CordEditorConfig
 ---@field client? 'vim'|'neovim'|'lunarvim'|'nvchad'|'astronvim'|'lazyvim'|string Editor client name, one of 'vim', 'neovim', 'lunarvim', 'nvchad', 'astronvim', 'lazyvim' or a custom Discord application ID
@@ -136,6 +137,7 @@ local defaults = {
     enabled = true,
     reset_on_idle = false,
     reset_on_change = false,
+    shared = false,
   },
   idle = {
     enabled = true,
