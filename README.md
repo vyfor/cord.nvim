@@ -98,6 +98,22 @@ Invoke `:Cord update` whenever the plugin is updated.
 </details>
 
 <details>
+<summary>Using <strong>vim.pack (v0.12+)</strong></summary>
+
+```lua
+vim.pack.add { 'https://github.com/vyfor/cord.nvim' }
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(opts)
+    if opts.data.spec.name == 'cord.nvim' and opts.data.kind == 'update' then 
+      vim.cmd 'Cord update'
+    end
+  end
+})
+```
+
+</details>
+
+<details>
 <summary>Using <strong>Vim packages</strong></summary>
 
 **Unix:**
@@ -105,7 +121,7 @@ Invoke `:Cord update` whenever the plugin is updated.
 git clone https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
 ```
 
-**Windows:**
+**Windows (PowerShell):**
 ```powershell
 git clone https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 ```
