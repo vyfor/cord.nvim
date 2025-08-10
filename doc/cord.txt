@@ -1545,6 +1545,19 @@ Cord is available on LuaRocks <https://luarocks.org/modules/vyfor/cord.nvim>.
 
 Invoke `:Cord update` whenever the plugin is updated.
 
+Using vim.pack (v0.12+) ~
+
+>lua
+    vim.pack.add { 'https://github.com/vyfor/cord.nvim' }
+    vim.api.nvim_create_autocmd('PackChanged', {
+      callback = function(opts)
+        if opts.data.spec.name == 'cord.nvim' and opts.data.kind == 'update' then 
+          vim.cmd 'Cord update'
+        end
+      end
+    })
+<
+
 Using Vim packages ~
 
 **Unix:**
@@ -1553,7 +1566,7 @@ Using Vim packages ~
     git clone https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugins/start/cord.nvim
 <
 
-**Windows:**
+**Windows (PowerShell):**
 
 >powershell
     git clone https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
