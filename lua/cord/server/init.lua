@@ -12,9 +12,9 @@ function M:connect(path, retried)
     end
 
     self.status = 'connecting'
-    logger.debug 'Connecting...'
+    logger.debug('Connecting to pipe...')
 
-    logger.debug('Pipe: ' .. path)
+    logger.trace('Pipe: ' .. path)
     M.client = require('cord.core.uv.pipe').new()
     local _, err = M.client:connect(path):get()
 
@@ -54,6 +54,7 @@ function M:run()
   return async.wrap(function()
     M.tx = require('cord.server.event.sender').new(M.client)
     M.rx = require('cord.server.event.receiver').new(M.client)
+    logger.debug 'Server: registering ready handler'
     M.rx:register(
       'ready',
       true,
@@ -108,7 +109,7 @@ function M:run()
       end)
     )
 
-    logger.debug 'Server initialized'
+    logger.debug 'Server initialized; starting receiver'
     M.rx:run()
   end)()
 end
@@ -121,6 +122,7 @@ function M:initialize()
     local path = config.advanced.server.pipe_path
       or require('cord.plugin.constants').get_pipe_path()
 
+    logger.trace(function() return 'Server pipe path: ' .. tostring(path) end)
     local _, err = M:connect(path):get()
     if err then
       self.status = 'disconnected'

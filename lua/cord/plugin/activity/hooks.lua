@@ -1,5 +1,6 @@
 ---@diagnostic disable-next-line: deprecated
 local unpack = unpack or table.unpack
+local logger = require 'cord.plugin.log'
 
 local M = {}
 
@@ -51,6 +52,8 @@ end
 ---@param event string Event name
 ---@param ... any Arguments to pass to hooks
 function M.run(event, ...)
+  logger.trace(function() return 'Hooks.run: event=' .. tostring(event) end)
+
   local hook = hooks[event]
   if not hook then return end
 

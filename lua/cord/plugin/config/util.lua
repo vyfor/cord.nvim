@@ -1,10 +1,10 @@
 local config = require 'cord.plugin.config'
+local logger = require 'cord.plugin.log'
 
 local M = {}
 
 function M.validate(new_config)
   local user_config = new_config or require('cord').user_config or {}
-  local logger = require 'cord.plugin.log'
   local icons = require 'cord.api.icon'
   local config_manager = require 'cord.plugin.config'
 
@@ -89,29 +89,43 @@ end
 
 function M.get(option, args)
   local ty = type(option)
+  logger.trace(function() return 'config.get: option_type=' .. tostring(ty) end)
 
   local variables = config.variables
   local vars_is_table = type(variables) == 'table'
   if vars_is_table then
     ---@cast variables table
+    logger.trace(function()
+      local keys = {}
+      for k, _ in pairs(variables) do table.insert(keys, k) end
+      return 'config.get: merging variables=[' .. table.concat(keys, ',') .. ']'
+    end)
     for k, v in pairs(variables) do
       args[k] = v
     end
   end
 
   if ty == 'string' and (vars_is_table or variables == true) then
+    logger.trace(function() return 'config.get: processing string with variables: ' .. tostring(option) end)
     option = option:gsub('%${(.-)}', function(var)
       local arg = args[var]
+      logger.trace(function() return 'config.get: variable ${' .. var .. '} = ' .. tostring(arg) end)
       if type(arg) == 'function' then
-        return tostring(arg(args))
+        local result = tostring(arg(args))
+        logger.trace(function() return 'config.get: function variable ${' .. var .. '} = ' .. result end)
+        return result
       elseif arg ~= nil then
         return tostring(arg)
       end
+      logger.trace(function() return 'config.get: undefined variable ${' .. var .. '}, keeping placeholder' end)
       return '${' .. var .. '}'
     end)
+    logger.trace(function() return 'config.get: final string: ' .. tostring(option) end)
   end
 
-  return ty == 'function' and option(args) or option
+  local result = ty == 'function' and option(args) or option
+  logger.trace(function() return 'config.get: returning ' .. tostring(type(result)) end)
+  return result
 end
 
 function M.get_buttons(opts)
