@@ -1,7 +1,7 @@
 # ⚡ Configuration
 
 ### 📖 Table of Contents
-  - [🏷️ Default Configuration](#default-config)
+  - [🏷️ Default Configuration](#%EF%B8%8F-default-configuration)
   - [🧰 Useful Functions](#-useful-functions)
   - [🕒 Manual Plugin Startup](#-manual-plugin-startup)
   - [🎨 Editor](#-editor)
