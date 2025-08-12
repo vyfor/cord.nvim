@@ -9,8 +9,8 @@ Start here - these steps often resolve most issues:
 1. Make sure Discord is running, restart Neovim, and check whether Cord is fully loaded.
 2. Run `:Cord update` to check for server updates.
 3. Double-check your [Discord Activity Privacy settings](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce) — Rich Presence needs permission to show.
-4. Add `log_level = vim.log.levels.TRACE` to your `cord.setup()` to see debug logs via `:messages`. Don't forget to switch back to a lower level after (e.g. `WARN` or `OFF`).
-5. Run `:checkhealth cord` for a quick config check.
+4. Enable logging. See [FAQ](./FAQ.md#q-how-to-see-the-logs).
+5. Run `:checkhealth cord` for a config check.
 6. Make sure the Discord IPC pipe exists:
 
    * **Windows:** 
@@ -22,7 +22,7 @@ Start here - these steps often resolve most issues:
      find /tmp ${XDG_RUNTIME_DIR:+$XDG_RUNTIME_DIR} ${TMPDIR:+$TMPDIR} ${TMP:+$TMP} ${TEMP:+$TEMP} -type s -name 'discord-ipc-*' 2>/dev/null
      ```
 
-   If you get nothing or "False", the pipe may not be available.
+   If you get nothing or "False", the pipe has not been created in the expected location.
 
 ## 🎛️ No Buttons in Rich Presence
 

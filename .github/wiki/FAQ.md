@@ -10,6 +10,19 @@ Cord is tested with Neovim **0.6.0** or later. Although, we encourage you to use
 
 Nope, you don't need Rust anymore!  We made it easier. Cord will automatically download the necessary server component from GitHub. Just run `:Cord update` after installing the plugin, and you're good to go! If you *want* to build from source (maybe you're a Rustacean!), you can still do `:Cord update build`, but it's totally optional.
 
+> ### Q: How to see the logs?
+
+Pass in the desired log level to the `log_level` field in your configuration. Logs at that level and above will be output to `:messages`.
+
+```lua
+require 'cord'.setup {
+    log_level = '...' -- one of 'trace', 'debug', 'info', 'warn', 'error'
+}
+```
+
+> [!WARNING]
+> Trace and debug logs can be very verbose and overwhelming in the editor. Instead, set the `CORD_LOG_FILE` environment variable to a file path. This will redirect all logs to that file, but note that doing so will bypass the `log_level` setting and log everything.
+
 > ### Q: Can I use a custom name in my Rich Presence?
 
 Yes, you will have to create an application with the desired name in the [Discord Developer Portal](https://discord.com/developers/applications).
