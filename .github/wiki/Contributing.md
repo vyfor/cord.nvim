@@ -2,8 +2,6 @@
 
 Thank you for your interest in contributing to cord.nvim! This document provides guidelines for contributing to the project.
 
----
-
 ## TL;DR
 
 - Fork and branch from `master`.
@@ -13,8 +11,6 @@ Thank you for your interest in contributing to cord.nvim! This document provides
 - If your changes affect the server component, [build](./Build.md) the binary from source.
 - Update docs when your change affects behavior or config.
 - Submit a PR with a clear overview and description of your changes. PR title and commits must follow [Conventional Commits](https://www.conventionalcommits.org/) spec.
-
----
 
 ## Getting Started
 
@@ -88,8 +84,6 @@ Discord IPC, message protocol, session management, cross-platform pipes and some
 ### Documentation
 - `.github/wiki/`: Documentation source which is published to GitHub Wiki pages.
 
----
-
 ## Local Development
 
 1. Clone the repositoy:
@@ -108,8 +102,6 @@ Discord IPC, message protocol, session management, cross-platform pipes and some
   build = ':Cord update',
 }
 ```
-
----
 
 ### Logging and debugging
 
