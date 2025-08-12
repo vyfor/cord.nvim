@@ -17,7 +17,7 @@
 </div>
 
 <div align="center">
-  <a href="#-quick-start">Installation</a>
+  <a href="#-installation">Installation</a>
   <span> • </span>
   <a href="https://github.com/vyfor/cord.nvim/wiki">Documentation</a>
   <span> • </span>
@@ -25,29 +25,27 @@
 </div>
 
 >[!IMPORTANT]
-> Cord no longer requires Rust to be installed. Rust component will be automatically downloaded from GitHub Releases.
+> Cord no longer requires Rust to be installed. Server component will be automatically downloaded from GitHub Releases.
 
-## 💎 Features  
-- 🌐 **Client-Server Design** — Handles multiple Neovim instances with a single connection to Discord.
-- ⚡ **Performance in Mind** — Lightweight, dependency-free, with blazingly-fast startup.
-- 🚀 **Event-Driven Architecture** — Instant presence updates with zero delays.  
-- 🎨 **Customizable Templates** — Dynamic string templates with custom variables.
-- 🔧 **Unmatched Configurability** — Function-based configuration for infinite customization possibilities.
-- 🧠 **Automated State Handling** — Automatically manages activities across all instances.
-- 💤 **Smart Idle Detection** — Identifies idle sessions and switches to the most recent non-idle session.
-- 🛠️ **Built-in Git Integration** — Detects repositories and workspaces based on VCS files without relying on command-line tools.
-- 🗃️ **Custom Assets** — Extendable with fully customizable assets for any file/buffer type.
-- ⚙️ **Robust User Commands** - Quickly manage Cord and its features through user commands and easily create your own keybindings.
-- 🔌 **Plugin System** — Extendable with custom plugins, with a plethora of built-in ones out of the box.
-- 📦 **Wide Compatibility** - Compatible with various Discord installations (Snap, Flatpak) and able to work inside [WSL](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#-running-inside-wsl) and [Discord in browser](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting#-using-discord-in-browser).
-- 🌍 **Cross-Platform** — Supports Windows, Linux, macOS, and FreeBSD.
-- 🌸 **Rich Icon Collection** — Features 120+ uniquely designed themed icons for 200+ file types and plugins.
-- 🔁 **Automatic Reconnection** — Able to reconnect to Discord if the connection is lost.
+## 💎 Features
+- ⚡ Fast, lightweight, and batteries-included.
+- 🚀 Event-based architecture with instant presence updates.
+- 🎨 Dynamic string templates with custom variables.
+- 🗃️ Customizable assets for any file/buffer type.
+- 🔧 Flexible configuration with rich API, function-based fields, hook system and user commands.
+- 🔌 Plugin system of its own, with many plugins out-of-the-box.
+- 🛠️ Finds repositories and workspaces based on VCS files without relying on command-line tools.
+- 🧠 Manages activities across all instances with a single connection to Discord.
+- 💤 Detects when you're idle and switches to the most recent active instance.
+- 📦 Works with different Discord setups (Snap, Flatpak, WSL, and even the browser version).
+- 🌍 Runs on Windows, Linux, macOS, and FreeBSD.
+- 🌸 Includes 120+ unique icons for over 200 file types and plugins.
+- 🔁 Reconnects automatically if connection to Discord is lost.
 
+## 📦 Installation
 
-## 📦 Quick Start
-
-For most users, the quickest way to get started is by using **lazy.nvim**:
+<details>
+<summary><strong>lazy.nvim</strong></summary>
 
 ```lua
 {
@@ -57,20 +55,10 @@ For most users, the quickest way to get started is by using **lazy.nvim**:
 }
 ```
 
-### Considerations
-<details>
-<summary>Expand</summary>
-
-Cord requires the server executables to be present. To get it, you can either:
-- **Fetch from GitHub**: Invoking `:Cord update [fetch]` (async, recommended). Make sure you have **[`curl`](https://curl.se)** installed.
-- **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
-- [**Build from source**](#️-build-from-source)
-
 </details>
 
-### Installation
 <details>
-<summary>Using <strong>packer.nvim</strong></summary>
+<summary><strong>packer.nvim</strong></summary>
 
 ```lua
 use {
@@ -85,7 +73,22 @@ use {
 </details>
 
 <details>
-<summary>Using <strong>rocks.nvim</strong></summary>
+<summary><strong>packer.nvim</strong></summary>
+
+```lua
+use {
+  'vyfor/cord.nvim',
+  run = ':Cord update',
+  -- config = function()
+  --   require('cord').setup {}
+  -- end
+}
+```
+
+</details>
+
+<details>
+<summary><strong>rocks.nvim</strong></summary>
 
 Cord is available on [LuaRocks](https://luarocks.org/modules/vyfor/cord.nvim).
 
@@ -98,7 +101,7 @@ Invoke `:Cord update` whenever the plugin is updated.
 </details>
 
 <details>
-<summary>Using <strong>vim.pack (v0.12+)</strong></summary>
+<summary><strong>vim.pack (v0.12+)</strong></summary>
 
 ```lua
 vim.pack.add { 'https://github.com/vyfor/cord.nvim' }
@@ -114,7 +117,7 @@ vim.api.nvim_create_autocmd('PackChanged', {
 </details>
 
 <details>
-<summary>Using <strong>Vim packages</strong></summary>
+<summary><strong>Vim packages</strong></summary>
 
 **Unix:**
 ```bash
@@ -131,65 +134,31 @@ Invoke `:Cord update` whenever the plugin is updated.
 </details>
 
 <details>
-<summary>Other</summary>
+<summary><strong>Considerations</strong></summary>
 
-Invoke `:Cord update` whenever the plugin is updated.
+Cord requires the server executables to be present. By default, the plugin automatically fetches them from GitHub, which requires a dependency on [**`curl`**](https://curl.se). Alternatively, either:
+- **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
+- [**Build from source**](https://github.com/vyfor/cord.nvim/wiki/Build)
 
 </details>
 
 ## 🎨 Themes
 
-Cord boasts over 120 meticulously crafted icons for languages and tools, available in distinct themes to match your style.
-
-👉 **Explore the Icon Showcase**: [vyfor/icons](https://github.com/vyfor/icons#showcase)
+Cord features over 120 meticulously crafted icons available in distinct themes: [see the showcase](https://github.com/vyfor/icons#showcase).
 
 ---
 
-Cord currently offers three themes:
+#### Cord currently offers three themes:
 
 - **Default**: A clean and stylish theme featuring widely recognized icons.
 - **Atom**: A sleek theme inspired by Atom Material Icons
 - **Catppuccin**: A soothing pastel theme inspired by Catppuccin.
 
 > Each theme includes multiple flavors, typically `dark`, `light`, and `accent`.
-> Choose your theme in the `display` configuration option. More themes are coming soon!
-
-## 📖 Documentation
-
-Full documentation is available in the [**Wiki**](https://github.com/vyfor/cord.nvim/wiki):
-
-- 📘 **[Configuration Guide](https://github.com/vyfor/cord.nvim/wiki/Configuration)**
-- 💡 **[Examples](https://github.com/vyfor/cord.nvim/wiki/Examples)**
-- ❓ **[FAQ](https://github.com/vyfor/cord.nvim/wiki/FAQ)**
-- 🚑 **[Troubleshooting Guide](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting)**
-
-## 📜 Versioning
-
-- **PATCH**: Non-breaking changes.
-- **MINOR**: Breaking changes.
-- **MAJOR**: Significant rewrites or fundamental shifts, bumped manually.
-
-All breaking changes will be **announced in [GitHub Discussions](https://github.com/vyfor/cord.nvim/discussions)**.
-
-## 🤝 Contributing
-
-We welcome contributions to make Cord even better!
-- Check out our [**Contribution Guidelines**](https://github.com/vyfor/cord.nvim/wiki/Contributing).  
+> Choose your theme in the [`display`](https://github.com/vyfor/cord.nvim/wiki/Configuration#-display) configuration option. More themes are coming soon!
 
 ## ❤️ Support the Project
 I'm the sole maintainer of cord.nvim and dedicate much of my free time to this project. If you find Cord helpful, you can show your support by giving the repo a star or [sponsoring me on GitHub](https://github.com/sponsors/vyfor). Every bit of support helps me continue to improve and maintain Cord for everyone. Thank you!
-
-## 🛠️ Build From Source
->[!NOTE]
-> Make sure you have **[Rust](https://www.rust-lang.org/tools/install)** >= 1.85.0 (nightly) installed.
-
-To build Cord from source, you can run `:Cord update build` (async) which will install the server binary from crates.io by running the following command:
-
-```bash
-cargo install --path . --root path/to/nvim-data-dir/cord --force
-```
-
-Alternatively, you can use `cargo b --release` to build the binary, then place it under `nvim-data-dir/cord/bin`.
 
 ---
 

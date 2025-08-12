@@ -1,6 +1,9 @@
 # ⚡ Configuration
 
 ### 📖 Table of Contents
+  - [🏷️ Default Configuration](#default-config)
+  - [🧰 Useful Functions](#-useful-functions)
+  - [🕒 Manual Plugin Startup](#-manual-plugin-startup)
   - [🎨 Editor](#-editor)
   - [📊 Display](#-display)
   - [⏰ Timestamp](#-timestamp)
@@ -25,10 +28,12 @@ require('cord').setup {
 }
 ```
 
-If you want a fresh start, you can copy the [default config](#default-configuration) and tweak it. I suggest only changing what you need, since the rest falls back to defaults.
+### 🏷️ Default Configuration
+
+If you want a fresh start, you can copy the default config and tweak it. I suggest only changing what you need, since the rest falls back to defaults.
 
 <details id="default-config">
-  <summary>Expand to view default config</summary>
+  <summary><strong>Default Configuration</strong></summary>
 
 ```lua
 {

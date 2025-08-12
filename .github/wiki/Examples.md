@@ -1,6 +1,6 @@
 # 🎨 Examples
 
-Learn how to customize your Discord presence in countless ways using Cord's robust configuration system. The possibilities are endless, and the only limit is your creativity!
+Learn how to customize your Discord presence with examples. The possibilities are endless, and the only limit is your creativity!
 
 ### Customizing Icons
 
@@ -14,7 +14,7 @@ opts = function()
       theme = 'default',
       flavor = 'dark',
     },
-    lazy = {
+    idle = {
       -- change default idle icon to keyboard
       icon = require('cord.api.icon').get('keyboard'),
       -- or use another theme's idle icon
@@ -55,33 +55,6 @@ hooks = {
   end
 }
 ```
-
-### Local Time as Timestamp
-```lua
-hooks = {
-  post_activity = function(opts, activity)
-    local date = os.date('*t')
-    date.hour, date.min, date.sec = 0, 0, 0
-    activity.timestamps.start = os.time(date)
-  end,
-
-  -- optionally, you can do one of the two:
-  -- A. also set local time for idle status, or
-  idle_enter = function(opts, activity)
-    local date = os.date('*t')
-    date.hour, date.min, date.sec = 0, 0, 0
-    activity.timestamps.start = os.time(date)
-  end
-}
-
--- B. reset the timestamp for idle activity, regular activity is not affected in this case
-timestamp = {
-  reset_on_idle = true
-}
-```
-
-> [!NOTE]
-> Consider using the built-in [local time plugin](./Plugins.md#local-time-cordpluginslocal_time).
 
 ### Workspace Blacklist
 ```lua
@@ -161,27 +134,6 @@ text = {
 }
 ```
 
-### LSP-Aware Status
-```lua
-local get_errors = function(bufnr) return vim.diagnostic.get(bufnr, { severity = vim.diagnostic.severity.ERROR }) end
-local errors = get_errors(0) -- pass the current buffer; pass nil to get errors for all buffers
-
-vim.api.nvim_create_autocmd('DiagnosticChanged', {
-  callback = function()
-    errors = get_errors(0)
-  end
-})
-
-text = {
-  editing = function(opts)
-    return string.format('Editing %s - %s errors', opts.filename, #errors)
-  end
-}
-```
-
-> [!NOTE]
-> Consider using the built-in [diagnostics plugin](./Plugins.md#diagnostics-cordpluginsdiagnostics).
-
 ### Dynamic Buttons
 ```lua
 buttons = {
@@ -196,31 +148,7 @@ buttons = {
 }
 ```
 
-### Documentation Links
-```lua
-buttons = {
-  {
-    label = function(opts)
-      local docs = {
-        rust = 'Rust Docs',
-        typescript = "TS Docs',
-        lua = 'Lua Reference',
-      }
-      return docs[opts.filetype] or 'Documentation'
-    end,
-    url = function(opts)
-      local urls = {
-        rust = 'https://doc.rust-lang.org/std/',
-        typescript = 'https://www.typescriptlang.org/docs/',
-        lua = 'https://www.lua.org/manual/5.1/',
-      }
-      return urls[opts.filetype] or 'https://devdocs.io'
-    end
-  }
-}
-```
-
-### Project-Based Idle Messages
+### Custom Idle Messages
 ```lua
 idle = {
   details = function(opts)

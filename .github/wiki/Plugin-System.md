@@ -1,10 +1,6 @@
 # 🔌 Plugin System
 
-Cord's plugin system allows you to extend its functionality and customize your Discord Rich Presence in modular and reusable ways. Plugins are ideal for:
-
-- **Encapsulating complex configurations**: Bundle variables, hooks, assets, and settings into self-contained units.
-- **Sharing customizations**: Easily share your Cord enhancements with the community.
-- **Creating reusable features**: Develop plugins for common use cases and avoid repetitive configuration.
+Cord's plugin system allows you to extend its functionality and customize it in modular and reusable ways.
 
 This guide will walk you through creating Cord plugins.
 
