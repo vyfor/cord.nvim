@@ -1,28 +1,24 @@
 # 🔧 Troubleshooting
 
-Running into issues with Cord? Here are some common problems and how to fix them.
-
 ## 🛠️ General Steps
 
-Start here - these steps often resolve most issues:
+1. Run `:Cord update` to check for server updates.
+2. Double-check your [Discord Activity Privacy settings](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce).
+3. Enable logging. See [FAQ](./FAQ.md#q-how-to-see-the-logs).
+4. Run `:checkhealth cord` for a config check.
+5. Make sure the Discord IPC pipe exists:
 
-1. Make sure Discord is running, restart Neovim, and check whether Cord is fully loaded.
-2. Run `:Cord update` to check for server updates.
-3. Double-check your [Discord Activity Privacy settings](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce) — Rich Presence needs permission to show.
-4. Enable logging. See [FAQ](./FAQ.md#q-how-to-see-the-logs).
-5. Run `:checkhealth cord` for a config check.
-6. Make sure the Discord IPC pipe exists:
-
-   * **Windows:** 
+   - **Windows:** 
      ```pwsh
      Test-Path \\.\pipe\discord-ipc-0
      ```
-   * **Linux/macOS:**
+
+   - **Linux/macOS:**
      ```sh
      find /tmp ${XDG_RUNTIME_DIR:+$XDG_RUNTIME_DIR} ${TMPDIR:+$TMPDIR} ${TMP:+$TMP} ${TEMP:+$TEMP} -type s -name 'discord-ipc-*' 2>/dev/null
      ```
 
-   If you get nothing or "False", the pipe has not been created in the expected location.
+   If you get nothing or "False", the pipe does not exist in the expected location.
 
 ## 🎛️ No Buttons in Rich Presence
 
@@ -32,15 +28,13 @@ But there is actually a way to see them, join a voice channel and hover over you
 
 ## ⏱️ Rich Presence Timer Stuck at 00:00
 
-This usually means your system clock is off.
-
-Make sure your date, time, and timezone are correct and synced (using automatic time sync is best).
+This usually means your system clock is off. Sync your clock with NTP.
 
 ## 💻 Special Environments
 
 ### 🌐 Using Discord in a Browser
 
-Cord doesn't support browser Discord out of the box. Use [arrpc](https://github.com/OpenAsar/arrpc) as a bridge. Follow its instructions closely.
+Cord doesn't support browser Discord out of the box. Use [arrpc](https://github.com/OpenAsar/arrpc) as a bridge. Follow its instructions closely at your own risk.
 
 >[!IMPORTANT]
 > arrpc has been left unmaintained for quite some time.
@@ -83,7 +77,7 @@ If nothing above works:
 
 1. Check the [FAQ](./FAQ.md) for other common questions.
 2. Look through [existing GitHub issues](https://github.com/vyfor/cord.nvim/issues).
-3. If it seems like a bug, [open a new issue](https://github.com/vyfor/cord.nvim/issues/new/choose).
+3. [Open a new issue](https://github.com/vyfor/cord.nvim/issues/new/choose).
    Be clear and include as much detail as possible.
 
 You can also ask in Discussions or Discord if you're unsure.

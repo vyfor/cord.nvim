@@ -1,6 +1,6 @@
 # 📂 Custom Assets
 
-Cord allows you to go beyond the default icons and fully customize the assets used in your Discord Rich Presence. This guide will walk you through how to define and configure custom assets to perfectly match your workflow and style.
+Cord allows you to go beyond the default icons and fully customize the assets used in your Discord Rich Presence. This guide will walk you through how to override and define custom assets.
 
 ## 🛠️ Structure
 
@@ -23,19 +23,19 @@ The `key` in your asset configuration determines what type of file or context th
 - **Filetype**: Use a Vim filetype string (e.g., `"lua"`, `"python"`) to set assets for specific languages.
 - **Filename**: Use a specific filename (e.g., `"Cargo.toml"`, `"README.md"`) to customize assets for particular files.
 - **File Extension**: Use a file extension (e.g., `".rs"`, `".js"`) to apply assets to all files with that extension.
-- **Special Keys**: Cord provides special keys for generic scenarios (see [Overriding Defaults](#overriding-defaults)).
+- **Special Keys**: Cord provides special keys for generic scenarios (see [Overriding Defaults](#-overriding-defaults)).
 
 ## ⚙️ Asset Options
 
 When you use a table as the `value` in your asset configuration, you can specify these options to fine-tune your custom asset:
 
-| Option    | Type                  | Description                                                                                                                |
-| --------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Option    | Type                  | Description                                                                                                  |
+| --------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `icon`    | `string \| function ` | A direct URL to the icon image or the name of a rich presence asset (if using your own Discord application). |
-| `tooltip` | `string \| function`  | Text that appears when you hover over the icon in Discord.                                                                 |
-| `name`    | `string \| function`  | An optional override for the icon's name. Generally used for types other than `language`.                                  |
-| `text`    | `string \| function`  | An optional override for the icon's text. **Completely replaces** the default text.                                        |
-| `type`    | `string`              | Specifies the context of the asset.  See [Asset Types](#asset-types) for available options.                                |
+| `tooltip` | `string \| function`  | Text that appears when you hover over the icon in Discord.                                                   |
+| `name`    | `string \| function`  | An optional override for the icon's name. Generally used for types other than `language`.                    |
+| `text`    | `string \| function`  | An optional override for the icon's text. **Completely replaces** the default text.                          |
+| `type`    | `string`              | Specifies the context of the asset.  See [Asset Types](#asset-types) for available options.                  |
 
 ### Asset Types
 

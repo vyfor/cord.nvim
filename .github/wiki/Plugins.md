@@ -1,6 +1,6 @@
 # 📦 Plugins
 
-Cord comes with several built-in plugins that you can easily enable and configure to enhance your Discord Rich Presence right away. These plugins provide ready-made functionality for common use cases.
+Cord comes with several built-in plugins that you can easily enable and configure. These plugins provide ready-made functionality for common use cases.
 
 ## 🚀 Enabling Plugins
 
