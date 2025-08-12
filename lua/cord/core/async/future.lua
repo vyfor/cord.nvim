@@ -30,10 +30,8 @@ function Future.new(executor)
   end
 
   xpcall(function() executor(resolve, reject) end, function(err)
-    require('cord.plugin.log').tracecb(
-      function()
-        return 'Error in executor: ' .. err .. '\n' .. debug.traceback()
-      end
+    require('cord.plugin.log').trace(
+      function() return 'Error in executor: ' .. err .. '\n' .. debug.traceback() end
     )
     reject(err)
   end)
@@ -44,11 +42,8 @@ end
 function Future:and_then(on_fulfilled, on_rejected)
   local current = coroutine.running()
   if not current then
-    require('cord.plugin.log').errorcb(
-      function()
-        return 'Future:and_then must be called within a coroutine\n'
-          .. debug.traceback()
-      end
+    require('cord.plugin.log').error(
+      function() return 'Future:and_then must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
@@ -67,10 +62,8 @@ function Future:and_then(on_fulfilled, on_rejected)
       local success, result = xpcall(
         function() return callback(value or self._value) end,
         function(err)
-          require('cord.plugin.log').tracecb(
-            function()
-              return 'Error in callback: ' .. err .. '\n' .. debug.traceback()
-            end
+          require('cord.plugin.log').trace(
+            function() return 'Error in callback: ' .. err .. '\n' .. debug.traceback() end
           )
         end
       )
@@ -89,12 +82,8 @@ function Future:and_then(on_fulfilled, on_rejected)
 
     if self._state == 'pending' then
       table.insert(self._callbacks, {
-        on_fulfilled = function(value)
-          handle_callback(on_fulfilled, resolve, reject, value)
-        end,
-        on_rejected = function(reason)
-          handle_callback(on_rejected, resolve, reject, reason)
-        end,
+        on_fulfilled = function(value) handle_callback(on_fulfilled, resolve, reject, value) end,
+        on_rejected = function(reason) handle_callback(on_rejected, resolve, reject, reason) end,
       })
     else
       vim.defer_fn(function()
@@ -114,11 +103,8 @@ function Future:catch(on_rejected) return self:and_then(nil, on_rejected) end
 function Future.await(future)
   local co = coroutine.running()
   if not co then
-    require('cord.plugin.log').errorcb(
-      function()
-        return 'Future:await must be called within a coroutine\n'
-          .. debug.traceback()
-      end
+    require('cord.plugin.log').error(
+      function() return 'Future:await must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
@@ -139,11 +125,8 @@ end
 function Future.get(future)
   local co = coroutine.running()
   if not co then
-    require('cord.plugin.log').errorcb(
-      function()
-        return 'Future:get must be called within a coroutine\n'
-          .. debug.traceback()
-      end
+    require('cord.plugin.log').error(
+      function() return 'Future:get must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
