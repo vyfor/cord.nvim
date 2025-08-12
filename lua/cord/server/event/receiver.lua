@@ -9,10 +9,12 @@ function Handler.new(client)
   self.client = client
   self.handlers = {}
   self.queue = {}
+  logger.trace('Receiver.new: client created')
   return self
 end
 
 function Handler:on_event(type, data)
+  logger.trace(function() return 'Receiver:on_event: type=' .. tostring(type) end)
   local handler = self.handlers[type]
   if handler then
     if handler.oneshot then self.handlers[type] = nil end
@@ -25,6 +27,9 @@ end
 function Handler:register(type, oneshot, callback)
   local data = self.queue[type]
   if data then
+    logger.trace(function()
+      return 'Receiver:register immediate dispatch: type=' .. tostring(type) .. ', oneshot=' .. tostring(oneshot)
+    end)
     callback(data)
     self.queue[type] = nil
     if oneshot then return end
@@ -34,9 +39,13 @@ function Handler:register(type, oneshot, callback)
     oneshot = oneshot,
     callback = callback,
   }
+  logger.trace(function()
+    return 'Receiver:registered handler: type=' .. tostring(type) .. ', oneshot=' .. tostring(oneshot)
+  end)
 end
 
 function Handler:run()
+  logger.debug 'Receiver: starting event loop'
   self:setup_default_handlers()
 
   local buffer = ''
@@ -65,6 +74,9 @@ function Handler:run()
         goto continue
       end
 
+      logger.trace(function()
+        return 'Receiver:decoded event: type=' .. tostring(event.type)
+      end)
       self:on_event(event.type, event.data)
 
       ::continue::
@@ -84,6 +96,7 @@ function Handler:setup_default_handlers()
       end
     end
   end)
+  logger.trace 'Receiver: default handlers registered'
 end
 
 return Handler

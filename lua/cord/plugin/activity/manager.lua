@@ -73,6 +73,7 @@ local has_initialized = false
 ---Meant to be called only once throughout the entire lifetime of the program
 ---@return nil
 local function setup()
+  logger.debug 'ActivityManager.setup: initializing hooks and plugin API'
   if config.hooks then
     for event, hook in pairs(config.hooks) do
       if type(hook) == 'function' then
@@ -101,6 +102,7 @@ ActivityManager.new = async.wrap(function(opts)
   local rawdir = vim.fn.expand '%:p'
   local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
   self.workspace_dir = dir
+  logger.debug(function() return 'ActivityManager.new: workspace_dir=' .. tostring(dir) end)
 
   local cache = {
     dir = dir,
@@ -111,6 +113,7 @@ ActivityManager.new = async.wrap(function(opts)
   if repo_url then
     self.repo_url = repo_url
     cache.repo_url = repo_url
+    logger.trace(function() return 'ActivityManager.new: repo_url=' .. tostring(repo_url) end)
   end
 
   self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = cache
@@ -130,6 +133,7 @@ end)
 ---Run the activity manager
 ---@return nil
 function ActivityManager:run()
+  logger.debug 'ActivityManager.run: starting'
   self.workspace = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.last_updated = uv.now()
 
@@ -137,8 +141,16 @@ function ActivityManager:run()
 
   self:queue_update(true)
   if config.advanced.plugin.autocmds then self.setup_autocmds() end
+  logger.trace(
+    function() return 'ActivityManager.run: autocmds=' .. tostring(config.advanced.plugin.autocmds) end
+  )
 
   if config.idle.enabled then
+    logger.trace(
+      function()
+        return 'ActivityManager.run: idle timer enabled; timeout=' .. tostring(config.idle.timeout)
+      end
+    )
     self.idle_timer = uv.new_timer()
     self.idle_timer:start(
       0,
@@ -151,6 +163,7 @@ end
 ---Clean up the activity manager
 ---@return nil
 function ActivityManager:cleanup()
+  logger.debug 'ActivityManager.cleanup'
   self:clear_autocmds()
   if self.idle_timer then
     self.idle_timer:stop()
@@ -169,6 +182,7 @@ function ActivityManager:should_update()
     or self.opts.cursor_char ~= self.last_opts.cursor_char
     or self.opts.is_focused ~= self.last_opts.is_focused
 
+  logger.trace(function() return 'ActivityManager.should_update=' .. tostring(should_update) end)
   return should_update
 end
 
@@ -179,6 +193,11 @@ function ActivityManager:queue_update(force_update)
 
   self.opts = self:build_opts()
   if not self.is_force_idle and (force_update or self:should_update()) then
+    logger.debug(
+      function()
+        return 'ActivityManager.queue_update: running update; force=' .. tostring(force_update)
+      end
+    )
     if self.is_idle then hooks.run('idle_leave', self.opts) end
     self:update_activity()
   end
@@ -192,10 +211,23 @@ function ActivityManager:check_idle()
   if self.is_idle then return end
 
   local time_elapsed = uv.now() - self.last_updated
+  logger.trace(
+    function()
+      return 'ActivityManager.check_idle: elapsed='
+        .. tostring(time_elapsed)
+        .. ', timeout='
+        .. tostring(config.idle.timeout)
+        .. ', is_force_idle='
+        .. tostring(self.is_force_idle)
+        .. ', is_focused='
+        .. tostring(self.is_focused)
+    end
+  )
   if
     self.is_force_idle
     or (time_elapsed >= config.idle.timeout and (config.idle.ignore_focus or not self.is_focused))
   then
+    logger.debug 'ActivityManager.check_idle: switching to idle activity'
     self:update_idle_activity()
   else
     local time_remaining = config.idle.timeout - time_elapsed
@@ -221,6 +253,7 @@ function ActivityManager:update_idle_activity()
   self.opts.is_idle = true
   self.is_idle = true
   self.last_updated = uv.now()
+  logger.debug 'ActivityManager.update_idle_activity'
 
   if config.idle.show_status then
     local buttons = config_utils.get_buttons(self.opts)
@@ -245,7 +278,11 @@ function ActivityManager:update_idle_activity()
 
     self.tx:update_activity(activity)
     hooks.run('idle_enter', self.opts)
+    logger.trace(
+      function() return 'ActivityManager.update_idle_activity: activity=' .. vim.inspect(activity) end
+    )
   else
+    logger.trace 'ActivityManager.update_idle_activity: clear activity (no idle status)'
     hooks.run('post_activity', self.opts)
 
     if config.timestamp.shared then
@@ -266,6 +303,7 @@ end
 ---Update the activity
 ---@return nil
 function ActivityManager:update_activity()
+  logger.debug 'ActivityManager.update_activity'
   self.is_idle = false
   self.is_force_idle = false
   self.last_opts = self.opts
@@ -291,6 +329,9 @@ function ActivityManager:update_activity()
   end
 
   self.tx:update_activity(activity)
+  logger.trace(
+    function() return 'ActivityManager.update_activity: activity=' .. vim.inspect(activity) end
+  )
 end
 
 ---Skip the next activity update
@@ -305,6 +346,7 @@ function ActivityManager:pause()
   self:pause_events()
   if self.idle_timer then self.idle_timer:stop() end
   self.is_paused = true
+  logger.debug 'ActivityManager.pause'
 end
 
 ---Resume activity updates and events
@@ -322,6 +364,7 @@ function ActivityManager:resume()
     )
   end
   self.is_paused = false
+  logger.debug 'ActivityManager.resume'
 end
 
 ---Pause only events, keeping the current activity state
@@ -333,6 +376,7 @@ function ActivityManager:pause_events() self.events_enabled = false end
 function ActivityManager:resume_events()
   self.events_enabled = true
   self:queue_update(true)
+  logger.trace 'ActivityManager.resume_events'
 end
 
 ---Set idle state
@@ -344,6 +388,7 @@ function ActivityManager:idle() self:update_idle_activity() end
 function ActivityManager:force_idle()
   self.is_force_idle = true
   self:update_idle_activity()
+  logger.trace 'ActivityManager.force_idle'
 end
 
 ---Unforce idle state
@@ -351,6 +396,7 @@ end
 function ActivityManager:unidle()
   self.is_force_idle = false
   self:queue_update(true)
+  logger.trace 'ActivityManager.unidle'
 end
 
 ---Toggle idle state
@@ -363,6 +409,7 @@ function ActivityManager:toggle_idle(force)
   else
     self:idle()
   end
+  logger.trace(function() return 'ActivityManager.toggle_idle: force=' .. tostring(force) end)
 end
 
 ---Hide the activity
@@ -370,6 +417,7 @@ end
 function ActivityManager:hide()
   self:pause()
   self:clear_activity(true)
+  logger.debug 'ActivityManager.hide'
 end
 
 ---Suppress the activity for current Neovim instance
@@ -377,6 +425,7 @@ end
 function ActivityManager:suppress()
   self:pause()
   self:clear_activity()
+  logger.debug 'ActivityManager.suppress'
 end
 
 ---Toggle the activity
@@ -387,6 +436,7 @@ function ActivityManager:toggle()
   else
     self:hide()
   end
+  logger.trace 'ActivityManager.toggle'
 end
 
 ---Toggle suppress state
@@ -397,11 +447,13 @@ function ActivityManager:toggle_suppress()
   else
     self:suppress()
   end
+  logger.trace 'ActivityManager.toggle_suppress'
 end
 
 ---Setup autocmds
 ---@return nil
 function ActivityManager.setup_autocmds()
+  logger.trace 'ActivityManager.setup_autocmds'
   vim.cmd [[
     augroup CordActivityManager
       autocmd!
@@ -430,6 +482,7 @@ end
 ---Clear autocmds
 ---@return nil
 function ActivityManager.clear_autocmds()
+  logger.trace 'ActivityManager.clear_autocmds'
   vim.cmd [[
     augroup CordActivityManager
       autocmd!
@@ -458,6 +511,7 @@ end
 ---Handle buffer enter event
 ---@return nil
 function ActivityManager:on_buf_enter()
+  logger.trace 'ActivityManager.on_buf_enter'
   local rawdir = vim.fn.expand '%:p'
   local cached = self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')]
   if cached then
@@ -475,6 +529,7 @@ function ActivityManager:on_buf_enter()
     self:queue_update()
     return
   elseif cached == false then
+    logger.trace 'ActivityManager.on_buf_enter: cached=false; clearing workspace'
     if self.workspace_dir then
       self.workspace_dir = nil
       self.workspace = nil
@@ -492,6 +547,9 @@ function ActivityManager:on_buf_enter()
 
   async.run(function()
     local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
+    logger.trace(
+      function() return 'ActivityManager.on_buf_enter: detected dir=' .. tostring(dir) end
+    )
 
     if not dir then
       self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = false
@@ -526,6 +584,7 @@ function ActivityManager:on_focus_gained()
   if not self.events_enabled then return end
   self.is_focused = true
   self.opts.is_focused = true
+  logger.trace 'ActivityManager.on_focus_gained'
 
   if config.idle.unidle_on_focus then self:queue_update(true) end
 end
@@ -536,18 +595,21 @@ function ActivityManager:on_focus_lost()
   if not self.events_enabled then return end
   self.is_focused = false
   self.opts.is_focused = false
+  logger.trace 'ActivityManager.on_focus_lost'
 end
 
 ---Handle cursor update event
 ---@return nil
 function ActivityManager:on_cursor_update()
   if not self.events_enabled then return end
+  logger.trace 'ActivityManager.on_cursor_update'
   self:queue_update()
 end
 
 ---Build options
 ---@return CordOpts
 function ActivityManager:build_opts()
+  logger.trace 'ActivityManager.build_opts'
   local cursor_position = vim.api.nvim_win_get_cursor(0)
   local opts = {
     manager = self,

@@ -56,7 +56,7 @@ function M.mkdirp(path, mode)
         end
 
         uv.fs_mkdir(current_path, mode or 511, function(mk_err)
-          if mk_err and not mk_err:match('EEXIST') then
+          if mk_err and not mk_err:match 'EEXIST' then
             reject(mk_err)
           else
             create_dirs(dirs, index + 1)
@@ -66,13 +66,11 @@ function M.mkdirp(path, mode)
     end
 
     local parts = {}
-    for part in path:gmatch('[^/]+') do
+    for part in path:gmatch '[^/]+' do
       table.insert(parts, part)
     end
 
-    if path:sub(1, 1) == '/' then
-      table.insert(parts, 1, '')
-    end
+    if path:sub(1, 1) == '/' then table.insert(parts, 1, '') end
 
     if #parts == 0 then
       resolve(true)
@@ -86,6 +84,42 @@ end
 function M.rename(old_path, new_path)
   return Future.new(function(resolve, reject)
     uv.fs_rename(old_path, new_path, function(err)
+      if err then
+        reject(err)
+        return
+      end
+      resolve(true)
+    end)
+  end)
+end
+
+function M.openfile(path, flags)
+  return Future.new(function(resolve, reject)
+    uv.fs_open(path, flags, 438, function(err, fd)
+      if err then
+        reject(err)
+        return
+      end
+      resolve(fd)
+    end)
+  end)
+end
+
+function M.write(fd, data)
+  return Future.new(function(resolve, reject)
+    uv.fs_write(fd, data, 0, function(err, bytes_written)
+      if err then
+        reject(err)
+        return
+      end
+      resolve(bytes_written)
+    end)
+  end)
+end
+
+function M.closefile(fd)
+  return Future.new(function(resolve, reject)
+    uv.fs_close(fd, function(err)
       if err then
         reject(err)
         return

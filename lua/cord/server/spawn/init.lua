@@ -4,6 +4,7 @@ local M = {}
 
 M.spawn = async.wrap(function(config, pipe_path)
   return Future.new(function(resolve, reject)
+    local logger = require 'cord.plugin.log'
     local update_strategy = config.advanced.server.update
     local client_id = config.editor.client
     local exec_path = require('cord.server.fs').get_executable_path(config)
@@ -11,6 +12,7 @@ M.spawn = async.wrap(function(config, pipe_path)
     local fs = require 'cord.core.uv.fs'
     local stat = fs.stat(exec_path):get()
     if not stat then
+      logger.debug('Spawn: executable missing at ' .. tostring(exec_path))
       if update_strategy == 'fetch' then
         require('cord.server.update').fetch():await()
       elseif update_strategy == 'build' then
@@ -37,17 +39,25 @@ M.spawn = async.wrap(function(config, pipe_path)
         config.advanced.discord.reconnect.initial and '-i' or nil,
       },
       on_stdout = function(data)
-        if data:match 'Ready' then resolve(true, false) end
+        if data:match 'Ready' then
+          logger.debug 'Spawn: server signaled Ready'
+          resolve(true, false)
+        end
       end,
       on_stderr = function(err)
         if err:match 'another instance is running' then
+          logger.debug 'Spawn: another instance detected; will retry connect'
           resolve(true, true)
           return
         end
 
+        logger.debug('Spawn: stderr: ' .. tostring(err))
         reject(err)
       end,
-      on_error = function(err) reject(err) end,
+      on_error = function(err)
+        logger.debug('Spawn: on_error: ' .. tostring(err))
+        reject(err)
+      end,
     }
   end)
 end)

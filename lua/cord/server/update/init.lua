@@ -103,17 +103,20 @@ local function check_versions()
         args = {
           'https://raw.githubusercontent.com/vyfor/cord.nvim/refs/heads/master/.github/server-version.txt',
           '--fail',
+          '--silent',
+          '--show-error',
         },
       })
       :await()
 
     if res.code ~= 0 then
-      error('Failed to fetch latest version: ' .. res.stdout, 0)
+      error('Failed to fetch latest version; code: ' .. tostring(res.code), 0)
+      if res.stderr and res.stderr ~= '' then logger.debug('curl stderr: ' .. res.stderr) end
       return nil
     end
 
-    local version = res.stdout:gsub('^%s*(.-)%s*$', '%1')
-    if not version then
+    local version = res.stdout and res.stdout:gsub('^%s*(.-)%s*$', '%1') or nil
+    if not version or version == '' then
       error('Failed to parse latest version', 0)
       return nil
     end
@@ -199,6 +202,8 @@ M.fetch = async.wrap(function()
               '--create-dirs',
               '--fail',
               '--location',
+              '--silent',
+              '--show-error',
               '-o',
               executable_path,
               '-H',
@@ -209,7 +214,9 @@ M.fetch = async.wrap(function()
             if res.code ~= 0 then
               server.is_updating = false
               logger.error('Failed to download executable; code: ' .. res.code .. ', path: ' .. url)
-              if res.stderr then logger.error('curl\'s stderr: ' .. res.stderr) end
+              if res.stderr and res.stderr ~= '' then
+                logger.error('curl\'s stderr: ' .. res.stderr)
+              end
               return
             end
             logger.log_raw(vim.log.levels.INFO, 'Successfully updated executable. Restarting...')
