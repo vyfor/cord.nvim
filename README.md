@@ -24,7 +24,7 @@
   <a href="https://discord.gg/q9rC4bjCHv">Discord</a>
 </div>
 
->[!IMPORTANT]
+> [!IMPORTANT]
 > Cord no longer requires Rust to be installed. Server component will be automatically downloaded from GitHub Releases.
 
 ## 💎 Features
@@ -52,21 +52,6 @@
   'vyfor/cord.nvim',
   build = ':Cord update',
   -- opts = {}
-}
-```
-
-</details>
-
-<details>
-<summary><strong>packer.nvim</strong></summary>
-
-```lua
-use {
-  'vyfor/cord.nvim',
-  run = ':Cord update',
-  -- config = function()
-  --   require('cord').setup {}
-  -- end
 }
 ```
 
@@ -144,23 +129,20 @@ Cord requires the server executables to be present. By default, the plugin autom
 
 ## 🎨 Themes
 
-Cord features over 120 meticulously crafted icons available in distinct themes: [see the showcase](https://github.com/vyfor/icons#showcase).
-
----
-
-#### Cord currently offers three themes:
+Cord features over 120 meticulously crafted icons available in distinct themes:
 
 - **Default**: A clean and stylish theme featuring widely recognized icons.
-- **Atom**: A sleek theme inspired by Atom Material Icons
+- **Atom**: A sleek theme inspired by Atom Material Icons.
 - **Catppuccin**: A soothing pastel theme inspired by Catppuccin.
 
-> Each theme includes multiple flavors, typically `dark`, `light`, and `accent`.
+See the [showcase](https://github.com/vyfor/icons#showcase) for a visual comparison.
+
+> [!TIP]
+> Each theme includes multiple flavors, typically `dark`, `light`, and `accent`, representing the background color of the icons.
 > Choose your theme in the [`display`](https://github.com/vyfor/cord.nvim/wiki/Configuration#-display) configuration option. More themes are coming soon!
 
 ## ❤️ Support the Project
 I'm the sole maintainer of cord.nvim and dedicate much of my free time to this project. If you find Cord helpful, you can show your support by giving the repo a star or [sponsoring me on GitHub](https://github.com/sponsors/vyfor). Every bit of support helps me continue to improve and maintain Cord for everyone. Thank you!
-
----
 
 <div align="center">  
   <p>💬 Questions? Post in <a href="https://github.com/vyfor/cord.nvim/discussions">Discussions</a> or reach me out on Discord: <a href="https://discord.com/users/446729269872427018"><strong>vyfor</strong></a></p>
