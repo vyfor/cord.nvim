@@ -6,7 +6,10 @@ on:
     branches: [master]
     paths:
       - README.md
-      - .github/wiki/**
+      - .github/wiki/Configuration.md
+      - .github/wiki/Assets.md
+      - .github/wiki/Plugins.md
+      - .github/wiki/Examples.md
       - .github/workflows/panvimdoc.yml 
 
 permissions:
@@ -31,6 +34,8 @@ jobs:
           pandoc: _README.md
           version: "NVIM v0.6.0"
           demojify: true
+
+      - run: rm _README.md
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
