@@ -53,6 +53,17 @@ macro_rules! echo {
         use std::io::{self, Write};
         let stdout = io::stdout();
         let mut handle = stdout.lock();
+        let _ = write!(handle, $($arg)*);
+    }};
+}
+
+/// Prints a message with a newline appended to stdout without panicking.
+#[macro_export]
+macro_rules! echoln {
+    ($($arg:tt)*) => {{
+        use std::io::{self, Write};
+        let stdout = io::stdout();
+        let mut handle = stdout.lock();
         let _ = writeln!(handle, $($arg)*);
     }};
 }
