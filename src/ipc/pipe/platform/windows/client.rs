@@ -1,14 +1,14 @@
 use std::fs::File;
 use std::io::{self};
 use std::os::windows::io::AsRawHandle;
-use std::sync::mpsc::Sender;
 use std::sync::Arc;
+use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
 
 use crate::ipc::bindings::{
-    GetOverlappedResult, Overlapped, ReadFile, WriteFile, ERROR_IO_PENDING,
+    ERROR_IO_PENDING, GetOverlappedResult, Overlapped, ReadFile, WriteFile,
 };
-use crate::ipc::pipe::{report_error, PipeClientImpl};
+use crate::ipc::pipe::{PipeClientImpl, report_error};
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
 use crate::messages::events::server::LogEvent;

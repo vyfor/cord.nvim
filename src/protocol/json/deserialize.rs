@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::str::from_utf8_unchecked;
 
-use super::value::Value;
 use super::Json;
+use super::value::Value;
 use crate::protocol::error::ProtocolError;
 
 /// Trait for deserializing JSON data into Rust types.
@@ -112,7 +112,7 @@ impl Json {
 
             match input[pos] {
                 b']' if !expecting_value => {
-                    return Ok((Value::Array(values), pos + 1))
+                    return Ok((Value::Array(values), pos + 1));
                 }
                 b',' if !expecting_value => {
                     pos += 1;
@@ -125,7 +125,7 @@ impl Json {
                     expecting_value = false;
                 }
                 c => {
-                    return Err(ProtocolError::UnexpectedChar(c as char).into())
+                    return Err(ProtocolError::UnexpectedChar(c as char).into());
                 }
             }
         }
@@ -148,7 +148,7 @@ impl Json {
 
             match input[pos] {
                 b'}' if !expecting_key => {
-                    return Ok((Value::Object(map), pos + 1))
+                    return Ok((Value::Object(map), pos + 1));
                 }
                 b',' if !expecting_key => {
                     pos += 1;
@@ -171,7 +171,7 @@ impl Json {
                     expecting_key = false;
                 }
                 c => {
-                    return Err(ProtocolError::UnexpectedChar(c as char).into())
+                    return Err(ProtocolError::UnexpectedChar(c as char).into());
                 }
             }
         }
@@ -257,7 +257,7 @@ impl Json {
                     break;
                 }
                 c => {
-                    return Err(ProtocolError::UnexpectedChar(c as char).into())
+                    return Err(ProtocolError::UnexpectedChar(c as char).into());
                 }
             }
         }

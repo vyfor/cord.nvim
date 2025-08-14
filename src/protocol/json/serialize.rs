@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use super::value::ValueRef;
 use super::Json;
+use super::value::ValueRef;
 
 pub type SerializeFn<'a> =
     fn(&'a str, ValueRef<'a>, &mut SerializeState) -> crate::Result<()>;

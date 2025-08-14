@@ -1,8 +1,8 @@
 pub mod platform;
 
 use std::io;
-use std::sync::mpsc::Sender;
 use std::sync::Arc;
+use std::sync::mpsc::Sender;
 
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;

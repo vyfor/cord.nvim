@@ -1,3 +1,6 @@
+#![deny(warnings)]
+#![allow(mismatched_lifetime_syntaxes)]
+
 mod cli;
 mod cord;
 mod error;

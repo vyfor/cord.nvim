@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use crate::protocol::msgpack::deserialize::Deserialize;
 use crate::protocol::msgpack::Value;
+use crate::protocol::msgpack::deserialize::Deserialize;
 use crate::remove_field;
 use crate::util::logger::LogLevel;
 

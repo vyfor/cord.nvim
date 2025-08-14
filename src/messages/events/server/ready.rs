@@ -1,8 +1,8 @@
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
+use crate::protocol::msgpack::MsgPack;
 use crate::protocol::msgpack::serialize::Serialize;
 use crate::protocol::msgpack::value::ValueRef;
-use crate::protocol::msgpack::MsgPack;
 
 #[derive(Debug, Default)]
 pub struct ReadyEvent;

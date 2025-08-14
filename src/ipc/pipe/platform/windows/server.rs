@@ -3,16 +3,16 @@
 use std::fs::File;
 use std::io;
 use std::os::windows::io::FromRawHandle;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::mpsc::Sender;
-use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use super::client::PipeClient;
 use crate::ipc::bindings::{
     CloseHandle, ConnectNamedPipe, CreateEventW, CreateNamedPipeW,
-    GetLastError, GetOverlappedResult, Overlapped, ERROR_IO_PENDING,
-    ERROR_PIPE_CONNECTED, FILE_FLAG_OVERLAPPED, HANDLE, INVALID_HANDLE_VALUE,
+    ERROR_IO_PENDING, ERROR_PIPE_CONNECTED, FILE_FLAG_OVERLAPPED, GetLastError,
+    GetOverlappedResult, HANDLE, INVALID_HANDLE_VALUE, Overlapped,
     PIPE_ACCESS_DUPLEX, PIPE_READMODE_MESSAGE, PIPE_TYPE_MESSAGE,
     PIPE_UNLIMITED_INSTANCES, PIPE_WAIT,
 };
@@ -180,10 +180,10 @@ impl PipeServerImpl for PipeServer {
 
     fn write_to(&self, client_id: u32, data: &[u8]) -> io::Result<()> {
         let mut sessions = self.session_manager.sessions.write().unwrap();
-        if let Some(session) = sessions.get_mut(&client_id) {
-            if let Some(client) = session.get_pipe_client_mut() {
-                return client.write(data);
-            }
+        if let Some(session) = sessions.get_mut(&client_id)
+            && let Some(client) = session.get_pipe_client_mut()
+        {
+            return client.write(data);
         }
         Err(io::Error::new(io::ErrorKind::NotFound, "Client not found"))
     }
