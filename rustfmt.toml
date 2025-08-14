@@ -1,6 +1,6 @@
 max_width = 80
 tab_spaces = 4
-edition = "2021"
+edition = "2024"
 imports_granularity = "Module"
 group_imports = "StdExternalCrate"
 use_field_init_shorthand = true
