@@ -116,7 +116,7 @@ jobs:
         
       - name: Set up Rust
         run: |
-          rustup default nightly
+          rustup default 1.89.0
           
       - name: Install additional targets
         run: rustup target add ${{ matrix.target }}

@@ -1,7 +1,7 @@
 # 🏗️ Build From Source
 
 > [!NOTE]
-> Make sure you have **[Rust](https://www.rust-lang.org/tools/install)** >= 1.85.0 (nightly) installed.
+> Make sure you have **[Rust](https://www.rust-lang.org/tools/install)** >= 1.89.0 installed.
 
 1. Clone the repository and move into the directory
    ```bash
