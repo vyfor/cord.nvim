@@ -3,7 +3,7 @@ use std::os::unix::net::UnixStream;
 use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
 
-use crate::ipc::pipe::{report_error, PipeClientImpl};
+use crate::ipc::pipe::{PipeClientImpl, report_error};
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
 use crate::messages::events::server::LogEvent;

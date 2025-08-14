@@ -1,5 +1,5 @@
-use std::sync::atomic::Ordering;
 use std::sync::Arc;
+use std::sync::atomic::Ordering;
 
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::types::config::PluginConfig;

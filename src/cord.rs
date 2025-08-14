@@ -4,8 +4,8 @@ use std::time::Duration;
 
 use crate::error::CordErrorKind;
 use crate::ipc::discord::client::{Connection, RichClient};
-use crate::ipc::pipe::platform::server::PipeServer;
 use crate::ipc::pipe::PipeServerImpl;
+use crate::ipc::pipe::platform::server::PipeServer;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
@@ -133,10 +133,10 @@ impl Cord {
 
     /// Cleans up before shutdown.
     pub fn cleanup(&mut self) {
-        if let Some(client) = Arc::get_mut(&mut self.rich_client) {
-            if let Ok(client) = client.get_mut() {
-                client.close();
-            }
+        if let Some(client) = Arc::get_mut(&mut self.rich_client)
+            && let Ok(client) = client.get_mut()
+        {
+            client.close();
         }
 
         self.pipe.stop();

@@ -1,6 +1,6 @@
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::Sender;
-use std::sync::Arc;
 use std::thread::JoinHandle;
 use std::time::Duration;
 
@@ -102,7 +102,6 @@ impl RichClient {
                 if client.handshake().is_ok() {
                     *self = client;
                     if self.start_read_thread(tx).is_err() {
-
                         self.is_reconnecting.store(false, Ordering::SeqCst);
                     };
 

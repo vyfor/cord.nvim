@@ -103,10 +103,7 @@ impl From<DiscordError> for CordError {
 
 impl From<String> for CordError {
     fn from(err: String) -> Self {
-        Self::new(
-            CordErrorKind::Other,
-            io::Error::new(io::ErrorKind::Other, err),
-        )
+        Self::new(CordErrorKind::Other, io::Error::other(err))
     }
 }
 

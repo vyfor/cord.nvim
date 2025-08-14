@@ -7,9 +7,9 @@ use std::sync::mpsc::Sender;
 use std::{io, ptr};
 
 use crate::ipc::bindings::{
-    CreateEventW, CreateFileW, GetLastError, GetOverlappedResult, Overlapped,
-    ReadFile, WriteFile, ERROR_IO_PENDING, FILE_FLAG_OVERLAPPED, GENERIC_READ,
-    GENERIC_WRITE, INVALID_HANDLE_VALUE, OPEN_EXISTING,
+    CreateEventW, CreateFileW, ERROR_IO_PENDING, FILE_FLAG_OVERLAPPED,
+    GENERIC_READ, GENERIC_WRITE, GetLastError, GetOverlappedResult,
+    INVALID_HANDLE_VALUE, OPEN_EXISTING, Overlapped, ReadFile, WriteFile,
 };
 use crate::ipc::discord::client::{Connection, RichClient};
 use crate::ipc::discord::error::DiscordError;
@@ -133,55 +133,47 @@ impl Connection for RichClient {
                             break;
                         }
 
-                        if bytes_transferred >= 8 {
-                            if let Some((opcode, size)) = utils::decode(
+                        if bytes_transferred >= 8
+                            && let Some((opcode, size)) = utils::decode(
                                 &buf[..bytes_transferred as usize],
-                            ) {
-                                if size > 0 && bytes_transferred >= (8 + size) {
-                                    let data = &buf[8..8 + size as usize];
-                                    let data_str =
-                                        String::from_utf8_lossy(data);
+                            )
+                            && size > 0
+                            && bytes_transferred >= (8 + size)
+                        {
+                            let data = &buf[8..8 + size as usize];
+                            let data_str = String::from_utf8_lossy(data);
 
-                                    match Opcode::from(opcode) {
-                                        Opcode::Frame => {
-                                            if data_str
-                                                .contains("Invalid Client ID")
-                                            {
-                                                tx.send(local_event!(
-                                                    0,
-                                                    Error,
-                                                    ErrorEvent::new(Box::new(
-                                                        DiscordError::InvalidClientId(
-                                                            client_id.to_string()
-                                                        )
-                                                    ))
-                                                ))
-                                                .ok();
-                                                break;
-                                            }
-                                            if !is_ready
-                                                .swap(true, Ordering::SeqCst)
-                                            {
-                                                tx.send(server_event!(
-                                                    0, Ready
-                                                ))
-                                                .ok();
-                                            }
-                                        }
-                                        Opcode::Close => {
-                                            tx.send(local_event!(
-                                                0,
-                                                Error,
-                                                ErrorEvent::new(Box::new(
-                                                    DiscordError::ConnectionClosed
-                                                ))
+                            match Opcode::from(opcode) {
+                                Opcode::Frame => {
+                                    if data_str.contains("Invalid Client ID") {
+                                        tx.send(local_event!(
+                                            0,
+                                            Error,
+                                            ErrorEvent::new(Box::new(
+                                                DiscordError::InvalidClientId(
+                                                    client_id.to_string()
+                                                )
                                             ))
-                                            .ok();
-                                            break;
-                                        }
-                                        _ => {}
+                                        ))
+                                        .ok();
+                                        break;
+                                    }
+                                    if !is_ready.swap(true, Ordering::SeqCst) {
+                                        tx.send(server_event!(0, Ready)).ok();
                                     }
                                 }
+                                Opcode::Close => {
+                                    tx.send(local_event!(
+                                        0,
+                                        Error,
+                                        ErrorEvent::new(Box::new(
+                                            DiscordError::ConnectionClosed
+                                        ))
+                                    ))
+                                    .ok();
+                                    break;
+                                }
+                                _ => {}
                             }
                         }
                     }

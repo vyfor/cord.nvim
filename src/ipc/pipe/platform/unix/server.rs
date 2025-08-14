@@ -1,9 +1,9 @@
 use std::io;
 use std::os::unix::net::UnixListener;
 use std::path::Path;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::mpsc::Sender;
-use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use super::client::PipeClient;

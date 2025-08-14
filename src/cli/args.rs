@@ -53,7 +53,7 @@ impl Args {
                                     "--client-id",
                                     "client id is not a valid u64",
                                 )
-                                .into())
+                                .into());
                             }
                         }
                         i += 2;
@@ -70,7 +70,7 @@ impl Args {
                                     "--timeout",
                                     "timeout must be a valid u64",
                                 )
-                                .into())
+                                .into());
                             }
                         }
                         i += 2;
@@ -85,7 +85,7 @@ impl Args {
                                     "--reconnect-interval",
                                     "reconnect interval must be a valid u64",
                                 )
-                                .into())
+                                .into());
                             }
                         }
                         i += 2;
