@@ -49,7 +49,7 @@ mod windows {
         }
     }
 
-    extern "system" {
+    unsafe extern "system" {
         pub fn CreateFileW(
             lfFileName: LPCWSTR,
             dwDesiredAccess: DWORD,
