@@ -3,7 +3,7 @@ local logger = require 'cord.plugin.log'
 
 local M = {}
 
-M.build = async.wrap(function()
+M.install = async.wrap(function()
   local server = require 'cord.server'
   if server.is_updating then return end
   server.is_updating = true

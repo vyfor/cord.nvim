@@ -86,7 +86,7 @@
 ---@field match_in_mappings? boolean Whether to match against file extensions in mappings
 
 ---@class CordAdvancedServerConfig
----@field update? 'fetch'|'build'|'none'|string How to acquire the server executable: 'fetch' or 'build' or 'none'
+---@field update? 'fetch'|'install'|'none'|string How to acquire the server executable: 'fetch' or 'install' or 'none'
 ---@field pipe_path? string Path to the server's pipe
 ---@field executable_path? string Path to the server's executable
 ---@field timeout? integer Timeout in milliseconds
