@@ -15,8 +15,8 @@ M.spawn = async.wrap(function(config, pipe_path)
       logger.debug('Spawn: executable missing at ' .. tostring(exec_path))
       if update_strategy == 'fetch' then
         require('cord.server.update').fetch():await()
-      elseif update_strategy == 'build' then
-        require('cord.server.update').build():await()
+      elseif update_strategy == 'install' then
+        require('cord.server.update').install():await()
       else
         require('cord.plugin.log').error 'Could not find the server executable'
       end

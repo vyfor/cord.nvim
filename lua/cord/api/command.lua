@@ -1,7 +1,7 @@
 local M = {}
 
-M.build = function()
-  require('cord.core.async').run(function() require('cord.server.update').build():await() end)
+M.install = function()
+  require('cord.core.async').run(function() require('cord.server.update').install():await() end)
 end
 M.fetch = function()
   require('cord.core.async').run(function() require('cord.server.update').fetch():await() end)
@@ -11,8 +11,8 @@ M.update = function()
 
   if mode == 'fetch' then
     M.fetch()
-  elseif mode == 'build' then
-    M.build()
+  elseif mode == 'install' then
+    M.install()
   elseif mode ~= 'none' then
     require('cord.plugin.log').log_raw(
       vim.log.levels.ERROR,
@@ -198,7 +198,7 @@ M.commands = {
     subcommands = {
       check = M.check,
       fetch = M.fetch,
-      build = M.build,
+      install = M.install,
     },
   },
   status = M.status,
