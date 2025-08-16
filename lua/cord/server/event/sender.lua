@@ -24,6 +24,11 @@ function Producer:initialize(config)
     timestamp = {
       shared = config.timestamp.shared,
     },
+    advanced = {
+      discord = {
+        pipe_paths = config.advanced.discord.pipe_paths,
+      },
+    },
   })
 end
 

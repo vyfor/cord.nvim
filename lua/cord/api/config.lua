@@ -81,6 +81,7 @@ local validation_rules = {
   ['advanced.server.executable_path'] = { 'string' },
   ['advanced.server.timeout'] = { 'number' },
   ['advanced.discord'] = { 'table' },
+  ['advanced.discord.pipe_paths'] = { 'table' },
   ['advanced.discord.reconnect'] = { 'table' },
   ['advanced.discord.reconnect.enabled'] = { 'boolean' },
   ['advanced.discord.reconnect.interval'] = { 'number' },
@@ -93,6 +94,7 @@ local validation_rules = {
 local array_paths = {
   ['buttons'] = true,
   ['plugins'] = true,
+  ['advanced.discord.pipe_paths'] = true,
   ['advanced.workspace.root_markers'] = true,
 }
 
