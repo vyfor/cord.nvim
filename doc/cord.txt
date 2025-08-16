@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0             Last change: 2025 August 13
+*cord.txt*             For NVIM v0.6.0             Last change: 2025 August 16
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -89,6 +89,7 @@ Default Configuration ~
       display = {
         theme = 'default',
         flavor = 'dark',
+        view = 'full',
         swap_fields = false,
         swap_icons = false,
       },
@@ -160,6 +161,7 @@ Default Configuration ~
           timeout = 300000,
         },
         discord = {
+          pipe_paths = nil,
           reconnect = {
             enabled = false,
             interval = 5000,
@@ -225,12 +227,23 @@ DISPLAY                                           *cord-configuration-display*
   display.flavor        string    dark      Choose between different theme flavors;
                                             typically ‘dark’, ‘light’, ‘accent’
 
+  display.view          string    full      Control what shows up as the large and small
+                                            images
+
   display.swap_fields   boolean   false     Show workspace name before filename
 
   display.swap_icons    boolean   false     Use editor icon as large image
   ----------------------------------------------------------------------------------------
 
   [!TIP] Check out our icon showcase <https://github.com/vyfor/icons#showcase>!
+
+VIEW ~
+
+- `full` - always shows both of the icons
+- `editor` - only shows the editor icon
+- `asset` - only shows the asset (language, file browser, plugin manager, etc.) icon
+- `auto` - shows both icons, but drops the language icon if in a new/empty buffer
+
 
 TIMESTAMP                                       *cord-configuration-timestamp*
 
@@ -273,7 +286,7 @@ IDLE                                                 *cord-configuration-idle*
                                                                                       focus
 
   idle.smart_idle        boolean                    true                              Enable smart idle
-                                                                                      feature
+                                                                                      feature. See below
 
   idle.details           string \| function(opts)   'Idling'                          Details shown when
                                                                                       idle
@@ -542,42 +555,70 @@ PLUGINS                                           *cord-configuration-plugins*
 
 ADVANCED                                         *cord-configuration-advanced*
 
-  -----------------------------------------------------------------------------------------------------------------------
-  Option                                Type            Default     Description
-  ------------------------------------- --------------- ----------- -----------------------------------------------------
-  advanced.plugin.autocmds              boolean         true        Enable autocmds
 
-  advanced.plugin.cursor_update         string          'on_hold'   When to update cursor position: 'on_move', 'on_hold',
-                                                                    or 'none'. See Cursor Update Mode
+PLUGIN SETTINGS ~
 
-  advanced.plugin.match_in_mappings     boolean         true        Whether to match against file extensions in mappings
+  ----------------------------------------------------------------------------------------------------------
+  Option                              Type      Default     Description
+  ----------------------------------- --------- ----------- ------------------------------------------------
+  advanced.plugin.autocmds            boolean   true        Enable autocmds
 
-  advanced.server.update                string          'fetch'     Default way to acquire the server executable either
-                                                                    if the executable is not found or a manual update is
-                                                                    requested: 'fetch' - fetch from GitHub, 'build' -
-                                                                    build from source, 'none' - no-op
+  advanced.plugin.cursor_update       string    'on_hold'   When to update cursor position: 'on_move',
+                                                            'on_hold', or 'none'. See Cursor Update Mode
 
-  advanced.server.pipe_path             string \| nil   nil         Custom IPC pipe path
+  advanced.plugin.match_in_mappings   boolean   true        Whether to match against file extensions in
+                                                            mappings
+  ----------------------------------------------------------------------------------------------------------
 
-  advanced.server.executable_path       string \| nil   nil         Custom server executable path
+SERVER SETTINGS ~
 
-  advanced.server.timeout               number          300000      Server shutdown timeout (ms)
+  --------------------------------------------------------------------------------------------------------------------
+  Option                            Type            Default   Description
+  --------------------------------- --------------- --------- --------------------------------------------------------
+  advanced.server.update            string          'fetch'   Default way to acquire the server executable either if
+                                                              the executable is not found or a manual update is
+                                                              requested: 'fetch' - fetch from GitHub, 'install' -
+                                                              install from crates.io, 'build' - build from source,
+                                                              'none' - no-op
 
-  advanced.discord.reconnect.enabled    boolean         false       Whether reconnection is enabled. Has minimal impact
-                                                                    on performance
+  advanced.server.pipe_path         string \| nil   nil       Custom IPC pipe path
 
-  advanced.discord.reconnect.interval   number          5000        Reconnection interval in milliseconds, 0 to disable
+  advanced.server.executable_path   string \| nil   nil       Custom server executable path
 
-  advanced.discord.reconnect.initial    boolean         true        Whether to reconnect if initial connection fails
+  advanced.server.timeout           number          300000    Server shutdown timeout (ms)
+  --------------------------------------------------------------------------------------------------------------------
 
-  advanced.workspace.root_markers       string[]        string[]    List of root markers to use when determining the
-                                                                    workspace directory
+DISCORD SETTINGS ~
 
-  advanced.workspace.limit_to_cwd       boolean         false       Limits workspace detection to the working directory
-                                                                    (vim.fn.getcwd()). When true, workspace detection
-                                                                    stops at the CWD if no marker is found, making the
-                                                                    search more efficient
-  -----------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
+  Option                                Type       Default   Description
+  ------------------------------------- ---------- --------- ---------------------------------------
+  advanced.discord.pipe_paths           string[]   nil       Custom IPC pipe paths to use when
+                                                             connecting to Discord
+
+  advanced.discord.reconnect.enabled    boolean    false     Whether reconnection is enabled. Has
+                                                             minimal impact on performance
+
+  advanced.discord.reconnect.interval   number     5000      Reconnection interval in milliseconds,
+                                                             0 to disable
+
+  advanced.discord.reconnect.initial    boolean    true      Whether to reconnect if initial
+                                                             connection fails
+  --------------------------------------------------------------------------------------------------
+
+WORKSPACE SETTINGS ~
+
+  --------------------------------------------------------------------------------------------------------------
+  Option                            Type       Default    Description
+  --------------------------------- ---------- ---------- ------------------------------------------------------
+  advanced.workspace.root_markers   string[]   string[]   List of root markers to use when determining the
+                                                          workspace directory
+
+  advanced.workspace.limit_to_cwd   boolean    false      Limits workspace detection to the working directory
+                                                          (vim.fn.getcwd()). When true, workspace detection
+                                                          stops at the CWD if no marker is found, making the
+                                                          search more efficient
+  --------------------------------------------------------------------------------------------------------------
 
 CURSOR UPDATE MODE ~
 
@@ -614,7 +655,8 @@ USER COMMANDS                               *cord-configuration-user-commands*
 - `:Cord update` - Update the server executable using the configured update mode (fetch by default)
     - `:Cord update check` - Check for server updates
     - `:Cord update fetch` - Fetch the server executable from GitHub using `curl`
-    - `:Cord update build` - Build the server executable using `cargo`
+    - `:Cord update install` - Install the server executable from crates.io using `cargo`
+    - `:Cord update build` - Build the server executable locally using `cargo`
 - `:Cord status` - Show connection status
 - `:Cord version` - Show current server version
 - `:Cord restart` - Restart the server
@@ -1401,11 +1443,11 @@ KEYMAPPINGS ~
 
 FEATURES                                              *cord-examples-features*
 
-- Fast, lightweight, and batteries-included.
-- Event-based architecture with instant presence updates.
+- Fast, lightweight, and batteries included.
+- Event-driven architecture with instant presence updates.
 - Dynamic string templates with custom variables.
 - Customizable assets for any file/buffer type.
-- Flexible configuration with rich API, function-based fields, hook system and user commands.
+- Flexible configuration with rich API, function-based fields, hooks, user commands and support for custom IPC paths.
 - Plugin system of its own, with many plugins out-of-the-box.
 - Finds repositories and workspaces based on VCS files without relying on command-line tools.
 - Manages activities across all instances with a single connection to Discord.
@@ -1481,12 +1523,18 @@ Invoke `:Cord update` whenever the plugin is updated.
 
 Considerations ~
 
-Cord requires the server executables to be present. By default, the plugin
-automatically fetches them from GitHub, which requires a dependency on **curl**
-<https://curl.se>. Alternatively, either: - **Download from GitHub**Get latest
-release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to
-cord[.exe] and place it under `nvim-data-dir/cord/bin` - **Build from source**
-<https://github.com/vyfor/cord.nvim/wiki/Build>
+Cord requires the **server executable** to be present. By default, the plugin
+automatically fetches it from GitHub, which requires a dependency on **curl**
+<https://curl.se>.
+
+Alternatively, you can provide the executable manually:
+
+- **Download from GitHub:** Get the latest release from
+    <https://github.com/vyfor/cord.nvim/releases/latest>, rename it to `cord` (or
+    `cord.exe` on Windows), and place it under `nvim-data-dir/cord/bin`. This is
+    essentially what `:Cord update fetch` does.
+- **Build from source:** Run `:Cord update install` to install from crates.io or
+    `:Cord update build` to build from source locally.
 
 
 THEMES                                                  *cord-examples-themes*
