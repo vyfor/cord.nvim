@@ -22,7 +22,7 @@ require 'cord'.setup {
 }
 ```
 
-2. Set the `CORD_LOG_FILE` environment variable to a file path. This will redirect all logs to that file, but note that doing so will bypass the `log_level` setting and log everything. This is useful for debugging as trace and debug logs can be very verbose and overwhelming in the editor.
+1. Set the `CORD_LOG_FILE` environment variable to a file path. This will redirect all logs to that file. This is useful for debugging as trace and debug logs can be very verbose and overwhelming in the editor.
 
 > ### Q: Can I use a custom name in my Rich Presence?
 
@@ -44,7 +44,7 @@ Cord's server keeps running intentionally. In fact, this is one of the key desig
 
 > ### Q: I'm using a custom Discord client. Will Cord work with it?
 
-Yes, although we do not endorse custom clients, and cannot guarantee that they will work. The main issue is that custom clients often cannot/do not expose the IPC pipe at the same path as the official client, so you might need to create a symlink to make it work.
+Yes, although we do not endorse custom clients, and cannot guarantee that they will work. The main issue is that custom clients often cannot/do not expose the IPC pipe at the same path as the official client, so you might need to create a symlink to make it work. You can also override the defaults by setting the `advanced.discord.pipe_paths` field to a list of absolute paths to use when connecting to Discord.
 
 > ### Q: Is X plugin or X language supported?
 
