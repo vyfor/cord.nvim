@@ -118,6 +118,7 @@ If you want a fresh start, you can copy the default config and tweak it. I sugge
       timeout = 300000,
     },
     discord = {
+      pipe_paths = nil,
       reconnect = {
         enabled = false,
         interval = 5000,
@@ -190,7 +191,7 @@ With this option set to true, the plugin **will not start automatically**. Inste
 | `idle.show_status`     | `boolean`                  | `true`                                                                                            | Show idle status in presence, or hide the presence if `false` |
 | `idle.ignore_focus`    | `boolean`                  | `true`                                                                                            | Show idle despite Neovim having focus                         |
 | `idle.unidle_on_focus` | `boolean`                  | `true`                                                                                            | Unidle the session when Neovim gains focus                    |
-| `idle.smart_idle`      | `boolean`                  | `true`                                                                                            | Enable [smart idle](#smart-idle) feature                      |
+| `idle.smart_idle`      | `boolean`                  | `true`                                                                                            | Enable smart idle feature. See below                          |
 | `idle.details`         | `string \| function(opts)` | `'Idling'`                                                                                        | Details shown when idle                                       |
 | `idle.state`           | `string \| function(opts)` | `nil`                                                                                             | State shown when idle                                         |
 | `idle.tooltip`         | `string \| function(opts)` | `'💤'`                                                                                             | Tooltip shown when hovering over idle icon                    |
@@ -376,20 +377,38 @@ require('cord').setup {
 
 ## ⚙️ Advanced
 
-| Option                                | Type            | Default     | Description                                                                                                                                                                                        |
-| ------------------------------------- | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `advanced.plugin.autocmds`            | `boolean`       | `true`      | Enable autocmds                                                                                                                                                                                    |
-| `advanced.plugin.cursor_update`       | `string`        | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                                               |
-| `advanced.plugin.match_in_mappings`   | `boolean`       | `true`      | Whether to match against file extensions in mappings                                                                                                                                               |
-| `advanced.server.update`              | `string`        | `'fetch'`   | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
-| `advanced.server.pipe_path`           | `string \| nil` | `nil`       | Custom IPC pipe path                                                                                                                                                                               |
-| `advanced.server.executable_path`     | `string \| nil` | `nil`       | Custom server executable path                                                                                                                                                                      |
-| `advanced.server.timeout`             | `number`        | `300000`    | Server shutdown timeout (ms)                                                                                                                                                                       |
-| `advanced.discord.reconnect.enabled`  | `boolean`       | `false`     | Whether reconnection is enabled. Has minimal impact on performance                                                                                                                                 |
-| `advanced.discord.reconnect.interval` | `number`        | `5000`      | Reconnection interval in milliseconds, 0 to disable                                                                                                                                                |
-| `advanced.discord.reconnect.initial`  | `boolean`       | `true`      | Whether to reconnect if initial connection fails                                                                                                                                                   |
-| `advanced.workspace.root_markers`     | `string[]`      | `string[]`  | List of root markers to use when determining the workspace directory                                                                                                                               |
-| `advanced.workspace.limit_to_cwd`     | `boolean`       | `false`     | Limits workspace detection to the working directory (vim.fn.getcwd()). When true, workspace detection stops at the CWD if no marker is found, making the search more efficient                     |
+### Plugin Settings
+
+| Option                              | Type      | Default     | Description                                                                                                          |
+| ----------------------------------- | --------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| `advanced.plugin.autocmds`          | `boolean` | `true`      | Enable autocmds                                                                                                      |
+| `advanced.plugin.cursor_update`     | `string`  | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode) |
+| `advanced.plugin.match_in_mappings` | `boolean` | `true`      | Whether to match against file extensions in mappings                                                                 |
+
+### Server Settings
+
+| Option                            | Type            | Default   | Description                                                                                                                                                                                        |
+| --------------------------------- | --------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `advanced.server.update`          | `string`        | `'fetch'` | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
+| `advanced.server.pipe_path`       | `string \| nil` | `nil`     | Custom IPC pipe path                                                                                                                                                                               |
+| `advanced.server.executable_path` | `string \| nil` | `nil`     | Custom server executable path                                                                                                                                                                      |
+| `advanced.server.timeout`         | `number`        | `300000`  | Server shutdown timeout (ms)                                                                                                                                                                       |
+
+### Discord Settings
+
+| Option                                | Type       | Default | Description                                                        |
+| ------------------------------------- | ---------- | ------- | ------------------------------------------------------------------ |
+| `advanced.discord.pipe_paths`         | `string[]` | `nil`   | Custom IPC pipe paths to use when connecting to Discord            |
+| `advanced.discord.reconnect.enabled`  | `boolean`  | `false` | Whether reconnection is enabled. Has minimal impact on performance |
+| `advanced.discord.reconnect.interval` | `number`   | `5000`  | Reconnection interval in milliseconds, 0 to disable                |
+| `advanced.discord.reconnect.initial`  | `boolean`  | `true`  | Whether to reconnect if initial connection fails                   |
+
+### Workspace Settings
+
+| Option                            | Type       | Default    | Description                                                                                                                                                                    |
+| --------------------------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `advanced.workspace.root_markers` | `string[]` | `string[]` | List of root markers to use when determining the workspace directory                                                                                                           |
+| `advanced.workspace.limit_to_cwd` | `boolean`  | `false`    | Limits workspace detection to the working directory (vim.fn.getcwd()). When true, workspace detection stops at the CWD if no marker is found, making the search more efficient |
 
 ### Cursor Update Mode
 
