@@ -12,7 +12,7 @@ function M:connect(path, retried)
     end
 
     self.status = 'connecting'
-    logger.debug('Connecting to pipe...')
+    logger.debug 'Connecting to pipe...'
 
     logger.trace('Pipe: ' .. path)
     M.client = require('cord.core.uv.pipe').new()
@@ -91,9 +91,7 @@ function M:run()
               M.manager:cleanup()
               require('cord.plugin.activity.hooks').run 'shutdown'
 
-              if config.advanced.discord.reconnect.enabled then
-                logger.info 'Reconnecting...'
-              end
+              if config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
 
               M.rx:register(
                 'ready',

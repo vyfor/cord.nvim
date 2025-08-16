@@ -70,9 +70,7 @@ function M.spawn_daemon(options)
   if not handle then
     if stdout then stdout:close() end
     if stderr then stderr:close() end
-    if options.on_error then
-      options.on_error('Failed to spawn process: ' .. pid)
-    end
+    if options.on_error then options.on_error('Failed to spawn process: ' .. pid) end
     return
   end
 

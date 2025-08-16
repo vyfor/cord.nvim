@@ -9,7 +9,7 @@ function Handler.new(client)
   self.client = client
   self.handlers = {}
   self.queue = {}
-  logger.trace('Receiver.new: client created')
+  logger.trace 'Receiver.new: client created'
   return self
 end
 
@@ -27,9 +27,14 @@ end
 function Handler:register(type, oneshot, callback)
   local data = self.queue[type]
   if data then
-    logger.trace(function()
-      return 'Receiver:register immediate dispatch: type=' .. tostring(type) .. ', oneshot=' .. tostring(oneshot)
-    end)
+    logger.trace(
+      function()
+        return 'Receiver:register immediate dispatch: type='
+          .. tostring(type)
+          .. ', oneshot='
+          .. tostring(oneshot)
+      end
+    )
     callback(data)
     self.queue[type] = nil
     if oneshot then return end
@@ -39,9 +44,14 @@ function Handler:register(type, oneshot, callback)
     oneshot = oneshot,
     callback = callback,
   }
-  logger.trace(function()
-    return 'Receiver:registered handler: type=' .. tostring(type) .. ', oneshot=' .. tostring(oneshot)
-  end)
+  logger.trace(
+    function()
+      return 'Receiver:registered handler: type='
+        .. tostring(type)
+        .. ', oneshot='
+        .. tostring(oneshot)
+    end
+  )
 end
 
 function Handler:run()
@@ -74,9 +84,7 @@ function Handler:run()
         goto continue
       end
 
-      logger.trace(function()
-        return 'Receiver:decoded event: type=' .. tostring(event.type)
-      end)
+      logger.trace(function() return 'Receiver:decoded event: type=' .. tostring(event.type) end)
       self:on_event(event.type, event.data)
 
       ::continue::

@@ -33,9 +33,7 @@ local uv = vim.loop or vim.uv
 
 local function now() return os.time() end
 
-local function get_dir(path)
-  return path:match '^(.*)[/\\]'
-end
+local function get_dir(path) return path:match '^(.*)[/\\]' end
 
 local function generate_instance_id()
   return vim.fn.getpid() .. '_' .. os.time() .. '_' .. math.random(1000, 9999)
@@ -75,9 +73,7 @@ local function stop_timer(key)
   for _, bucket in pairs(timer.modes) do
     if bucket.session_start_time then
       local elapsed = now() - bucket.session_start_time
-      if elapsed > 0 then
-        bucket.total_time = bucket.total_time + elapsed
-      end
+      if elapsed > 0 then bucket.total_time = bucket.total_time + elapsed end
       bucket.session_start_time = nil
       bucket.display_start_time = nil
     end
@@ -95,9 +91,7 @@ local function start_timer(key, mode)
 
   for _, bucket_name in ipairs(buckets_to_start) do
     local bucket = timer.modes[bucket_name]
-    if bucket and not bucket.session_start_time then
-      bucket.session_start_time = now()
-    end
+    if bucket and not bucket.session_start_time then bucket.session_start_time = now() end
   end
 end
 
@@ -127,7 +121,7 @@ local load_timers = Async.wrap(function()
   if ok and type(data) == 'table' then
     merge_timers(data)
   else
-    logger.debug('Failed to decode JSON from timer file.')
+    logger.debug 'Failed to decode JSON from timer file.'
   end
 end)
 
@@ -138,9 +132,7 @@ local function get_snapshot()
     for _, bucket in pairs(timer.modes) do
       if bucket.session_start_time then
         local elapsed = now() - bucket.session_start_time
-        if elapsed > 0 then
-          bucket.total_time = bucket.total_time + elapsed
-        end
+        if elapsed > 0 then bucket.total_time = bucket.total_time + elapsed end
       end
     end
   end
@@ -158,7 +150,7 @@ end
 local save_timers = Async.wrap(function()
   if M.save_in_progress then return false end
   M.save_in_progress = true
-  logger.debug('save_timers: triggered.')
+  logger.debug 'save_timers: triggered.'
 
   local timers_to_save = get_snapshot()
   local json_content = vim.json.encode(timers_to_save)
@@ -216,7 +208,7 @@ M.validate = function(config)
     return 'Invalid file value, must be a string'
   end
 
-  if not config.file:lower():match('%.json') then
+  if not config.file:lower():match '%.json' then
     return 'Invalid file value, must be a JSON file (ending with .json)'
   end
 
@@ -229,9 +221,7 @@ M.validate = function(config)
         break
       end
     end
-    if not ok then
-      return 'Invalid mode value, must be \'active\', \'idle\', or \'all\''
-    end
+    if not ok then return 'Invalid mode value, must be \'active\', \'idle\', or \'all\'' end
   end
 
   if config.save_on then
@@ -249,13 +239,15 @@ M.validate = function(config)
       end
       if not ok then
         return 'Invalid save_on trigger \''
-            .. tostring(trig)
-            .. '\', must be one of: \'exit\', \'periodic\', \'focus_change\''
+          .. tostring(trig)
+          .. '\', must be one of: \'exit\', \'periodic\', \'focus_change\''
       end
     end
   end
 
-  if config.save_interval and (type(config.save_interval) ~= 'number' or config.save_interval <= 0) then
+  if
+    config.save_interval and (type(config.save_interval) ~= 'number' or config.save_interval <= 0)
+  then
     return 'Invalid save_interval value, must be a positive number'
   end
 end
@@ -284,11 +276,11 @@ M.setup = function(config)
 
   local group = vim.api.nvim_create_augroup('CordPersistentTimerPlugin', { clear = true })
 
-  if should_save('exit') then
+  if should_save 'exit' then
     vim.api.nvim_create_autocmd('VimLeavePre', {
       group = group,
       callback = function()
-        logger.debug('VimLeavePre: Triggering final save.')
+        logger.debug 'VimLeavePre: Triggering final save.'
         local done = false
         Async.run(function()
           local timers_to_save = get_snapshot()
@@ -302,7 +294,9 @@ M.setup = function(config)
                 logger.debug('VimLeavePre: Final save failed: ' .. tostring(write_err))
               end
             else
-              logger.debug('VimLeavePre: Failed to create dir for final save: ' .. tostring(mkdir_err))
+              logger.debug(
+                'VimLeavePre: Failed to create dir for final save: ' .. tostring(mkdir_err)
+              )
             end
           end
           done = true
@@ -312,18 +306,16 @@ M.setup = function(config)
     })
   end
 
-  if should_save('focus_change') then
+  if should_save 'focus_change' then
     vim.api.nvim_create_autocmd('FocusLost', {
       group = group,
       callback = function()
-        if now() - M.last_save_time >= 5 then
-          Async.run(function() save_timers():get() end)
-        end
+        if now() - M.last_save_time >= 5 then Async.run(function() save_timers():get() end) end
       end,
     })
   end
 
-  if should_save('periodic') then
+  if should_save 'periodic' then
     local timer = uv.new_timer()
     if timer then
       timer:start(M.config.save_interval * 1000, M.config.save_interval * 1000, function()
@@ -342,13 +334,13 @@ M.setup = function(config)
         function(opts, activity)
           if not M.is_initialized then
             M.is_initialized = true
-            logger.debug('post_activity: First run, pausing manager for initial load.')
+            logger.debug 'post_activity: First run, pausing manager for initial load.'
             local manager = opts.manager
             manager:skip_update()
             manager:pause()
             Async.run(function()
               load_timers():get()
-              logger.debug('post_activity: Initial load complete. Resuming manager.')
+              logger.debug 'post_activity: Initial load complete. Resuming manager.'
               manager:resume()
             end)
             return
@@ -358,8 +350,8 @@ M.setup = function(config)
           if not key then return end
 
           local mode_to_run = (M.config.mode == 'active' and not opts.is_idle and 'active')
-              or (M.config.mode == 'idle' and opts.is_idle and 'idle')
-              or (M.config.mode == 'all' and 'all')
+            or (M.config.mode == 'idle' and opts.is_idle and 'idle')
+            or (M.config.mode == 'all' and 'all')
 
           if not mode_to_run then
             if M.current_key then

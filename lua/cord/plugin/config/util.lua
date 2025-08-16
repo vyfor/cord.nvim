@@ -57,9 +57,7 @@ function M.validate(new_config)
     if not client then
       if final_config.editor.client:match '^%d+$' then
         final_config.is_custom_client = true
-        if not final_config.editor.icon then
-          final_config.editor.icon = icons.get 'neovim'
-        end
+        if not final_config.editor.icon then final_config.editor.icon = icons.get 'neovim' end
         goto continue
       end
 
@@ -68,16 +66,12 @@ function M.validate(new_config)
     end
 
     final_config.editor.client = client.id
-    if not final_config.editor.icon then
-      final_config.editor.icon = icons.get(client.icon)
-    end
+    if not final_config.editor.icon then final_config.editor.icon = icons.get(client.icon) end
   end
 
   ::continue::
 
-  if not final_config.idle.icon then
-    final_config.idle.icon = icons.get(icons.DEFAULT_IDLE_ICON)
-  end
+  if not final_config.idle.icon then final_config.idle.icon = icons.get(icons.DEFAULT_IDLE_ICON) end
 
   if user_config.text and user_config.text.default then
     local default_text = user_config.text.default
@@ -102,7 +96,9 @@ function M.get(option, args)
     ---@cast variables table
     logger.trace(function()
       local keys = {}
-      for k, _ in pairs(variables) do table.insert(keys, k) end
+      for k, _ in pairs(variables) do
+        table.insert(keys, k)
+      end
       return 'config.get: merging variables=[' .. table.concat(keys, ',') .. ']'
     end)
     for k, v in pairs(variables) do
@@ -111,18 +107,26 @@ function M.get(option, args)
   end
 
   if ty == 'string' and (vars_is_table or variables == true) then
-    logger.trace(function() return 'config.get: processing string with variables: ' .. tostring(option) end)
+    logger.trace(
+      function() return 'config.get: processing string with variables: ' .. tostring(option) end
+    )
     option = option:gsub('%${(.-)}', function(var)
       local arg = args[var]
-      logger.trace(function() return 'config.get: variable ${' .. var .. '} = ' .. tostring(arg) end)
+      logger.trace(
+        function() return 'config.get: variable ${' .. var .. '} = ' .. tostring(arg) end
+      )
       if type(arg) == 'function' then
         local result = tostring(arg(args))
-        logger.trace(function() return 'config.get: function variable ${' .. var .. '} = ' .. result end)
+        logger.trace(
+          function() return 'config.get: function variable ${' .. var .. '} = ' .. result end
+        )
         return result
       elseif arg ~= nil then
         return tostring(arg)
       end
-      logger.trace(function() return 'config.get: undefined variable ${' .. var .. '}, keeping placeholder' end)
+      logger.trace(
+        function() return 'config.get: undefined variable ${' .. var .. '}, keeping placeholder' end
+      )
       return '${' .. var .. '}'
     end)
     logger.trace(function() return 'config.get: final string: ' .. tostring(option) end)
