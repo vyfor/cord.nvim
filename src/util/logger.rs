@@ -1,9 +1,12 @@
 #![allow(unused)]
 use std::sync::mpsc::Sender;
+use std::sync::{OnceLock, RwLock};
 
 use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
 use crate::server_event;
+
+pub static INSTANCE: OnceLock<RwLock<Logger>> = OnceLock::new();
 
 pub struct Logger {
     tx: Sender<Message>,
@@ -26,6 +29,11 @@ impl Logger {
         Logger { tx, level }
     }
 
+    pub fn set_level(&mut self, level: LogLevel) {
+        self.level = level;
+    }
+
+    #[inline(always)]
     pub fn log(
         &self,
         level: LogLevel,
@@ -43,6 +51,7 @@ impl Logger {
         }
     }
 
+    #[inline(always)]
     pub fn log_cb(
         &self,
         level: LogLevel,
@@ -56,6 +65,7 @@ impl Logger {
         }
     }
 
+    #[inline(always)]
     pub fn log_raw(
         &self,
         level: LogLevel,
@@ -71,6 +81,7 @@ impl Logger {
             .ok();
     }
 
+    #[inline(always)]
     pub fn log_raw_cb(
         &self,
         level: LogLevel,
@@ -81,51 +92,182 @@ impl Logger {
             .send(server_event!(client_id, Log, LogEvent::new(cb(), level)))
             .ok();
     }
+}
 
-    pub fn trace(&self, message: impl Into<String>, client_id: u32) {
-        self.log(LogLevel::Trace, message.into(), client_id);
-    }
+#[macro_export]
+macro_rules! log {
+    ($level:expr, $msg:expr, $client_id:expr) => {{
+        let logger = $crate::util::logger::INSTANCE
+            .get()
+            .expect("Logger not initialized")
+            .read()
+            .unwrap();
 
-    pub fn trace_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
-        self.log_cb(LogLevel::Trace, client_id, cb);
-    }
+        logger.log($level, $msg, $client_id);
+    }};
+    ($level:expr, $msg:expr) => {
+        $crate::log!($level, $msg, 0)
+    };
+}
 
-    pub fn debug(&self, message: impl Into<String>, client_id: u32) {
-        self.log(LogLevel::Debug, message.into(), client_id);
-    }
+#[macro_export]
+macro_rules! log_raw {
+    ($level:expr, $msg:expr, $client_id:expr) => {{
+        let logger = $crate::util::logger::INSTANCE
+            .get()
+            .expect("Logger not initialized")
+            .read()
+            .unwrap();
 
-    pub fn debug_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
-        self.log_cb(LogLevel::Debug, client_id, cb);
-    }
+        logger.log_raw($level, $msg, $client_id);
+    }};
+    ($level:expr, $msg:expr) => {
+        $crate::log_raw!($level, $msg, 0)
+    };
+}
 
-    pub fn info(&self, message: impl Into<String>, client_id: u32) {
-        self.log(LogLevel::Info, message.into(), client_id);
-    }
+#[macro_export]
+macro_rules! log_cb {
+    ($level:expr, $cb:expr, $client_id:expr) => {{
+        let logger = $crate::util::logger::INSTANCE
+            .get()
+            .expect("Logger not initialized")
+            .read()
+            .unwrap();
 
-    pub fn info_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
-        self.log_cb(LogLevel::Info, client_id, cb);
-    }
+        logger.log_cb($level, $client_id, $cb);
+    }};
+    ($level:expr, $cb:expr) => {
+        $crate::log_cb!($level, $cb, 0)
+    };
+}
 
-    pub fn warn(&self, message: impl Into<String>, client_id: u32) {
-        self.log(LogLevel::Warn, message.into(), client_id);
-    }
+#[macro_export]
+macro_rules! log_raw_cb {
+    ($level:expr, $cb:expr, $client_id:expr) => {{
+        let logger = $crate::util::logger::INSTANCE
+            .get()
+            .expect("Logger not initialized")
+            .read()
+            .unwrap();
 
-    pub fn warn_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
-        self.log_cb(LogLevel::Warn, client_id, cb);
-    }
+        logger.log_raw_cb($level, $client_id, $cb);
+    }};
+    ($level:expr, $cb:expr) => {
+        $crate::log_raw_cb!($level, $cb, 0)
+    };
+}
 
-    pub fn error(&self, message: impl Into<String>, client_id: u32) {
-        self.log(LogLevel::Error, message.into(), client_id);
-    }
+#[macro_export]
+macro_rules! trace {
+    // Pattern: trace!(client_id, "format", args...)
+    ($client_id:expr, $fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Trace, $client_id, format!($fmt, $($args),*))
+    };
+    // Pattern: trace!("format", args...)
+    ($fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Trace, 0, format!($fmt, $($args),*))
+    };
+    // Pattern: trace!(client_id, msg)
+    ($client_id:literal, $msg:expr) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Trace, $client_id, $msg)
+    };
+    // Pattern: trace!(msg)
+    ($msg:expr) => {
+        $crate::log!($crate::util::logger::LogLevel::Trace, $msg, 0)
+    };
+}
 
-    pub fn error_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
-        self.log_cb(LogLevel::Error, client_id, cb);
-    }
+#[macro_export]
+macro_rules! debug {
+    // Pattern: debug!(client_id, "format", args...)
+    ($client_id:expr, $fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Debug, $client_id, format!($fmt, $($args),*))
+    };
+    // Pattern: debug!("format", args...)
+    ($fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Debug, 0, format!($fmt, $($args),*))
+    };
+    // Pattern: debug!(client_id, msg)
+    ($client_id:literal, $msg:expr) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Debug, $client_id, $msg)
+    };
+    // Pattern: debug!(msg)
+    ($msg:expr) => {
+        $crate::log!($crate::util::logger::LogLevel::Debug, $msg, 0)
+    };
+}
 
-    #[inline]
-    pub fn set_level(&mut self, level: LogLevel) {
-        self.level = level;
-    }
+#[macro_export]
+macro_rules! info {
+    // Pattern: info!(client_id, "format", args...)
+    ($client_id:expr, $fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Info, $client_id, format!($fmt, $($args),*))
+    };
+    // Pattern: info!("format", args...)
+    ($fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Info, 0, format!($fmt, $($args),*))
+    };
+    // Pattern: info!(client_id, msg)
+    ($client_id:literal, $msg:expr) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Info, $client_id, $msg)
+    };
+    // Pattern: info!(msg)
+    ($msg:expr) => {
+        $crate::log!($crate::util::logger::LogLevel::Info, $msg, 0)
+    };
+}
+
+#[macro_export]
+macro_rules! warn {
+    // Pattern: warn!(client_id, "format", args...)
+    ($client_id:expr, $fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Warn, $client_id, format!($fmt, $($args),*))
+    };
+    // Pattern: warn!("format", args...)
+    ($fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Warn, 0, format!($fmt, $($args),*))
+    };
+    // Pattern: warn!(client_id, msg)
+    ($client_id:literal, $msg:expr) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Warn, $client_id, $msg)
+    };
+    // Pattern: warn!(msg)
+    ($msg:expr) => {
+        $crate::log!($crate::util::logger::LogLevel::Warn, $msg, 0)
+    };
+}
+
+#[macro_export]
+macro_rules! error {
+    // Pattern: error!(client_id, "format", args...)
+    ($client_id:expr, $fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Error, $client_id, format!($fmt, $($args),*))
+    };
+    // Pattern: error!("format", args...)
+    ($fmt:literal, $($args:expr),* $(,)?) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Error, 0, format!($fmt, $($args),*))
+    };
+    // Pattern: error!(client_id, msg)
+    ($client_id:literal, $msg:expr) => {
+        $crate::__log_with_client_id!($crate::util::logger::LogLevel::Error, $client_id, $msg)
+    };
+    // Pattern: error!(msg)
+    ($msg:expr) => {
+        $crate::log!($crate::util::logger::LogLevel::Error, $msg, 0)
+    };
+}
+
+#[macro_export]
+macro_rules! __log_with_client_id {
+    ($level:expr, $client_id:expr, $msg:expr) => {{
+        let logger = $crate::util::logger::INSTANCE
+            .get()
+            .expect("Logger not initialized")
+            .read()
+            .unwrap();
+        logger.log($level, $msg, $client_id);
+    }};
 }
 
 impl From<u8> for LogLevel {

@@ -1,11 +1,10 @@
-use std::sync::Arc;
 use std::sync::atomic::Ordering;
 
 use crate::error::CordErrorKind;
 use crate::ipc::discord::client::Connection;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::types::config::PluginConfig;
-use crate::util::now;
+use crate::util::{logger, now};
 
 #[derive(Debug)]
 pub struct InitializeEvent {
@@ -20,8 +19,8 @@ impl InitializeEvent {
 
 impl OnEvent for InitializeEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        if let Some(logger) = Arc::get_mut(&mut ctx.cord.logger) {
-            logger.set_level(self.config.log_level);
+        if let Some(logger) = logger::INSTANCE.get() {
+            logger.write().unwrap().set_level(self.config.log_level);
         }
 
         ctx.cord.config.shared_timestamps = self.config.timestamp.shared;

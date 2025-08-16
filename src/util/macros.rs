@@ -70,7 +70,7 @@ macro_rules! echoln {
 
 /// Prints a message to stderr without panicking.
 #[macro_export]
-macro_rules! error {
+macro_rules! errorln {
     ($($arg:tt)*) => {{
         use std::io::{self, Write};
         let stderr = io::stderr();
