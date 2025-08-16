@@ -92,6 +92,7 @@
 ---@field timeout? integer Timeout in milliseconds
 
 ---@class CordAdvancedDiscordConfig
+---@field pipe_paths? string Pipe paths to use when connecting to Discord
 ---@field reconnect? CordAdvancedDiscordReconnectConfig Reconnection configuration
 
 ---@class CordAdvancedDiscordReconnectConfig
@@ -195,6 +196,7 @@ local defaults = {
       timeout = 300000,
     },
     discord = {
+      pipe_paths = nil,
       reconnect = {
         enabled = false,
         interval = 5000,

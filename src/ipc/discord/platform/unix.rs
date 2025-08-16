@@ -14,7 +14,7 @@ use crate::messages::message::Message;
 use crate::{local_event, server_event};
 
 impl Connection for RichClient {
-    /// Pipe path can be in any of the following directories:
+    /// Pipe can be in any of the following directories:
     /// * `XDG_RUNTIME_DIR`
     /// * `TMPDIR`
     /// * `TMP`
@@ -27,38 +27,21 @@ impl Connection for RichClient {
     ///
     /// Followed by:
     /// * `/discord-ipc-{i}` - where `i` is a number from 0 to 9
-    fn connect(&mut self) -> crate::Result<()> {
-        let dirs = ["XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"]
-            .iter()
-            .filter_map(|&dir| var(dir).ok())
-            .chain(["/tmp".to_string()])
-            .flat_map(|base| {
-                [
-                    base.to_string(),
-                    format!("{}/app/com.discordapp.Discord", base),
-                    format!("{}/snap.discord", base),
-                ]
-            });
-
-        for dir in dirs {
-            for i in 0..10 {
-                match UnixStream::connect(format!("{dir}/discord-ipc-{i}")) {
-                    Ok(pipe) => {
-                        let read_pipe =
-                            pipe.try_clone().map_err(DiscordError::Io)?;
-                        self.read_pipe = Some(read_pipe);
-                        self.write_pipe = Some(pipe);
-                        return Ok(());
-                    }
-                    Err(e) => match e.kind() {
-                        io::ErrorKind::NotFound => continue,
-                        _ => return Err(DiscordError::Io(e).into()),
-                    },
-                }
+    fn try_connect(&mut self, pipe: &str) -> crate::Result<bool> {
+        match UnixStream::connect(pipe) {
+            Ok(pipe) => {
+                let read_pipe = pipe.try_clone().map_err(DiscordError::Io)?;
+                self.read_pipe = Some(read_pipe);
+                self.write_pipe = Some(pipe);
+                return Ok(true);
+            }
+            Err(e) => {
+                return match e.kind() {
+                    io::ErrorKind::NotFound => Ok(false),
+                    _ => Err(DiscordError::Io(e).into()),
+                };
             }
         }
-
-        Err(DiscordError::PipeNotFound.into())
     }
 
     fn close(&mut self) {
