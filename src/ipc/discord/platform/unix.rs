@@ -1,4 +1,3 @@
-use std::env::var;
 use std::io::{self, Read, Write};
 use std::net::Shutdown;
 use std::os::unix::net::UnixStream;
