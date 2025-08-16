@@ -17,7 +17,7 @@ use crate::ipc::discord::opcodes::Opcode;
 use crate::ipc::discord::utils;
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
-use crate::{local_event, server_event};
+use crate::{local_event, server_event, trace};
 
 impl Connection for RichClient {
     /// Pipe can be under the path `\\\\.\\pipe\\discord-ipc-{i}` where `i` is a number from 0 to 9.
@@ -134,6 +134,10 @@ impl Connection for RichClient {
                         {
                             let data = &buf[8..8 + size as usize];
                             let data_str = String::from_utf8_lossy(data);
+                            trace!(
+                                "Received message from Discord: opcode={}, data={}",
+                                opcode, data_str
+                            );
 
                             match Opcode::from(opcode) {
                                 Opcode::Frame => {
