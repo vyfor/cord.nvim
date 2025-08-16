@@ -42,27 +42,28 @@ impl OnEvent for InitializeEvent {
         }
 
         let config = &ctx.cord.config;
-        if !client.is_ready.load(Ordering::SeqCst) && client.connect().is_err()
-        {
-            if config.reconnect_interval > 0 && config.initial_reconnect {
-                drop(client);
-                let client_clone = rich_client.clone();
-                let tx = ctx.cord.tx.clone();
+        if !client.is_ready.load(Ordering::SeqCst) {
+            if client.connect().is_err() {
+                if config.reconnect_interval > 0 && config.initial_reconnect {
+                    drop(client);
+                    let client_clone = rich_client.clone();
+                    let tx = ctx.cord.tx.clone();
 
-                let reconnect_interval = config.reconnect_interval;
-                std::thread::spawn(move || {
-                    let mut client = client_clone.write().unwrap();
-                    client.reconnect(reconnect_interval, tx.clone());
-                });
+                    let reconnect_interval = config.reconnect_interval;
+                    std::thread::spawn(move || {
+                        let mut client = client_clone.write().unwrap();
+                        client.reconnect(reconnect_interval, tx.clone());
+                    });
+                } else {
+                    return Err(crate::error::CordError::new(
+                        CordErrorKind::Io,
+                        "Failed to connect to Discord",
+                    ));
+                }
             } else {
-                return Err(crate::error::CordError::new(
-                    CordErrorKind::Io,
-                    "Failed to connect to Discord",
-                ));
+                client.handshake()?;
+                client.start_read_thread(ctx.cord.tx.clone())?;
             }
-        } else {
-            client.handshake()?;
-            client.start_read_thread(ctx.cord.tx.clone())?;
         }
 
         if let Some(mut session) =
