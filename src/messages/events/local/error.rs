@@ -3,7 +3,6 @@ use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::messages::events::server::DisconnectEvent;
 use crate::protocol::msgpack::MsgPack;
-use crate::util::logger::LogLevel;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 
@@ -46,22 +45,14 @@ impl OnEvent for ErrorEvent {
                             .reconnect(reconnect_interval, tx);
                     });
 
-                    ctx.cord.logger.log(
-                        LogLevel::Debug,
-                        "Discord closed the connection".into(),
-                        0,
-                    );
+                    ctx.cord.logger.debug("Discord closed the connection", 0);
 
                     return Ok(());
                 }
                 _ => (),
             }
         }
-        ctx.cord.logger.log(
-            LogLevel::Error,
-            self.error.to_string().into(),
-            ctx.client_id,
-        );
+        ctx.cord.logger.error(self.error.to_string(), ctx.client_id);
 
         Ok(())
     }
