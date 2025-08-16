@@ -2,7 +2,7 @@ local M = {}
 
 function M.get_plugin_root()
   local source = debug.getinfo(1, 'S').source:sub(2)
-  return vim.fn.fnamemodify(source, ':h:h:h:h')
+  return vim.fn.fnamemodify(source, ':h:h:h:h:h')
 end
 
 function M.get_data_path() return vim.fn.stdpath 'data' .. '/cord' end

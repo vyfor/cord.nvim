@@ -69,6 +69,73 @@ M.install = async.wrap(function()
   end)
 end)
 
+M.build = async.wrap(function()
+  local server = require 'cord.server'
+  if server.is_updating then return end
+  server.is_updating = true
+
+  if not vim.fn.executable 'cargo' then
+    error 'cargo is not installed or not in PATH'
+    return
+  end
+
+  logger.info 'Building executable locally...'
+
+  vim.schedule(function()
+    local cord = require 'cord.server'
+    local function initialize()
+      local process = require 'cord.core.uv.process'
+
+      async.run(function()
+        process
+          .spawn({
+            cmd = 'cargo',
+            args = {
+              'install',
+              '--path',
+              require('cord.server.fs').get_plugin_root(),
+              '--force',
+              '--root',
+              require('cord.server.fs').get_data_path(),
+            },
+          })
+          :and_then(function(res)
+            if res.code ~= 0 then
+              server.is_updating = false
+              logger.error 'Failed to build executable'
+              if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
+              return
+            end
+            logger.log_raw(vim.log.levels.INFO, 'Successfully built executable. Restarting...')
+
+            async.run(function()
+              server.is_updating = false
+              cord:initialize()
+            end)
+          end, function(err)
+            server.is_updating = false
+
+            logger.error(err)
+          end)
+      end)
+    end
+
+    if cord.manager then cord.manager:cleanup() end
+    if not cord.tx then return initialize() end
+    if not cord.client then return initialize() end
+    if cord.client:is_closing() then return initialize() end
+
+    if cord.client.on_close then cord.client.on_close() end
+
+    cord.client.on_close = function()
+      cord.client.on_close = nil
+      initialize()
+    end
+
+    cord.tx:shutdown()
+  end)
+end)
+
 local function get_local_version()
   local process = require 'cord.core.uv.process'
   local executable_path =
