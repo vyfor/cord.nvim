@@ -11,7 +11,7 @@ use crate::messages::message::Message;
 use crate::protocol::msgpack::MsgPack;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
-use crate::util::logger::{LogLevel, Logger};
+use crate::util::logger::{self, LogLevel, Logger};
 
 pub const VERSION: &str = include_str!("../.github/server-version.txt");
 
@@ -32,7 +32,6 @@ pub struct Cord {
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
-    pub logger: Arc<Logger>,
     _lock: ServerLock,
 }
 
@@ -43,7 +42,8 @@ impl Cord {
 
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = Arc::new(SessionManager::default());
-        let logger = Arc::new(Logger::new(tx.clone(), LogLevel::Off));
+        let _ = logger::INSTANCE
+            .set(RwLock::new(Logger::new(tx.clone(), LogLevel::Off)));
 
         let rich_client =
             Arc::new(RwLock::new(RichClient::new(config.client_id, vec![])));
@@ -61,7 +61,6 @@ impl Cord {
             pipe: server,
             tx,
             rx,
-            logger,
             _lock: lock,
         })
     }
