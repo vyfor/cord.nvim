@@ -20,42 +20,34 @@ use crate::messages::message::Message;
 use crate::{local_event, server_event};
 
 impl Connection for RichClient {
-    /// Pipe path can be under the directory `\\\\.\\pipe\\discord-ipc-{i}` where `i` is a number from 0 to 9.
-    fn connect(&mut self) -> crate::Result<()> {
-        for i in 0..10 {
-            let pipe_name = format!("\\\\.\\pipe\\discord-ipc-{i}");
-            let wide_name: Vec<u16> = OsStr::new(&pipe_name)
-                .encode_wide()
-                .chain(Some(0))
-                .collect();
+    /// Pipe can be under the path `\\\\.\\pipe\\discord-ipc-{i}` where `i` is a number from 0 to 9.
+    fn try_connect(&mut self, pipe_name: &str) -> crate::Result<bool> {
+        let wide_name: Vec<u16> =
+            OsStr::new(pipe_name).encode_wide().chain(Some(0)).collect();
 
-            unsafe {
-                let handle = CreateFileW(
-                    wide_name.as_ptr(),
-                    GENERIC_READ | GENERIC_WRITE,
-                    0,
-                    ptr::null_mut(),
-                    OPEN_EXISTING,
-                    FILE_FLAG_OVERLAPPED,
-                    0 as _,
-                );
+        unsafe {
+            let handle = CreateFileW(
+                wide_name.as_ptr(),
+                GENERIC_READ | GENERIC_WRITE,
+                0,
+                ptr::null_mut(),
+                OPEN_EXISTING,
+                FILE_FLAG_OVERLAPPED,
+                0 as _,
+            );
 
-                if handle == INVALID_HANDLE_VALUE {
-                    let error = io::Error::last_os_error();
-                    match error.kind() {
-                        io::ErrorKind::NotFound => continue,
-                        _ => return Err(DiscordError::Io(error).into()),
-                    }
-                }
-
-                let pipe = File::from_raw_handle(handle);
-                self.pipe = Some(pipe.into());
-
-                return Ok(());
+            if handle == INVALID_HANDLE_VALUE {
+                let error = io::Error::last_os_error();
+                return match error.kind() {
+                    io::ErrorKind::NotFound => Ok(false),
+                    _ => Err(DiscordError::Io(error).into()),
+                };
             }
-        }
 
-        Err(DiscordError::PipeNotFound.into())
+            let pipe = File::from_raw_handle(handle);
+            self.pipe = Some(pipe.into());
+            Ok(true)
+        }
     }
 
     fn close(&mut self) {
