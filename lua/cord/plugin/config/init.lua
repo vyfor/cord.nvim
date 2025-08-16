@@ -12,6 +12,7 @@
 ---@class CordDisplayConfig
 ---@field theme? 'default'|'atom'|'catppuccin'|string Set icon theme
 ---@field flavor? 'dark'|'light'|'accent'|string Set icon theme flavor
+---@field view? 'full'|'editor'|'asset'|'auto'|string Control what shows up as the large and small images
 ---@field swap_fields? boolean Whether to swap activity fields
 ---@field swap_icons? boolean Whether to swap activity icons
 
@@ -131,6 +132,7 @@ local defaults = {
   display = {
     theme = 'default',
     flavor = 'dark',
+    view = 'full',
     swap_fields = false,
     swap_icons = false,
   },
