@@ -7,13 +7,4 @@
    ```bash
    git clone https://github.com/vyfor/cord.nvim
    ```
-2. Build the server binary and place it under the Neovim data directory
-   **Linux:**
-   ```bash
-   cargo install --path . --root ~/.local/share/nvim/cord --force
-   ```
-
-   **Windows (PowerShell):**
-   ```powershell
-   cargo install --path . --root $env:LOCALAPPDATA/nvim-data/cord --force
-   ```
+2. Build the server binary using `:Cord update build` which will place the built binary under the Neovim data directory

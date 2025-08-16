@@ -28,11 +28,11 @@
 > Cord no longer requires Rust to be installed. Server component will be automatically downloaded from GitHub Releases.
 
 ## 💎 Features
-- ⚡ Fast, lightweight, and batteries-included.
-- 🚀 Event-based architecture with instant presence updates.
+- ⚡ Fast, lightweight, and batteries included.
+- 🚀 Event-driven architecture with instant presence updates.
 - 🎨 Dynamic string templates with custom variables.
 - 🗃️ Customizable assets for any file/buffer type.
-- 🔧 Flexible configuration with rich API, function-based fields, hook system and user commands.
+- 🔧 Flexible configuration with rich API, function-based fields, hooks, user commands and support for custom IPC paths.
 - 🔌 Plugin system of its own, with many plugins out-of-the-box.
 - 🛠️ Finds repositories and workspaces based on VCS files without relying on command-line tools.
 - 🧠 Manages activities across all instances with a single connection to Discord.
@@ -121,9 +121,15 @@ Invoke `:Cord update` whenever the plugin is updated.
 <details>
 <summary><strong>Considerations</strong></summary>
 
-Cord requires the server executables to be present. By default, the plugin automatically fetches them from GitHub, which requires a dependency on [**`curl`**](https://curl.se). Alternatively, either:
-- **Download from GitHub**: Get latest release from https://github.com/vyfor/cord.nvim/releases/latest, rename it to cord[.exe] and place it under `nvim-data-dir/cord/bin`
-- [**Build from source**](https://github.com/vyfor/cord.nvim/wiki/Build)
+Cord requires the **server executable** to be present. By default, the plugin automatically fetches it from GitHub, which requires a dependency on [**`curl`**](https://curl.se).
+
+Alternatively, you can provide the executable manually:
+
+- **Download from GitHub:**  
+  Get the latest release from [https://github.com/vyfor/cord.nvim/releases/latest](https://github.com/vyfor/cord.nvim/releases/latest), rename it to `cord` (or `cord.exe` on Windows), and place it under `nvim-data-dir/cord/bin`. This is essentially what `:Cord update fetch` does.
+
+- **Build from source:**  
+  Run `:Cord update install` to install from crates.io or `:Cord update build` to build from source locally.
 
 </details>
 
