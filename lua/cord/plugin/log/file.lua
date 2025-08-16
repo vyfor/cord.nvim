@@ -2,10 +2,13 @@ local levels = vim.log.levels
 local fs = require 'cord.core.uv.fs'
 local Async = require 'cord.core.async'
 
+local log_level = levels.TRACE
 local queue = {}
 local queue_start, queue_end = 1, 0
 local flushing = false
 local fd
+
+local function set_level(level) log_level = level end
 
 local function log_notify(msg, level)
   if vim.in_fast_event and vim.in_fast_event() then
@@ -67,7 +70,7 @@ end
 local function format_message(entry, message)
   local ts = os.date '%Y-%m-%d %H:%M:%S'
   local level_name = level_names[entry.level] or tostring(entry.level)
-  return string.format('[%s] [cord.nvim] [%s] %s', ts, level_name, tostring(message))
+  return string.format('[%s] [%s] %s', ts, level_name, tostring(message))
 end
 
 local function flush()
@@ -113,7 +116,7 @@ local function flush()
 end
 
 local function log(level, msg)
-  if not level then return end
+  if not level or level < log_level then return end
   Async.run(function()
     enqueue(level, msg)
     flush()
@@ -127,9 +130,6 @@ local function log_raw(level, msg)
     flush()
   end)
 end
-
--- no-op
-local function set_level(_level) end
 
 local function error(msg) log(levels.ERROR, msg) end
 local function warn(msg) log(levels.WARN, msg) end
