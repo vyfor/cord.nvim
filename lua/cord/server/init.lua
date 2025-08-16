@@ -54,6 +54,8 @@ function M:run()
   return async.wrap(function()
     M.tx = require('cord.server.event.sender').new(M.client)
     M.rx = require('cord.server.event.receiver').new(M.client)
+    logger.debug 'Server: sending initialize event'
+    M.tx:initialize(config.get())
     logger.debug 'Server: registering ready handler'
     M.rx:register(
       'ready',
@@ -62,7 +64,6 @@ function M:run()
         self.status = 'ready'
         async.run(function()
           logger.info 'Connected to Discord'
-          M.tx:initialize(config.get())
 
           local ActivityManager = require 'cord.plugin.activity.manager'
           local manager, err = ActivityManager.new({ tx = M.tx }):get()

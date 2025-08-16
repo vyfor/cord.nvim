@@ -10,14 +10,15 @@ use crate::protocol::msgpack::MsgPack;
 
 impl OnEvent for ConnectEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        if ctx
+        let is_ready = ctx
             .cord
             .rich_client
             .read()
             .unwrap()
             .is_ready
-            .load(Ordering::SeqCst)
-        {
+            .load(Ordering::SeqCst);
+
+        if is_ready {
             ctx.cord
                 .pipe
                 .write_to(ctx.client_id, &MsgPack::serialize(&ReadyEvent)?)?;

@@ -2,7 +2,6 @@ use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 
-use crate::error::CordErrorKind;
 use crate::ipc::discord::client::{Connection, RichClient};
 use crate::ipc::pipe::PipeServerImpl;
 use crate::ipc::pipe::platform::server::PipeServer;
@@ -47,33 +46,10 @@ impl Cord {
         let logger = Arc::new(Logger::new(tx.clone(), LogLevel::Off));
 
         let rich_client =
-            Arc::new(RwLock::new(RichClient::new(config.client_id)));
-        {
-            let mut client = rich_client.write().unwrap();
-            if client.connect().is_err() {
-                if config.reconnect_interval > 0 && config.initial_reconnect {
-                    drop(client);
-                    let client_clone = rich_client.clone();
-                    let tx = tx.clone();
-
-                    std::thread::spawn(move || {
-                        let mut client = client_clone.write().unwrap();
-                        client.reconnect(config.reconnect_interval, tx.clone());
-                    });
-                } else {
-                    return Err(crate::error::CordError::new(
-                        CordErrorKind::Io,
-                        "Failed to connect to Discord",
-                    ));
-                }
-            } else {
-                client.handshake()?;
-                client.start_read_thread(tx.clone())?;
-            }
-        }
+            Arc::new(RwLock::new(RichClient::new(config.client_id, vec![])));
 
         let server = PipeServer::new(
-            &config.pipe_name,
+            &config.server_pipe,
             tx.clone(),
             Arc::clone(&session_manager),
         );
@@ -152,7 +128,7 @@ impl Cord {
 
 /// Manages application settings required for initialization.
 pub struct Config {
-    pub pipe_name: String,
+    pub server_pipe: String,
     pub client_id: u64,
     pub timeout: u64,
     pub reconnect_interval: u64,
@@ -163,7 +139,7 @@ pub struct Config {
 impl Config {
     /// Creates a new configuration.
     pub fn new(
-        pipe_name: String,
+        server_pipe: String,
         client_id: u64,
         timeout: u64,
         reconnect_interval: u64,
@@ -171,7 +147,7 @@ impl Config {
         shared_timestamps: bool,
     ) -> Self {
         Self {
-            pipe_name,
+            server_pipe,
             client_id,
             timeout,
             reconnect_interval,
