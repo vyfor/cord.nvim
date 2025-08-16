@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+#![allow(unused)]
 use std::sync::mpsc::Sender;
 
 use crate::messages::events::server::LogEvent;
@@ -26,16 +26,100 @@ impl Logger {
         Logger { tx, level }
     }
 
-    pub fn log(&self, level: LogLevel, message: Cow<str>, client_id: u32) {
+    pub fn log(
+        &self,
+        level: LogLevel,
+        message: impl Into<String>,
+        client_id: u32,
+    ) {
         if level >= self.level && level != LogLevel::Off {
             self.tx
                 .send(server_event!(
                     client_id,
                     Log,
-                    LogEvent::new(message.into_owned(), level)
+                    LogEvent::new(message.into(), level)
                 ))
                 .ok();
         }
+    }
+
+    pub fn log_cb(
+        &self,
+        level: LogLevel,
+        client_id: u32,
+        cb: impl FnOnce() -> String,
+    ) {
+        if level >= self.level && level != LogLevel::Off {
+            self.tx
+                .send(server_event!(client_id, Log, LogEvent::new(cb(), level)))
+                .ok();
+        }
+    }
+
+    pub fn log_raw(
+        &self,
+        level: LogLevel,
+        message: impl Into<String>,
+        client_id: u32,
+    ) {
+        self.tx
+            .send(server_event!(
+                client_id,
+                Log,
+                LogEvent::new(message.into(), level)
+            ))
+            .ok();
+    }
+
+    pub fn log_raw_cb(
+        &self,
+        level: LogLevel,
+        client_id: u32,
+        cb: impl FnOnce() -> String,
+    ) {
+        self.tx
+            .send(server_event!(client_id, Log, LogEvent::new(cb(), level)))
+            .ok();
+    }
+
+    pub fn trace(&self, message: impl Into<String>, client_id: u32) {
+        self.log(LogLevel::Trace, message.into(), client_id);
+    }
+
+    pub fn trace_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
+        self.log_cb(LogLevel::Trace, client_id, cb);
+    }
+
+    pub fn debug(&self, message: impl Into<String>, client_id: u32) {
+        self.log(LogLevel::Debug, message.into(), client_id);
+    }
+
+    pub fn debug_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
+        self.log_cb(LogLevel::Debug, client_id, cb);
+    }
+
+    pub fn info(&self, message: impl Into<String>, client_id: u32) {
+        self.log(LogLevel::Info, message.into(), client_id);
+    }
+
+    pub fn info_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
+        self.log_cb(LogLevel::Info, client_id, cb);
+    }
+
+    pub fn warn(&self, message: impl Into<String>, client_id: u32) {
+        self.log(LogLevel::Warn, message.into(), client_id);
+    }
+
+    pub fn warn_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
+        self.log_cb(LogLevel::Warn, client_id, cb);
+    }
+
+    pub fn error(&self, message: impl Into<String>, client_id: u32) {
+        self.log(LogLevel::Error, message.into(), client_id);
+    }
+
+    pub fn error_cb(&self, client_id: u32, cb: impl FnOnce() -> String) {
+        self.log_cb(LogLevel::Error, client_id, cb);
     }
 
     #[inline]
