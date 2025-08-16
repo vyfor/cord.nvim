@@ -27,6 +27,11 @@ function M.validate(new_config)
   logger.set_level(log_level)
   icons.set(final_config.display.theme, final_config.display.flavor)
 
+  if not vim.tbl_contains({ 'auto', 'editor', 'asset', 'full' }, final_config.display.view) then
+    logger.log_raw(vim.log.levels.ERROR, 'View must be one of `auto`, `editor`, `asset`, or `full`')
+    return
+  end
+
   if final_config.buttons then
     if #final_config.buttons > 2 then
       logger.log_raw(vim.log.levels.ERROR, 'There cannot be more than 2 buttons')

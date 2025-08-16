@@ -91,19 +91,43 @@ local function build_activity(opts)
   end
 
   local large_image, large_text, small_image, small_text
-  if opts.filetype == 'Cord.new' then
+
+  local function set_editor_only()
     large_image = config.editor.icon
     large_text = config_utils.get(config.editor.tooltip, opts)
-  elseif config.display.swap_icons then
-    large_image = config.editor.icon
-    large_text = config_utils.get(config.editor.tooltip, opts)
-    small_image = opts.icon
-    small_text = opts.tooltip or opts.filetype
-  else
+  end
+
+  local function set_asset_only()
     large_image = opts.icon
     large_text = opts.tooltip or opts.filetype
-    small_image = config.editor.icon
-    small_text = config_utils.get(config.editor.tooltip, opts)
+  end
+
+  local function set_full()
+    if config.display.swap_icons then
+      large_image = config.editor.icon
+      large_text = config_utils.get(config.editor.tooltip, opts)
+      small_image = opts.icon
+      small_text = opts.tooltip or opts.filetype
+    else
+      large_image = opts.icon
+      large_text = opts.tooltip or opts.filetype
+      small_image = config.editor.icon
+      small_text = config_utils.get(config.editor.tooltip, opts)
+    end
+  end
+
+  if config.display.view == 'auto' then
+    if opts.filetype == 'Cord.new' then
+      set_editor_only()
+    else
+      set_full()
+    end
+  elseif config.display.view == 'editor' then
+    set_editor_only()
+  elseif config.display.view == 'asset' then
+    set_asset_only()
+  elseif config.display.view == 'full' or config.display.view == 'auto' then
+    set_full()
   end
 
   return {
@@ -134,16 +158,37 @@ local function build_idle_activity(opts)
   end
 
   local large_image, large_text, small_image, small_text
-  if config.display.swap_icons then
+
+  local function set_editor_only()
     large_image = config.editor.icon
     large_text = config_utils.get(config.editor.tooltip, opts)
-    small_image = config_utils.get(config.idle.icon, opts)
-    small_text = config_utils.get(config.idle.tooltip, opts)
-  else
+  end
+
+  local function set_asset_only()
     large_image = config_utils.get(config.idle.icon, opts)
     large_text = config_utils.get(config.idle.tooltip, opts)
-    small_image = config.editor.icon
-    small_text = config_utils.get(config.editor.tooltip, opts)
+  end
+
+  local function set_full()
+    if config.display.swap_icons then
+      large_image = config.editor.icon
+      large_text = config_utils.get(config.editor.tooltip, opts)
+      small_image = config_utils.get(config.idle.icon, opts)
+      small_text = config_utils.get(config.idle.tooltip, opts)
+    else
+      large_image = config_utils.get(config.idle.icon, opts)
+      large_text = config_utils.get(config.idle.tooltip, opts)
+      small_image = config.editor.icon
+      small_text = config_utils.get(config.editor.tooltip, opts)
+    end
+  end
+
+  if config.display.view == 'editor' then
+    set_editor_only()
+  elseif config.display.view == 'asset' then
+    set_asset_only()
+  elseif config.display.view == 'full' or config.display.view == 'auto' then
+    set_full()
   end
 
   return {
