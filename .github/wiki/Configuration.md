@@ -387,12 +387,12 @@ require('cord').setup {
 
 ### Server Settings
 
-| Option                            | Type            | Default   | Description                                                                                                                                                                                        |
-| --------------------------------- | --------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `advanced.server.update`          | `string`        | `'fetch'` | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'build'` - build from source, `'none'` - no-op |
-| `advanced.server.pipe_path`       | `string \| nil` | `nil`     | Custom IPC pipe path                                                                                                                                                                               |
-| `advanced.server.executable_path` | `string \| nil` | `nil`     | Custom server executable path                                                                                                                                                                      |
-| `advanced.server.timeout`         | `number`        | `300000`  | Server shutdown timeout (ms)                                                                                                                                                                       |
+| Option                            | Type            | Default   | Description                                                                                                                                                                                                                              |
+| --------------------------------- | --------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `advanced.server.update`          | `string`        | `'fetch'` | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'install'` - install from crates.io, `'build'` - build from source, `'none'` - no-op |
+| `advanced.server.pipe_path`       | `string \| nil` | `nil`     | Custom IPC pipe path                                                                                                                                                                                                                     |
+| `advanced.server.executable_path` | `string \| nil` | `nil`     | Custom server executable path                                                                                                                                                                                                            |
+| `advanced.server.timeout`         | `number`        | `300000`  | Server shutdown timeout (ms)                                                                                                                                                                                                             |
 
 ### Discord Settings
 
@@ -443,7 +443,8 @@ The `advanced.cursor_update_mode` option controls how cursor position updates ar
 - `:Cord update` - Update the server executable using the configured update mode (fetch by default)
   - `:Cord update check` - Check for server updates
   - `:Cord update fetch` - Fetch the server executable from GitHub using `curl`
-  - `:Cord update build` - Build the server executable using `cargo`
+  - `:Cord update install` - Install the server executable from crates.io using `cargo`
+  - `:Cord update build` - Build the server executable locally using `cargo`
 - `:Cord status` - Show connection status
 - `:Cord version` - Show current server version
 - `:Cord restart` - Restart the server
