@@ -14,12 +14,12 @@ function M.validate(new_config)
   if type(log_level) == 'string' then
     local level = vim.log.levels[string.upper(log_level)]
     if not level then
-      logger.log_raw(vim.log.levels.ERROR, 'Unknown log level: ' .. log_level)
+      logger.notify('Unknown log level: ' .. log_level, vim.log.levels.ERROR)
       return
     end
     log_level = level
   elseif type(log_level) ~= 'number' then
-    logger.log_raw(vim.log.levels.ERROR, 'Log level must be a string or `vim.log.levels.*`')
+    logger.notify('Log level must be a string or `vim.log.levels.*`', vim.log.levels.ERROR)
     return
   end
 
@@ -28,24 +28,24 @@ function M.validate(new_config)
   icons.set(final_config.display.theme, final_config.display.flavor)
 
   if not vim.tbl_contains({ 'auto', 'editor', 'asset', 'full' }, final_config.display.view) then
-    logger.log_raw(vim.log.levels.ERROR, 'View must be one of `auto`, `editor`, `asset`, or `full`')
+    logger.notify('View must be one of `auto`, `editor`, `asset`, or `full`', vim.log.levels.ERROR)
     return
   end
 
   if final_config.buttons then
     if #final_config.buttons > 2 then
-      logger.log_raw(vim.log.levels.ERROR, 'There cannot be more than 2 buttons')
+      logger.notify('There cannot be more than 2 buttons', vim.log.levels.ERROR)
       return
     end
 
     for _, button in ipairs(final_config.buttons) do
       if not button.label or not button.url then
-        logger.log_raw(vim.log.levels.ERROR, 'Each button must have a label and a URL')
+        logger.notify('Each button must have a label and a URL', vim.log.levels.ERROR)
         return
       end
 
       if type(button.url) == 'string' and not button.url:match '^https?://[^%s]+$' then
-        logger.log_raw(vim.log.levels.ERROR, '`' .. button.url .. '` is not a valid button URL')
+        logger.notify('`' .. button.url .. '` is not a valid button URL', vim.log.levels.ERROR)
         return
       end
     end
@@ -61,7 +61,7 @@ function M.validate(new_config)
         goto continue
       end
 
-      logger.log_raw(vim.log.levels.ERROR, 'Unknown client: ' .. final_config.editor.client)
+      logger.notify('Unknown client: ' .. final_config.editor.client, vim.log.levels.ERROR)
       return
     end
 

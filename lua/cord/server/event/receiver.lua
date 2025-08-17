@@ -95,7 +95,7 @@ end
 function Handler:setup_default_handlers()
   self:register('log', false, function(data)
     if data.level and data.message then
-      logger.log_raw(data.level, data.message)
+      logger.log_raw(data.message, data.level)
       if data.level == vim.log.levels.ERROR then
         vim.schedule(function()
           local manager = require('cord.server').manager

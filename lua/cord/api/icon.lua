@@ -24,11 +24,11 @@ end
 
 M.set = function(theme, flavor)
   if not vim.tbl_contains(M.supported_themes, theme) then
-    require('cord.plugin.log').log_raw(vim.log.levels.WARN, 'Unknown theme: ' .. theme)
+    require('cord.plugin.log').notify('Unknown theme: ' .. theme, vim.log.levels.WARN)
   end
 
   if not vim.tbl_contains(M.supported_flavors, flavor) then
-    require('cord.plugin.log').log_raw(vim.log.levels.WARN, 'Unknown flavor: ' .. flavor)
+    require('cord.plugin.log').notify('Unknown flavor: ' .. flavor, vim.log.levels.WARN)
   end
 
   M.ICON_THEME = theme

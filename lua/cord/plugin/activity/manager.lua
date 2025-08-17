@@ -121,7 +121,7 @@ ActivityManager.new = async.wrap(function(opts)
   if not has_initialized then
     local err = setup()
     if err then
-      logger.log_raw(vim.log.levels.ERROR, err)
+      logger.notify(err, vim.log.levels.ERROR)
       error('Failed to initialize ActivityManager', 0)
     end
     has_initialized = true

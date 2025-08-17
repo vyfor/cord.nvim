@@ -39,7 +39,7 @@ M.install = async.wrap(function()
               if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
               return
             end
-            logger.log_raw(vim.log.levels.INFO, 'Successfully built executable. Restarting...')
+            logger.notify('Successfully built executable. Restarting...', vim.log.levels.INFO)
 
             async.run(function()
               server.is_updating = false
@@ -106,7 +106,7 @@ M.build = async.wrap(function()
               if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
               return
             end
-            logger.log_raw(vim.log.levels.INFO, 'Successfully built executable. Restarting...')
+            logger.notify('Successfully built executable. Restarting...', vim.log.levels.INFO)
 
             async.run(function()
               server.is_updating = false
@@ -204,16 +204,16 @@ M.check_version = async.wrap(function()
   end
 
   async.run(function()
-    logger.log_raw(vim.log.levels.INFO, 'Checking for updates...')
+    logger.notify('Checking for updates...', vim.log.levels.INFO)
     local current, latest = check_versions()
 
     if current and latest then
       if latest == current then
-        logger.log_raw(vim.log.levels.INFO, 'You are on the latest server version ' .. latest)
+        logger.notify('You are on the latest server version ' .. latest, vim.log.levels.INFO)
       else
-        logger.log_raw(
-          vim.log.levels.INFO,
-          'New version available: ' .. latest .. ' (current: ' .. current .. ')'
+        logger.notify(
+          'New version available: ' .. latest .. ' (current: ' .. current .. ')',
+          vim.log.levels.INFO
         )
       end
     end
@@ -223,7 +223,7 @@ end)
 M.version = async.wrap(function()
   async.run(function()
     local version = get_local_version():await()
-    if version then logger.log_raw(vim.log.levels.INFO, 'Server version: ' .. version) end
+    if version then logger.notify('Server version: ' .. version, vim.log.levels.INFO) end
   end)
 end)
 
@@ -286,7 +286,7 @@ M.fetch = async.wrap(function()
               end
               return
             end
-            logger.log_raw(vim.log.levels.INFO, 'Successfully updated executable. Restarting...')
+            logger.notify('Successfully updated executable. Restarting...', vim.log.levels.INFO)
 
             async.run(function()
               server.is_updating = false

@@ -8,7 +8,7 @@ local flush_scheduled = false
 
 local function set_level(level) log_level = level end
 
-local function enqueue(level, msg)
+local function enqueue(msg, level)
   queue_end = queue_end + 1
   queue[queue_end] = { level = level, msg = msg }
 end
@@ -56,26 +56,27 @@ local function flush_or_schedule()
   end
 end
 
-local function log(level, msg)
+local function log(msg, level)
   if not level or level < log_level then return end
-  enqueue(level, msg)
+  enqueue(msg, level)
   flush_or_schedule()
 end
 
-local function log_raw(level, msg)
+local function log_raw(msg, level)
   if not level then return end
-  enqueue(level, msg)
+  enqueue(msg, level)
   flush_or_schedule()
 end
 
-local function error(msg) log(levels.ERROR, msg) end
-local function warn(msg) log(levels.WARN, msg) end
-local function info(msg) log(levels.INFO, msg) end
-local function debug(msg) log(levels.DEBUG, msg) end
-local function trace(msg) log(levels.TRACE, msg) end
+local function error(msg) log(msg, levels.ERROR) end
+local function warn(msg) log(msg, levels.WARN) end
+local function info(msg) log(msg, levels.INFO) end
+local function debug(msg) log(msg, levels.DEBUG) end
+local function trace(msg) log(msg, levels.TRACE) end
 
 return {
   set_level = set_level,
+  notify = log_raw,
   log = log,
   log_raw = log_raw,
   error = error,
