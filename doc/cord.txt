@@ -1431,57 +1431,6 @@ RANDOM QUOTES ~
 <
 
 
-LAST.FM INTEGRATION ~
-
->lua
-    local user, api_key, song = 'YOUR_USERNAME', 'YOUR_API_KEY', nil
-    local timer = vim.uv.new_timer()
-    timer:start(
-      0,
-      15000, -- look for new song every 15 seconds (default ratelimit on most Discord clients)
-      vim.schedule_wrap(function()
-        vim.system(
-          { 'curl', 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' .. user .. '&api_key=' .. api_key .. '&format=json&limit=1, '-s', '--fail' },
-          { text = true },
-          vim.schedule_wrap(function(opts)
-            if opts.code ~= 0 or not opts.stdout then
-              print 'Failed to fetch data from last.fm'
-              timer:close()
-              return
-            end
-    
-            local data = vim.fn.json_decode(opts.stdout)
-            local recenttracks = data.recenttracks
-            if not recenttracks then
-              print 'Failed to fetch recenttracks from last.fm'
-              timer:close()
-              return
-            end
-    
-            local track = recenttracks.track[1]
-            if not track or not track['@attr'] then
-              song = nil
-              return
-            end
-    
-            song = track.name
-            if song == '' then song = nil end
-          end)
-        )
-      end)
-    )
-    
-    return {
-      text = {
-        workspace = function(opts)
-          if song then return ('🎶 Playing ' .. song) end
-          return opts.workspace
-        end,
-      },
-    }
-<
-
-
 KEYMAPPINGS ~
 
 >lua
