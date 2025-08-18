@@ -263,37 +263,14 @@ function ActivityManager:update_idle_activity()
     end
 
     local activity = activities.build_idle_activity(self.opts)
+    self:set_activity(activity)
 
-    hooks.run('post_activity', self.opts, activity)
-
-    if config.timestamp.shared then
-      self.opts.timestamp = nil
-      self.last_opts.timestamp = nil
-    end
-
-    if self.should_skip_update then
-      self.should_skip_update = false
-      return
-    end
-
-    self.tx:update_activity(activity)
     hooks.run('idle_enter', self.opts)
     logger.trace(
       function() return 'ActivityManager.update_idle_activity: activity=' .. vim.inspect(activity) end
     )
   else
     logger.trace 'ActivityManager.update_idle_activity: clear activity (no idle status)'
-    hooks.run('post_activity', self.opts)
-
-    if config.timestamp.shared then
-      self.opts.timestamp = nil
-      self.last_opts.timestamp = nil
-    end
-
-    if self.should_skip_update then
-      self.should_skip_update = false
-      return
-    end
 
     self.tx:clear_activity()
     hooks.run('idle_enter', self.opts)
@@ -316,19 +293,7 @@ function ActivityManager:update_activity()
   if activity == true then return end
   if activity == false then return self:clear_activity() end
 
-  hooks.run('post_activity', self.opts, activity)
-
-  if config.timestamp.shared then
-    self.opts.timestamp = nil
-    self.last_opts.timestamp = nil
-  end
-
-  if self.should_skip_update then
-    self.should_skip_update = false
-    return
-  end
-
-  self.tx:update_activity(activity)
+  self:set_activity(activity --[[@as table]])
   logger.trace(
     function() return 'ActivityManager.update_activity: activity=' .. vim.inspect(activity) end
   )
@@ -493,7 +458,21 @@ end
 ---Set the activity
 ---@param activity table Activity to set
 ---@return nil
-function ActivityManager:set_activity(activity) self.tx:update_activity(activity) end
+function ActivityManager:set_activity(activity, force)
+  hooks.run('post_activity', self.opts, activity)
+
+  if config.timestamp.shared then
+    self.opts.timestamp = nil
+    self.last_opts.timestamp = nil
+  end
+
+  if not force and self.should_skip_update then
+    self.should_skip_update = false
+    return
+  end
+
+  self.tx:update_activity(activity)
+end
 
 ---Clear the activity
 ---@param force? boolean Whether to force clear the activity

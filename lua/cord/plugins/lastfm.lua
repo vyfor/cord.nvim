@@ -146,7 +146,7 @@ M.run = Async.wrap(function()
         M.current_track = track
 
         if M.config.override then
-          manager:set_activity {
+          manager:set_activity({
             type = 'listening',
             status_display_type = 'state',
             details = track.title,
@@ -159,7 +159,7 @@ M.run = Async.wrap(function()
             timestamps = {
               start = os.time(),
             },
-          }
+          }, true)
         else
           manager:queue_update(true)
         end

@@ -504,24 +504,24 @@ The `ActivityManager` contains useful methods:
 
 ## ActivityManager Methods
 
-| Method                               | Description                                                                                                        |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `manager:queue_update(force_update)` | Schedules an update to the activity. If `force_update` is true, it bypasses checks and updates immediately.        |
-| `manager:pause()`                    | Pauses all events and stops the idle timer.                                                                        |
-| `manager:resume()`                   | Resumes events and restarts the idle timer.                                                                        |
-| `manager:pause_events()`             | Disables event handling without affecting the idle timer.                                                          |
-| `manager:resume_events()`            | Enables event handling and queues an immediate update.                                                             |
-| `manager:skip_update()`              | Skips the next update once.                                                                                        |
-| `manager:hide()`                     | Pauses events and clears rich presence.                                                                            |
-| `manager:suppress()`                 | Pauses events and suppresses sending presence updates for the current Neovim session.                              |
-| `manager:toggle()`                   | Toggles between pausing and resuming the activity updates.                                                         |
-| `manager:toggle_suppress()`          | Toggles between suppressing and resuming sending presence updates for the current Neovim session.                  |
-| `manager:idle()`                     | Sets the session to idle.                                                                                          |
-| `manager:force_idle()`               | Forcibly sets the session to idle until unforced.                                                                  |
-| `manager:unidle()`                   | Clears the idle state and resumes normal activity.                                                                 |
-| `manager:toggle_idle()`              | Toggles between idle and normal activity.                                                                          |
-| `manager:set_activity(activity)`     | Sets the rich presence to the provided [activity](#activity-options), offering complete control over the presence. |
-| `manager:clear_activity(force)`      | Clears the current activity from the server. If `force` is true, it completely clears the presence.                |
+| Method                                  | Description                                                                                                                                          |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `manager:queue_update(force_update)`    | Schedules an update to the activity. If `force_update` is true, it bypasses checks and updates immediately.                                          |
+| `manager:pause()`                       | Pauses all events and stops the idle timer.                                                                                                          |
+| `manager:resume()`                      | Resumes events and restarts the idle timer.                                                                                                          |
+| `manager:pause_events()`                | Disables event handling without affecting the idle timer.                                                                                            |
+| `manager:resume_events()`               | Enables event handling and queues an immediate update.                                                                                               |
+| `manager:skip_update()`                 | Skips the next update once.                                                                                                                          |
+| `manager:hide()`                        | Pauses events and clears rich presence.                                                                                                              |
+| `manager:suppress()`                    | Pauses events and suppresses sending presence updates for the current Neovim session.                                                                |
+| `manager:toggle()`                      | Toggles between pausing and resuming the activity updates.                                                                                           |
+| `manager:toggle_suppress()`             | Toggles between suppressing and resuming sending presence updates for the current Neovim session.                                                    |
+| `manager:idle()`                        | Sets the session to idle.                                                                                                                            |
+| `manager:force_idle()`                  | Forcibly sets the session to idle until unforced.                                                                                                    |
+| `manager:unidle()`                      | Clears the idle state and resumes normal activity.                                                                                                   |
+| `manager:toggle_idle()`                 | Toggles between idle and normal activity.                                                                                                            |
+| `manager:set_activity(activity, force)` | Sets the rich presence to the provided [activity](#activity-options). Setting `force` to true will bypass any previous `manager:skip_update()` call. |
+| `manager:clear_activity(force)`         | Clears the current activity from the server. If `force` is true, it completely clears the presence.                                                  |
 
 ## Activity Options
 
