@@ -69,7 +69,7 @@ Here's a list of the built-in plugins included with Cord, along with their descr
 - **`diagnostic`**: A table containing the scoped diagnostics data (useful for advanced customization).
 - **`diagnostics`**: A function that returns the number of diagnostics in the current scope (buffer or workspace), based on the plugin's configuration.
 
-**Usage Example (Manual Text Configuration - `override = false`):**
+**Usage Example (`override = false`):**
 
 ```lua
 text = {
@@ -171,3 +171,56 @@ text = {
 
 > [!NOTE]
 > Incompatible with any other timestamp-related plugins.
+
+### 🧩 Last.fm (`cord.plugins.lastfm`)
+
+**Purpose:** Displays your current Last.fm "Now Playing" track in Rich Presence. By default, takes full control of the activity. If you want to disable this behavior, set `override = false`.
+
+**Requirements:**
+
+- `LASTFM_USERNAME` and `LASTFM_API_KEY` environment variables must be present. You can get them from [here](https://www.last.fm/api/accounts) by creating an API account.
+- `curl` must be available on your system (used for HTTP requests).
+
+**Configuration Options:**
+
+```lua
+{
+  interval = 10000,
+  max_retries = 3,
+  override = true, 
+  -- fallback_image = '...',
+}
+```
+
+- **`interval`**: How often to poll Last.fm for the latest track. Minimum is 500ms.
+- **`max_retries`**: Number of times failed HTTP requests will be retried.
+- **`override`**:
+  - `true` (default): The plugin fully manages activity updates.
+  - `false`: The plugin will not change activity directly; instead, it exposes variables you can use in your own configuration.
+- **`fallback_image`**: Image URL used when the track has no album art or Last.fm returns a placeholder.
+
+**Variables Added:**
+
+- **`track_title`**: The current track title (or `nil` if none).
+- **`track_artist`**: The current track artist (or `nil`).
+- **`track_album`**: The current track album (or `nil`).
+- **`track_url`**: The Last.fm track URL (or `nil`).
+- **`track_image`**: The best available album image URL or the configured `fallback_image`.
+
+**Usage Example (`override = false`):**
+
+```lua
+require('cord').setup {
+  plugins = {
+    ['cord.plugins.lastfm'] = { override = false },
+  },
+
+  text = {
+    viewing = 'Listening to ${track_title} — ${track_artist}',
+    editing = 'Listening to ${track_title} — ${track_artist}',
+  },
+}
+```
+
+> [!NOTE]
+> Incompatible with any other plugin if `override = true`.
