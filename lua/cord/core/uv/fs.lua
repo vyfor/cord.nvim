@@ -41,6 +41,14 @@ end
 
 function M.mkdirp(path, mode)
   return Future.new(function(resolve, reject)
+    path = vim.fs.normalize(path)
+
+    local parts = {}
+    for part in path:gmatch '[^/]+' do
+      table.insert(parts, part)
+    end
+    local is_abs = path:sub(1, 1) == '/'
+
     local function create_dirs(dirs, index)
       if index > #dirs then
         resolve(true)
@@ -48,6 +56,7 @@ function M.mkdirp(path, mode)
       end
 
       local current_path = table.concat(dirs, '/', 1, index)
+      if is_abs then current_path = '/' .. current_path end
 
       uv.fs_stat(current_path, function(stat_err, stat)
         if not stat_err and stat and stat.type == 'directory' then
@@ -64,13 +73,6 @@ function M.mkdirp(path, mode)
         end)
       end)
     end
-
-    local parts = {}
-    for part in path:gmatch '[^/]+' do
-      table.insert(parts, part)
-    end
-
-    if path:sub(1, 1) == '/' then table.insert(parts, 1, '') end
 
     if #parts == 0 then
       resolve(true)
