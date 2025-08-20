@@ -4,7 +4,7 @@ local ws_utils = require 'cord.internal.activity.workspace'
 local config_utils = require 'cord.internal.config.util'
 local hooks = require 'cord.internal.activity.hooks'
 local config = require 'cord.internal.config'
-local logger = require 'cord.internal.log'
+local logger = require 'cord.api.log'
 
 local uv = vim.loop or vim.uv
 

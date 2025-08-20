@@ -1,6 +1,6 @@
 local Async = require 'cord.core.async'
 local Process = require 'cord.core.uv.process'
-local logger = require 'cord.internal.log'
+local logger = require 'cord.api.log'
 local utils = require 'cord.core.util'
 local uv = vim.uv or vim.loop
 

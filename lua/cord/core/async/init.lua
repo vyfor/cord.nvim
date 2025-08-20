@@ -8,7 +8,7 @@ function Async.wrap(fn)
     return Future.new(function(resolve, reject)
       local current = coroutine.running()
       if not current then
-        require('cord.internal.log').error(
+        require('cord.api.log').error(
           function() return 'async.wrap must be called within a coroutine\n' .. debug.traceback() end
         )
         return
@@ -20,7 +20,7 @@ function Async.wrap(fn)
         return fn(unpack(args))
       end)
       if not success then
-        require('cord.internal.log').trace(
+        require('cord.api.log').trace(
           function() return 'Error in async.wrap: ' .. result .. '\n' .. debug.traceback() end
         )
         reject(result)

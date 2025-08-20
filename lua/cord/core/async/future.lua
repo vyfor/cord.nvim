@@ -30,7 +30,7 @@ function Future.new(executor)
   end
 
   xpcall(function() executor(resolve, reject) end, function(err)
-    require('cord.internal.log').trace(
+    require('cord.api.log').trace(
       function() return 'Error in executor: ' .. err .. '\n' .. debug.traceback() end
     )
     reject(err)
@@ -42,7 +42,7 @@ end
 function Future:and_then(on_fulfilled, on_rejected)
   local current = coroutine.running()
   if not current then
-    require('cord.internal.log').error(
+    require('cord.api.log').error(
       function() return 'Future:and_then must be called within a coroutine\n' .. debug.traceback() end
     )
     return
@@ -62,7 +62,7 @@ function Future:and_then(on_fulfilled, on_rejected)
       local success, result = xpcall(
         function() return callback(value or self._value) end,
         function(err)
-          require('cord.internal.log').trace(
+          require('cord.api.log').trace(
             function() return 'Error in callback: ' .. err .. '\n' .. debug.traceback() end
           )
         end
@@ -103,7 +103,7 @@ function Future:catch(on_rejected) return self:and_then(nil, on_rejected) end
 function Future.await(future)
   local co = coroutine.running()
   if not co then
-    require('cord.internal.log').error(
+    require('cord.api.log').error(
       function() return 'Future:await must be called within a coroutine\n' .. debug.traceback() end
     )
     return
@@ -125,7 +125,7 @@ end
 function Future.get(future)
   local co = coroutine.running()
   if not co then
-    require('cord.internal.log').error(
+    require('cord.api.log').error(
       function() return 'Future:get must be called within a coroutine\n' .. debug.traceback() end
     )
     return

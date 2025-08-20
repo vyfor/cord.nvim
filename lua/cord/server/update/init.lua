@@ -1,5 +1,5 @@
 local async = require 'cord.core.async'
-local logger = require 'cord.internal.log'
+local logger = require 'cord.api.log'
 
 local M = {}
 

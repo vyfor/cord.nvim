@@ -1,6 +1,6 @@
 ---@diagnostic disable-next-line: deprecated
 local unpack = unpack or table.unpack
-local logger = require 'cord.internal.log'
+local logger = require 'cord.api.log'
 
 local M = {}
 
