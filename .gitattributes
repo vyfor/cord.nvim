@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.md text eol=lf
+*.lua text eol=lf
+*.vim text eol=lf
+*.rs text eol=lf
