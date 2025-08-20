@@ -1,4 +1,4 @@
-local config = require 'cord.internal.config'
+local config = require 'cord.api.config'
 
 local M = {}
 

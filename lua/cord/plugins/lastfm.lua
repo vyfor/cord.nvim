@@ -199,7 +199,7 @@ M.setup = function(config)
             mngr:pause()
           end
         end,
-        priority = require('cord.internal.activity.hooks').PRIORITY.HIGHEST,
+        priority = require('cord.internal.hooks').PRIORITY.HIGHEST,
       },
     },
   }

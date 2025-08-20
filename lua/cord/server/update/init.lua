@@ -139,7 +139,7 @@ end)
 local function get_local_version()
   local process = require 'cord.core.uv.process'
   local executable_path =
-    require('cord.server.fs').get_executable_path(require('cord.internal.config').get())
+    require('cord.server.fs').get_executable_path(require('cord.api.config').get())
 
   return async.wrap(function()
     local res = process
@@ -238,7 +238,7 @@ M.fetch = async.wrap(function()
   end
 
   local executable_path =
-    require('cord.server.fs').get_executable_path(require('cord.internal.config').get())
+    require('cord.server.fs').get_executable_path(require('cord.api.config').get())
   local process = require 'cord.core.uv.process'
 
   local fetch_executable = vim.schedule_wrap(function(tag)

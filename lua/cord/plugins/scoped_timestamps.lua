@@ -1,4 +1,4 @@
-local user_config = require 'cord.internal.config'
+local user_config = require 'cord.api.config'
 
 local M = {
   timestamps = {}, -- Effective timestamp for each key

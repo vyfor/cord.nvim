@@ -10,7 +10,7 @@ M.build = function()
   require('cord.core.async').run(function() require('cord.server.update').build():await() end)
 end
 M.update = function()
-  local mode = require('cord.internal.config').advanced.server.update
+  local mode = require('cord.api.config').advanced.server.update
 
   if mode == 'fetch' then
     M.fetch()
@@ -137,7 +137,7 @@ local function handle_feature(feature, enable)
     return
   end
 
-  local config = require 'cord.internal.config'
+  local config = require 'cord.api.config'
   local target = config
   for i = 1, #feat.path - 1 do
     target = target[feat.path[i]]

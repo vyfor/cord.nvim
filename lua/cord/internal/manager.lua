@@ -1,9 +1,8 @@
 local async = require 'cord.core.async'
-local builder = require 'cord.internal.builder'
+local builder = require 'cord.internal.activity.builder'
 local ws_utils = require 'cord.internal.activity.workspace'
-local config_utils = require 'cord.internal.config.util'
-local hooks = require 'cord.internal.activity.hooks'
-local config = require 'cord.internal.config'
+local hooks = require 'cord.internal.hooks'
+local config = require 'cord.api.config'
 local logger = require 'cord.api.log'
 
 local uv = vim.loop or vim.uv
@@ -84,7 +83,41 @@ local function setup()
     end
   end
 
-  return require('cord.api.plugin').init()
+  return require('cord.plugins').init()
+end
+
+local function get_buttons(opts)
+  if not config.buttons then return {} end
+
+  local buttons = {}
+  for i = 1, #config.buttons do
+    local sourcebtn = config.buttons[i]
+    local button = {}
+
+    if type(sourcebtn.label) == 'function' then
+      local label = sourcebtn.label(opts)
+      if not label then goto continue end
+      button.label = label
+    else
+      if not sourcebtn.label then goto continue end
+      button.label = sourcebtn.label
+    end
+
+    if type(sourcebtn.url) == 'function' then
+      local url = sourcebtn.url(opts)
+      if not url then goto continue end
+      button.url = url
+    else
+      if not sourcebtn.url then goto continue end
+      button.url = sourcebtn.url
+    end
+
+    buttons[#buttons + 1] = button
+
+    ::continue::
+  end
+
+  return buttons
 end
 
 ---Create a new ActivityManager instance
@@ -256,7 +289,7 @@ function ActivityManager:update_idle_activity()
   logger.debug 'ActivityManager.update_idle_activity'
 
   if config.idle.show_status then
-    local buttons = config_utils.get_buttons(self.opts)
+    local buttons = get_buttons(self.opts)
     self.opts.buttons = buttons
     if config.timestamp.enabled and config.timestamp.reset_on_idle then
       self.opts.timestamp = os.time()
@@ -612,7 +645,7 @@ function ActivityManager:build_opts()
     end
   end
   if self:should_update_time() then opts.timestamp = os.time() end
-  local buttons = config_utils.get_buttons(opts)
+  local buttons = get_buttons(opts)
   opts.buttons = buttons
 
   return opts

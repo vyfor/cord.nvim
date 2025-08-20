@@ -1,8 +1,10 @@
-local hooks = require 'cord.internal.activity.hooks'
-local config = require 'cord.internal.config'
+local hooks = require 'cord.internal.hooks'
+local config = require 'cord.api.config'
 local logger = require 'cord.api.log'
 
 local M = {}
+
+M.HOOK_PRIORITY = hooks.PRIORITY
 
 local plugins = {}
 local variables = {}
@@ -118,9 +120,7 @@ function M.init()
   local merged_config = vim.tbl_deep_extend('force', plugin_configs, user_config)
   local final_config = vim.tbl_deep_extend('force', config.get(), merged_config)
 
-  if not require('cord.internal.config.util').validate(final_config) then
-    return 'Invalid config'
-  end
+  if not require('cord.api.config').verify(final_config) then return 'Invalid config' end
 end
 
 return M

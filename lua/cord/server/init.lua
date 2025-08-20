@@ -1,5 +1,5 @@
 local async = require 'cord.core.async'
-local config = require 'cord.internal.config'
+local config = require 'cord.api.config'
 local logger = require 'cord.api.log'
 
 local M = {}
@@ -52,8 +52,8 @@ end
 
 function M:run()
   return async.wrap(function()
-    M.tx = require('cord.server.event.sender').new(M.client)
-    M.rx = require('cord.server.event.receiver').new(M.client)
+    M.tx = require('cord.server.ipc.sender').new(M.client)
+    M.rx = require('cord.server.ipc.receiver').new(M.client)
     logger.debug 'Server: sending initialize event'
     M.tx:initialize(config.get())
     logger.debug 'Server: registering ready handler'
@@ -65,7 +65,7 @@ function M:run()
         async.run(function()
           logger.info 'Connected to Discord'
 
-          local ActivityManager = require 'cord.internal.activity.manager'
+          local ActivityManager = require 'cord.internal.manager'
           local manager, err = ActivityManager.new({ tx = M.tx }):get()
           if not manager or err then
             self.status = 'disconnected'
@@ -77,7 +77,7 @@ function M:run()
           M.client.on_close = vim.schedule_wrap(function()
             M.status = 'disconnected'
             if M.manager then M.manager:cleanup() end
-            require('cord.internal.activity.hooks').run 'shutdown'
+            require('cord.internal.hooks').run 'shutdown'
           end)
 
           manager:run()
@@ -89,7 +89,7 @@ function M:run()
             vim.schedule_wrap(function()
               self.status = 'connected'
               M.manager:cleanup()
-              require('cord.internal.activity.hooks').run 'shutdown'
+              require('cord.internal.hooks').run 'shutdown'
 
               if config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
 
