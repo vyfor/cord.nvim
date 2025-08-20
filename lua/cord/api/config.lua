@@ -1,5 +1,6 @@
 ---@diagnostic disable-next-line: deprecated
 local unpack = unpack or table.unpack
+local utils = require 'cord.core.util'
 
 local M = {}
 
@@ -134,7 +135,7 @@ local function is_valid_path(path)
     if dict_paths[parent] then return true end
 
     local wildcard_path = table.concat(
-      vim.tbl_flatten {
+      utils.tbl_flatten {
         { parts[1] },
         { '*' },
         { unpack(parts, 3) },
