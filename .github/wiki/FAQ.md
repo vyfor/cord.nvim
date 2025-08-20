@@ -1,6 +1,6 @@
 ## ❓ FAQ
 
-**Got questions? We've got answers!**  Here are some common questions about cord.nvim that nobody asked, yet we answered anyway. If you don't find your answer here or in the [Troubleshooting Guide](./Troubleshooting.md), don't hesitate to ask in our [Discord community](https://discord.gg/q9rC4bjCHv) or [GitHub Discussions](https://github.com/vyfor/cord.nvim/discussions)!
+Here are some common questions about cord.nvim that nobody asked, yet we answered anyway. If you don't find your answer here or in the [Troubleshooting Guide](./Troubleshooting.md), don't hesitate to ask in our [Discord community](https://discord.gg/q9rC4bjCHv) or [GitHub Discussions](https://github.com/vyfor/cord.nvim/discussions)!
 
 > ### Q: What is the minimum required version of Neovim?
 
@@ -8,7 +8,7 @@ Cord is tested with Neovim **0.6.0** or later. Although, we encourage you to use
 
 > ### Q: Do I need to install Rust to use Cord?
 
-Nope, you don't need Rust anymore! We made it easier. Cord will automatically download the necessary server component from GitHub. If you want to build the binary from source, refer to [this](./Build.md) page.
+Nope, you don't need Rust anymore! Cord will automatically download the necessary server binary from GitHub. If you want to build the binary from source, refer to [this](./Build.md) page.
 
 > ### Q: How to see the logs?
 
@@ -22,7 +22,10 @@ require 'cord'.setup {
 }
 ```
 
-1. Set the `CORD_LOG_FILE` environment variable to a file path. This will redirect all logs to that file. This is useful for debugging as trace and debug logs can be very verbose and overwhelming in the editor.
+2. Set the `CORD_LOG_FILE` environment variable to a file path. This will redirect all logs to that file. This is useful for debugging as trace and debug logs can be very verbose and overwhelming in the editor.
+
+> [!NOTE]
+> If you were asked to provide logs as part of an issue, you should enable verbose logging via `log_level = 'trace'` and set `CORD_LOG_FILE` env var. Use of relative paths is allowed, e.g. `export CORD_LOG_FILE="./cord.log"`. The log file gets cleared at plugin startup, so keep that in mind.
 
 > ### Q: Can I use a custom name in my Rich Presence?
 
@@ -44,13 +47,13 @@ Cord's server keeps running intentionally. In fact, this is one of the key desig
 
 > ### Q: I'm using a custom Discord client. Will Cord work with it?
 
-Yes, although we do not endorse custom clients, and cannot guarantee that they will work. The main issue is that custom clients often cannot/do not expose the IPC pipe at the same path as the official client, so you might need to create a symlink to make it work. You can also override the defaults by setting the `advanced.discord.pipe_paths` field to a list of absolute paths to use when connecting to Discord.
+See [Special Environments](./Special-Environments.md#-custom-discord-clients).
 
 > ### Q: Is X plugin or X language supported?
 
 Cord detects different buffers based on their filetype, and occasionally their filename. See the list of supported filetypes [here](https://github.com/vyfor/cord.nvim/blob/master/lua/cord/plugin/activity/mappings.lua). If it's not listed, it usually means one of two things:
-- It hasn't been added yet — feel free to [open an issue](https://github.com/vyfor/cord.nvim/issues/new/choose) and we'll add it.
-- It can't be detected:
+- It has not been added yet — feel free to [open an issue](https://github.com/vyfor/cord.nvim/issues/new/choose) and we'll add it.
+- It cannot be detected:
   - *Languages* that cannot be detected by filetype or filename alone, have to be configured to be detectable, as explained in [here](https://github.com/vyfor/cord.nvim/wiki/Assets#-tip).
   - *Plugins* are required to override current buffer's `filetype`, or otherwise Cord will not be able to detect it.
 
