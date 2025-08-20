@@ -32,7 +32,7 @@
 - 🚀 Event-driven architecture with instant presence updates.
 - 🎨 Dynamic string templates with custom variables.
 - 🗃️ Customizable assets for any file/buffer type.
-- 🔧 Flexible configuration with rich API, function-based fields, hooks, user commands and support for custom IPC paths.
+- 🔧 Flexible configuration with rich API, function-based fields, hooks, user commands and custom IPC paths.
 - 🔌 Plugin system of its own, with many plugins out-of-the-box.
 - 🛠️ Finds repositories and workspaces based on VCS files without relying on command-line tools.
 - 🧠 Manages activities across all instances with a single connection to Discord.
