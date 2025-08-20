@@ -1,6 +1,6 @@
 local Async = require 'cord.core.async'
 local Process = require 'cord.core.uv.process'
-local logger = require 'cord.plugin.log'
+local logger = require 'cord.internal.log'
 local utils = require 'cord.core.util'
 local uv = vim.uv or vim.loop
 
@@ -199,7 +199,7 @@ M.setup = function(config)
             mngr:pause()
           end
         end,
-        priority = require('cord.plugin.activity.hooks').PRIORITY.HIGHEST,
+        priority = require('cord.internal.activity.hooks').PRIORITY.HIGHEST,
       },
     },
   }

@@ -1,4 +1,4 @@
-local logger = require 'cord.plugin.log'
+local logger = require 'cord.internal.log'
 local bit = require 'bit'
 
 local Handler = {}

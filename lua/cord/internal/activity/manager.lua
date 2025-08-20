@@ -1,10 +1,10 @@
 local async = require 'cord.core.async'
-local activities = require 'cord.plugin.activity'
-local ws_utils = require 'cord.plugin.fs.workspace'
-local config_utils = require 'cord.plugin.config.util'
-local hooks = require 'cord.plugin.activity.hooks'
-local config = require 'cord.plugin.config'
-local logger = require 'cord.plugin.log'
+local builder = require 'cord.internal.builder'
+local ws_utils = require 'cord.internal.activity.workspace'
+local config_utils = require 'cord.internal.config.util'
+local hooks = require 'cord.internal.activity.hooks'
+local config = require 'cord.internal.config'
+local logger = require 'cord.internal.log'
 
 local uv = vim.loop or vim.uv
 
@@ -262,7 +262,7 @@ function ActivityManager:update_idle_activity()
       self.opts.timestamp = os.time()
     end
 
-    local activity = activities.build_idle_activity(self.opts)
+    local activity = builder.build_idle_activity(self.opts)
     self:set_activity(activity)
 
     hooks.run('idle_enter', self.opts)
@@ -289,7 +289,7 @@ function ActivityManager:update_activity()
 
   hooks.run('pre_activity', self.opts)
 
-  local activity = activities.build_activity(self.opts)
+  local activity = builder.build_activity(self.opts)
   if activity == true then return end
   if activity == false then return self:clear_activity() end
 

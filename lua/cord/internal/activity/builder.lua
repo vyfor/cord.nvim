@@ -1,7 +1,7 @@
-local config_utils = require 'cord.plugin.config.util'
-local mappings = require 'cord.plugin.activity.mappings'
+local config_utils = require 'cord.internal.config.util'
+local mappings = require 'cord.internal.activity.mappings'
 local icons = require 'cord.api.icon'
-local config = require 'cord.plugin.config'
+local config = require 'cord.internal.config'
 
 local function get_custom_asset(config, filename, filetype)
   if not config.assets then return end

@@ -1,5 +1,5 @@
 local async = require 'cord.core.async'
-local logger = require 'cord.plugin.log'
+local logger = require 'cord.internal.log'
 
 local M = {}
 
@@ -139,7 +139,7 @@ end)
 local function get_local_version()
   local process = require 'cord.core.uv.process'
   local executable_path =
-    require('cord.server.fs').get_executable_path(require('cord.plugin.config').get())
+    require('cord.server.fs').get_executable_path(require('cord.internal.config').get())
 
   return async.wrap(function()
     local res = process
@@ -238,7 +238,7 @@ M.fetch = async.wrap(function()
   end
 
   local executable_path =
-    require('cord.server.fs').get_executable_path(require('cord.plugin.config').get())
+    require('cord.server.fs').get_executable_path(require('cord.internal.config').get())
   local process = require 'cord.core.uv.process'
 
   local fetch_executable = vim.schedule_wrap(function(tag)
@@ -251,7 +251,7 @@ M.fetch = async.wrap(function()
       base_url = 'https://github.com/vyfor/cord.nvim/releases/latest/download/'
     end
 
-    local os_info = require('cord.plugin.constants').get_os()
+    local os_info = require('cord.core.util').get_os()
     local url = base_url
       .. os_info.arch
       .. '-'

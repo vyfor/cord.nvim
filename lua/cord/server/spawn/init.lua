@@ -4,7 +4,7 @@ local M = {}
 
 M.spawn = async.wrap(function(config, pipe_path)
   return Future.new(function(resolve, reject)
-    local logger = require 'cord.plugin.log'
+    local logger = require 'cord.internal.log'
     local update_strategy = config.advanced.server.update
     local client_id = config.editor.client
     local exec_path = require('cord.server.fs').get_executable_path(config)
@@ -20,7 +20,7 @@ M.spawn = async.wrap(function(config, pipe_path)
       elseif update_strategy == 'build' then
         require('cord.server.update').build():await()
       else
-        require('cord.plugin.log').error 'Could not find the server executable'
+        require('cord.internal.log').error 'Could not find the server executable'
       end
       return resolve(false, false)
     end

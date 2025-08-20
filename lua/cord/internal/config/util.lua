@@ -1,12 +1,12 @@
-local config = require 'cord.plugin.config'
-local logger = require 'cord.plugin.log'
+local config = require 'cord.internal.config'
+local logger = require 'cord.internal.log'
 
 local M = {}
 
 function M.validate(new_config)
   local user_config = new_config or require('cord').user_config or {}
   local icons = require 'cord.api.icon'
-  local config_manager = require 'cord.plugin.config'
+  local config_manager = require 'cord.internal.config'
 
   local final_config = vim.tbl_deep_extend('force', config_manager.get(), user_config)
 
@@ -52,7 +52,7 @@ function M.validate(new_config)
   end
 
   if type(final_config.editor.client) == 'string' then
-    local client = require('cord.plugin.constants').CLIENT_IDS[final_config.editor.client]
+    local client = require('cord.internal.constants').CLIENT_IDS[final_config.editor.client]
 
     if not client then
       if final_config.editor.client:match '^%d+$' then

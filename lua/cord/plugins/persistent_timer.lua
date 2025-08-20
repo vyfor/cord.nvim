@@ -28,7 +28,7 @@ local M = {
 
 local FS = require 'cord.core.uv.fs'
 local Async = require 'cord.core.async'
-local logger = require 'cord.plugin.log'
+local logger = require 'cord.internal.log'
 local uv = vim.loop or vim.uv
 
 local function now() return os.time() end

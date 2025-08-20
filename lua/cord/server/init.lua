@@ -1,6 +1,6 @@
 local async = require 'cord.core.async'
-local config = require 'cord.plugin.config'
-local logger = require 'cord.plugin.log'
+local config = require 'cord.internal.config'
+local logger = require 'cord.internal.log'
 
 local M = {}
 
@@ -65,7 +65,7 @@ function M:run()
         async.run(function()
           logger.info 'Connected to Discord'
 
-          local ActivityManager = require 'cord.plugin.activity.manager'
+          local ActivityManager = require 'cord.internal.activity.manager'
           local manager, err = ActivityManager.new({ tx = M.tx }):get()
           if not manager or err then
             self.status = 'disconnected'
@@ -77,7 +77,7 @@ function M:run()
           M.client.on_close = vim.schedule_wrap(function()
             M.status = 'disconnected'
             if M.manager then M.manager:cleanup() end
-            require('cord.plugin.activity.hooks').run 'shutdown'
+            require('cord.internal.activity.hooks').run 'shutdown'
           end)
 
           manager:run()
@@ -89,7 +89,7 @@ function M:run()
             vim.schedule_wrap(function()
               self.status = 'connected'
               M.manager:cleanup()
-              require('cord.plugin.activity.hooks').run 'shutdown'
+              require('cord.internal.activity.hooks').run 'shutdown'
 
               if config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
 
@@ -118,8 +118,7 @@ function M:initialize()
   async.run(function()
     logger.debug 'Initializing server...'
 
-    local path = config.advanced.server.pipe_path
-      or require('cord.plugin.constants').get_pipe_path()
+    local path = config.advanced.server.pipe_path or require('cord.core.util').get_pipe_path()
 
     logger.trace(function() return 'Server pipe path: ' .. tostring(path) end)
     local _, err = M:connect(path):get()
