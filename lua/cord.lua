@@ -6,7 +6,7 @@ M = {
     if opts then M.user_config = opts end
 
     if vim.g.cord_defer_startup == true then
-      local config = require('cord.plugin.config.util').validate(opts)
+      local config = require('cord.api.config').verify(opts)
       if not config then return end
 
       if config.enabled then

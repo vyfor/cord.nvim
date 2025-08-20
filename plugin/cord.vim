@@ -32,7 +32,7 @@ lua << EOF
     -- Also allows the plugin to start automatically without requiring setup() call.
     -- This is experimental, do let us know if you're having any issues.
     vim.schedule(function()
-        local config = require('cord.plugin.config.util').validate()
+        local config = require('cord.api.config').verify()
         if not config then return end
 
         if config.enabled then

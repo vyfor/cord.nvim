@@ -10,7 +10,7 @@ M.build = function()
   require('cord.core.async').run(function() require('cord.server.update').build():await() end)
 end
 M.update = function()
-  local mode = require('cord.plugin.config').advanced.server.update
+  local mode = require('cord.api.config').advanced.server.update
 
   if mode == 'fetch' then
     M.fetch()
@@ -19,7 +19,7 @@ M.update = function()
   elseif mode == 'build' then
     M.build()
   elseif mode ~= 'none' then
-    require('cord.plugin.log').notify(
+    require('cord.api.log').notify(
       'Unknown update mode: ' .. '\'' .. mode .. '\'',
       vim.log.levels.ERROR
     )
@@ -69,14 +69,11 @@ M.restart = function()
   vim.schedule(function()
     local cord = require 'cord.server'
     if cord.is_updating then
-      require('cord.plugin.log').notify(
-        'Operation cancelled: Server is updating',
-        vim.log.levels.WARN
-      )
+      require('cord.api.log').notify('Operation cancelled: Server is updating', vim.log.levels.WARN)
       return
     end
 
-    require('cord.plugin.log').debug 'Restarting...'
+    require('cord.api.log').debug 'Restarting...'
     local function initialize()
       require('cord.core.async').run(function() cord:initialize() end)
     end
@@ -99,24 +96,24 @@ M.shutdown = function()
   local cord = require 'cord.server'
 
   if not cord.client or cord.client:is_closing() then
-    return require('cord.plugin.log').notify('Server is not running', vim.log.levels.INFO)
+    return require('cord.api.log').notify('Server is not running', vim.log.levels.INFO)
   end
 
   cord.is_updating = false
   if cord.manager then cord.manager:cleanup() end
   cord.tx:shutdown()
-  require('cord.plugin.log').notify('Stopped server', vim.log.levels.INFO)
+  require('cord.api.log').notify('Stopped server', vim.log.levels.INFO)
 end
 M.status = function()
   local cord = require 'cord.server'
   if cord.status == 'ready' then
-    require('cord.plugin.log').notify('Status: Connected to Discord', vim.log.levels.INFO)
+    require('cord.api.log').notify('Status: Connected to Discord', vim.log.levels.INFO)
   elseif cord.status == 'connecting' then
-    require('cord.plugin.log').notify('Status: Connecting to Cord server', vim.log.levels.INFO)
+    require('cord.api.log').notify('Status: Connecting to Cord server', vim.log.levels.INFO)
   elseif cord.status == 'connected' then
-    require('cord.plugin.log').notify('Status: Connecting to Discord', vim.log.levels.INFO)
+    require('cord.api.log').notify('Status: Connecting to Discord', vim.log.levels.INFO)
   else
-    require('cord.plugin.log').notify('Status: Disconnected', vim.log.levels.INFO)
+    require('cord.api.log').notify('Status: Disconnected', vim.log.levels.INFO)
   end
 end
 M.check = function()
@@ -136,11 +133,11 @@ M.features = {
 local function handle_feature(feature, enable)
   local feat = M.features[feature]
   if not feat then
-    require('cord.plugin.log').notify('Unknown option: \'' .. feature .. '\'', vim.log.levels.ERROR)
+    require('cord.api.log').notify('Unknown option: \'' .. feature .. '\'', vim.log.levels.ERROR)
     return
   end
 
-  local config = require 'cord.plugin.config'
+  local config = require 'cord.api.config'
   local target = config
   for i = 1, #feat.path - 1 do
     target = target[feat.path[i]]
@@ -240,12 +237,12 @@ end
 
 M.handle = function(q_args)
   if not q_args then
-    require('cord.plugin.log').notify('No command provided', vim.log.levels.ERROR)
+    require('cord.api.log').notify('No command provided', vim.log.levels.ERROR)
     return
   end
 
   if type(q_args) ~= 'string' then
-    require('cord.plugin.log').notify(
+    require('cord.api.log').notify(
       'Invalid input: expected string, got ' .. tostring(q_args),
       vim.log.levels.ERROR
     )
@@ -255,7 +252,7 @@ M.handle = function(q_args)
   local args = vim.split(string.gsub(q_args, '"', ''), '%s+')
   local args_len = #args
   if args_len == 0 then
-    require('cord.plugin.log').notify('No command provided', vim.log.levels.ERROR)
+    require('cord.api.log').notify('No command provided', vim.log.levels.ERROR)
     return
   end
 
@@ -263,7 +260,7 @@ M.handle = function(q_args)
   local command = M.commands[cmd]
 
   if not command then
-    require('cord.plugin.log').notify('Unknown command: \'' .. cmd .. '\'', vim.log.levels.ERROR)
+    require('cord.api.log').notify('Unknown command: \'' .. cmd .. '\'', vim.log.levels.ERROR)
     return
   end
 
@@ -281,7 +278,7 @@ M.handle = function(q_args)
 
   local subcmd = args[2]
   if not subcmd then
-    require('cord.plugin.log').notify('Additional arguments required', vim.log.levels.ERROR)
+    require('cord.api.log').notify('Additional arguments required', vim.log.levels.ERROR)
     return
   end
 
@@ -291,13 +288,13 @@ M.handle = function(q_args)
     elseif command.action then
       command.action(subcmd)
     else
-      require('cord.plugin.log').notify(
+      require('cord.api.log').notify(
         'Unknown option: \'' .. subcmd .. '\' for command \'' .. cmd .. '\'',
         vim.log.levels.ERROR
       )
     end
   else
-    require('cord.plugin.log').notify(
+    require('cord.api.log').notify(
       'Unknown subcommand: \'' .. subcmd .. '\' for command \'' .. cmd .. '\'',
       vim.log.levels.ERROR
     )

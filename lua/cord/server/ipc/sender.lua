@@ -1,5 +1,5 @@
 local mpack = vim.mpack
-local logger = require 'cord.plugin.log'
+local logger = require 'cord.api.log'
 
 local Producer = {}
 local mt = { __index = Producer }

@@ -1,7 +1,7 @@
-local config_utils = require 'cord.plugin.config.util'
-local mappings = require 'cord.plugin.activity.mappings'
+local logger = require 'cord.api.log'
+local mappings = require 'cord.internal.activity.mappings'
 local icons = require 'cord.api.icon'
-local config = require 'cord.plugin.config'
+local config = require 'cord.api.config'
 
 local function get_custom_asset(config, filename, filetype)
   if not config.assets then return end
@@ -18,6 +18,57 @@ local function get_custom_asset(config, filename, filetype)
 
   icon = config.assets['Cord.override']
   if icon then return icon, 'Cord.override' end
+end
+
+local function get_option(option, args)
+  local ty = type(option)
+  logger.trace(function() return 'config.get: option_type=' .. tostring(ty) end)
+
+  local variables = config.variables
+  local vars_is_table = type(variables) == 'table'
+  if vars_is_table then
+    ---@cast variables table
+    logger.trace(function()
+      local keys = {}
+      for k, _ in pairs(variables) do
+        table.insert(keys, k)
+      end
+      return 'config.get: merging variables=[' .. table.concat(keys, ',') .. ']'
+    end)
+    for k, v in pairs(variables) do
+      args[k] = v
+    end
+  end
+
+  if ty == 'string' and (vars_is_table or variables == true) then
+    logger.trace(
+      function() return 'config.get: processing string with variables: ' .. tostring(option) end
+    )
+    option = option:gsub('%${(.-)}', function(var)
+      local arg = args[var]
+      logger.trace(
+        function() return 'config.get: variable ${' .. var .. '} = ' .. tostring(arg) end
+      )
+      if type(arg) == 'function' then
+        local result = tostring(arg(args))
+        logger.trace(
+          function() return 'config.get: function variable ${' .. var .. '} = ' .. result end
+        )
+        return result
+      elseif arg ~= nil then
+        return tostring(arg)
+      end
+      logger.trace(
+        function() return 'config.get: undefined variable ${' .. var .. '}, keeping placeholder' end
+      )
+      return '${' .. var .. '}'
+    end)
+    logger.trace(function() return 'config.get: final string: ' .. tostring(option) end)
+  end
+
+  local result = ty == 'function' and option(args) or option
+  logger.trace(function() return 'config.get: returning ' .. tostring(type(result)) end)
+  return result
 end
 
 ---@return Activity|boolean
@@ -45,12 +96,12 @@ local function build_activity(opts)
     if type(custom_icon) == 'string' then
       opts.icon = custom_icon
     else
-      opts.name = config_utils.get(custom_icon.name, opts)
-      opts.tooltip = config_utils.get(custom_icon.tooltip, opts) or tooltip
+      opts.name = get_option(custom_icon.name, opts)
+      opts.tooltip = get_option(custom_icon.tooltip, opts) or tooltip
       opts.type = custom_icon.type or icon_type
-      opts.text = config_utils.get(custom_icon.text, opts)
+      opts.text = get_option(custom_icon.text, opts)
       opts.filetype = override_type or opts.filetype
-      opts.icon = config_utils.get(custom_icon.icon, opts)
+      opts.icon = get_option(custom_icon.icon, opts)
         or (custom_icon.type and icons.get(mappings.get_default_icon(custom_icon.type)))
         or opts.icon
     end
@@ -62,16 +113,16 @@ local function build_activity(opts)
   else
     if opts.type == 'language' then
       if opts.is_read_only then
-        local text = config_utils.get(config.text.viewing, opts)
+        local text = get_option(config.text.viewing, opts)
         if text == true or text == false then return text end
         if text ~= '' then file_text = text end
       else
-        local text = config_utils.get(config.text.editing, opts)
+        local text = get_option(config.text.editing, opts)
         if text == true or text == false then return text end
         if text ~= '' then file_text = text end
       end
     else
-      local text = config_utils.get(config.text[opts.type], opts)
+      local text = get_option(config.text[opts.type], opts)
       if text == true or text == false then return text end
       if text ~= '' then file_text = text end
     end
@@ -79,12 +130,12 @@ local function build_activity(opts)
 
   local details, state
   if config.display.swap_fields then
-    local workspace = config_utils.get(config.text.workspace, opts)
+    local workspace = get_option(config.text.workspace, opts)
     if workspace == true or workspace == false then return workspace end
     if workspace ~= '' then details = workspace end
     state = file_text
   else
-    local workspace = config_utils.get(config.text.workspace, opts)
+    local workspace = get_option(config.text.workspace, opts)
     if workspace == true or workspace == false then return workspace end
     if workspace ~= '' then state = workspace end
     details = file_text
@@ -94,7 +145,7 @@ local function build_activity(opts)
 
   local function set_editor_only()
     large_image = config.editor.icon
-    large_text = config_utils.get(config.editor.tooltip, opts)
+    large_text = get_option(config.editor.tooltip, opts)
   end
 
   local function set_asset_only()
@@ -105,14 +156,14 @@ local function build_activity(opts)
   local function set_full()
     if config.display.swap_icons then
       large_image = config.editor.icon
-      large_text = config_utils.get(config.editor.tooltip, opts)
+      large_text = get_option(config.editor.tooltip, opts)
       small_image = opts.icon
       small_text = opts.tooltip or opts.filetype
     else
       large_image = opts.icon
       large_text = opts.tooltip or opts.filetype
       small_image = config.editor.icon
-      small_text = config_utils.get(config.editor.tooltip, opts)
+      small_text = get_option(config.editor.tooltip, opts)
     end
   end
 
@@ -150,36 +201,36 @@ end
 local function build_idle_activity(opts)
   local details, state
   if config.display.swap_fields then
-    details = config_utils.get(config.idle.state, opts)
-    state = config_utils.get(config.idle.details, opts)
+    details = get_option(config.idle.state, opts)
+    state = get_option(config.idle.details, opts)
   else
-    details = config_utils.get(config.idle.details, opts)
-    state = config_utils.get(config.idle.state, opts)
+    details = get_option(config.idle.details, opts)
+    state = get_option(config.idle.state, opts)
   end
 
   local large_image, large_text, small_image, small_text
 
   local function set_editor_only()
     large_image = config.editor.icon
-    large_text = config_utils.get(config.editor.tooltip, opts)
+    large_text = get_option(config.editor.tooltip, opts)
   end
 
   local function set_asset_only()
-    large_image = config_utils.get(config.idle.icon, opts)
-    large_text = config_utils.get(config.idle.tooltip, opts)
+    large_image = get_option(config.idle.icon, opts)
+    large_text = get_option(config.idle.tooltip, opts)
   end
 
   local function set_full()
     if config.display.swap_icons then
       large_image = config.editor.icon
-      large_text = config_utils.get(config.editor.tooltip, opts)
-      small_image = config_utils.get(config.idle.icon, opts)
-      small_text = config_utils.get(config.idle.tooltip, opts)
+      large_text = get_option(config.editor.tooltip, opts)
+      small_image = get_option(config.idle.icon, opts)
+      small_text = get_option(config.idle.tooltip, opts)
     else
-      large_image = config_utils.get(config.idle.icon, opts)
-      large_text = config_utils.get(config.idle.tooltip, opts)
+      large_image = get_option(config.idle.icon, opts)
+      large_text = get_option(config.idle.tooltip, opts)
       small_image = config.editor.icon
-      small_text = config_utils.get(config.editor.tooltip, opts)
+      small_text = get_option(config.editor.tooltip, opts)
     end
   end
 

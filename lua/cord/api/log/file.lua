@@ -1,7 +1,7 @@
 local levels = vim.log.levels
 local fs = require 'cord.core.uv.fs'
 local Async = require 'cord.core.async'
-local msg_logger = require 'cord.plugin.log.notify'
+local msg_logger = require 'cord.api.log.notify'
 
 local log_level = levels.TRACE
 local queue = {}

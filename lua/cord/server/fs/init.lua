@@ -15,7 +15,7 @@ function M.get_executable_path(config)
 end
 
 function M.get_executable_name()
-  return require('cord.plugin.constants').get_os().name == 'windows' and 'cord.exe' or 'cord'
+  return require('cord.core.util').get_os().name == 'windows' and 'cord.exe' or 'cord'
 end
 
 return M
