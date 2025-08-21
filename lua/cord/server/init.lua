@@ -11,16 +11,16 @@ function M:connect(path, retried)
       return
     end
 
-    self.status = 'connecting'
-    logger.debug 'Connecting to pipe...'
+    self.status = 'initializing'
+    logger.debug 'Connecting to server...'
 
     logger.trace('Pipe: ' .. path)
     M.client = require('cord.core.uv.pipe').new()
     local _, err = M.client:connect(path):get()
 
     if not err then
-      self.status = 'connected'
-      logger.debug 'Connected to pipe'
+      self.status = 'initialized'
+      logger.debug 'Connected to server'
 
       return M:run():await()
     end
@@ -87,7 +87,7 @@ function M:run()
             'disconnect',
             false,
             vim.schedule_wrap(function()
-              self.status = 'connected'
+              self.status = 'initialized'
               M.manager:cleanup()
               require('cord.internal.hooks').run 'shutdown'
 
@@ -114,7 +114,7 @@ function M:run()
 end
 
 function M:initialize()
-  self.status = 'connecting'
+  self.status = 'initializing'
   async.run(function()
     logger.debug 'Initializing server...'
 

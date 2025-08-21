@@ -108,9 +108,9 @@ M.status = function()
   local cord = require 'cord.server'
   if cord.status == 'ready' then
     require('cord.api.log').notify('Status: Connected to Discord', vim.log.levels.INFO)
-  elseif cord.status == 'connecting' then
-    require('cord.api.log').notify('Status: Connecting to Cord server', vim.log.levels.INFO)
-  elseif cord.status == 'connected' then
+  elseif cord.status == 'initializing' then
+    require('cord.api.log').notify('Status: Connecting to server', vim.log.levels.INFO)
+  elseif cord.status == 'initialized' then
     require('cord.api.log').notify('Status: Connecting to Discord', vim.log.levels.INFO)
   else
     require('cord.api.log').notify('Status: Disconnected', vim.log.levels.INFO)
