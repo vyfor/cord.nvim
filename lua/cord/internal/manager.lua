@@ -125,6 +125,7 @@ end
 ActivityManager.new = async.wrap(function(opts)
   local self = setmetatable({
     tx = opts.tx,
+    is_ready = false,
     is_focused = true,
     is_paused = false,
     is_force_idle = false,
@@ -170,6 +171,7 @@ function ActivityManager:run()
   self.workspace = vim.fn.fnamemodify(self.workspace_dir, ':t')
   self.last_updated = uv.now()
 
+  self.is_ready = true
   hooks.run('ready', self)
 
   self:queue_update(true)
@@ -197,6 +199,7 @@ end
 ---@return nil
 function ActivityManager:cleanup()
   logger.debug 'ActivityManager.cleanup'
+  self.is_ready = false
   self:clear_autocmds()
   if self.idle_timer then
     self.idle_timer:stop()
@@ -222,7 +225,7 @@ end
 ---Queue an activity update
 ---@param force_update? boolean Whether to force the update regardless of conditions
 function ActivityManager:queue_update(force_update)
-  if not self.events_enabled then return end
+  if not self.events_enabled or not self.is_ready then return end
 
   self.opts = self:build_opts()
   if not self.is_force_idle and (force_update or self:should_update()) then
@@ -239,7 +242,7 @@ end
 ---Check if the activity should be updated to idle
 ---@return nil
 function ActivityManager:check_idle()
-  if not self.events_enabled then return end
+  if not self.events_enabled or not self.is_ready then return end
   if not config.idle.enabled and not self.is_force_idle then return end
   if self.is_idle then return end
 
@@ -492,6 +495,8 @@ end
 ---@param activity table Activity to set
 ---@return nil
 function ActivityManager:set_activity(activity, force)
+  if not self.is_ready then return end
+
   hooks.run('post_activity', self.opts, activity)
 
   if config.timestamp.shared then
