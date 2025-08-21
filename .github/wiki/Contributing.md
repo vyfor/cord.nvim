@@ -14,7 +14,7 @@ Thank you for your interest in contributing to cord.nvim! This document provides
 
 ## Getting Started
 
-If you're new to contributing in general, we recommend starting small by improving the documentation or finding missing mappings and adding them to the appropriate [mappings](./lua/cord/plugin/activity/mappings.lua) table.
+If you're new to contributing in general, we recommend starting small by improving the documentation or finding missing mappings and adding them to the appropriate [mappings](./lua/cord/internal/activity/mappings.lua) table.
 
 ## Project Overview
 
@@ -25,30 +25,30 @@ The Neovim-side implementation: configuration, activity detection, hooks, built-
 <summary><strong>Expand</strong></summary>
 
 - `lua/cord/api/`
-  - `command.lua`: `:Cord ...` user commands.
-  - `config.lua`: Config validation for health checks.
-  - `plugin.lua`: Plugin API.
-  - `icon.lua`: Icon API.
-- `lua/cord/core/`
-  - `async/`: Async/Futures helpers on top of coroutines.
-  - `uv/`: Thin wrappers over libuv based on the Futures system above.
-- `lua/cord/plugin/`
-  - `activity/`: Core activity system
-    - `mappings.lua`: Buffer/filetype/context mappings.
-    - `manager.lua`: Builds/schedules/sends activities; idle handling; queueing.
-    - `hooks.lua`: Hook registration and execution used by the manager.
-    - `init.lua`: Aggregates the activity subsystem, builds the Activity object.
-  - `config/`: Runtime config layer (`init.lua`, `util.lua`) for merge/override logic.
-  - `constants/`: Constants and enums used across the plugin.
-  - `fs/workspace.lua`: Workspace discovery from root markers (`.git`, `.hg`, `.svn`, etc.).
+  - `config/`: Runtime config layer, defaults and validation.
   - `log/`: Logging backends
     - `init.lua`: Logger facade.
     - `file.lua`: File logger.
     - `notify.lua`: `:messages` logger.
-- `lua/cord/plugins/` Built-in plugins
+  - `command.lua`: `:Cord ...` user commands.
+  - `icon.lua`: Icon API.
+- `lua/cord/core/`
+  - `async/`: Async/Futures helpers on top of coroutines.
+  - `uv/`: Thin wrappers over libuv based on the Futures system above.
+  - `util/`: Utility functions used throughout the codebase.
+- `lua/cord/internal/`
+  - `activity/`
+    - `builder.lua`: Aggregates the activity subsystem, builds the Activity object.
+    - `mappings.lua`: Buffer/filetype/context mappings.
+    - `workspace.lua`: Workspace discovery from root markers (`.git`, `.hg`, `.svn`, etc.).
+  - `constants/`: Constants and enums used across the plugin.
+  - `manager.lua`: Builds/schedules/sends activities; idle handling; queueing.
+  - `hooks.lua`: Hook registration and execution used by the manager.
+- `lua/cord/plugins/`: Built-in plugins.
+  - `init.lua`: Plugin API.
 - `lua/cord/server/`
   - `init.lua`: High-level server lifecycle: connect, restart, shutdown, and integration with events.
-  - `event/receiver.lua` / `event/sender.lua`: Message bus between Lua and Rust server.
+  - `ipc/`: Message bus between Lua and Rust server.
   - `spawn/`: Spawning the server process.
   - `update/`: Fetch/build/update the server executable.
   - `fs/`: Server-related path management.
@@ -83,6 +83,9 @@ Discord IPC, message protocol, session management, cross-platform pipes and some
 
 ### Documentation
 - `.github/wiki/`: Documentation source which is published to GitHub Wiki pages.
+
+### Icons
+- See [vyfor/icons](https://github.com/vyfor/icons).
 
 ## Local Development
 
