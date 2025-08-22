@@ -9,6 +9,7 @@ use crate::ipc::discord::error::DiscordError;
 use crate::ipc::discord::opcodes::Opcode;
 use crate::ipc::discord::utils;
 use crate::messages::events::local::ErrorEvent;
+use crate::messages::events::server::StatusUpdateEvent;
 use crate::messages::message::Message;
 use crate::{local_event, server_event, trace};
 
@@ -112,7 +113,9 @@ impl Connection for RichClient {
                                                     Ordering::SeqCst,
                                                 ) {
                                                     tx.send(server_event!(
-                                                        0, Ready
+                                                        0,
+                                                        StatusUpdate,
+                                                        StatusUpdateEvent::ready()
                                                     ))
                                                     .ok();
                                                 }

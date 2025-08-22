@@ -100,20 +100,26 @@ M.shutdown = function()
   end
 
   cord.is_updating = false
-  if cord.manager then cord.manager:cleanup() end
+  cord:cleanup()
   cord.tx:shutdown()
   require('cord.api.log').notify('Stopped server', vim.log.levels.INFO)
 end
 M.status = function()
   local cord = require 'cord.server'
-  if cord.status == 'ready' then
-    require('cord.api.log').notify('Status: Connected to Discord', vim.log.levels.INFO)
+  if cord.status == 'disconnected' then
+    require('cord.api.log').notify('Status: Disconnected', vim.log.levels.INFO)
   elseif cord.status == 'initializing' then
     require('cord.api.log').notify('Status: Connecting to server', vim.log.levels.INFO)
   elseif cord.status == 'initialized' then
+    require('cord.api.log').notify('Status: Connected to server', vim.log.levels.INFO)
+  elseif cord.status == 'connecting' then
     require('cord.api.log').notify('Status: Connecting to Discord', vim.log.levels.INFO)
+  elseif cord.status == 'connected' then
+    require('cord.api.log').notify('Status: Handshaking with Discord', vim.log.levels.INFO)
+  elseif cord.status == 'ready' then
+    require('cord.api.log').notify('Status: Connected to Discord', vim.log.levels.INFO)
   else
-    require('cord.api.log').notify('Status: Disconnected', vim.log.levels.INFO)
+    require('cord.api.log').notify('Status: Unknown', vim.log.levels.INFO)
   end
 end
 M.check = function()

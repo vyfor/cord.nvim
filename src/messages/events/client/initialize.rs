@@ -2,7 +2,11 @@ use std::sync::atomic::Ordering;
 
 use crate::error::CordErrorKind;
 use crate::ipc::discord::client::Connection;
+use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
+use crate::messages::events::server::StatusUpdateEvent;
+use crate::messages::events::server::status_update::Status;
+use crate::protocol::msgpack::MsgPack;
 use crate::types::config::PluginConfig;
 use crate::util::{logger, now};
 
@@ -42,7 +46,13 @@ impl OnEvent for InitializeEvent {
         }
 
         let config = &ctx.cord.config;
-        if !client.is_ready.load(Ordering::SeqCst) {
+        let is_ready = client.is_ready.load(Ordering::SeqCst);
+        let has_thread = client.thread_handle.is_some();
+        if !has_thread && !is_ready {
+            client.status = Status::Connecting;
+            ctx.cord.pipe.broadcast(&MsgPack::serialize(
+                &StatusUpdateEvent::connecting(),
+            )?)?;
             if client.connect().is_err() {
                 if config.reconnect_interval > 0 && config.initial_reconnect {
                     drop(client);
@@ -61,9 +71,21 @@ impl OnEvent for InitializeEvent {
                     ));
                 }
             } else {
+                client.status = Status::Connected;
+                ctx.cord.pipe.broadcast(&MsgPack::serialize(
+                    &StatusUpdateEvent::connected(),
+                )?)?;
                 client.handshake()?;
                 client.start_read_thread(ctx.cord.tx.clone())?;
             }
+        } else {
+            if is_ready {
+                client.status = Status::Ready;
+            }
+
+            ctx.cord.pipe.broadcast(&MsgPack::serialize(
+                &StatusUpdateEvent::new(client.status),
+            )?)?;
         }
 
         if let Some(mut session) =

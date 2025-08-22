@@ -12,6 +12,7 @@ function M:connect(path, retried)
     end
 
     self.status = 'initializing'
+    self.is_shut_down = false
     logger.debug 'Connecting to server...'
 
     logger.trace('Pipe: ' .. path)
@@ -58,53 +59,53 @@ function M:run()
     M.tx:initialize(config.get())
     logger.debug 'Server: registering ready handler'
     M.rx:register(
-      'ready',
-      true,
-      vim.schedule_wrap(function()
-        self.status = 'ready'
-        async.run(function()
-          logger.info 'Connected to Discord'
+      'status_update',
+      false,
+      vim.schedule_wrap(function(data)
+        if data.status == 'connecting' then
+          self.status = 'connecting'
+          logger.debug 'Connecting to Discord...'
+        elseif data.status == 'connected' then
+          self.status = 'connected'
+          logger.debug 'Handshaking with Discord...'
+        elseif data.status == 'ready' then
+          self.status = 'ready'
+          async.run(function()
+            logger.info 'Connected to Discord'
 
-          local ActivityManager = require 'cord.internal.manager'
-          local manager, err = ActivityManager.new({ tx = M.tx }):get()
-          if not manager or err then
-            self.status = 'disconnected'
-            self.client:close()
-            logger.error(err or 'Failed to initialize activity manager')
-            return
+            local ActivityManager = require 'cord.internal.manager'
+            local manager, err = ActivityManager.new({ tx = M.tx }):get()
+            if not manager or err then
+              self.status = 'disconnected'
+              self.client:close()
+              logger.error(err or 'Failed to initialize activity manager')
+              return
+            end
+
+            M.client.on_close = vim.schedule_wrap(function()
+              M.status = 'disconnected'
+              M.manager:cleanup()
+
+              if not self.is_shut_down then
+                self.is_shut_down = true
+                require('cord.internal.hooks').run 'shutdown'
+              end
+            end)
+
+            manager:run()
+            M.manager = manager
+          end)
+        elseif data.status == 'disconnected' then
+          self.status = 'initialized'
+          M.manager:cleanup()
+
+          if not self.is_shut_down then
+            self.is_shut_down = true
+            require('cord.internal.hooks').run 'shutdown'
           end
 
-          M.client.on_close = vim.schedule_wrap(function()
-            M.status = 'disconnected'
-            if M.manager then M.manager:cleanup() end
-            require('cord.internal.hooks').run 'shutdown'
-          end)
-
-          manager:run()
-          M.manager = manager
-
-          M.rx:register(
-            'disconnect',
-            false,
-            vim.schedule_wrap(function()
-              self.status = 'initialized'
-              M.manager:cleanup()
-              require('cord.internal.hooks').run 'shutdown'
-
-              if config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
-
-              M.rx:register(
-                'ready',
-                true,
-                vim.schedule_wrap(function()
-                  self.status = 'ready'
-                  logger.info 'Connected to Discord'
-                  M.manager:run()
-                end)
-              )
-            end)
-          )
-        end)
+          if config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
+        end
       end)
     )
 
@@ -130,7 +131,6 @@ function M:initialize()
 end
 
 function M:cleanup()
-  if self.manager then self.manager:cleanup() end
   if self.client then self.client:close() end
 end
 

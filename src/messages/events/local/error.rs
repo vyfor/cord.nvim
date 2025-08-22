@@ -1,7 +1,7 @@
 use crate::ipc::discord::error::DiscordError;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::messages::events::server::DisconnectEvent;
+use crate::messages::events::server::StatusUpdateEvent;
 use crate::protocol::msgpack::MsgPack;
 use crate::{debug, error};
 
@@ -33,9 +33,9 @@ impl OnEvent for ErrorEvent {
                         return Err("Discord closed the connection".into());
                     }
 
-                    ctx.cord
-                        .pipe
-                        .broadcast(&MsgPack::serialize(&DisconnectEvent)?)?;
+                    ctx.cord.pipe.broadcast(&MsgPack::serialize(
+                        &StatusUpdateEvent::disconnected(),
+                    )?)?;
 
                     let rich_client = ctx.cord.rich_client.clone();
                     let tx = ctx.cord.tx.clone();
@@ -50,7 +50,13 @@ impl OnEvent for ErrorEvent {
 
                     return Ok(());
                 }
-                _ => (),
+                _ => {
+                    ctx.cord.pipe.broadcast(&MsgPack::serialize(
+                        &StatusUpdateEvent::disconnected(),
+                    )?)?;
+                    error!(ctx.client_id, "{}", self.error);
+                    return Ok(());
+                }
             }
         }
         error!(ctx.client_id, "{}", self.error);

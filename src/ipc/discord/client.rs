@@ -5,6 +5,7 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 
 use crate::ipc::discord::error::DiscordError;
+use crate::messages::events::server::status_update::Status;
 use crate::messages::message::Message;
 use crate::presence::packet::Packet;
 use crate::protocol::json::Json;
@@ -29,6 +30,8 @@ pub struct RichClient {
     pub is_ready: Arc<AtomicBool>,
     pub thread_handle: Option<JoinHandle<()>>,
     pub is_reconnecting: bool,
+    /// Managed externally.
+    pub status: Status,
 }
 
 /// Defines methods for connecting and closing the client.
@@ -58,6 +61,7 @@ impl RichClient {
             is_ready: Arc::new(AtomicBool::new(false)),
             thread_handle: None,
             is_reconnecting: false,
+            status: Status::Disconnected,
         }
     }
 
