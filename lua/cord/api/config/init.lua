@@ -499,7 +499,7 @@ M.check = function()
   )
   info('Neovim version: `' .. tostring(vim.version()) .. '`')
   info('Lua version: `' .. tostring(_VERSION) .. (jit and ' (with LuaJIT)`' or '`'))
-  info('Cord connection status: `' .. tostring(require('cord.server').status) .. '`\n')
+  info('Cord connection status: `' .. require('cord.api.command').status() .. '`\n')
 
   if vim.fn.executable 'curl' == 1 then
     ok '`curl` is installed'

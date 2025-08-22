@@ -106,21 +106,17 @@ M.shutdown = function()
 end
 M.status = function()
   local cord = require 'cord.server'
-  if cord.status == 'disconnected' then
-    require('cord.api.log').notify('Status: Disconnected', vim.log.levels.INFO)
-  elseif cord.status == 'initializing' then
-    require('cord.api.log').notify('Status: Connecting to server', vim.log.levels.INFO)
-  elseif cord.status == 'initialized' then
-    require('cord.api.log').notify('Status: Connected to server', vim.log.levels.INFO)
-  elseif cord.status == 'connecting' then
-    require('cord.api.log').notify('Status: Connecting to Discord', vim.log.levels.INFO)
-  elseif cord.status == 'connected' then
-    require('cord.api.log').notify('Status: Handshaking with Discord', vim.log.levels.INFO)
-  elseif cord.status == 'ready' then
-    require('cord.api.log').notify('Status: Connected to Discord', vim.log.levels.INFO)
-  else
-    require('cord.api.log').notify('Status: Unknown', vim.log.levels.INFO)
-  end
+  local status_map = {
+    disconnected = 'Disconnected',
+    initializing = 'Connecting to server',
+    initialized = 'Connected to server',
+    connecting = 'Connecting to Discord',
+    connected = 'Handshaking with Discord',
+    ready = 'Connected to Discord',
+  }
+  local msg = status_map[cord.status] or 'Unknown'
+  require('cord.api.log').notify('Status: ' .. msg, vim.log.levels.INFO)
+  return msg
 end
 M.check = function()
   require('cord.core.async').run(
