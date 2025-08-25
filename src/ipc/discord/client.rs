@@ -154,11 +154,25 @@ fn get_dirs() -> impl Iterator<Item = String> {
 
 #[cfg(not(target_os = "windows"))]
 fn get_dirs() -> impl Iterator<Item = String> {
-    ["XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"]
+    let default_bases = ["XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"]
         .iter()
-        .filter_map(|&dir| std::env::var(dir).ok())
-        .chain(["/tmp".to_string()])
-        .flat_map(|base| {
+        .filter_map(|&var| std::env::var(var).ok())
+        .chain(std::iter::once("/tmp".to_string()));
+    let sandbox_base = std::env::var("XDG_RUNTIME_DIR")
+        .ok()
+        .unwrap_or_else(|| "/tmp".to_string());
+
+    default_bases
+        .flat_map(move |base| {
             (0..10).map(move |i| format!("{}/discord-ipc-{}", base, i))
         })
+        .chain((0..10).flat_map(move |i| {
+            let flatpak = format!(
+                "{}/app/com.discordapp.Discord/discord-ipc-{}",
+                sandbox_base, i
+            );
+            let snap =
+                format!("{}/snap.discord/discord-ipc-{}", sandbox_base, i);
+            [flatpak, snap].into_iter()
+        }))
 }
