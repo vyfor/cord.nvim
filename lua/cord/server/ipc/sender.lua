@@ -40,4 +40,6 @@ function Producer:disconnect() self:send_event 'disconnect' end
 
 function Producer:shutdown() self:send_event 'shutdown' end
 
+function Producer:restart() self:send_event 'restart' end
+
 return Producer

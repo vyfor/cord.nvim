@@ -89,7 +89,7 @@ M.restart = function()
       initialize()
     end
 
-    cord.tx:shutdown()
+    cord.tx:restart()
   end)
 end
 M.shutdown = function()
