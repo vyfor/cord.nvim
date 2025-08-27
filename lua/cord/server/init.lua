@@ -69,6 +69,7 @@ function M:run()
           self.status = 'connected'
           logger.debug 'Handshaking with Discord...'
         elseif data.status == 'ready' then
+          if self.status == 'ready' then return end
           self.status = 'ready'
           async.run(function()
             logger.info 'Connected to Discord'
