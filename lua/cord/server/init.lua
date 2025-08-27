@@ -109,6 +109,14 @@ function M:run()
       end)
     )
 
+    M.rx:register(
+      'restart',
+      false,
+      vim.schedule_wrap(function()
+        M:initialize()
+      end)
+    )
+
     logger.debug 'Server initialized; starting receiver'
     M.rx:run()
   end)()
