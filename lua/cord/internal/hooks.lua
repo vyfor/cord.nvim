@@ -59,7 +59,8 @@ function M.run(event, ...)
 
   local args = { ... }
   for _, ihook in ipairs(hook) do
-    ihook.fn(unpack(args))
+    local ok, err = pcall(ihook.fn, unpack(args))
+    if not ok then logger.notify(err, vim.log.levels.ERROR) end
   end
 end
 
