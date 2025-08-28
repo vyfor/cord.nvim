@@ -104,7 +104,7 @@ M.shutdown = function()
   cord.tx:shutdown()
   require('cord.api.log').notify('Stopped server', vim.log.levels.INFO)
 end
-M.status = function()
+M.status = function(silent)
   local cord = require 'cord.server'
   local status_map = {
     disconnected = 'Disconnected',
@@ -115,6 +115,8 @@ M.status = function()
     ready = 'Connected to Discord',
   }
   local msg = status_map[cord.status] or 'Unknown'
+
+  if silent == true then return msg end
   require('cord.api.log').notify('Status: ' .. msg, vim.log.levels.INFO)
   return msg
 end

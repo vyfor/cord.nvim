@@ -22,34 +22,34 @@ M.install = async.wrap(function()
 
       async.run(function()
         process
-          .spawn({
-            cmd = 'cargo',
-            args = {
-              'install',
-              'cord-nvim',
-              '--force',
-              '--root',
-              require('cord.server.fs').get_data_path(),
-            },
-          })
-          :and_then(function(res)
-            if res.code ~= 0 then
-              server.is_updating = false
-              logger.error 'Failed to build executable'
-              if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
-              return
-            end
-            logger.notify('Successfully built executable. Restarting...', vim.log.levels.INFO)
+            .spawn({
+              cmd = 'cargo',
+              args = {
+                'install',
+                'cord-nvim',
+                '--force',
+                '--root',
+                require('cord.server.fs').get_data_path(),
+              },
+            })
+            :and_then(function(res)
+              if res.code ~= 0 then
+                server.is_updating = false
+                logger.error 'Failed to build executable'
+                if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
+                return
+              end
+              logger.notify('Successfully built executable. Restarting...', vim.log.levels.INFO)
 
-            async.run(function()
+              async.run(function()
+                server.is_updating = false
+                cord:initialize()
+              end)
+            end, function(err)
               server.is_updating = false
-              cord:initialize()
+
+              logger.error(err)
             end)
-          end, function(err)
-            server.is_updating = false
-
-            logger.error(err)
-          end)
       end)
     end
 
@@ -88,35 +88,35 @@ M.build = async.wrap(function()
 
       async.run(function()
         process
-          .spawn({
-            cmd = 'cargo',
-            args = {
-              'install',
-              '--path',
-              require('cord.server.fs').get_plugin_root(),
-              '--force',
-              '--root',
-              require('cord.server.fs').get_data_path(),
-            },
-          })
-          :and_then(function(res)
-            if res.code ~= 0 then
-              server.is_updating = false
-              logger.error 'Failed to build executable'
-              if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
-              return
-            end
-            logger.notify('Successfully built executable. Restarting...', vim.log.levels.INFO)
+            .spawn({
+              cmd = 'cargo',
+              args = {
+                'install',
+                '--path',
+                require('cord.server.fs').get_plugin_root(),
+                '--force',
+                '--root',
+                require('cord.server.fs').get_data_path(),
+              },
+            })
+            :and_then(function(res)
+              if res.code ~= 0 then
+                server.is_updating = false
+                logger.error 'Failed to build executable'
+                if res.stderr then logger.error('cargo\'s stderr: ' .. res.stderr) end
+                return
+              end
+              logger.notify('Successfully built executable. Restarting...', vim.log.levels.INFO)
 
-            async.run(function()
+              async.run(function()
+                server.is_updating = false
+                cord:initialize()
+              end)
+            end, function(err)
               server.is_updating = false
-              cord:initialize()
+
+              logger.error(err)
             end)
-          end, function(err)
-            server.is_updating = false
-
-            logger.error(err)
-          end)
       end)
     end
 
@@ -136,35 +136,29 @@ M.build = async.wrap(function()
   end)
 end)
 
-local function get_local_version()
+M.local_version = async.wrap(function()
   local process = require 'cord.core.uv.process'
   local executable_path =
-    require('cord.server.fs').get_executable_path(require('cord.api.config').get())
+      require('cord.server.fs').get_executable_path(require('cord.api.config').get())
 
-  return async.wrap(function()
-    local res = process
+  local res = process
       .spawn({
         cmd = executable_path,
         args = { '-v' },
       })
       :get()
 
-    if not res then return nil end
-    if res.code ~= 0 then return nil end
-    local version = res.stdout:gsub('^%s*(.-)%s*$', '%1')
-    if not version then return nil end
+  if not res then return nil end
+  if res.code ~= 0 then return nil end
+  local version = res.stdout:gsub('^%s*(.-)%s*$', '%1')
+  if not version then return nil end
 
-    return version
-  end)()
-end
+  return version
+end)
 
-local function check_versions()
+M.remote_version = async.wrap(function()
   local process = require 'cord.core.uv.process'
-
-  local current_version = async.wrap(function() return get_local_version() end)
-
-  local latest_version = async.wrap(function()
-    local res = process
+  local res = process
       .spawn({
         cmd = 'curl',
         args = {
@@ -176,23 +170,20 @@ local function check_versions()
       })
       :await()
 
-    if res.code ~= 0 then
-      error('Failed to fetch latest version; code: ' .. tostring(res.code), 0)
-      if res.stderr and res.stderr ~= '' then logger.debug('curl stderr: ' .. res.stderr) end
-      return nil
-    end
+  if res.code ~= 0 then
+    error('Failed to fetch latest version; code: ' .. tostring(res.code), 0)
+    if res.stderr and res.stderr ~= '' then logger.debug('curl stderr: ' .. res.stderr) end
+    return nil
+  end
 
-    local version = res.stdout and res.stdout:gsub('^%s*(.-)%s*$', '%1') or nil
-    if not version or version == '' then
-      error('Failed to parse latest version', 0)
-      return nil
-    end
+  local version = res.stdout and res.stdout:gsub('^%s*(.-)%s*$', '%1') or nil
+  if not version or version == '' then
+    error('Failed to parse latest version', 0)
+    return nil
+  end
 
-    return version
-  end)
-
-  return current_version():await(), latest_version():await()
-end
+  return version
+end)
 
 M.check_version = async.wrap(function()
   local server = require 'cord.server'
@@ -205,7 +196,7 @@ M.check_version = async.wrap(function()
 
   async.run(function()
     logger.notify('Checking for updates...', vim.log.levels.INFO)
-    local current, latest = check_versions()
+    local current, latest = M.local_version():await(), M.remote_version():await()
 
     if current and latest then
       if latest == current then
@@ -222,7 +213,7 @@ end)
 
 M.version = async.wrap(function()
   async.run(function()
-    local version = get_local_version():await()
+    local version = M.local_version():await()
     if version then logger.notify('Server version: ' .. version, vim.log.levels.INFO) end
   end)
 end)
@@ -238,7 +229,7 @@ M.fetch = async.wrap(function()
   end
 
   local executable_path =
-    require('cord.server.fs').get_executable_path(require('cord.api.config').get())
+      require('cord.server.fs').get_executable_path(require('cord.api.config').get())
   local process = require 'cord.core.uv.process'
 
   local fetch_executable = vim.schedule_wrap(function(tag)
@@ -253,50 +244,50 @@ M.fetch = async.wrap(function()
 
     local os_info = require('cord.core.util').get_os()
     local url = base_url
-      .. os_info.arch
-      .. '-'
-      .. os_info.name
-      .. '-'
-      .. (os_info.name == 'windows' and 'cord.exe' or 'cord')
+        .. os_info.arch
+        .. '-'
+        .. os_info.name
+        .. '-'
+        .. (os_info.name == 'windows' and 'cord.exe' or 'cord')
 
     local function initialize()
       async.run(function()
         process
-          .spawn({
-            cmd = 'curl',
-            args = {
-              url,
-              '--create-dirs',
-              '--fail',
-              '--location',
-              '--silent',
-              '--show-error',
-              '-o',
-              executable_path,
-              '-H',
-              'Accept: application/octet-stream',
-            },
-          })
-          :and_then(function(res)
-            if res.code ~= 0 then
-              server.is_updating = false
-              logger.error('Failed to download executable; code: ' .. res.code .. ', path: ' .. url)
-              if res.stderr and res.stderr ~= '' then
-                logger.error('curl\'s stderr: ' .. res.stderr)
+            .spawn({
+              cmd = 'curl',
+              args = {
+                url,
+                '--create-dirs',
+                '--fail',
+                '--location',
+                '--silent',
+                '--show-error',
+                '-o',
+                executable_path,
+                '-H',
+                'Accept: application/octet-stream',
+              },
+            })
+            :and_then(function(res)
+              if res.code ~= 0 then
+                server.is_updating = false
+                logger.error('Failed to download executable; code: ' .. res.code .. ', path: ' .. url)
+                if res.stderr and res.stderr ~= '' then
+                  logger.error('curl\'s stderr: ' .. res.stderr)
+                end
+                return
               end
-              return
-            end
-            logger.notify('Successfully updated executable. Restarting...', vim.log.levels.INFO)
+              logger.notify('Successfully updated executable. Restarting...', vim.log.levels.INFO)
 
-            async.run(function()
+              async.run(function()
+                server.is_updating = false
+                require('cord.core.uv.fs').chmod(executable_path, '755'):await()
+                server:initialize()
+              end)
+            end, function(err)
               server.is_updating = false
-              require('cord.core.uv.fs').chmod(executable_path, '755'):await()
-              server:initialize()
+              logger.error(err)
             end)
-          end, function(err)
-            server.is_updating = false
-            logger.error(err)
-          end)
       end)
     end
 
@@ -317,7 +308,7 @@ M.fetch = async.wrap(function()
 
   async.run(function()
     logger.info 'Checking for updates...'
-    local current, latest = check_versions()
+    local current, latest = M.local_version():await(), M.remote_version():await()
 
     if current and latest then
       if latest == current then
