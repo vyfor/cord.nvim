@@ -1,7 +1,7 @@
 # 🏠 All things cord.nvim
 
 ### Getting Started
-- 🚀 **[Installation](../../README.md#-installation)**: Installation instructions for a variety of plugin managers.
+- 🚀 **[Installation](https://github.com/vyfor/cord.nvim?tab=readme-ov-file#-installation)**: Installation instructions for a variety of plugin managers.
 - ⚙️ **[Configuration Guide](./Configuration.md)**: Default configuration and detailed explanation of all available configuration options.
 - 💡 **[Examples](./Examples.md)**: See how Cord can be customized with a rich set of code snippets.
 - 🔌 **[Plugins](./Plugins.md)**: Extend Cord's functionality with built-in and custom plugins.
