@@ -68,6 +68,7 @@ local mt = { __index = ActivityManager }
 ---@field text? string Asset text, if any
 
 local has_initialized = false
+local has_loaded_workspace = false
 
 ---Meant to be called only once throughout the entire lifetime of the program
 ---@return nil
@@ -228,6 +229,12 @@ function ActivityManager:queue_update(force_update)
   if not self.events_enabled or not self.is_ready then return end
 
   self.opts = self:build_opts()
+  if not has_loaded_workspace then
+    has_loaded_workspace = true
+    hooks.run('workspace_change', self.opts)
+    if self.is_paused then return end
+  end
+
   if not self.is_force_idle and (force_update or self:should_update()) then
     logger.debug(
       function()
@@ -495,7 +502,7 @@ end
 ---@param activity table Activity to set
 ---@return nil
 function ActivityManager:set_activity(activity, force)
-  if not self.is_ready then return end
+  if not self.is_ready or self.is_paused then return end
 
   hooks.run('post_activity', self.opts, activity)
 
@@ -568,28 +575,28 @@ function ActivityManager:on_buf_enter()
       function() return 'ActivityManager.on_buf_enter: detected dir=' .. tostring(dir) end
     )
 
-    if not dir then
-      self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = false
-      self:queue_update()
-      return
-    end
+    local workspace_name = dir and vim.fn.fnamemodify(dir, ':t') or nil
+    local repo_url = dir and ws_utils.find_git_repository(dir):get() or nil
 
-    self.workspace_dir = dir
-    self.workspace = vim.fn.fnamemodify(self.workspace_dir, ':t')
-    self.opts.workspace_dir = self.workspace_dir
-    self.opts.workspace = self.workspace
-
-    local repo_url = ws_utils.find_git_repository(dir):get()
-    self.repo_url = repo_url
-    self.opts.repo_url = repo_url
-
-    self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = {
-      dir = self.workspace_dir,
-      name = self.workspace,
-      repo_url = self.repo_url,
+    local cache_entry = {
+      dir = dir,
+      name = workspace_name,
+      repo_url = repo_url,
     }
 
-    hooks.run('workspace_change', self.opts)
+    self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')] = dir and cache_entry or false
+
+    if dir ~= self.workspace_dir then
+      self.workspace_dir = dir
+      self.workspace = workspace_name
+      self.repo_url = repo_url
+
+      self.opts.workspace_dir = self.workspace_dir
+      self.opts.workspace = self.workspace
+      self.opts.repo_url = self.repo_url
+
+      hooks.run('workspace_change', self.opts)
+    end
 
     self:queue_update()
   end)
