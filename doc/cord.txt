@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0             Last change: 2025 August 20
+*cord.txt*            For NVIM v0.6.0           Last change: 2025 September 01
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -146,6 +146,7 @@ Default Configuration ~
         idle_enter = nil,
         idle_leave = nil,
         workspace_change = nil,
+        buf_enter = nil,
       },
       plugins = nil,
       advanced = {
@@ -538,6 +539,9 @@ HOOKS                                               *cord-configuration-hooks*
                                                                                                                 (opts)
 
   hooks.workspace_change   function(opts) \| table<fun: function(opts), priority: number>                       Called when workspace changes (opts)
+
+  hooks.buf_enter          function(manager) \| table<fun: function(manager), priority: number>                 Called when entering a buffer
+                                                                                                                (manager)
   --------------------------------------------------------------------------------------------------------------------------------------------------
 
 PLUGINS                                           *cord-configuration-plugins*
