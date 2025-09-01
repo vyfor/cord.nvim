@@ -57,6 +57,10 @@ hooks = {
 ```
 
 ### Workspace Blacklist
+
+> [!NOTE]
+> Use the [**Visibility**](./Plugins.md#-visibility-cordpluginsvisibility) plugin instead.
+
 ```lua
 local blacklist = {
   'blacklisted_workspace',

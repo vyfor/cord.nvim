@@ -227,9 +227,8 @@ M.set = function(config) defaults = config end
 function M.verify(new_config)
   local user_config = new_config or require('cord').user_config or {}
   local icons = require 'cord.api.icon'
-  local config_manager = require 'cord.api.config'
 
-  local final_config = vim.tbl_deep_extend('force', config_manager.get(), user_config)
+  local final_config = vim.tbl_deep_extend('force', M.get(), user_config)
 
   local log_level = final_config.log_level
   if type(log_level) == 'string' then
@@ -303,7 +302,7 @@ function M.verify(new_config)
     end
   end
 
-  config_manager.set(final_config)
+  M.set(final_config)
   return final_config
 end
 

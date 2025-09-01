@@ -81,6 +81,77 @@ text = {
 }
 ```
 
+### 🧩 Visibility (`cord.plugins.visibility`)
+
+**Purpose:**  Controls whether the Rich Presence activity is shown for a workspace or buffer based on rules. Useful for hiding activity for specific projects, directories, or file types.
+
+**Configuration Options:**
+
+```lua
+{
+  override = true,            -- Whether the plugin overrides activity updates directly
+  precedence = 'blacklist',   -- 'blacklist' or 'whitelist' to resolve conflicts
+  resolve_symlinks = true,    -- Resolve symlinks when matching paths
+  rules = {
+    blacklist = {},
+    whitelist = {},
+  },
+  action = nil,               -- Optional function called when a visibility decision is made
+  fallback = nil,             -- Optional fallback function when no rule matched
+}
+```
+
+- **`override`**:
+    - `true` (default): Plugin will automatically `suppress()` or `resume()` the manager based on rules.
+    - `false`: The plugin will not change activity directly; use the provided variables.
+
+- **`precedence`**:
+    - `'blacklist'` (default): Blacklist rules take precedence when both types match.
+    - `'whitelist'`: Whitelist rules take precedence.
+
+- **`rules`**:
+    - `blacklist` / `whitelist`: Tables of rules. Each rule may be:
+      - **string**: A path (contains `/` or `\`) is treated as a `path` rule; otherwise it's a `name` rule matching workspace name.
+      - **table**: `{ type = 'path'|'glob'|'name', value = '...', action = function(opts) end }`.
+      - **function**: Custom function that receives `{ rule = <rule>, workspace = <string>, workspace_dir = <string> }` and returns truthy to match.
+
+- **`action` / `fallback`**:
+    - Optional functions called with `{ visible = <bool>, rule = <rule>, workspace = <string>, workspace_dir = <string> }` to perform custom behavior when a decision is made.
+
+**Variables Added:**
+
+- **`has_match`**: Function that returns whether the current buffer/workspace matches any configured rule.
+
+**Rule Matching Behavior:**
+
+- Rules support types: `path`, `name`, and `glob`. Globs are converted to regex with `vim.fn.glob2regpat`.
+- Paths may be normalized and (optionally) resolved to their real paths when `resolve_symlinks = true`.
+
+**Usage Example (`override = true`):**
+
+```lua
+require('cord').setup {
+  plugins = {
+    ['cord.plugins.visibility'] = {
+      precedence = 'blacklist',
+      rules = {
+        blacklist = {
+          -- string examples
+          'private',            -- matches name
+          '~/projects/private', -- matches path
+
+          -- table examples
+          { type = 'glob', value = '**/vendor/**' },
+
+          -- function example
+          function(ctx) return ctx.workspace == 'secret' end,
+        },
+      },
+    },
+  },
+}
+```
+
 ### 🧩 Local Time (`cord.plugins.local_time`)
 
 **Purpose:**  Sets the Rich Presence timestamp to display the current local clock time (hours, minutes and seconds) instead of elapsed time.
