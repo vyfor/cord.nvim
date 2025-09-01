@@ -15,6 +15,8 @@ local hooks = {
   idle_leave = {},
 
   workspace_change = {},
+
+  buf_enter = {},
 }
 
 ---Constants for common priority levels

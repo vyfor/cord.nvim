@@ -175,6 +175,7 @@ function ActivityManager:run()
   self.is_ready = true
   hooks.run('ready', self)
 
+  hooks.run('buf_enter', self)
   self:queue_update(true)
   if config.advanced.plugin.autocmds then self.setup_autocmds() end
   logger.trace(
@@ -536,6 +537,7 @@ end
 ---@return nil
 function ActivityManager:on_buf_enter()
   logger.trace 'ActivityManager.on_buf_enter'
+  hooks.run('buf_enter', self)
   local rawdir = vim.fn.expand '%:p'
   local cached = self.workspace_cache[vim.fn.fnamemodify(rawdir, ':h')]
   if cached then
