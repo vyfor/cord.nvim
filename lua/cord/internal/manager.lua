@@ -352,9 +352,9 @@ function ActivityManager:skip_update() self.should_skip_update = true end
 function ActivityManager:pause()
   if self.is_paused then return end
 
+  self.is_paused = true
   self:pause_events()
   if self.idle_timer then self.idle_timer:stop() end
-  self.is_paused = true
   logger.debug 'ActivityManager.pause'
 end
 
@@ -363,6 +363,7 @@ end
 function ActivityManager:resume()
   if not self.is_paused then return end
 
+  self.is_paused = false
   self:resume_events()
   if self.idle_timer then
     self.idle_timer:stop()
@@ -372,7 +373,6 @@ function ActivityManager:resume()
       vim.schedule_wrap(function() self:check_idle() end)
     )
   end
-  self.is_paused = false
   logger.debug 'ActivityManager.resume'
 end
 
