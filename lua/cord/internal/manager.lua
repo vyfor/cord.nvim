@@ -545,11 +545,13 @@ function ActivityManager:on_buf_enter()
       self.workspace_dir = cached.dir
       self.workspace = cached.name
       self.repo_url = cached.repo_url
-      self.opts.workspace_dir = self.workspace_dir
-      self.opts.workspace = self.workspace
-      self.opts.repo_url = self.repo_url
 
-      hooks.run('workspace_change', self.opts)
+      local opts = self.opts or self.last_opts or {}
+      opts.workspace_dir = self.workspace_dir
+      opts.workspace = self.workspace
+      opts.repo_url = self.repo_url
+
+      hooks.run('workspace_change', opts)
     end
 
     self:queue_update()
@@ -560,11 +562,13 @@ function ActivityManager:on_buf_enter()
       self.workspace_dir = nil
       self.workspace = nil
       self.repo_url = nil
-      self.opts.workspace_dir = nil
-      self.opts.workspace = nil
-      self.opts.repo_url = nil
 
-      hooks.run('workspace_change', self.opts)
+      local opts = self.opts or self.last_opts or {}
+      opts.workspace_dir = self.workspace_dir
+      opts.workspace = self.workspace
+      opts.repo_url = self.repo_url
+
+      hooks.run('workspace_change', opts)
     end
 
     self:queue_update()
@@ -593,11 +597,12 @@ function ActivityManager:on_buf_enter()
       self.workspace = workspace_name
       self.repo_url = repo_url
 
-      self.opts.workspace_dir = self.workspace_dir
-      self.opts.workspace = self.workspace
-      self.opts.repo_url = self.repo_url
+      local opts = self.opts or self.last_opts or {}
+      opts.workspace_dir = self.workspace_dir
+      opts.workspace = self.workspace
+      opts.repo_url = self.repo_url
 
-      hooks.run('workspace_change', self.opts)
+      hooks.run('workspace_change', opts)
     end
 
     self:queue_update()
