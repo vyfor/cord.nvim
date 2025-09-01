@@ -61,17 +61,18 @@ local logger = require 'cord.api.log'
 ---@field type? string|fun(opts: CordOpts):string Asset type
 
 ---@class CordHooksConfig
----@field ready? CordReadyHook
----@field shutdown? CordShutdownHook
+---@field ready? CordManagerHook
+---@field shutdown? CordEmptyHook
 ---@field pre_activity? CordHook
 ---@field post_activity? CordActivityHook
 ---@field idle_enter? CordHook
 ---@field idle_leave? CordHook
 ---@field workspace_change? CordHook
+---@field buf_enter? CordManagerHook
 
 ---@alias CordHook fun(opts: CordOpts):nil | {fun: fun(opts: CordOpts):nil, priority: number}
----@alias CordReadyHook fun(manager: ActivityManager):nil | {fun: fun(manager: ActivityManager):nil, priority: number}
----@alias CordShutdownHook fun():nil | {fun: fun():nil, priority: number}
+---@alias CordManagerHook fun(manager: ActivityManager):nil | {fun: fun(manager: ActivityManager):nil, priority: number}
+---@alias CordEmptyHook fun():nil | {fun: fun():nil, priority: number}
 ---@alias CordActivityHook fun(opts: CordOpts, activity: Activity):nil | {fun: fun(opts: CordOpts, activity: Activity):nil, priority: number}
 
 ---@class CordAdvancedConfig
@@ -186,6 +187,7 @@ local defaults = {
     idle_enter = nil,
     idle_leave = nil,
     workspace_change = nil,
+    buf_enter = nil,
   },
   plugins = nil,
   advanced = {

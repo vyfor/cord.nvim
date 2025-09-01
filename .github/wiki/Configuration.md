@@ -104,6 +104,7 @@ If you want a fresh start, you can copy the default config and tweak it. I sugge
     idle_enter = nil,
     idle_leave = nil,
     workspace_change = nil,
+    buf_enter = nil,
   },
   plugins = nil,
   advanced = {
@@ -375,6 +376,7 @@ require('cord').setup {
 | `hooks.idle_enter`       | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when entering idle state ([opts](#options-table))                                                           |
 | `hooks.idle_leave`       | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when leaving idle state ([opts](#options-table))                                                            |
 | `hooks.workspace_change` | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when workspace changes ([opts](#options-table))                                                             |
+| `hooks.buf_enter`        | `function(manager) \| table<fun: function(manager), priority: number>`               | Called when entering a buffer ([manager](#activitymanager-methods))                                                |
 
 ## 🔌 Plugins
 
