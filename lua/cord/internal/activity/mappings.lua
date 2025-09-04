@@ -89,6 +89,7 @@ M.filetype_mappings = {
   jsonc = { 'language', 'json', 'JSON' },
   jule = { 'language', 'jule', 'Jule' },
   julia = { 'language', 'julia', 'Julia' },
+  just = { 'language', 'just', 'Just' },
   kotlin = { 'language', 'kotlin', 'Kotlin' },
   lalrpop = { 'language', 'rust', 'LALRPOP' },
   latex = { 'language', 'latex', 'LaTeX' },
