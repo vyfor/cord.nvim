@@ -137,9 +137,10 @@ Alternatively, you can provide the executable manually:
 
 Cord features over 120 meticulously crafted icons available in distinct themes:
 
-- **Default**: A clean and stylish theme featuring widely recognized icons.
+- **Default**: A stylish theme inspired by Nerd Fonts icons.
 - **Atom**: A sleek theme inspired by Atom Material Icons.
 - **Catppuccin**: A soothing pastel theme inspired by Catppuccin.
+- **Classic**: A clean theme featuring widely recognized icons.
 
 See the [showcase](https://github.com/vyfor/icons#showcase) for a visual comparison.
 

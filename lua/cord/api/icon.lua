@@ -3,12 +3,12 @@ local M = {}
 --- Increment this only when an existing icon is modified
 ---
 --- Appended to the end of the asset URL for refetching; otherwise, it will be loaded from the cache, thus not being updated
-M.ICONS_VERSION = '16'
+M.ICONS_VERSION = '17'
 M.ICONS_URL = 'https://raw.githubusercontent.com/vyfor/icons/master/icons/'
 M.ICON_THEME = 'default'
 M.THEME_FLAVOR = 'dark'
 
-M.supported_themes = { 'default', 'atom', 'catppuccin' }
+M.supported_themes = { 'default', 'atom', 'catppuccin', 'classic' }
 M.supported_flavors = { 'dark', 'light', 'accent' }
 
 M.get = function(name, theme, flavor)

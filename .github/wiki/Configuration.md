@@ -165,13 +165,13 @@ With this option set to true, the plugin **will not start automatically**. Inste
 
 ## 📊 Display
 
-| Option                | Type      | Default   | Description                                                                 |
-| --------------------- | --------- | --------- | --------------------------------------------------------------------------- |
-| `display.theme`       | `string`  | `default` | Choose between different icon themes; 'default', 'atom', 'catppuccin'       |
-| `display.flavor`      | `string`  | `dark`    | Choose between different theme flavors; typically 'dark', 'light', 'accent' |
-| `display.view`        | `string`  | `full`    | Control what shows up as the large and small images                         |
-| `display.swap_fields` | `boolean` | `false`   | Show workspace name before filename                                         |
-| `display.swap_icons`  | `boolean` | `false`   | Use editor icon as large image                                              |
+| Option                | Type      | Default   | Description                                                                            |
+| --------------------- | --------- | --------- | -------------------------------------------------------------------------------------- |
+| `display.theme`       | `string`  | `default` | Choose between different icon themes; 'default', 'atom', 'catppuccin', 'classic'       |
+| `display.flavor`      | `string`  | `dark`    | Choose between different theme flavors; typically 'dark', 'light', 'accent'            |
+| `display.view`        | `string`  | `full`    | Control what shows up as the large and small images                                    |
+| `display.swap_fields` | `boolean` | `false`   | Show workspace name before filename                                                    |
+| `display.swap_icons`  | `boolean` | `false`   | Use editor icon as large image                                                         |
 
 > [!TIP]
 > Check out our icon [showcase](https://github.com/vyfor/icons#showcase)!
