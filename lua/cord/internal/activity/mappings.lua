@@ -103,6 +103,7 @@ M.filetype_mappings = {
   make = { 'language', 'make', 'Makefile' },
   markdown = { 'language', 'markdown', 'Markdown' },
   matlab = { 'language', 'matlab', 'MATLAB' },
+  nest = { 'language', 'nest', 'Nest' },
   nim = { 'language', 'nim', 'Nim' },
   nix = { 'language', 'nix', 'Nix' },
   nu = { 'language', 'nushell', 'Nushell' },
