@@ -84,7 +84,7 @@ local function build_activity(opts)
     opts.filename = 'checkhealth'
   end
 
-  local icon_type, icon, tooltip = mappings.get(opts.filetype, opts.filename, opts.buftype)
+  local icon_type, icon, tooltip = mappings.get(opts.filetype, opts.filename, opts.buftype, opts)
   opts.type = icon_type or 'language'
   opts.icon = icons.get(icon or mappings.get_default_icon(opts.type))
   opts.tooltip = tooltip

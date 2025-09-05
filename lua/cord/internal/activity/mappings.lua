@@ -393,7 +393,21 @@ M.cord_related = {
 
 M.get_default_icon = function(type) return M.default_icons[type] or M.default_icons.language end
 
-M.get = function(filetype, filename, buftype)
+M.get = function(filetype, filename, buftype, opts)
+  if opts then
+    if opts.force_fileext then
+      local result = M.extension_mappings[opts.force_fileext]
+      if result then return result[1], result[2], result[3] end
+      return
+    end
+
+    if opts.force_filetype then
+      local result = M.filetype_mappings[opts.force_filetype]
+      if result then return result[1], result[2], result[3] end
+      return
+    end
+  end
+
   local result = M.filename_mappings[filename:lower()]
   if result then return result[1], result[2], result[3] end
 
