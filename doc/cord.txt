@@ -1,4 +1,4 @@
-*cord.txt*            For NVIM v0.6.0           Last change: 2025 September 04
+*cord.txt*            For NVIM v0.6.0           Last change: 2025 September 11
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -993,8 +993,6 @@ using the plugin’s require path as the key in the `plugins` table.
 >lua
     require('cord').setup {
       plugins = {
-        'cord.plugins.diagnostics', -- Enable diagnostics plugin with default settings
-    
         ['cord.plugins.diagnostics'] = { -- Enable AND configure diagnostics plugin
           scope = 'workspace', -- Set scope to 'workspace' instead of default 'buffer'
           severity = vim.diagnostic.severity.WARN, -- Show warnings and above
