@@ -23,8 +23,6 @@ If a plugin has configuration options, you can provide a configuration table usi
 ```lua
 require('cord').setup {
   plugins = {
-    'cord.plugins.diagnostics', -- Enable diagnostics plugin with default settings
-
     ['cord.plugins.diagnostics'] = { -- Enable AND configure diagnostics plugin
       scope = 'workspace', -- Set scope to 'workspace' instead of default 'buffer'
       severity = vim.diagnostic.severity.WARN, -- Show warnings and above
