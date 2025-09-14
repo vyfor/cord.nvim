@@ -185,12 +185,12 @@ With this option set to true, the plugin **will not start automatically**. Inste
 
 ## ⏰ Timestamp
 
-| Option                      | Type      | Default | Description                              |
-| --------------------------- | --------- | ------- | ---------------------------------------- |
-| `timestamp.enabled`         | `boolean` | `true`  | Show elapsed time in presence            |
-| `timestamp.reset_on_idle`   | `boolean` | `false` | Reset timestamp when entering idle state |
-| `timestamp.reset_on_change` | `boolean` | `false` | Reset timestamp when presence changes    |
-| `timestamp.shared`          | `boolean` | `false` | Synchronize timestamps between clients   |
+| Option                      | Type      | Default | Description                                                                                                                                                                                     |
+| --------------------------- | --------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `timestamp.enabled`         | `boolean` | `true`  | Show elapsed time in presence. <br /> Currently Broken. See [FAQ](https://github.com/vyfor/cord.nvim/wiki/FAQ#q-why-cant-i-disable-timestamps-in-my-rich-presence-why-are-they-misbehaving) |
+| `timestamp.reset_on_idle`   | `boolean` | `false` | Reset timestamp when entering idle state                                                                                                                                                        |
+| `timestamp.reset_on_change` | `boolean` | `false` | Reset timestamp when presence changes                                                                                                                                                           |
+| `timestamp.shared`          | `boolean` | `false` | Synchronize timestamps between clients                                                                                                                                                          |
 
 ## 💤 Idle
 
