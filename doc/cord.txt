@@ -1,4 +1,4 @@
-*cord.txt*            For NVIM v0.6.0           Last change: 2025 September 11
+*cord.txt*            For NVIM v0.6.0           Last change: 2025 September 14
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -248,20 +248,17 @@ VIEW ~
 
 TIMESTAMP                                       *cord-configuration-timestamp*
 
-  ----------------------------------------------------------------------------------
+  ---------------------------------------------------------------------------------------------------------
   Option                      Type      Default   Description
-  --------------------------- --------- --------- ----------------------------------
-  timestamp.enabled           boolean   true      Show elapsed time in presence
+  --------------------------- --------- --------- ---------------------------------------------------------
+  timestamp.enabled           boolean   true      Show elapsed time in presence. Currently Broken. See FAQ
 
-  timestamp.reset_on_idle     boolean   false     Reset timestamp when entering idle
-                                                  state
+  timestamp.reset_on_idle     boolean   false     Reset timestamp when entering idle state
 
-  timestamp.reset_on_change   boolean   false     Reset timestamp when presence
-                                                  changes
+  timestamp.reset_on_change   boolean   false     Reset timestamp when presence changes
 
-  timestamp.shared            boolean   false     Synchronize timestamps between
-                                                  clients
-  ----------------------------------------------------------------------------------
+  timestamp.shared            boolean   false     Synchronize timestamps between clients
+  ---------------------------------------------------------------------------------------------------------
 
 IDLE                                                 *cord-configuration-idle*
 
