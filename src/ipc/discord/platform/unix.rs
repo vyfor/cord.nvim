@@ -11,7 +11,7 @@ use crate::ipc::discord::utils;
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::events::server::StatusUpdateEvent;
 use crate::messages::message::Message;
-use crate::{local_event, server_event, trace};
+use crate::{echoln, local_event, server_event, trace};
 
 impl Connection for RichClient {
     /// Pipe can be in any of the following directories:
@@ -89,6 +89,12 @@ impl Connection for RichClient {
                                         trace!(
                                             "Received message from Discord: opcode={}, data={}",
                                             opcode, data_str
+                                        );
+
+                                        echoln!(
+                                            "\n### Received message from Discord: opcode={}, data=\n{}\n\n----------------------------------------------",
+                                            opcode,
+                                            data_str
                                         );
 
                                         match Opcode::from(opcode) {
@@ -170,6 +176,12 @@ impl Connection for RichClient {
                 }
                 None => utils::encode(opcode, 0),
             };
+
+            echoln!(
+                "\n### Sending message to Discord: opcode={}, data=\n{}",
+                opcode,
+                String::from_utf8_lossy(&payload)
+            );
 
             match pipe.write_all(&payload) {
                 Ok(_) => Ok(()),
