@@ -1,4 +1,4 @@
-*cord.txt*            For NVIM v0.6.0           Last change: 2025 September 14
+*cord.txt*             For NVIM v0.6.0            Last change: 2025 October 29
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -815,10 +815,10 @@ ASSET KEYS                                     *cord-custom-assets-asset-keys*
 The `key` in your asset configuration determines what type of file or context
 the custom asset will apply to. You can use the following key types:
 
-- **Filetype**Use a Vim filetype string (e.g., `"lua"`, `"python"`) to set assets for specific languages.
-- **Filename**Use a specific filename (e.g., `"Cargo.toml"`, `"README.md"`) to customize assets for particular files.
-- **File Extension**Use a file extension (e.g., `".rs"`, `".js"`) to apply assets to all files with that extension.
-- **Special Keys**Cord provides special keys for generic scenarios (see |cord-overriding-defaults|).
+- **Filetype**: Use a Vim filetype string (e.g., `"lua"`, `"python"`) to set assets for specific languages.
+- **Filename**: Use a specific filename (e.g., `"Cargo.toml"`, `"README.md"`) to customize assets for particular files.
+- **File Extension**: Use a file extension (e.g., `".rs"`, `".js"`) to apply assets to all files with that extension.
+- **Special Keys**: Cord provides special keys for generic scenarios (see |cord-overriding-defaults|).
 
 
 ASSET OPTIONS                               *cord-custom-assets-asset-options*
@@ -928,9 +928,9 @@ OVERRIDING DEFAULTS                   *cord-custom-assets-overriding-defaults*
 
 Cord provides special keys to define assets for generic situations:
 
-- `['Cord.new']`Asset for a new, empty buffer when Neovim starts without file arguments, when both filetype and filename are empty.
-- `['Cord.unknown']`Asset when the filetype is not detected/defined in Cord.
-- `['Cord.override']`This key overrides _all_ existing icons, applying the specified asset everywhere.
+- `['Cord.new']`: Asset for a new, empty buffer when Neovim starts without file arguments, when both filetype and filename are empty.
+- `['Cord.unknown']`: Asset when the filetype is not detected/defined in Cord.
+- `['Cord.override']`: This key overrides _all_ existing icons, applying the specified asset everywhere.
 
 **Example of Default Overrides:**
 
@@ -1021,21 +1021,21 @@ current buffer or workspace.
     }
 <
 
-- **scope**
-    - `'buffer'`(default): Show diagnostics count for the _current buffer_ only. Overrides `text.viewing` and `text.editing` to include diagnostics count.
-    - `'workspace'`Show diagnostics count for _all buffers in the workspace_. Overrides `text.workspace` to include diagnostics count.
-- **severity**
-    - Atable defining the minimum diagnostic severity level to include in the count. Uses Neovim’s diagnostic severity levels (see `:help diagnostic-severity`).
+- **scope**:
+    - `'buffer'` (default): Show diagnostics count for the _current buffer_ only. Overrides `text.viewing` and `text.editing` to include diagnostics count.
+    - `'workspace'`: Show diagnostics count for _all buffers in the workspace_. Overrides `text.workspace` to include diagnostics count.
+- **severity**:
+    - A table defining the minimum diagnostic severity level to include in the count. Uses Neovim’s diagnostic severity levels (see `:help diagnostic-severity`).
     - Example: `{ min = vim.diagnostic.severity.WARN }` will count warnings and errors, but not information messages or hints.
     - Defaults to showing errors.
-- **override**
-    - `true`(default): The plugin will automatically override the `text.viewing`, `text.editing`, and `text.workspace` options to display diagnostics information. Recommended for seamless integration.
-    - `false`The plugin will _not_ override text options. You’ll need to manually use the plugin’s variables in your `text` configuration to display diagnostics (see "Usage Example" below).
+- **override**:
+    - `true` (default): The plugin will automatically override the `text.viewing`, `text.editing`, and `text.workspace` options to display diagnostics information. Recommended for seamless integration.
+    - `false`: The plugin will _not_ override text options. You’ll need to manually use the plugin’s variables in your `text` configuration to display diagnostics (see "Usage Example" below).
 
 **Variables Added:**
 
-- **diagnostic**A table containing the scoped diagnostics data (useful for advanced customization).
-- **diagnostics**A function that returns the number of diagnostics in the current scope (buffer or workspace), based on the plugin’s configuration.
+- **diagnostic**: A table containing the scoped diagnostics data (useful for advanced customization).
+- **diagnostics**: A function that returns the number of diagnostics in the current scope (buffer or workspace), based on the plugin’s configuration.
 
 **Usage Example (override = false):**
 
@@ -1072,23 +1072,23 @@ projects, directories, or file types.
     }
 <
 
-- **override**
-    - `true`(default): Plugin will automatically `suppress()` or `resume()` the manager based on rules.
-    - `false`The plugin will not change activity directly; use the provided variables.
-- **precedence**
-    - `'blacklist'`(default): Blacklist rules take precedence when both types match.
-    - `'whitelist'`Whitelist rules take precedence.
-- **rules**
-    - `blacklist`/ `whitelist`Tables of rules. Each rule may be:
-        - **string**A path (contains `/` or `\`) is treated as a `path` rule; otherwise it’s a `name` rule matching workspace name.
-        - **table**`{ type = 'path'|'glob'|'name', value = '...', action = function(opts) end }`.
-        - **function**Custom function that receives `{ rule = <rule>, workspace = <string>, workspace_dir = <string> }` and returns truthy to match.
-- **action / fallback**
-    - Optionalfunctions called with `{ visible = <bool>, rule = <rule>, workspace = <string>, workspace_dir = <string> }` to perform custom behavior when a decision is made.
+- **override**:
+    - `true` (default): Plugin will automatically `suppress()` or `resume()` the manager based on rules.
+    - `false`: The plugin will not change activity directly; use the provided variables.
+- **precedence**:
+    - `'blacklist'` (default): Blacklist rules take precedence when both types match.
+    - `'whitelist'`: Whitelist rules take precedence.
+- **rules**:
+    - `blacklist` / `whitelist`: Tables of rules. Each rule may be:
+        - **string**: A path (contains `/` or `\`) is treated as a `path` rule; otherwise it’s a `name` rule matching workspace name.
+        - **table**: `{ type = 'path'|'glob'|'name', value = '...', action = function(opts) end }`.
+        - **function**: Custom function that receives `{ rule = <rule>, workspace = <string>, workspace_dir = <string> }` and returns truthy to match.
+- **action / fallback**:
+    - Optional functions called with `{ visible = <bool>, rule = <rule>, workspace = <string>, workspace_dir = <string> }` to perform custom behavior when a decision is made.
 
 **Variables Added:**
 
-- **has_match**Function that returns whether the current buffer/workspace matches any configured rule.
+- **has_match**: Function that returns whether the current buffer/workspace matches any configured rule.
 
 **Rule Matching Behavior:**
 
@@ -1134,13 +1134,13 @@ clock time (hours, minutes and seconds) instead of elapsed time.
     }
 <
 
-- **affect_idle**
-    - `true`(default): Also sets the timestamp for the idle status to local time.
-    - `false`Only affects the timestamp for active presence, elapsed time will be shown when idle.
+- **affect_idle**:
+    - `true` (default): Also sets the timestamp for the idle status to local time.
+    - `false`: Only affects the timestamp for active presence, elapsed time will be shown when idle.
 
 **Variables Added:**
 
-- **local_timestamp**A function that returns the zeroed timestamp of the current local time (midnight of the current day).
+- **local_timestamp**: A function that returns the zeroed timestamp of the current local time (midnight of the current day).
 
 
   [!NOTE] Incompatible with any other timestamp-related plugins.
@@ -1165,25 +1165,25 @@ simultaneously open clients without data races.
     }
 <
 
-- **scope**
-    - `'workspace'`(default): Track one continuous timer for the entire workspace.
-    - `'file'`Track a separate timer for each individual file.
-    - `'filetype'`Track a separate timer for each filetype (e.g., all `lua` files share one timer).
-    - `'global'`Track a single timer for all activity within Neovim.
-- **mode**
-    - `'all'`(default): Count all time the corresponding scope is active.
-    - `'active'`Only accumulate time when you are actively moving or typing.
-    - `'idle'`Only accumulate time when the instance is idle.
-- **file**
-    - Definesthe absolute path to the JSON file where time data is stored.
+- **scope**:
+    - `'workspace'` (default): Track one continuous timer for the entire workspace.
+    - `'file'`: Track a separate timer for each individual file.
+    - `'filetype'`: Track a separate timer for each filetype (e.g., all `lua` files share one timer).
+    - `'global'`: Track a single timer for all activity within Neovim.
+- **mode**:
+    - `'all'` (default): Count all time the corresponding scope is active.
+    - `'active'`: Only accumulate time when you are actively moving or typing.
+    - `'idle'`: Only accumulate time when the instance is idle.
+- **file**:
+    - Defines the absolute path to the JSON file where time data is stored.
     - Defaults to a file within Neovim’s standard data directory.
-- **save_on**
-    - Atable of strings defining when the timer data should be saved to disk.
-    - `'exit'`Saves when Neovim is closed. **(Recommended)**
-    - `'focus_change'`Saves when you focus away from the Neovim window. Important for multi-client sync.
-    - `'periodic'`Saves automatically at the interval defined by `save_interval`.
-- **save_interval**
-    - Thenumber of seconds between automatic saves if `'periodic'` is enabled.
+- **save_on**:
+    - A table of strings defining when the timer data should be saved to disk.
+    - `'exit'`: Saves when Neovim is closed. **(Recommended)**
+    - `'focus_change'`: Saves when you focus away from the Neovim window. Important for multi-client sync.
+    - `'periodic'`: Saves automatically at the interval defined by `save_interval`.
+- **save_interval**:
+    - The number of seconds between automatic saves if `'periodic'` is enabled.
 
 
   [!NOTE] Incompatible with any other timestamp-related plugins.
@@ -1203,17 +1203,17 @@ providing more context-aware time tracking.
     }
 <
 
-- **scope**
-    - `'buffer'`(default): Track time elapsed _per buffer_. Timestamp resets when switching buffers (if `pause = false`), or pauses/resumes (if `pause = true`).
-    - `'workspace'`Track time elapsed _per workspace_. Timestamp is consistent across buffers within the same workspace.
-    - `'idle'`Track time spent in _idle state_. Shows elapsed idle time when in idle, and normal activity time when active.
-- **pause**
-    - `true`(default): When switching scope, the timestamp "pauses" for the previous scope and "resumes" where it left off when you return to that scope.
-    - `false`When switching scope, the timestamp for the previous scope is not untouched, resulting in two scopes.
+- **scope**:
+    - `'buffer'` (default): Track time elapsed _per buffer_. Timestamp resets when switching buffers (if `pause = false`), or pauses/resumes (if `pause = true`).
+    - `'workspace'`: Track time elapsed _per workspace_. Timestamp is consistent across buffers within the same workspace.
+    - `'idle'`: Track time spent in _idle state_. Shows elapsed idle time when in idle, and normal activity time when active.
+- **pause**:
+    - `true` (default): When switching scope, the timestamp "pauses" for the previous scope and "resumes" where it left off when you return to that scope.
+    - `false`: When switching scope, the timestamp for the previous scope is not untouched, resulting in two scopes.
 
 **Variables Added:**
 
-- **get_scoped_timestamp()**A function that returns the appropriate timestamp value based on the plugin’s `scope` and `pause` settings. This is used internally by the plugin.
+- **get_scoped_timestamp()**: A function that returns the appropriate timestamp value based on the plugin’s `scope` and `pause` settings. This is used internally by the plugin.
 
 
   [!NOTE] Incompatible with any other timestamp-related plugins.
@@ -1240,20 +1240,20 @@ disable this behavior, set `override = false`.
     }
 <
 
-- **interval**How often to poll Last.fm for the latest track. Minimum is 500ms.
-- **max_retries**Number of times failed HTTP requests will be retried.
-- **override**
-    - `true`(default): The plugin fully manages activity updates.
-    - `false`The plugin will not change activity directly; instead, it exposes variables you can use in your own configuration.
-- **fallback_image**Image URL used when the track has no album art or Last.fm returns a placeholder.
+- **interval**: How often to poll Last.fm for the latest track. Minimum is 500ms.
+- **max_retries**: Number of times failed HTTP requests will be retried.
+- **override**:
+    - `true` (default): The plugin fully manages activity updates.
+    - `false`: The plugin will not change activity directly; instead, it exposes variables you can use in your own configuration.
+- **fallback_image**: Image URL used when the track has no album art or Last.fm returns a placeholder.
 
 **Variables Added:**
 
-- **track_title**The current track title (or `nil` if none).
-- **track_artist**The current track artist (or `nil`).
-- **track_album**The current track album (or `nil`).
-- **track_url**The Last.fm track URL (or `nil`).
-- **track_image**The best available album image URL or the configured `fallback_image`.
+- **track_title**: The current track title (or `nil` if none).
+- **track_artist**: The current track artist (or `nil`).
+- **track_album**: The current track album (or `nil`).
+- **track_url**: The Last.fm track URL (or `nil`).
+- **track_image**: The best available album image URL or the configured `fallback_image`.
 
 **Usage Example (override = false):**
 
@@ -1529,7 +1529,7 @@ FEATURES                                              *cord-examples-features*
 - Finds repositories and workspaces based on VCS files without relying on command-line tools.
 - Manages activities across all instances with a single connection to Discord.
 - Detects when you’re idle and switches to the most recent active instance.
-- Works with different Discord setups (Snap, Flatpak, WSL, and even the browser version).
+- Works with different Discord setups (Snap, Flatpak, WSL <https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-running-inside-wsl>, and even the ~browser~ <https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-using-discord-in-a-browser>).
 - Runs on Windows, Linux, macOS, and FreeBSD.
 - Includes 120+ unique icons for over 200 file types and plugins.
 - Reconnects automatically if connection to Discord is lost.
@@ -1618,10 +1618,10 @@ THEMES                                                  *cord-examples-themes*
 
 Cord features over 120 meticulously crafted icons available in distinct themes:
 
-- **Default**A stylish theme inspired by Nerd Fonts icons.
-- **Atom**A sleek theme inspired by Atom Material Icons.
-- **Catppuccin**A soothing pastel theme inspired by Catppuccin.
-- **Classic**A clean theme featuring widely recognized icons.
+- **Default**: A stylish theme inspired by Nerd Fonts icons.
+- **Atom**: A sleek theme inspired by Atom Material Icons.
+- **Catppuccin**: A soothing pastel theme inspired by Catppuccin.
+- **Classic**: A clean theme featuring widely recognized icons.
 
 See the showcase <https://github.com/vyfor/icons#showcase> for a visual
 comparison.
