@@ -34,7 +34,7 @@ You can forward the Discord IPC socket over SSH. [This
 Use [arrpc](https://github.com/OpenAsar/arrpc) as a bridge. Follow its instructions closely at your own risk.
 
 > [!IMPORTANT]
-> arrpc has been left unmaintained for quite some time.
+> arrpc has been unmaintained for quite some time, and the injection script is reportedly no longer working.
 
 ## 🧪 Custom Discord Clients
 
