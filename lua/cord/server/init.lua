@@ -98,7 +98,8 @@ function M:run()
           end)
         elseif data.status == 'disconnected' then
           self.status = 'initialized'
-          M.manager:cleanup()
+
+          if M.manager then M.manager:cleanup() end
 
           if not self.is_shut_down then
             self.is_shut_down = true
