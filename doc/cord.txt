@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0            Last change: 2025 October 29
+*cord.txt*            For NVIM v0.6.0            Last change: 2025 December 19
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -204,18 +204,19 @@ USEFUL FUNCTIONS ~
 
 EDITOR                                             *cord-configuration-editor*
 
-  ---------------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------------------
   Option           Type            Default                      Description
-  ---------------- --------------- ---------------------------- -------------------------------------------------
+  ---------------- --------------- ---------------------------- ----------------------------------------------------
   editor.client    string          'neovim'                     Client identifier. Can be 'vim', 'neovim',
-                                                                'lunarvim', 'nvchad', 'astronvim', 'lazyvim', or
-                                                                a custom Discord application ID
+                                                                'lunarvim', 'nvchad', 'astronvim', 'lazyvim', or a
+                                                                custom Discord application ID. Takes effect after
+                                                                :Cord restart
 
   editor.tooltip   string          'The Superior Text Editor'   Tooltip shown when hovering over editor icon
 
-  editor.icon      string \| nil   nil                          Custom icon URL or asset ID when using custom
-                                                                client ID
-  ---------------------------------------------------------------------------------------------------------------
+  editor.icon      string \| nil   nil                          Custom icon URL or asset ID when using custom client
+                                                                ID
+  ------------------------------------------------------------------------------------------------------------------
 
 DISPLAY                                           *cord-configuration-display*
 
