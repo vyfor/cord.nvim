@@ -157,11 +157,11 @@ With this option set to true, the plugin **will not start automatically**. Inste
 
 ## 🎨 Editor
 
-| Option           | Type            | Default                      | Description                                                                                                                             |
-| ---------------- | --------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `editor.client`  | `string`        | `'neovim'`                   | Client identifier. Can be `'vim'`, `'neovim'`, `'lunarvim'`, `'nvchad'`, `'astronvim'`, `'lazyvim'`, or a custom Discord application ID |
-| `editor.tooltip` | `string`        | `'The Superior Text Editor'` | Tooltip shown when hovering over editor icon                                                                                            |
-| `editor.icon`    | `string \| nil` | `nil`                        | Custom icon URL or asset ID when using custom client ID                                                                                 |
+| Option           | Type            | Default                      | Description                                                                                                                                                                 |
+| ---------------- | --------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `editor.client`  | `string`        | `'neovim'`                   | Client identifier. Can be `'vim'`, `'neovim'`, `'lunarvim'`, `'nvchad'`, `'astronvim'`, `'lazyvim'`, or a custom Discord application ID. Takes effect after `:Cord restart` |
+| `editor.tooltip` | `string`        | `'The Superior Text Editor'` | Tooltip shown when hovering over editor icon                                                                                                                                |
+| `editor.icon`    | `string \| nil` | `nil`                        | Custom icon URL or asset ID when using custom client ID                                                                                                                     |
 
 ## 📊 Display
 
