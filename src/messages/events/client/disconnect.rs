@@ -14,8 +14,25 @@ impl OnEvent for DisconnectEvent {
             ctx.cord.rich_client.read().unwrap().clear()?;
             ctx.cord
                 .session_manager
+                .last_activity
+                .write()
+                .unwrap()
+                .take();
+            ctx.cord
+                .session_manager
                 .shared_timestamp
                 .store(0, Ordering::SeqCst);
+            return Ok(());
+        }
+
+        if ctx
+            .cord
+            .session_manager
+            .last_activity
+            .read()
+            .unwrap()
+            .is_none()
+        {
             return Ok(());
         }
 
@@ -31,11 +48,24 @@ impl OnEvent for DisconnectEvent {
             .map(|(_, s)| s);
 
         if let Some(session) = latest {
+            let activity = session.last_activity.as_ref().unwrap();
+
+            {
+                let mut last_activity =
+                    ctx.cord.session_manager.last_activity.write().unwrap();
+
+                if let Some(global_last_activity) = last_activity.as_ref() {
+                    if global_last_activity == activity {
+                        return Ok(());
+                    }
+                }
+
+                *last_activity = Some(activity.clone());
+            }
+
             let rich_client = ctx.cord.rich_client.read().unwrap();
-            rich_client.update(&Packet::new(
-                rich_client.pid,
-                session.last_activity.as_ref(),
-            ))?;
+            rich_client
+                .update(&Packet::new(rich_client.pid, Some(activity)))?;
         }
 
         Ok(())
