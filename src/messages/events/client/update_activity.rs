@@ -4,17 +4,13 @@ use std::sync::atomic::Ordering;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::presence::activity::{Activity, ActivityTimestamps};
 use crate::presence::packet::Packet;
+use crate::protocol::msgpack::Deserialize;
 use crate::util::now;
 
 #[derive(Debug)]
 pub struct UpdateActivityEvent {
     activity: Activity,
-}
-
-impl UpdateActivityEvent {
-    pub fn new(activity: Activity) -> Self {
-        Self { activity }
-    }
+    force: bool,
 }
 
 impl OnEvent for UpdateActivityEvent {
@@ -69,7 +65,7 @@ impl OnEvent for UpdateActivityEvent {
                 ctx.cord.session_manager.last_activity.write().unwrap();
 
             if let Some(global_last_activity) = last_activity.as_ref() {
-                if global_last_activity == &activity {
+                if !self.force && global_last_activity == &activity {
                     return Ok(());
                 }
             }
@@ -87,5 +83,24 @@ impl OnEvent for UpdateActivityEvent {
         }
 
         Ok(())
+    }
+}
+
+impl Deserialize for UpdateActivityEvent {
+    fn deserialize(
+        input: crate::protocol::msgpack::Value,
+    ) -> crate::Result<Self> {
+        let mut map =
+            input.take_map().ok_or("Invalid update activity event")?;
+        let activity = Activity::deserialize(
+            map.remove("activity")
+                .ok_or("Missing or invalid 'activity' field")?,
+        )?;
+        let force = map
+            .remove("force")
+            .and_then(|v| v.as_bool())
+            .unwrap_or_default();
+
+        Ok(UpdateActivityEvent { activity, force })
     }
 }

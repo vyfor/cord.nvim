@@ -1,7 +1,6 @@
 #![allow(clippy::large_enum_variant)]
 
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::presence::activity::Activity;
 use crate::protocol::msgpack::{Deserialize, MsgPack};
 use crate::types::config::PluginConfig;
 
@@ -65,7 +64,7 @@ impl ClientEvent {
                 PluginConfig::deserialize(data!(map))?,
             )),
             "update_activity" => Self::UpdateActivity(
-                UpdateActivityEvent::new(Activity::deserialize(data!(map))?),
+                UpdateActivityEvent::deserialize(data!(map))?,
             ),
             "clear_activity" => Self::ClearActivity(
                 ClearActivityEvent::deserialize(data!(map))?,
