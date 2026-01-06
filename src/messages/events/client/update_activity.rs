@@ -64,6 +64,19 @@ impl OnEvent for UpdateActivityEvent {
             }
         }
 
+        {
+            let mut last_activity =
+                ctx.cord.session_manager.last_activity.write().unwrap();
+
+            if let Some(global_last_activity) = last_activity.as_ref() {
+                if global_last_activity == &activity {
+                    return Ok(());
+                }
+            }
+
+            *last_activity = Some(activity.clone());
+        }
+
         rich_client.update(&Packet::new(rich_client.pid, Some(&activity)))?;
 
         if let Some(mut session) =

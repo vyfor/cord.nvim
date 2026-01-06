@@ -12,10 +12,33 @@ pub struct ClearActivityEvent {
 
 impl OnEvent for ClearActivityEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        let global_last_activity = ctx
+            .cord
+            .session_manager
+            .last_activity
+            .read()
+            .unwrap()
+            .clone();
+
         if self.force {
-            ctx.cord.rich_client.read().unwrap().clear()?;
+            if let Some(mut session) =
+                ctx.cord.session_manager.get_session_mut(ctx.client_id)
+            {
+                session.last_activity = None;
+            }
+
+            if global_last_activity.is_some() {
+                *ctx.cord.session_manager.last_activity.write().unwrap() = None;
+                ctx.cord.rich_client.read().unwrap().clear()?;
+            }
         } else {
-            let sessions = ctx.cord.session_manager.sessions.read().unwrap();
+            let mut sessions =
+                ctx.cord.session_manager.sessions.write().unwrap();
+
+            if let Some(session) = sessions.get_mut(&ctx.client_id) {
+                session.last_activity = None;
+            }
+
             let latest = sessions
                 .iter()
                 .filter(|s| {
@@ -31,6 +54,12 @@ impl OnEvent for ClearActivityEvent {
 
             if let Some(session) = latest {
                 if let Some(mut activity) = session.last_activity.clone() {
+                    if let Some(global) = &global_last_activity {
+                        if global == &activity {
+                            return Ok(());
+                        }
+                    }
+
                     if ctx.cord.config.shared_timestamps {
                         let shared_ts =
                             &ctx.cord.session_manager.shared_timestamp;
@@ -49,13 +78,21 @@ impl OnEvent for ClearActivityEvent {
                         }
                     }
 
+                    ctx.cord
+                        .session_manager
+                        .last_activity
+                        .write()
+                        .unwrap()
+                        .replace(activity.clone());
+
                     let rich_client = ctx.cord.rich_client.read().unwrap();
                     rich_client.update(&Packet::new(
                         rich_client.pid,
-                        session.last_activity.as_ref(),
+                        Some(&activity),
                     ))?;
                 }
-            } else {
+            } else if global_last_activity.is_some() {
+                *ctx.cord.session_manager.last_activity.write().unwrap() = None;
                 ctx.cord.rich_client.read().unwrap().clear()?;
             }
         }

@@ -102,6 +102,7 @@ impl std::ops::DerefMut for SessionRefMut<'_> {
 pub struct SessionManager {
     pub sessions: RwLock<HashMap<u32, Session>>,
     pub shared_timestamp: AtomicU64,
+    pub last_activity: RwLock<Option<Activity>>,
 }
 
 impl SessionManager {
