@@ -87,9 +87,9 @@ impl ActivityManager {
 
                         if now.duration_since(*last_sync) >= interval {
                             drop(last_sync);
+                            let client_guard = client.read().unwrap();
                             let activity_opt = last_activity.read().unwrap();
                             if let Some(activity) = activity_opt.as_ref() {
-                                let client_guard = client.read().unwrap();
                                 let mut padded_activity = activity.clone();
                                 if pad_enabled {
                                     pad_activity_field(
@@ -104,12 +104,14 @@ impl ActivityManager {
                                     Some(&padded_activity),
                                 );
                                 let _ = client_guard.update(&packet);
+                            } else {
+                                let _ = client_guard.clear();
+                            }
 
-                                if reset_on_update {
-                                    *last_update.write().unwrap() = now;
-                                } else {
-                                    *last_periodic_sync.write().unwrap() = now;
-                                }
+                            if reset_on_update {
+                                *last_update.write().unwrap() = now;
+                            } else {
+                                *last_periodic_sync.write().unwrap() = now;
                             }
                         }
                     }
