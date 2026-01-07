@@ -28,6 +28,8 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: x86_64-unknown-linux-musl-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            x86_64-unknown-linux-musl-cargo-
 
       - name: Install semantic-release-cargo
         uses: taiki-e/install-action@v2
@@ -113,6 +115,8 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.target }}-cargo-
         
       - name: Set up Rust
         run: |
@@ -188,6 +192,8 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: x86_64-unknown-linux-musl-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            x86_64-unknown-linux-musl-cargo-
 
       - name: Install semantic-release-cargo
         uses: taiki-e/install-action@v2
@@ -246,6 +252,8 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: x86_64-unknown-linux-musl-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            x86_64-unknown-linux-musl-cargo-
 
       - name: Install semantic-release-cargo
         uses: taiki-e/install-action@v2
