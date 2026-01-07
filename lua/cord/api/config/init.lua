@@ -13,7 +13,7 @@ local logger = require 'cord.api.log'
 ---@field icon? string Optional editor icon
 
 ---@class CordDisplayConfig
----@field theme? 'default'|'atom'|'catppuccin'|'classic'|string Set icon theme
+---@field theme? 'default'|'atom'|'catppuccin'|'minecraft'|'classic'|string Set icon theme
 ---@field flavor? 'dark'|'light'|'accent'|string Set icon theme flavor
 ---@field view? 'full'|'editor'|'asset'|'auto'|string Control what shows up as the large and small images
 ---@field swap_fields? boolean Whether to swap activity fields
@@ -125,6 +125,7 @@ local logger = require 'cord.api.log'
 ---@class CordConfig
 local M = {}
 
+---@class CordConfig
 local defaults = {
   enabled = true,
   log_level = vim.log.levels.OFF,
@@ -423,12 +424,12 @@ M.validate = function(user_config)
       local is_plugin_config = base_path == 'plugins' and type(k) == 'number'
 
       if
-        not (
-          (rules.array_paths[prefix] and type(k) == 'number')
-          or (rules.array_paths[base_path] and type(k) == 'number')
-          or (rules.dict_paths[base_path] and type(k) == 'string')
-          or is_plugin_config
-        ) and not utils.is_valid_path(rules.fields, rules.dict_paths, full_path)
+          not (
+            (rules.array_paths[prefix] and type(k) == 'number')
+            or (rules.array_paths[base_path] and type(k) == 'number')
+            or (rules.dict_paths[base_path] and type(k) == 'string')
+            or is_plugin_config
+          ) and not utils.is_valid_path(rules.fields, rules.dict_paths, full_path)
       then
         table.insert(warnings, string.format('Unknown configuration entry: `%s`', full_path))
       end
@@ -484,19 +485,19 @@ M.check = function()
   local wsl_info = os.getenv 'WSL_DISTRO_NAME'
   info(
     'System information:\n'
-      .. '  Sysname: `'
-      .. os_info.sysname
-      .. '`\n'
-      .. '  Architecture: `'
-      .. os_info.machine
-      .. '`\n'
-      .. '  Release: `'
-      .. os_info.release
-      .. '`\n'
-      .. '  Version: `'
-      .. os_info.version
-      .. '`'
-      .. (wsl_info and ('\n  Running inside WSL (`' .. wsl_info .. '`)') or '')
+    .. '  Sysname: `'
+    .. os_info.sysname
+    .. '`\n'
+    .. '  Architecture: `'
+    .. os_info.machine
+    .. '`\n'
+    .. '  Release: `'
+    .. os_info.release
+    .. '`\n'
+    .. '  Version: `'
+    .. os_info.version
+    .. '`'
+    .. (wsl_info and ('\n  Running inside WSL (`' .. wsl_info .. '`)') or '')
   )
   info('Neovim version: `' .. tostring(vim.version()) .. '`')
   info('Lua version: `' .. tostring(_VERSION) .. (jit and ' (with LuaJIT)`' or '`'))

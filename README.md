@@ -137,9 +137,10 @@ Alternatively, you can provide the executable manually:
 
 Cord features over 120 meticulously crafted icons available in distinct themes:
 
-- **Default**: A stylish theme inspired by Nerd Fonts icons.
-- **Atom**: A sleek theme inspired by Atom Material Icons.
-- **Catppuccin**: A soothing pastel theme inspired by Catppuccin.
+- **Default**: A stylish theme based on [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts) icons.
+- **Atom**: A sleek theme based on [Atom Material Icons](https://github.com/AtomMaterialUI/a-file-icon-vscode/).
+- **Catppuccin**: A soothing pastel theme based on [Catppuccin](https://github.com/catppuccin/vscode-icons) icons.
+- **Minecraft**: A blocky pixel-art set based on [Datapack Icons](https://github.com/FuncFusion/mc-dp-icons).
 - **Classic**: A clean theme featuring widely recognized icons.
 
 See the [showcase](https://github.com/vyfor/icons#showcase) for a visual comparison.
