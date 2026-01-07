@@ -2,7 +2,6 @@ use std::sync::atomic::Ordering;
 
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::presence::activity::ActivityTimestamps;
-use crate::presence::packet::Packet;
 use crate::protocol::msgpack::Deserialize;
 
 #[derive(Debug, Default)]
@@ -29,7 +28,7 @@ impl OnEvent for ClearActivityEvent {
 
             if global_last_activity.is_some() {
                 *ctx.cord.session_manager.last_activity.write().unwrap() = None;
-                ctx.cord.rich_client.read().unwrap().clear()?;
+                ctx.cord.activity_manager.clear()?;
             }
         } else {
             let mut sessions =
@@ -85,15 +84,11 @@ impl OnEvent for ClearActivityEvent {
                         .unwrap()
                         .replace(activity.clone());
 
-                    let rich_client = ctx.cord.rich_client.read().unwrap();
-                    rich_client.update(&Packet::new(
-                        rich_client.pid,
-                        Some(&activity),
-                    ))?;
+                    ctx.cord.activity_manager.update(activity)?;
                 }
             } else if global_last_activity.is_some() {
                 *ctx.cord.session_manager.last_activity.write().unwrap() = None;
-                ctx.cord.rich_client.read().unwrap().clear()?;
+                ctx.cord.activity_manager.clear()?;
             }
         }
 

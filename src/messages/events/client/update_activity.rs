@@ -3,7 +3,6 @@ use std::sync::atomic::Ordering;
 
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::presence::activity::{Activity, ActivityTimestamps};
-use crate::presence::packet::Packet;
 use crate::protocol::msgpack::Deserialize;
 use crate::util::now;
 
@@ -16,8 +15,15 @@ pub struct UpdateActivityEvent {
 impl OnEvent for UpdateActivityEvent {
     // if new activity is idle, set the most recent activity available, if not, display the new activity
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        let rich_client = ctx.cord.rich_client.read().unwrap();
-        if !rich_client.is_ready.load(Ordering::SeqCst) {
+        if !ctx
+            .cord
+            .activity_manager
+            .client
+            .read()
+            .unwrap()
+            .is_ready
+            .load(Ordering::SeqCst)
+        {
             return Ok(());
         }
 
@@ -73,7 +79,7 @@ impl OnEvent for UpdateActivityEvent {
             *last_activity = Some(activity.clone());
         }
 
-        rich_client.update(&Packet::new(rich_client.pid, Some(&activity)))?;
+        ctx.cord.activity_manager.update(activity.clone())?;
 
         if let Some(mut session) =
             ctx.cord.session_manager.get_session_mut(ctx.client_id)

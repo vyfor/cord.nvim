@@ -37,7 +37,7 @@ impl OnEvent for ErrorEvent {
                         &StatusUpdateEvent::disconnected(),
                     )?)?;
 
-                    let rich_client = ctx.cord.rich_client.clone();
+                    let rich_client = ctx.cord.activity_manager.client.clone();
                     let tx = ctx.cord.tx.clone();
                     std::thread::spawn(move || {
                         rich_client

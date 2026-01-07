@@ -97,13 +97,21 @@ local logger = require 'cord.api.log'
 ---@field timeout? integer Timeout in milliseconds
 
 ---@class CordAdvancedDiscordConfig
----@field pipe_paths? string Pipe paths to use when connecting to Discord
----@field reconnect? CordAdvancedDiscordReconnectConfig Reconnection configuration
+---@field pipe_paths? string[] Custom IPC pipe paths to use when connecting to Discord
+---@field reconnect? CordAdvancedDiscordReconnectConfig Reconnection settings
+---@field sync? CordAdvancedSyncConfig Synchronization settings
 
 ---@class CordAdvancedDiscordReconnectConfig
 ---@field enabled? boolean Whether reconnection is enabled
 ---@field interval? integer Reconnection interval in milliseconds, 0 to disable
 ---@field initial? boolean Whether to reconnect if initial connection fails
+
+---@class CordAdvancedSyncConfig
+---@field enabled? boolean Whether synchronization logic is enabled
+---@field mode? 'periodic'|'defer' Synchronization mode
+---@field interval? integer Interval in milliseconds
+---@field reset_on_update? boolean Whether to reset periodic synchronization on activity updates
+---@field pad? boolean Whether to pad activity fields
 
 ---@alias CordVariablesConfig { [string]: string|fun(opts: CordOpts):string }
 
@@ -210,6 +218,13 @@ local defaults = {
         interval = 5000,
         initial = true,
       },
+      sync = {
+        enabled = true,
+        mode = 'periodic',
+        interval = 12000,
+        reset_on_update = true,
+        pad = true,
+      },
     },
     workspace = {
       root_markers = {
@@ -293,6 +308,13 @@ function M.verify(new_config)
   ::continue::
 
   if not final_config.idle.icon then final_config.idle.icon = icons.get(icons.DEFAULT_IDLE_ICON) end
+
+  if final_config.advanced.discord.sync.enabled then
+    if not vim.tbl_contains({ 'periodic', 'defer' }, final_config.advanced.discord.sync.mode) then
+      logger.notify('Sync mode must be either `periodic` or `defer`', vim.log.levels.ERROR)
+      return
+    end
+  end
 
   if user_config.text and user_config.text.default then
     local default_text = user_config.text.default
@@ -392,6 +414,12 @@ local rules = {
     ['advanced.discord.reconnect.enabled'] = { 'boolean' },
     ['advanced.discord.reconnect.interval'] = { 'number' },
     ['advanced.discord.reconnect.initial'] = { 'boolean', 'table' },
+    ['advanced.discord.sync'] = { 'table' },
+    ['advanced.discord.sync.enabled'] = { 'boolean' },
+    ['advanced.discord.sync.mode'] = { 'string' },
+    ['advanced.discord.sync.interval'] = { 'number' },
+    ['advanced.discord.sync.reset_on_update'] = { 'boolean' },
+    ['advanced.discord.sync.pad'] = { 'boolean' },
     ['advanced.workspace'] = { 'table' },
     ['advanced.workspace.root_markers'] = { 'table' },
     ['advanced.workspace.limit_to_cwd'] = { 'boolean' },

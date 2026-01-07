@@ -1,7 +1,6 @@
 use std::sync::atomic::Ordering;
 
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::presence::packet::Packet;
 
 #[derive(Debug, Default)]
 pub struct DisconnectEvent;
@@ -11,7 +10,7 @@ impl OnEvent for DisconnectEvent {
         let mut sessions = ctx.cord.session_manager.sessions.write().unwrap();
         sessions.remove(&ctx.client_id);
         if sessions.is_empty() {
-            ctx.cord.rich_client.read().unwrap().clear()?;
+            ctx.cord.activity_manager.clear()?;
             ctx.cord
                 .session_manager
                 .last_activity
@@ -63,9 +62,7 @@ impl OnEvent for DisconnectEvent {
                 *last_activity = Some(activity.clone());
             }
 
-            let rich_client = ctx.cord.rich_client.read().unwrap();
-            rich_client
-                .update(&Packet::new(rich_client.pid, Some(activity)))?;
+            ctx.cord.activity_manager.update(activity.clone())?;
         }
 
         Ok(())

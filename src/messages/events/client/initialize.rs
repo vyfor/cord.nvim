@@ -37,7 +37,11 @@ impl OnEvent for InitializeEvent {
             );
         }
 
-        let rich_client = &ctx.cord.rich_client;
+        ctx.cord
+            .activity_manager
+            .set_config(self.config.advanced.discord.sync.clone());
+
+        let rich_client = &ctx.cord.activity_manager.client;
         let mut client = rich_client.write().unwrap();
         if !self.config.advanced.discord.pipe_paths.is_empty()
             && client.pipe_paths.is_empty()

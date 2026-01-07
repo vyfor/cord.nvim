@@ -67,10 +67,33 @@ Just keep in mind:
 
 > ### Q: Rich Presence updates take a long time to appear in Discord. Why?
 
-After the recent update, Discord started to *properly* rate-limit how often your Rich Presence can update. The exact numbers aren't known yet.
+After the recent update, Discord started to strictly rate limit how often your Rich Presence can update. The exact numbers aren't known yet.
+
+**UPD:** Through some testing I found that the rate limit moves between an 8/12s alternating cooldown and a 2-per-20s burst window depending on how long the presence has been running.
+
+If your status updates stop appearing, it might be because you've been rate limited. To make matters worse, Discord does not seem to "queue" updates anymore. To mitigate this, Cord provides an `advanced.discord.sync` feature. It's enabled by default so we strongly encourage you to keep up to date:
+
+```lua
+require 'cord'.setup {
+    advanced = {
+        discord = {
+            sync = {
+                enabled = true,
+                mode = 'periodic', -- Periodically resends last activity to resume "stuck" activities
+                interval = 12000,
+            },
+        }
+    },
+}
+```
+
+Alternatively, you can use `mode = 'defer'` to throttle your updates more strictly and try to avoid being rate limited in the first place.
+
+> [!NOTE]
+> I also have a hypothesis that Discord's internal state is somehow getting desynced. It *may* be thinking an update isn't necessary even when the displayed activity is out of date. To prevent this, the server now "pads" fields with whitespaces (can be disabled via `advanced.discord.sync.pad`) to force Discord to recognize the update as new data. Even in case my hypothesis proves wrong, it carries no harm, and seems to provide better results in my observations. It sounds a little silly but I can't think of any reason *why* would they intentionally remove queuing in the first place.
 
 
-Not caused by Cord.
+This issue is not Cord's fault.
 See the [discussion](https://github.com/vyfor/cord.nvim/discussions/196) for details.
 
 > ### Q: Why can't I disable timestamps in my Rich Presence? Why are they misbehaving?

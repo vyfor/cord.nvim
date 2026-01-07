@@ -27,6 +27,13 @@ function Producer:initialize(config)
     advanced = {
       discord = {
         pipe_paths = config.advanced.discord.pipe_paths,
+        sync = {
+          enabled = config.advanced.discord.sync.enabled,
+          mode = config.advanced.discord.sync.mode,
+          interval = config.advanced.discord.sync.interval,
+          reset_on_update = config.advanced.discord.sync.reset_on_update,
+          pad = config.advanced.discord.sync.pad,
+        },
       },
     },
   })

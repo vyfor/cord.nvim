@@ -29,7 +29,7 @@
 
 ## 💎 Features
 - ⚡ Fast, lightweight, and batteries included.
-- 🚀 Event-driven architecture with instant presence updates.
+- 🚀 [Rate-limit](https://github.com/vyfor/cord.nvim/wiki/FAQ#q-rich-presence-updates-take-a-long-time-to-appear-in-discord-why) aware, event-driven architecture.
 - 🎨 Dynamic string templates with custom variables.
 - 🗃️ Customizable assets for any file/buffer type.
 - 🔧 Flexible configuration with rich API, function-based fields, hooks, user commands and custom IPC paths.

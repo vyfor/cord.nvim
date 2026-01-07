@@ -126,6 +126,13 @@ If you want a fresh start, you can copy the default config and tweak it. I sugge
         interval = 5000,
         initial = true,
       },
+      sync = {
+        enabled = true,
+        mode = 'periodic',
+        interval = 12000,
+        reset_on_update = true,
+        pad = true,
+      },
     },
     workspace = {
       root_markers = {
@@ -407,12 +414,17 @@ require('cord').setup {
 
 ### Discord Settings
 
-| Option                                | Type       | Default | Description                                                        |
-|---------------------------------------|------------|---------|--------------------------------------------------------------------|
-| `advanced.discord.pipe_paths`         | `string[]` | `nil`   | Custom IPC pipe paths to use when connecting to Discord            |
-| `advanced.discord.reconnect.enabled`  | `boolean`  | `false` | Whether reconnection is enabled. Has minimal impact on performance |
-| `advanced.discord.reconnect.interval` | `number`   | `5000`  | Reconnection interval in milliseconds, 0 to disable                |
-| `advanced.discord.reconnect.initial`  | `boolean`  | `true`  | Whether to reconnect if initial connection fails                   |
+| Option                                  | Type       | Default      | Description                                                        |
+|-----------------------------------------|------------|--------------|--------------------------------------------------------------------|
+| `advanced.discord.pipe_paths`           | `string[]` | `nil`        | Custom IPC pipe paths to use when connecting to Discord            |
+| `advanced.discord.reconnect.enabled`    | `boolean`  | `false`      | Whether reconnection is enabled. Has minimal impact on performance |
+| `advanced.discord.reconnect.interval`   | `number`   | `5000`       | Reconnection interval in milliseconds, 0 to disable                |
+| `advanced.discord.reconnect.initial`    | `boolean`  | `true`       | Whether to reconnect if initial connection fails                   |
+| `advanced.discord.sync.enabled`         | `boolean`  | `true`       | Whether synchronization logic is enabled                           |
+| `advanced.discord.sync.mode`            | `string`   | `'periodic'` | Synchronization mode: `'periodic'` or `'defer'`                    |
+| `advanced.discord.sync.interval`        | `number`   | `12000`      | Synchronization interval in milliseconds                           |
+| `advanced.discord.sync.reset_on_update` | `boolean`  | `true`       | Whether to reset periodic synchronization on activity updates      |
+| `advanced.discord.sync.pad`             | `boolean`  | `true`       | Whether to pad activity fields with whitespace                     |
 
 ### Workspace Settings
 

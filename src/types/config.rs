@@ -47,6 +47,67 @@ impl Deserialize for AdvancedConfig {
 #[derive(Debug, Clone, Default)]
 pub struct AdvancedDiscordConfig {
     pub pipe_paths: Vec<String>,
+    pub sync: SyncConfig,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SyncMode {
+    Periodic,
+    Defer,
+}
+
+impl Default for SyncMode {
+    fn default() -> Self {
+        Self::Periodic
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SyncConfig {
+    pub enabled: bool,
+    pub mode: SyncMode,
+    pub interval: u64,
+    pub reset_on_update: bool,
+    pub pad: bool,
+}
+
+impl Default for SyncConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            mode: SyncMode::default(),
+            interval: 12000,
+            reset_on_update: true,
+            pad: true,
+        }
+    }
+}
+
+impl Deserialize for SyncConfig {
+    fn deserialize<'a>(input: Value) -> crate::Result<Self> {
+        let mut input = input.take_map().ok_or("Invalid config")?;
+
+        let enabled = remove_field!(input, "enabled", |v| v.as_bool());
+        let mode = remove_field!(input, "mode", |v| {
+            v.as_str().and_then(|s| match s {
+                "periodic" => Some(SyncMode::Periodic),
+                "defer" => Some(SyncMode::Defer),
+                _ => None,
+            })
+        });
+        let interval = remove_field!(input, "interval", |v| v.as_uinteger());
+        let pad = remove_field!(input, "pad", |v| v.as_bool());
+        let reset_on_update =
+            remove_field!(input, "reset_on_update", |v| v.as_bool());
+
+        Ok(SyncConfig {
+            enabled,
+            mode,
+            interval,
+            reset_on_update,
+            pad,
+        })
+    }
 }
 
 impl Deserialize for AdvancedDiscordConfig {
@@ -66,7 +127,12 @@ impl Deserialize for AdvancedDiscordConfig {
         })
         .unwrap_or_default();
 
-        Ok(AdvancedDiscordConfig { pipe_paths })
+        let sync = remove_field_or_none!(input, "sync", |v| {
+            SyncConfig::deserialize(v).ok()
+        })
+        .unwrap_or_default();
+
+        Ok(AdvancedDiscordConfig { pipe_paths, sync })
     }
 }
 

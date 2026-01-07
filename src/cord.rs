@@ -2,12 +2,13 @@ use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 
-use crate::ipc::discord::client::{Connection, RichClient};
+use crate::ipc::discord::client::Connection;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::ipc::pipe::platform::server::PipeServer;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
+use crate::presence::manager::ActivityManager;
 use crate::protocol::msgpack::MsgPack;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
@@ -20,7 +21,7 @@ pub const VERSION: &str = include_str!("../.github/server-version.txt");
 /// # Fields
 /// * `config`: Configuration settings.
 /// * `session_manager`: Manages user sessions.
-/// * `rich_client`: Handles communication with Discord.
+/// * `activity_manager`: Manages rich presence activity.
 /// * `pipe`: Server-side communication pipe.
 /// * `tx`, `rx`: Channels for message passing.
 /// * `logger`: Logs application events.
@@ -28,7 +29,7 @@ pub const VERSION: &str = include_str!("../.github/server-version.txt");
 pub struct Cord {
     pub config: Config,
     pub session_manager: Arc<SessionManager>,
-    pub rich_client: Arc<RwLock<RichClient>>,
+    pub activity_manager: ActivityManager,
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
@@ -45,8 +46,7 @@ impl Cord {
         let _ = logger::INSTANCE
             .set(RwLock::new(Logger::new(tx.clone(), LogLevel::Off)));
 
-        let rich_client =
-            Arc::new(RwLock::new(RichClient::new(config.client_id, vec![])));
+        let activity_manager = ActivityManager::new(config.client_id, vec![]);
 
         let server = PipeServer::new(
             &config.server_pipe,
@@ -57,7 +57,7 @@ impl Cord {
         Ok(Cord {
             config,
             session_manager,
-            rich_client,
+            activity_manager,
             pipe: server,
             tx,
             rx,
@@ -108,9 +108,7 @@ impl Cord {
 
     /// Cleans up before shutdown.
     pub fn cleanup(&mut self) {
-        if let Some(client) = Arc::get_mut(&mut self.rich_client)
-            && let Ok(client) = client.get_mut()
-        {
+        if let Ok(mut client) = self.activity_manager.client.write() {
             client.close();
         }
 
