@@ -158,20 +158,20 @@ With this option set to true, the plugin **will not start automatically**. Inste
 ## 🎨 Editor
 
 | Option           | Type            | Default                      | Description                                                                                                                                                                 |
-| ---------------- | --------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|------------------|-----------------|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `editor.client`  | `string`        | `'neovim'`                   | Client identifier. Can be `'vim'`, `'neovim'`, `'lunarvim'`, `'nvchad'`, `'astronvim'`, `'lazyvim'`, or a custom Discord application ID. Takes effect after `:Cord restart` |
 | `editor.tooltip` | `string`        | `'The Superior Text Editor'` | Tooltip shown when hovering over editor icon                                                                                                                                |
 | `editor.icon`    | `string \| nil` | `nil`                        | Custom icon URL or asset ID when using custom client ID                                                                                                                     |
 
 ## 📊 Display
 
-| Option                | Type      | Default   | Description                                                                            |
-| --------------------- | --------- | --------- | -------------------------------------------------------------------------------------- |
-| `display.theme`       | `string`  | `default` | Choose between different icon themes; 'default', 'atom', 'catppuccin', 'classic'       |
-| `display.flavor`      | `string`  | `dark`    | Choose between different theme flavors; typically 'dark', 'light', 'accent'            |
-| `display.view`        | `string`  | `full`    | Control what shows up as the large and small images                                    |
-| `display.swap_fields` | `boolean` | `false`   | Show workspace name before filename                                                    |
-| `display.swap_icons`  | `boolean` | `false`   | Use editor icon as large image                                                         |
+| Option                | Type      | Default   | Description                                                                                   |
+|-----------------------|-----------|-----------|-----------------------------------------------------------------------------------------------|
+| `display.theme`       | `string`  | `default` | Choose between different icon themes; 'default', 'atom', 'catppuccin', 'minecraft', 'classic' |
+| `display.flavor`      | `string`  | `dark`    | Choose between different theme flavors; typically 'dark', 'light', 'accent'                   |
+| `display.view`        | `string`  | `full`    | Control what shows up as the large and small images                                           |
+| `display.swap_fields` | `boolean` | `false`   | Show workspace name before filename                                                           |
+| `display.swap_icons`  | `boolean` | `false`   | Use editor icon as large image                                                                |
 
 > [!TIP]
 > Check out our icon [showcase](https://github.com/vyfor/icons#showcase)!
@@ -185,17 +185,17 @@ With this option set to true, the plugin **will not start automatically**. Inste
 
 ## ⏰ Timestamp
 
-| Option                      | Type      | Default | Description                                                                                                                                                                                     |
-| --------------------------- | --------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Option                      | Type      | Default | Description                                                                                                                                                                                 |
+|-----------------------------|-----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `timestamp.enabled`         | `boolean` | `true`  | Show elapsed time in presence. <br /> Currently Broken. See [FAQ](https://github.com/vyfor/cord.nvim/wiki/FAQ#q-why-cant-i-disable-timestamps-in-my-rich-presence-why-are-they-misbehaving) |
-| `timestamp.reset_on_idle`   | `boolean` | `false` | Reset timestamp when entering idle state                                                                                                                                                        |
-| `timestamp.reset_on_change` | `boolean` | `false` | Reset timestamp when presence changes                                                                                                                                                           |
-| `timestamp.shared`          | `boolean` | `false` | Synchronize timestamps between clients                                                                                                                                                          |
+| `timestamp.reset_on_idle`   | `boolean` | `false` | Reset timestamp when entering idle state                                                                                                                                                    |
+| `timestamp.reset_on_change` | `boolean` | `false` | Reset timestamp when presence changes                                                                                                                                                       |
+| `timestamp.shared`          | `boolean` | `false` | Synchronize timestamps between clients                                                                                                                                                      |
 
 ## 💤 Idle
 
 | Option                 | Type                       | Default                                                                                           | Description                                                   |
-| ---------------------- | -------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+|------------------------|----------------------------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
 | `idle.enabled`         | `boolean`                  | `true`                                                                                            | Enable idle status detection                                  |
 | `idle.timeout`         | `number`                   | `300000`                                                                                          | Milliseconds before marking the session as idle               |
 | `idle.show_status`     | `boolean`                  | `true`                                                                                            | Show idle status in presence, or hide the presence if `false` |
@@ -204,7 +204,7 @@ With this option set to true, the plugin **will not start automatically**. Inste
 | `idle.smart_idle`      | `boolean`                  | `true`                                                                                            | Enable smart idle feature. See below                          |
 | `idle.details`         | `string \| function(opts)` | `'Idling'`                                                                                        | Details shown when idle                                       |
 | `idle.state`           | `string \| function(opts)` | `nil`                                                                                             | State shown when idle                                         |
-| `idle.tooltip`         | `string \| function(opts)` | `'💤'`                                                                                             | Tooltip shown when hovering over idle icon                    |
+| `idle.tooltip`         | `string \| function(opts)` | `'💤'`                                                                                            | Tooltip shown when hovering over idle icon                    |
 | `idle.icon`            | `string \| function(opts)` | [`default idle icon`](https://github.com/vyfor/icons/blob/master/icons/default/dark/keyboard.png) | Custom icon URL or asset ID                                   |
 
 > Smart idle ensures that:
@@ -214,7 +214,7 @@ With this option set to true, the plugin **will not start automatically**. Inste
 ## 📝 Text
 
 | Option           | Type                                  | Default                        | Description                                        |
-| ---------------- | ------------------------------------- | ------------------------------ | -------------------------------------------------- |
+|------------------|---------------------------------------|--------------------------------|----------------------------------------------------|
 | `default`        | `string \| function(opts) \| boolean` | `nil`                          | Default text for all unspecified text options      |
 | `workspace`      | `string \| function(opts) \| boolean` | `In {workspace}`               | Text shown when in a workspace                     |
 | `viewing`        | `string \| function(opts) \| boolean` | `Viewing {filename}`           | Text shown when viewing a file                     |
@@ -346,7 +346,7 @@ vim.filetype.add {
 ## 🧩 Variables
 
 | Option      | Type                      | Default | Description                                                                                                                                                                                                                                                               |
-| ----------- | ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|-------------|---------------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `variables` | `table \| boolean \| nil` | `nil`   | Define [custom variables](#custom-variables) for use in string templates. Functions can be used to dynamically generate values. If `true`, uses the default [options table](#options-table), if `table`, extends the default table, if `false`, disables custom variables |
 
 > The `variables` option allows you to define custom variables to be used in string templates. These variables can be static values or functions that dynamically generate values based on the current context. By default, the table is populated with the [options table](#options-table) but they can be overridden by user-defined variables.
@@ -368,7 +368,7 @@ require('cord').setup {
 ## 🪝 Hooks
 
 | Option                   | Type                                                                                 | Description                                                                                                        |
-| ------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+|--------------------------|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
 | `hooks.ready`            | `function(manager) \| table<fun: function(manager), priority: number>`               | Called when connected to the server and ready for communication with Discord ([manager](#activitymanager-methods)) |
 | `hooks.shutdown`         | `function() \| table<fun: function(), priority: number>`                             | Called when connection to Discord is closed                                                                        |
 | `hooks.pre_activity`     | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called before building activity ([opts](#options-table))                                                           |
@@ -381,7 +381,7 @@ require('cord').setup {
 ## 🔌 Plugins
 
 | Option    | Type                               | Description                                                          |
-| --------- | ---------------------------------- | -------------------------------------------------------------------- |
+|-----------|------------------------------------|----------------------------------------------------------------------|
 | `plugins` | `string[] \| table<string, table>` | Extend Cord with plugins. See the [Wiki](./Plugins.md) for more info |
 
 > If you want to develop your own plugin, check out Cord's [Plugin System](./Plugin-System.md)
@@ -391,7 +391,7 @@ require('cord').setup {
 ### Plugin Settings
 
 | Option                              | Type      | Default     | Description                                                                                                          |
-| ----------------------------------- | --------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
+|-------------------------------------|-----------|-------------|----------------------------------------------------------------------------------------------------------------------|
 | `advanced.plugin.autocmds`          | `boolean` | `true`      | Enable autocmds                                                                                                      |
 | `advanced.plugin.cursor_update`     | `string`  | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode) |
 | `advanced.plugin.match_in_mappings` | `boolean` | `true`      | Whether to match against file extensions in mappings                                                                 |
@@ -399,7 +399,7 @@ require('cord').setup {
 ### Server Settings
 
 | Option                            | Type            | Default   | Description                                                                                                                                                                                                                              |
-| --------------------------------- | --------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|-----------------------------------|-----------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `advanced.server.update`          | `string`        | `'fetch'` | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'install'` - install from crates.io, `'build'` - build from source, `'none'` - no-op |
 | `advanced.server.pipe_path`       | `string \| nil` | `nil`     | Custom IPC pipe path                                                                                                                                                                                                                     |
 | `advanced.server.executable_path` | `string \| nil` | `nil`     | Custom server executable path                                                                                                                                                                                                            |
@@ -408,7 +408,7 @@ require('cord').setup {
 ### Discord Settings
 
 | Option                                | Type       | Default | Description                                                        |
-| ------------------------------------- | ---------- | ------- | ------------------------------------------------------------------ |
+|---------------------------------------|------------|---------|--------------------------------------------------------------------|
 | `advanced.discord.pipe_paths`         | `string[]` | `nil`   | Custom IPC pipe paths to use when connecting to Discord            |
 | `advanced.discord.reconnect.enabled`  | `boolean`  | `false` | Whether reconnection is enabled. Has minimal impact on performance |
 | `advanced.discord.reconnect.interval` | `number`   | `5000`  | Reconnection interval in milliseconds, 0 to disable                |
@@ -417,7 +417,7 @@ require('cord').setup {
 ### Workspace Settings
 
 | Option                            | Type       | Default    | Description                                                                                                                                                                    |
-| --------------------------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|-----------------------------------|------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `advanced.workspace.root_markers` | `string[]` | `string[]` | List of root markers to use when determining the workspace directory                                                                                                           |
 | `advanced.workspace.limit_to_cwd` | `boolean`  | `false`    | Limits workspace detection to the working directory (vim.fn.getcwd()). When true, workspace detection stops at the CWD if no marker is found, making the search more efficient |
 
@@ -507,7 +507,7 @@ The `ActivityManager` contains useful methods:
 ## ActivityManager Methods
 
 | Method                                  | Description                                                                                                                                          |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+|-----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `manager:queue_update(force_update)`    | Schedules an update to the activity. If `force_update` is true, it bypasses checks and updates immediately.                                          |
 | `manager:pause()`                       | Pauses all events and stops the idle timer.                                                                                                          |
 | `manager:resume()`                      | Resumes events and restarts the idle timer.                                                                                                          |
@@ -528,7 +528,7 @@ The `ActivityManager` contains useful methods:
 ## Activity Options
 
 | Parameter             | Type      | Description                                                                                                                    |
-| --------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------ |
+|-----------------------|-----------|--------------------------------------------------------------------------------------------------------------------------------|
 | `type`                | `string`  | One of 'playing', 'listening', 'watching', 'competing'                                                                         |
 | `status_display_type` | `string`  | One of 'name', 'state', 'details'. Controls which field is displayed in the user's status text in the member list              |
 | `details`             | `string`  | Detailed information about what the user is doing.                                                                             |

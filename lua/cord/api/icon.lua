@@ -8,18 +8,18 @@ M.ICONS_URL = 'https://raw.githubusercontent.com/vyfor/icons/master/icons/'
 M.ICON_THEME = 'default'
 M.THEME_FLAVOR = 'dark'
 
-M.supported_themes = { 'default', 'atom', 'catppuccin', 'classic' }
+M.supported_themes = { 'default', 'atom', 'catppuccin', 'minecraft', 'classic' }
 M.supported_flavors = { 'dark', 'light', 'accent' }
 
 M.get = function(name, theme, flavor)
   return M.ICONS_URL
-    .. (theme or M.ICON_THEME)
-    .. '/'
-    .. (flavor or M.THEME_FLAVOR)
-    .. '/'
-    .. name
-    .. '.png?v='
-    .. M.ICONS_VERSION
+      .. (theme or M.ICON_THEME)
+      .. '/'
+      .. (flavor or M.THEME_FLAVOR)
+      .. '/'
+      .. name
+      .. '.png?v='
+      .. M.ICONS_VERSION
 end
 
 M.set = function(theme, flavor)
