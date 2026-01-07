@@ -168,6 +168,13 @@ Default Configuration ~
             interval = 5000,
             initial = true,
           },
+          sync = {
+            enabled = true,
+            mode = 'periodic',
+            interval = 12000,
+            reset_on_update = true,
+            pad = true,
+          },
         },
         workspace = {
           root_markers = {
@@ -594,21 +601,36 @@ SERVER SETTINGS ~
 
 DISCORD SETTINGS ~
 
-  ------------------------------------------------------------------------------------------------
-  Option                                Type       Default   Description
-  ------------------------------------- ---------- --------- -------------------------------------
-  advanced.discord.pipe_paths           string[]   nil       Custom IPC pipe paths to use when
-                                                             connecting to Discord
+  ---------------------------------------------------------------------------------------------------
+  Option                                  Type       Default      Description
+  --------------------------------------- ---------- ------------ -----------------------------------
+  advanced.discord.pipe_paths             string[]   nil          Custom IPC pipe paths to use when
+                                                                  connecting to Discord
 
-  advanced.discord.reconnect.enabled    boolean    false     Whether reconnection is enabled. Has
-                                                             minimal impact on performance
+  advanced.discord.reconnect.enabled      boolean    false        Whether reconnection is enabled.
+                                                                  Has minimal impact on performance
 
-  advanced.discord.reconnect.interval   number     5000      Reconnection interval in
-                                                             milliseconds, 0 to disable
+  advanced.discord.reconnect.interval     number     5000         Reconnection interval in
+                                                                  milliseconds, 0 to disable
 
-  advanced.discord.reconnect.initial    boolean    true      Whether to reconnect if initial
-                                                             connection fails
-  ------------------------------------------------------------------------------------------------
+  advanced.discord.reconnect.initial      boolean    true         Whether to reconnect if initial
+                                                                  connection fails
+
+  advanced.discord.sync.enabled           boolean    true         Whether synchronization logic is
+                                                                  enabled
+
+  advanced.discord.sync.mode              string     'periodic'   Synchronization mode: 'periodic' or
+                                                                  'defer'
+
+  advanced.discord.sync.interval          number     12000        Synchronization interval in
+                                                                  milliseconds
+
+  advanced.discord.sync.reset_on_update   boolean    true         Whether to reset periodic
+                                                                  synchronization on activity updates
+
+  advanced.discord.sync.pad               boolean    true         Whether to pad activity fields with
+                                                                  whitespace
+  ---------------------------------------------------------------------------------------------------
 
 WORKSPACE SETTINGS ~
 
@@ -1525,7 +1547,7 @@ KEYMAPPINGS ~
 FEATURES                                              *cord-examples-features*
 
 - Fast, lightweight, and batteries included.
-- Event-driven architecture with instant presence updates.
+- Rate-limit <https://github.com/vyfor/cord.nvim/wiki/FAQ#q-rich-presence-updates-take-a-long-time-to-appear-in-discord-why> aware, event-driven architecture.
 - Dynamic string templates with custom variables.
 - Customizable assets for any file/buffer type.
 - Flexible configuration with rich API, function-based fields, hooks, user commands and custom IPC paths.
