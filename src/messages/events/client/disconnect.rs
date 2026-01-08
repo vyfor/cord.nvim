@@ -24,17 +24,6 @@ impl OnEvent for DisconnectEvent {
             return Ok(());
         }
 
-        if ctx
-            .cord
-            .session_manager
-            .last_activity
-            .read()
-            .unwrap()
-            .is_none()
-        {
-            return Ok(());
-        }
-
         let latest = sessions
             .iter()
             .filter(|s| s.1.last_activity.is_some())
@@ -63,6 +52,14 @@ impl OnEvent for DisconnectEvent {
             }
 
             ctx.cord.activity_manager.update(activity.clone())?;
+        } else {
+            let mut last_activity =
+                ctx.cord.session_manager.last_activity.write().unwrap();
+            if last_activity.is_some() {
+                *last_activity = None;
+                drop(last_activity);
+                ctx.cord.activity_manager.clear()?;
+            }
         }
 
         Ok(())

@@ -53,12 +53,6 @@ impl OnEvent for ClearActivityEvent {
 
             if let Some(session) = latest {
                 if let Some(mut activity) = session.last_activity.clone() {
-                    if let Some(global) = &global_last_activity {
-                        if global == &activity {
-                            return Ok(());
-                        }
-                    }
-
                     if ctx.cord.config.shared_timestamps {
                         let shared_ts =
                             &ctx.cord.session_manager.shared_timestamp;
@@ -74,6 +68,12 @@ impl OnEvent for ClearActivityEvent {
                         if ts_ref.start.is_none() {
                             ts_ref.start =
                                 Some(shared_ts.load(Ordering::SeqCst));
+                        }
+                    }
+
+                    if let Some(global) = &global_last_activity {
+                        if global == &activity {
+                            return Ok(());
                         }
                     }
 

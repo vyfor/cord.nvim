@@ -66,26 +66,32 @@ impl OnEvent for UpdateActivityEvent {
             }
         }
 
+        if let Some(mut session) =
+            ctx.cord.session_manager.get_session_mut(ctx.client_id)
         {
+            session.set_last_activity(activity.clone());
+            session.last_updated = now().as_nanos();
+        }
+
+        let should_update = {
             let mut last_activity =
                 ctx.cord.session_manager.last_activity.write().unwrap();
 
             if let Some(global_last_activity) = last_activity.as_ref() {
                 if !self.force && global_last_activity == &activity {
-                    return Ok(());
+                    false
+                } else {
+                    *last_activity = Some(activity.clone());
+                    true
                 }
+            } else {
+                *last_activity = Some(activity.clone());
+                true
             }
+        };
 
-            *last_activity = Some(activity.clone());
-        }
-
-        ctx.cord.activity_manager.update(activity.clone())?;
-
-        if let Some(mut session) =
-            ctx.cord.session_manager.get_session_mut(ctx.client_id)
-        {
-            session.set_last_activity(activity);
-            session.last_updated = now().as_nanos();
+        if should_update {
+            ctx.cord.activity_manager.update(activity)?;
         }
 
         Ok(())
