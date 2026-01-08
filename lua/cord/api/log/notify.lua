@@ -34,9 +34,7 @@ local function flush()
       message = entry.msg
     end
 
-    if message and (entry.level >= log_level) then
-      vim.notify('[cord.nvim] ' .. message, entry.level)
-    end
+    if message then vim.notify('[cord.nvim] ' .. message, entry.level) end
   end
 
   flushing = false
