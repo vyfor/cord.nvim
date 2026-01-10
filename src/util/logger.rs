@@ -97,13 +97,10 @@ impl Logger {
 #[macro_export]
 macro_rules! log {
     ($level:expr, $msg:expr, $client_id:expr) => {{
-        let logger = $crate::util::logger::INSTANCE
-            .get()
-            .expect("Logger not initialized")
-            .read()
-            .unwrap();
-
-        logger.log($level, $msg, $client_id);
+        if let Some(logger) = $crate::util::logger::INSTANCE.get() {
+            let logger = logger.read().unwrap();
+            logger.log($level, $msg, $client_id);
+        }
     }};
     ($level:expr, $msg:expr) => {
         $crate::log!($level, $msg, 0)
@@ -113,13 +110,10 @@ macro_rules! log {
 #[macro_export]
 macro_rules! log_raw {
     ($level:expr, $msg:expr, $client_id:expr) => {{
-        let logger = $crate::util::logger::INSTANCE
-            .get()
-            .expect("Logger not initialized")
-            .read()
-            .unwrap();
-
-        logger.log_raw($level, $msg, $client_id);
+        if let Some(logger) = $crate::util::logger::INSTANCE.get() {
+            let logger = logger.read().unwrap();
+            logger.log_raw($level, $msg, $client_id);
+        }
     }};
     ($level:expr, $msg:expr) => {
         $crate::log_raw!($level, $msg, 0)
@@ -129,13 +123,10 @@ macro_rules! log_raw {
 #[macro_export]
 macro_rules! log_cb {
     ($level:expr, $cb:expr, $client_id:expr) => {{
-        let logger = $crate::util::logger::INSTANCE
-            .get()
-            .expect("Logger not initialized")
-            .read()
-            .unwrap();
-
-        logger.log_cb($level, $client_id, $cb);
+        if let Some(logger) = $crate::util::logger::INSTANCE.get() {
+            let logger = logger.read().unwrap();
+            logger.log_cb($level, $client_id, $cb);
+        }
     }};
     ($level:expr, $cb:expr) => {
         $crate::log_cb!($level, $cb, 0)
@@ -145,13 +136,10 @@ macro_rules! log_cb {
 #[macro_export]
 macro_rules! log_raw_cb {
     ($level:expr, $cb:expr, $client_id:expr) => {{
-        let logger = $crate::util::logger::INSTANCE
-            .get()
-            .expect("Logger not initialized")
-            .read()
-            .unwrap();
-
-        logger.log_raw_cb($level, $client_id, $cb);
+        if let Some(logger) = $crate::util::logger::INSTANCE.get() {
+            let logger = logger.read().unwrap();
+            logger.log_raw_cb($level, $client_id, $cb);
+        }
     }};
     ($level:expr, $cb:expr) => {
         $crate::log_raw_cb!($level, $cb, 0)
@@ -261,12 +249,10 @@ macro_rules! error {
 #[macro_export]
 macro_rules! __log_with_client_id {
     ($level:expr, $client_id:expr, $msg:expr) => {{
-        let logger = $crate::util::logger::INSTANCE
-            .get()
-            .expect("Logger not initialized")
-            .read()
-            .unwrap();
-        logger.log($level, $msg, $client_id);
+        if let Some(logger) = $crate::util::logger::INSTANCE.get() {
+            let logger = logger.read().unwrap();
+            logger.log($level, $msg, $client_id);
+        }
     }};
 }
 
