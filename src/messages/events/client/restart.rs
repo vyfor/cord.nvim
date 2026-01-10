@@ -1,4 +1,5 @@
 use crate::{
+    debug,
     ipc::pipe::PipeServerImpl,
     messages::events::event::{EventContext, OnEvent},
     protocol::msgpack::{MsgPack, Serialize, ValueRef},
@@ -9,6 +10,7 @@ pub struct RestartEvent;
 
 impl OnEvent for RestartEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        debug!(ctx.client_id, "Processing restart event, broadcasting to clients");
         ctx.cord.pipe.broadcast(&MsgPack::serialize(&self)?)?;
         ctx.cord.shutdown();
 

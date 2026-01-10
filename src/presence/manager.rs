@@ -8,6 +8,7 @@ use crate::presence::activity::Activity;
 use crate::presence::packet::Packet;
 use crate::types::config::{SyncConfig, SyncMode};
 use crate::util::pad_activity_field;
+use crate::{debug, trace};
 
 #[derive(Clone)]
 enum PendingOp {
@@ -27,6 +28,7 @@ pub struct ActivityManager {
 
 impl ActivityManager {
     pub fn new(client_id: u64, pipe_paths: Vec<String>) -> Self {
+        debug!("Creating ActivityManager with client_id={}", client_id);
         let client =
             Arc::new(RwLock::new(RichClient::new(client_id, pipe_paths)));
         let last_activity = Arc::new(RwLock::new(None));
@@ -59,6 +61,7 @@ impl ActivityManager {
         let config = self.config.clone();
         let pending_op = self.pending_op.clone();
 
+        debug!("Starting activity manager background loop");
         thread::spawn(move || {
             loop {
                 thread::sleep(Duration::from_millis(500));
@@ -90,6 +93,7 @@ impl ActivityManager {
                             let client_guard = client.read().unwrap();
                             let activity_opt = last_activity.read().unwrap();
                             if let Some(activity) = activity_opt.as_ref() {
+                                trace!("Periodic sync: updating activity");
                                 let mut padded_activity = activity.clone();
                                 if pad_enabled {
                                     pad_activity_field(
@@ -105,6 +109,7 @@ impl ActivityManager {
                                 );
                                 let _ = client_guard.update(&packet);
                             } else {
+                                trace!("Periodic sync: clearing activity");
                                 let _ = client_guard.clear();
                             }
 
@@ -123,6 +128,7 @@ impl ActivityManager {
                                 let client_guard = client.read().unwrap();
                                 match op {
                                     PendingOp::Update(mut activity) => {
+                                        trace!("Deferred sync: updating activity");
                                         if pad_enabled {
                                             pad_activity_field(
                                                 &mut activity.details,
@@ -138,6 +144,7 @@ impl ActivityManager {
                                         let _ = client_guard.update(&packet);
                                     }
                                     PendingOp::Clear => {
+                                        trace!("Deferred sync: clearing activity");
                                         let _ = client_guard.clear();
                                     }
                                 }
@@ -151,10 +158,13 @@ impl ActivityManager {
     }
 
     pub fn set_config(&self, new_config: SyncConfig) {
+        debug!("Setting ActivityManager sync config: mode={:?}, interval={}, enabled={}", 
+               new_config.mode, new_config.interval, new_config.enabled);
         *self.config.write().unwrap() = new_config;
     }
 
     pub fn update(&self, activity: Activity) -> crate::Result<()> {
+        trace!("ActivityManager update called");
         let config = self.config.read().unwrap();
 
         match (config.enabled, &config.mode) {
@@ -166,6 +176,7 @@ impl ActivityManager {
                 if is_first
                     || Instant::now().duration_since(*last_update) >= interval
                 {
+                    debug!("Sending activity update to Discord (defer mode, immediate)");
                     let client = self.client.read().unwrap();
                     let mut padded_activity = activity.clone();
                     if config.pad {
@@ -178,12 +189,14 @@ impl ActivityManager {
                     *last_update = Instant::now();
                     *self.pending_op.write().unwrap() = None;
                 } else {
+                    trace!("Deferring activity update");
                     *self.pending_op.write().unwrap() =
                         Some(PendingOp::Update(activity.clone()));
                 }
                 *self.last_activity.write().unwrap() = Some(activity);
             }
             (true, SyncMode::Periodic) => {
+                debug!("Sending activity update to Discord (periodic mode)");
                 let client = self.client.read().unwrap();
                 let mut padded_activity = activity.clone();
                 if config.pad {
@@ -196,6 +209,7 @@ impl ActivityManager {
                 *self.last_activity.write().unwrap() = Some(activity);
             }
             (false, _) => {
+                debug!("Sending activity update to Discord (sync disabled)");
                 let client = self.client.read().unwrap();
                 let mut padded_activity = activity.clone();
                 if config.pad {
@@ -210,6 +224,7 @@ impl ActivityManager {
     }
 
     pub fn clear(&self) -> crate::Result<()> {
+        trace!("ActivityManager clear called");
         let config = self.config.read().unwrap();
 
         match (config.enabled, &config.mode) {
@@ -221,15 +236,18 @@ impl ActivityManager {
                 if is_first
                     || Instant::now().duration_since(*last_update) >= interval
                 {
+                    debug!("Clearing Discord activity (defer mode, immediate)");
                     self.client.read().unwrap().clear()?;
                     *last_update = Instant::now();
                     *self.pending_op.write().unwrap() = None;
                 } else {
+                    trace!("Deferring activity clear");
                     *self.pending_op.write().unwrap() = Some(PendingOp::Clear);
                 }
                 *self.last_activity.write().unwrap() = None;
             }
             _ => {
+                debug!("Clearing Discord activity");
                 self.client.read().unwrap().clear()?;
                 *self.last_activity.write().unwrap() = None;
                 *self.last_update.write().unwrap() = Instant::now();

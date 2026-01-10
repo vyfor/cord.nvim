@@ -6,6 +6,7 @@ use crate::messages::events::event::{EventContext, OnEvent};
 use crate::protocol::msgpack::MsgPack;
 use crate::protocol::msgpack::serialize::Serialize;
 use crate::protocol::msgpack::value::ValueRef;
+use crate::trace;
 
 #[derive(Debug)]
 pub struct StatusUpdateEvent {
@@ -59,6 +60,7 @@ impl StatusUpdateEvent {
 
 impl OnEvent for StatusUpdateEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        trace!(ctx.client_id, "Broadcasting status update: {}", self.status);
         ctx.cord.pipe.broadcast(&MsgPack::serialize(&self)?)?;
 
         Ok(())

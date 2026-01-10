@@ -27,6 +27,18 @@ pub trait Serialize {
         f: SerializeFn<'a>,
         state: &mut SerializeState,
     ) -> crate::Result<()>;
+
+    /// Convenience method to serialize this type to JSON string.
+    ///
+    /// # Returns
+    ///
+    /// A result containing the serialized JSON string or an error.
+    fn to_json(&self) -> crate::Result<String>
+    where
+        Self: Sized,
+    {
+        Json::serialize(self)
+    }
 }
 
 pub trait SerializeObj: Serialize + std::fmt::Debug {}

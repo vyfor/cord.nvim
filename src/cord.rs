@@ -1,18 +1,18 @@
+use std::sync::Arc;
 use std::sync::mpsc::{self, Receiver, Sender};
-use std::sync::{Arc, RwLock};
 use std::time::Duration;
 
 use crate::ipc::discord::client::Connection;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::ipc::pipe::platform::server::PipeServer;
-use crate::messages::events::event::{EventContext, OnEvent};
-use crate::messages::events::server::LogEvent;
+use crate::messages::events::event::{Event, EventContext, OnEvent};
+use crate::messages::events::server::{LogEvent, ServerEvent};
 use crate::messages::message::Message;
 use crate::presence::manager::ActivityManager;
-use crate::protocol::msgpack::MsgPack;
+use crate::protocol::msgpack::Serialize;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
-use crate::util::logger::{self, LogLevel, Logger};
+use crate::util::logger::{self, LOGGER, LogLevel, Logger};
 
 pub const VERSION: &str = include_str!("../.github/server-version.txt");
 
@@ -43,8 +43,7 @@ impl Cord {
 
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = Arc::new(SessionManager::default());
-        let _ = logger::INSTANCE
-            .set(RwLock::new(Logger::new(tx.clone(), LogLevel::Off)));
+        let _ = logger::LOGGER.set(Logger::new(tx.clone(), LogLevel::Off));
 
         let activity_manager = ActivityManager::new(config.client_id, vec![]);
 
@@ -87,10 +86,26 @@ impl Cord {
                     if self.session_manager.sessions.read().unwrap().is_empty()
                     {
                         return Err(e);
-                    } else if let Ok(data) = MsgPack::serialize(&LogEvent::new(
-                        e.to_string(),
-                        LogLevel::Error,
-                    )) {
+                    } else if let Some(logger) = LOGGER.get()
+                        && logger.would_log(LogLevel::Error)
+                        && let Ok(data) =
+                            LogEvent::new(e.to_string(), LogLevel::Error)
+                                .to_msgpack()
+                    {
+                        while let Ok(ev) = self.rx.try_recv() {
+                            match ev.event {
+                                Event::Server(sev)
+                                    if matches!(sev, ServerEvent::Log(_)) =>
+                                {
+                                    let _ = sev.on_event(&mut EventContext {
+                                        cord: self,
+                                        client_id: msg.client_id,
+                                    });
+                                }
+                                _ => {}
+                            }
+                        }
+
                         self.pipe.broadcast(&data)?;
                         return Ok(());
                     }

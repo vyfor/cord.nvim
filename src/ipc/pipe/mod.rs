@@ -7,7 +7,7 @@ use std::sync::mpsc::Sender;
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 use crate::session::SessionManager;
-use crate::{client_event, local_event};
+use crate::{client_event, debug, local_event};
 
 /// Trait for server-side pipe operations.
 ///
@@ -80,10 +80,12 @@ fn report_error(id: u32, tx: &Sender<Message>, error: io::Error) {
     if error.kind() == io::ErrorKind::BrokenPipe
         || error.kind() == io::ErrorKind::ConnectionReset
     {
+        debug!("Client {} disconnected: {}", id, error);
         tx.send(client_event!(id, Disconnect)).ok();
         return;
     }
 
+    debug!("Error for client {}: {}", id, error);
     tx.send(local_event!(0, Error, ErrorEvent::new(Box::new(error))))
         .ok();
 }

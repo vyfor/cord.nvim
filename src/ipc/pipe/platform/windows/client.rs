@@ -11,10 +11,8 @@ use crate::ipc::bindings::{
 use crate::ipc::pipe::{PipeClientImpl, report_error};
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
-use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
-use crate::util::logger::LogLevel;
-use crate::{client_event, server_event};
+use crate::{client_event, debug, trace};
 
 pub struct PipeClient {
     id: u32,
@@ -27,6 +25,7 @@ impl PipeClientImpl for PipeClient {
     type PipeType = File;
 
     fn new(id: u32, pipe: File, tx: Sender<Message>) -> Self {
+        trace!("Creating Windows pipe client: id={}", id);
         Self {
             id,
             pipe: Some(Arc::new(pipe)),
@@ -86,6 +85,7 @@ impl PipeClientImpl for PipeClient {
             let tx = self.tx.clone();
             let id = self.id;
 
+            debug!("Starting read thread for client {}", id);
             let handle = std::thread::spawn(move || {
                 let mut buf = [0u8; 4096];
                 let handle = pipe.as_raw_handle();
@@ -107,6 +107,10 @@ impl PipeClientImpl for PipeClient {
                             if error.raw_os_error()
                                 != Some(ERROR_IO_PENDING as i32)
                             {
+                                debug!(
+                                    "Read from client {} failed: {}",
+                                    id, error
+                                );
                                 report_error(id, &tx, error);
                                 break;
                             }
@@ -119,19 +123,36 @@ impl PipeClientImpl for PipeClient {
                             1,
                         ) == 0
                         {
-                            report_error(id, &tx, io::Error::last_os_error());
+                            let err = io::Error::last_os_error();
+                            debug!(
+                                "GetOverlappedResult failed for client {} read: {}",
+                                id, err
+                            );
+                            report_error(id, &tx, err);
                             break;
                         }
 
                         if bytes_read == 0 {
+                            debug!(
+                                "Client {} disconnected (zero bytes read)",
+                                id
+                            );
                             tx.send(client_event!(id, Disconnect)).ok();
                             break;
                         }
 
+                        trace!(
+                            "Received {} bytes from client {}",
+                            bytes_read, id
+                        );
                         match ClientEvent::deserialize(
                             &buf[..bytes_read as usize],
                         ) {
                             Ok(message) => {
+                                trace!(
+                                    "Received event from client {}: {:?}",
+                                    id, message
+                                );
                                 tx.send(Message::new(
                                     id,
                                     Event::Client(message),
@@ -139,15 +160,12 @@ impl PipeClientImpl for PipeClient {
                                 .ok();
                             }
                             Err(e) => {
-                                tx.send(server_event!(
+                                error!(
                                     id,
-                                    Log,
-                                    LogEvent::new(
-                                        e.to_string(),
-                                        LogLevel::Error
-                                    )
-                                ))
-                                .ok();
+                                    "Failed to deserialize message from client {}: {}",
+                                    id,
+                                    e
+                                );
                             }
                         }
                     }
@@ -157,6 +175,10 @@ impl PipeClientImpl for PipeClient {
             self.thread_handle = Some(handle);
             Ok(())
         } else {
+            debug!(
+                "Cannot start read thread for client {}: no pipe available",
+                self.id
+            );
             Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found"))
         }
     }
@@ -164,6 +186,7 @@ impl PipeClientImpl for PipeClient {
 
 impl Drop for PipeClient {
     fn drop(&mut self) {
+        trace!("Dropping Windows pipe client {}", self.id);
         {
             let _ = self.pipe.take();
         }

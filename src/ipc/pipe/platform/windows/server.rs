@@ -20,7 +20,7 @@ use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 use crate::session::SessionManager;
-use crate::{client_event, echoln, local_event};
+use crate::{client_event, debug, echoln, local_event, trace};
 
 pub struct PipeServer {
     session_manager: Arc<SessionManager>,
@@ -37,6 +37,7 @@ impl PipeServerImpl for PipeServer {
         tx: Sender<Message>,
         session_manager: Arc<SessionManager>,
     ) -> Self {
+        debug!("Creating Windows pipe server: {}", pipe_name);
         Self {
             session_manager,
             pipe_name: pipe_name.to_string(),
@@ -49,9 +50,11 @@ impl PipeServerImpl for PipeServer {
 
     fn start(&mut self) -> io::Result<()> {
         if self.running.swap(true, Ordering::SeqCst) {
+            trace!("Windows pipe server already running");
             return Ok(());
         }
 
+        debug!("Starting Windows pipe server on: {}", self.pipe_name);
         let pipe_name = self.pipe_name.clone();
         let session_manager = Arc::clone(&self.session_manager);
         let next_client_id = Arc::clone(&self.next_client_id);
@@ -63,6 +66,7 @@ impl PipeServerImpl for PipeServer {
             while running.load(Ordering::SeqCst) {
                 if let Ok(handle) = PipeServer::create_pipe_instance(&pipe_name)
                 {
+                    trace!("Created new Windows named pipe instance");
                     unsafe {
                         let h_event = CreateEventW(
                             std::ptr::null_mut(),
@@ -71,6 +75,9 @@ impl PipeServerImpl for PipeServer {
                             std::ptr::null_mut(),
                         );
                         if h_event.is_null() {
+                            debug!(
+                                "Failed to create event for pipe connection"
+                            );
                             CloseHandle(handle);
                             tx.send(local_event!(
                                 0,
@@ -98,6 +105,10 @@ impl PipeServerImpl for PipeServer {
                             if error != ERROR_IO_PENDING
                                 && error != ERROR_PIPE_CONNECTED
                             {
+                                debug!(
+                                    "ConnectNamedPipe failed with error code: {}",
+                                    error
+                                );
                                 CloseHandle(handle);
                                 CloseHandle(h_event);
                                 tx.send(local_event!(
@@ -128,6 +139,10 @@ impl PipeServerImpl for PipeServer {
                         ) == 0
                         {
                             let error = GetLastError();
+                            debug!(
+                                "GetOverlappedResult failed for pipe connection: error={}",
+                                error
+                            );
                             CloseHandle(handle);
                             CloseHandle(h_event);
                             tx.send(local_event!(
@@ -143,6 +158,7 @@ impl PipeServerImpl for PipeServer {
 
                         let client_id =
                             next_client_id.fetch_add(1, Ordering::SeqCst);
+                        debug!("New client connected: id={}", client_id);
                         let mut client = PipeClient::new(
                             client_id,
                             File::from_raw_handle(handle as _),
@@ -162,6 +178,7 @@ impl PipeServerImpl for PipeServer {
     }
 
     fn stop(&mut self) {
+        debug!("Stopping Windows pipe server");
         self.running.store(false, Ordering::SeqCst);
         if let Some(handle) = self.thread_handle.take() {
             drop(handle);
@@ -189,6 +206,7 @@ impl PipeServerImpl for PipeServer {
     }
 
     fn disconnect(&self, client_id: u32) -> io::Result<()> {
+        debug!("Disconnecting client {}", client_id);
         self.session_manager.remove_session(client_id);
         Ok(())
     }
@@ -196,6 +214,7 @@ impl PipeServerImpl for PipeServer {
 
 impl PipeServer {
     fn create_pipe_instance(pipe_name: &str) -> io::Result<HANDLE> {
+        trace!("Creating Windows named pipe instance: {}", pipe_name);
         let wide_name: Vec<u16> =
             pipe_name.encode_utf16().chain(std::iter::once(0)).collect();
 
@@ -213,7 +232,9 @@ impl PipeServer {
         };
 
         if handle == INVALID_HANDLE_VALUE {
-            Err(io::Error::last_os_error())
+            let err = io::Error::last_os_error();
+            debug!("Failed to create named pipe: {}", err);
+            Err(err)
         } else {
             Ok(handle)
         }

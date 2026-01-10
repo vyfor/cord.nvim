@@ -9,6 +9,7 @@ use crate::messages::events::server::status_update::Status;
 use crate::messages::message::Message;
 use crate::presence::packet::Packet;
 use crate::protocol::json::Json;
+use crate::{debug, trace};
 
 /// Manages the connection to Discord for sending and receiving data.
 ///
@@ -67,17 +68,24 @@ impl RichClient {
 
     /// Establishes a connection with Discord.
     pub fn connect(&mut self) -> crate::Result<()> {
+        debug!("Attempting to connect to Discord IPC");
         if self.pipe_paths.is_empty() {
             for pipe in get_dirs() {
+                trace!("Trying Discord IPC pipe: {}", pipe);
                 if self.try_connect(&pipe)? {
+                    debug!("Connected to Discord IPC pipe: {}", pipe);
                     return Ok(());
                 }
             }
         } else {
             let pipes = std::mem::take(&mut self.pipe_paths);
 
+            debug!("Custom pipe paths provided: {:#?}", pipes);
+
             for pipe in &pipes {
+                trace!("Trying custom Discord IPC pipe: {}", pipe);
                 if self.try_connect(pipe)? {
+                    debug!("Connected to custom Discord IPC pipe: {}", pipe);
                     self.pipe_paths = pipes;
                     return Ok(());
                 }
@@ -86,11 +94,16 @@ impl RichClient {
             self.pipe_paths = pipes;
         }
 
+        debug!("Failed to find Discord IPC pipe");
         Err(DiscordError::PipeNotFound.into())
     }
 
     /// Sends a handshake packet to Discord.
     pub fn handshake(&self) -> crate::Result<()> {
+        debug!(
+            "Sending handshake to Discord with client_id={}",
+            self.client_id
+        );
         self.write(
             0,
             Some(
@@ -102,6 +115,7 @@ impl RichClient {
 
     /// Updates the client's rich presence.
     pub fn update(&self, packet: &Packet) -> crate::Result<()> {
+        trace!("Updating Discord rich presence");
         let encoded = Json::serialize(packet)?;
         match self.write(1, Some(encoded.as_bytes())) {
             Err(_) => Err("The connection to Discord was lost".into()),
@@ -111,6 +125,7 @@ impl RichClient {
 
     /// Clears the current rich presence.
     pub fn clear(&self) -> crate::Result<()> {
+        debug!("Clearing Discord rich presence");
         let packet = Packet::empty();
         let encoded = Json::serialize(&packet)?;
 
@@ -122,6 +137,10 @@ impl RichClient {
 
     /// Reconnects to Discord with exponential backoff.
     pub fn reconnect(&mut self, interval: u64, tx: Sender<Message>) {
+        debug!(
+            "Initiating reconnection to Discord with interval={}ms",
+            interval
+        );
         self.is_reconnecting = true;
         self.close();
 
@@ -129,13 +148,16 @@ impl RichClient {
 
         let mut client = Self::new(self.client_id, self.pipe_paths.clone());
         while self.is_reconnecting {
+            trace!("Attempting to reconnect to Discord");
             if client.connect().is_ok() {
                 if client.handshake().is_ok() {
+                    debug!("Successfully reconnected to Discord");
                     *self = client;
                     let _ = self.start_read_thread(tx);
 
                     break;
                 } else {
+                    trace!("Handshake failed during reconnection");
                     client.close();
                 }
             };

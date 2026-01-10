@@ -3,6 +3,7 @@
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::protocol::msgpack::{Deserialize, MsgPack};
 use crate::types::config::PluginConfig;
+use crate::{debug, trace};
 
 pub mod clear_activity;
 pub mod connect;
@@ -58,6 +59,8 @@ impl ClientEvent {
             .and_then(|v| v.as_str())
             .ok_or("Missing 'type' field")?;
 
+        trace!("Deserializing client event: type={}", ty);
+
         Ok(match ty {
             "connect" => Self::Connect(ConnectEvent),
             "initialize" => Self::Initialize(InitializeEvent::new(
@@ -79,6 +82,7 @@ impl ClientEvent {
 
 impl OnEvent for ClientEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        debug!(ctx.client_id, "Processing client event: {:?}", std::mem::discriminant(&self));
         match self {
             Self::Initialize(e) => e.on_event(ctx),
             Self::Connect(e) => e.on_event(ctx),

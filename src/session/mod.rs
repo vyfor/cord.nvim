@@ -7,6 +7,7 @@ use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use crate::ipc::pipe::platform::client::PipeClient;
 use crate::presence::activity::Activity;
 use crate::types::config::PluginConfig;
+use crate::{debug, trace};
 
 pub struct Session {
     pub workspace: Option<String>,
@@ -30,18 +31,22 @@ impl Session {
     }
 
     pub fn set_workspace(&mut self, workspace: String) {
+        trace!("Setting session workspace: {}", workspace);
         self.workspace = Some(workspace);
     }
 
     pub fn set_timestamp(&mut self, timestamp: u64) {
+        trace!("Setting session timestamp: {}", timestamp);
         self.timestamp = Some(timestamp);
     }
 
     pub fn set_last_activity(&mut self, activity: Activity) {
+        trace!("Setting session last activity: {:?}", activity);
         self.last_activity = Some(activity);
     }
 
     pub fn set_config(&mut self, config: PluginConfig) {
+        trace!("Setting session config");
         self.config = Some(config);
     }
 
@@ -107,6 +112,7 @@ pub struct SessionManager {
 
 impl SessionManager {
     pub fn create_session(&self, id: u32, client: PipeClient) {
+        debug!("Creating session for client {}", id);
         let mut sessions = self.sessions.write().unwrap();
         let mut session = Session::new();
         session.set_pipe_client(client);
@@ -114,6 +120,7 @@ impl SessionManager {
     }
 
     pub fn remove_session(&self, id: u32) {
+        debug!("Removing session for client {}", id);
         let mut sessions = self.sessions.write().unwrap();
         sessions.remove(&id);
     }
@@ -123,6 +130,7 @@ impl SessionManager {
         if sessions.contains_key(&id) {
             Some(SessionRef { sessions, id })
         } else {
+            trace!("Session not found for client {}", id);
             None
         }
     }
@@ -132,6 +140,7 @@ impl SessionManager {
         if sessions.contains_key(&id) {
             Some(SessionRefMut { sessions, id })
         } else {
+            trace!("Session not found for client {}", id);
             None
         }
     }

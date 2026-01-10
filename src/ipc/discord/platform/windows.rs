@@ -18,11 +18,12 @@ use crate::ipc::discord::utils;
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::events::server::StatusUpdateEvent;
 use crate::messages::message::Message;
-use crate::{local_event, server_event, trace};
+use crate::{debug, local_event, server_event, trace};
 
 impl Connection for RichClient {
     /// Pipe can be under the path `\\\\.\\pipe\\discord-ipc-{i}` where `i` is a number from 0 to 9.
     fn try_connect(&mut self, pipe_name: &str) -> crate::Result<bool> {
+        trace!("Attempting to connect to Windows named pipe: {}", pipe_name);
         let wide_name: Vec<u16> =
             OsStr::new(pipe_name).encode_wide().chain(Some(0)).collect();
 
@@ -40,18 +41,29 @@ impl Connection for RichClient {
             if handle == INVALID_HANDLE_VALUE {
                 let error = io::Error::last_os_error();
                 return match error.kind() {
-                    io::ErrorKind::NotFound => Ok(false),
-                    _ => Err(DiscordError::Io(error).into()),
+                    io::ErrorKind::NotFound => {
+                        trace!("Windows named pipe not found: {}", pipe_name);
+                        Ok(false)
+                    }
+                    _ => {
+                        debug!(
+                            "Failed to connect to Windows named pipe: {}",
+                            error
+                        );
+                        Err(DiscordError::Io(error).into())
+                    }
                 };
             }
 
             let pipe = File::from_raw_handle(handle);
             self.pipe = Some(pipe.into());
+            debug!("Successfully connected to Windows named pipe");
             Ok(true)
         }
     }
 
     fn close(&mut self) {
+        debug!("Closing Discord Windows named pipe connection");
         self.pipe = None;
         let _ = self.thread_handle.take();
     }
@@ -62,6 +74,7 @@ impl Connection for RichClient {
             let client_id = self.client_id;
             let is_ready = self.is_ready.clone();
 
+            debug!("Starting Discord IPC read thread (Windows)");
             let handle = std::thread::spawn(move || {
                 let mut buf = [0u8; 8192];
                 let handle = pipe.as_raw_handle();
@@ -95,6 +108,10 @@ impl Connection for RichClient {
                         if read_result == 0 {
                             let error = GetLastError();
                             if error != ERROR_IO_PENDING {
+                                debug!(
+                                    "Discord IPC read failed with error code: {}",
+                                    error
+                                );
                                 tx.send(local_event!(
                                     0,
                                     Error,
@@ -115,6 +132,7 @@ impl Connection for RichClient {
                             1,
                         ) == 0
                         {
+                            debug!("Discord IPC GetOverlappedResult failed");
                             tx.send(local_event!(
                                 0,
                                 Error,
@@ -126,6 +144,10 @@ impl Connection for RichClient {
                             break;
                         }
 
+                        trace!(
+                            "Received {} bytes from Discord IPC",
+                            bytes_transferred
+                        );
                         if bytes_transferred >= 8
                             && let Some((opcode, size)) = utils::decode(
                                 &buf[..bytes_transferred as usize],
@@ -143,6 +165,9 @@ impl Connection for RichClient {
                             match Opcode::from(opcode) {
                                 Opcode::Frame => {
                                     if data_str.contains("Invalid Client ID") {
+                                        debug!(
+                                            "Discord reported invalid client ID"
+                                        );
                                         tx.send(local_event!(
                                             0,
                                             Error,
@@ -156,6 +181,9 @@ impl Connection for RichClient {
                                         break;
                                     }
                                     if !is_ready.swap(true, Ordering::SeqCst) {
+                                        debug!(
+                                            "Discord IPC connection is now ready"
+                                        );
                                         tx.send(server_event!(
                                             0,
                                             StatusUpdate,
@@ -165,6 +193,9 @@ impl Connection for RichClient {
                                     }
                                 }
                                 Opcode::Close => {
+                                    debug!(
+                                        "Received close opcode from Discord"
+                                    );
                                     tx.send(local_event!(
                                         0,
                                         Error,
@@ -175,7 +206,12 @@ impl Connection for RichClient {
                                     .ok();
                                     break;
                                 }
-                                _ => {}
+                                _ => {
+                                    trace!(
+                                        "Received unhandled opcode: {:?}",
+                                        Opcode::from(opcode)
+                                    );
+                                }
                             }
                         }
                     }
@@ -185,6 +221,7 @@ impl Connection for RichClient {
             self.thread_handle = Some(handle);
             Ok(())
         } else {
+            debug!("Cannot start read thread: no pipe available");
             Err(DiscordError::PipeNotFound.into())
         }
     }
@@ -201,6 +238,11 @@ impl Connection for RichClient {
                 None => utils::encode(opcode, 0),
             };
 
+            trace!(
+                "Writing {} bytes to Discord IPC (opcode={})",
+                payload.len(),
+                opcode
+            );
             unsafe {
                 let handle = pipe.as_raw_handle();
                 let h_event =
@@ -226,6 +268,10 @@ impl Connection for RichClient {
                 if write_result == 0 {
                     let error = GetLastError();
                     if error != ERROR_IO_PENDING {
+                        debug!(
+                            "Discord IPC write failed with error code: {}",
+                            error
+                        );
                         return Err(DiscordError::ConnectionClosed.into());
                     }
                 }
@@ -238,9 +284,14 @@ impl Connection for RichClient {
                     1,
                 ) == 0
                 {
+                    debug!("Discord IPC write GetOverlappedResult failed");
                     return Err(DiscordError::ConnectionClosed.into());
                 }
 
+                trace!(
+                    "Successfully wrote {} bytes to Discord IPC",
+                    bytes_transferred
+                );
                 Ok(())
             }
         })

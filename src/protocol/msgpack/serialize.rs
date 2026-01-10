@@ -32,6 +32,18 @@ pub trait Serialize {
         f: SerializeFn<'a>,
         state: &mut SerializeState,
     ) -> crate::Result<()>;
+
+    /// Convenience method to serialize this type to MsgPack bytes.
+    ///
+    /// # Returns
+    ///
+    /// A result containing the serialized MsgPack bytes or an error.
+    fn to_msgpack(&self) -> crate::Result<Vec<u8>>
+    where
+        Self: Sized,
+    {
+        MsgPack::serialize(self)
+    }
 }
 
 pub trait SerializeObj: Serialize + std::fmt::Debug {}

@@ -3,6 +3,7 @@ use std::sync::atomic::Ordering;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::presence::activity::ActivityTimestamps;
 use crate::protocol::msgpack::Deserialize;
+use crate::{debug, trace};
 
 #[derive(Debug, Default)]
 pub struct ClearActivityEvent {
@@ -11,6 +12,8 @@ pub struct ClearActivityEvent {
 
 impl OnEvent for ClearActivityEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
+        debug!(ctx.client_id, "Processing clear_activity event, force={}", self.force);
+        
         let global_last_activity = ctx
             .cord
             .session_manager
@@ -20,6 +23,7 @@ impl OnEvent for ClearActivityEvent {
             .clone();
 
         if self.force {
+            trace!(ctx.client_id, "Force clearing activity");
             if let Some(mut session) =
                 ctx.cord.session_manager.get_session_mut(ctx.client_id)
             {
@@ -53,6 +57,7 @@ impl OnEvent for ClearActivityEvent {
 
             if let Some(session) = latest {
                 if let Some(mut activity) = session.last_activity.clone() {
+                    trace!(ctx.client_id, "Switching to activity from another session");
                     if ctx.cord.config.shared_timestamps {
                         let shared_ts =
                             &ctx.cord.session_manager.shared_timestamp;
@@ -73,6 +78,7 @@ impl OnEvent for ClearActivityEvent {
 
                     if let Some(global) = &global_last_activity {
                         if global == &activity {
+                            trace!(ctx.client_id, "Skipping: activity unchanged");
                             return Ok(());
                         }
                     }
@@ -87,6 +93,7 @@ impl OnEvent for ClearActivityEvent {
                     ctx.cord.activity_manager.update(activity)?;
                 }
             } else if global_last_activity.is_some() {
+                debug!(ctx.client_id, "No other sessions, clearing activity");
                 *ctx.cord.session_manager.last_activity.write().unwrap() = None;
                 ctx.cord.activity_manager.clear()?;
             }

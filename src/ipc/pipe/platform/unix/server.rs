@@ -11,7 +11,7 @@ use crate::ipc::pipe::{PipeClientImpl, PipeServerImpl};
 use crate::messages::events::local::ErrorEvent;
 use crate::messages::message::Message;
 use crate::session::SessionManager;
-use crate::{client_event, echoln, local_event};
+use crate::{client_event, debug, echoln, local_event, trace};
 
 pub struct PipeServer {
     session_manager: Arc<SessionManager>,
@@ -29,6 +29,7 @@ impl PipeServerImpl for PipeServer {
         tx: Sender<Message>,
         session_manager: Arc<SessionManager>,
     ) -> Self {
+        debug!("Creating Unix pipe server: {}", pipe_name);
         Self {
             session_manager,
             pipe_name: pipe_name.to_string(),
@@ -42,13 +43,16 @@ impl PipeServerImpl for PipeServer {
 
     fn start(&mut self) -> io::Result<()> {
         if self.running.load(Ordering::SeqCst) {
+            trace!("Unix pipe server already running");
             return Ok(());
         }
 
         if Path::new(&self.pipe_name).exists() {
+            trace!("Removing existing Unix socket: {}", self.pipe_name);
             std::fs::remove_file(&self.pipe_name)?;
         }
 
+        debug!("Starting Unix pipe server on: {}", self.pipe_name);
         let listener = UnixListener::bind(&self.pipe_name)?;
         self.listener = Some(listener);
         self.running.store(true, Ordering::SeqCst);
@@ -71,6 +75,7 @@ impl PipeServerImpl for PipeServer {
                     Ok((stream, _)) => {
                         let client_id =
                             next_client_id.fetch_add(1, Ordering::SeqCst);
+                        debug!("New client connected: id={}", client_id);
                         let mut client =
                             PipeClient::new(client_id, stream, tx.clone());
                         client.start_read_thread().ok();
@@ -78,6 +83,7 @@ impl PipeServerImpl for PipeServer {
                         tx.send(client_event!(client_id, Connect)).ok();
                     }
                     Err(e) => {
+                        debug!("Error accepting client connection: {}", e);
                         tx.send(local_event!(
                             0,
                             Error,
@@ -93,6 +99,7 @@ impl PipeServerImpl for PipeServer {
     }
 
     fn stop(&mut self) {
+        debug!("Stopping Unix pipe server");
         self.running.store(false, Ordering::SeqCst);
         if let Some(handle) = self.thread_handle.take() {
             drop(handle);
@@ -124,6 +131,7 @@ impl PipeServerImpl for PipeServer {
     }
 
     fn disconnect(&self, client_id: u32) -> io::Result<()> {
+        debug!("Disconnecting client {}", client_id);
         self.session_manager.remove_session(client_id);
         Ok(())
     }

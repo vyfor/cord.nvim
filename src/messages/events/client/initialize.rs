@@ -1,5 +1,6 @@
 use std::sync::atomic::Ordering;
 
+use crate::debug;
 use crate::error::CordErrorKind;
 use crate::ipc::discord::client::Connection;
 use crate::ipc::pipe::PipeServerImpl;
@@ -23,8 +24,9 @@ impl InitializeEvent {
 
 impl OnEvent for InitializeEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        if let Some(logger) = logger::INSTANCE.get() {
-            logger.write().unwrap().set_level(self.config.log_level);
+        debug!(ctx.client_id, "Processing initialize event");
+        if let Some(logger) = logger::LOGGER.get() {
+            logger.set_level(self.config.log_level);
         }
 
         ctx.cord.config.shared_timestamps = self.config.timestamp.shared;
@@ -46,6 +48,7 @@ impl OnEvent for InitializeEvent {
         if !self.config.advanced.discord.pipe_paths.is_empty()
             && client.pipe_paths.is_empty()
         {
+            debug!(ctx.client_id, "Setting custom Discord pipe paths");
             client.pipe_paths = self.config.advanced.discord.pipe_paths.clone();
         }
 
@@ -53,12 +56,17 @@ impl OnEvent for InitializeEvent {
         let is_ready = client.is_ready.load(Ordering::SeqCst);
         let has_thread = client.thread_handle.is_some();
         if !has_thread && !is_ready {
+            debug!(ctx.client_id, "Initiating Discord connection");
             client.status = Status::Connecting;
             ctx.cord.pipe.broadcast(&MsgPack::serialize(
                 &StatusUpdateEvent::connecting(),
             )?)?;
             if client.connect().is_err() {
                 if config.reconnect_interval > 0 && config.initial_reconnect {
+                    debug!(
+                        ctx.client_id,
+                        "Connection failed, scheduling reconnect"
+                    );
                     drop(client);
                     let client_clone = rich_client.clone();
                     let tx = ctx.cord.tx.clone();
@@ -69,12 +77,17 @@ impl OnEvent for InitializeEvent {
                         client.reconnect(reconnect_interval, tx.clone());
                     });
                 } else {
+                    debug!(
+                        ctx.client_id,
+                        "Connection failed, no reconnect configured"
+                    );
                     return Err(crate::error::CordError::new(
                         CordErrorKind::Io,
                         "Failed to connect to Discord",
                     ));
                 }
             } else {
+                debug!(ctx.client_id, "Successfully connected to Discord");
                 client.status = Status::Connected;
                 ctx.cord.pipe.broadcast(&MsgPack::serialize(
                     &StatusUpdateEvent::connected(),
@@ -84,6 +97,7 @@ impl OnEvent for InitializeEvent {
             }
         } else {
             if is_ready {
+                debug!(ctx.client_id, "Discord already ready");
                 client.status = Status::Ready;
             }
 

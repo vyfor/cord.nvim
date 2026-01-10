@@ -95,7 +95,7 @@ end
 function Handler:setup_default_handlers()
   self:register('log', false, function(data)
     if data.level and data.message then
-      logger.log(data.message, data.level)
+      logger.log('[SERVER] ' .. data.message, data.level)
     end
   end)
   logger.trace 'Receiver: default handlers registered'

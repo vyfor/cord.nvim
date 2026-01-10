@@ -6,10 +6,8 @@ use std::thread::JoinHandle;
 use crate::ipc::pipe::{PipeClientImpl, report_error};
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
-use crate::messages::events::server::LogEvent;
 use crate::messages::message::Message;
-use crate::util::logger::LogLevel;
-use crate::{client_event, server_event};
+use crate::{client_event, debug, error, trace};
 
 pub struct PipeClient {
     id: u32,
@@ -23,6 +21,7 @@ impl PipeClientImpl for PipeClient {
     type PipeType = UnixStream;
 
     fn new(id: u32, pipe: UnixStream, tx: Sender<Message>) -> Self {
+        trace!("Creating Unix pipe client: id={}", id);
         let read_pipe = pipe.try_clone().unwrap();
         Self {
             id,
@@ -52,35 +51,42 @@ impl PipeClientImpl for PipeClient {
             let tx = self.tx.clone();
             let id = self.id;
 
+            debug!("Starting read thread for client {}", id);
             let handle = std::thread::spawn(move || {
                 let mut buf = [0u8; 4096];
                 loop {
                     match read_pipe.read(&mut buf) {
                         Ok(0) => {
+                            debug!("Client {} disconnected (EOF)", id);
                             tx.send(client_event!(id, Disconnect)).ok();
                             break;
                         }
-                        Ok(n) => match ClientEvent::deserialize(&buf[..n]) {
-                            Ok(message) => {
-                                tx.send(Message::new(
-                                    id,
-                                    Event::Client(message),
-                                ))
-                                .ok();
+                        Ok(n) => {
+                            trace!("Received {} bytes from client {}", n, id);
+                            match ClientEvent::deserialize(&buf[..n]) {
+                                Ok(message) => {
+                                    trace!(
+                                        "Received event from client {}: {:?}",
+                                        id, message
+                                    );
+                                    tx.send(Message::new(
+                                        id,
+                                        Event::Client(message),
+                                    ))
+                                    .ok();
+                                }
+                                Err(e) => {
+                                    error!(
+                                        id,
+                                        "Failed to deserialize message from client {}: {}",
+                                        id,
+                                        e
+                                    );
+                                }
                             }
-                            Err(e) => {
-                                tx.send(server_event!(
-                                    id,
-                                    Log,
-                                    LogEvent::new(
-                                        e.to_string(),
-                                        LogLevel::Error
-                                    )
-                                ))
-                                .ok();
-                            }
-                        },
+                        }
                         Err(e) => {
+                            debug!("Read error from client {}: {}", id, e);
                             report_error(id, &tx, e);
                             break;
                         }
@@ -90,6 +96,10 @@ impl PipeClientImpl for PipeClient {
             self.thread_handle = Some(handle);
             Ok(())
         } else {
+            debug!(
+                "Cannot start read thread for client {}: no pipe available",
+                self.id
+            );
             Err(io::Error::new(io::ErrorKind::NotFound, "Pipe not found"))
         }
     }
@@ -97,6 +107,7 @@ impl PipeClientImpl for PipeClient {
 
 impl Drop for PipeClient {
     fn drop(&mut self) {
+        trace!("Dropping Unix pipe client {}", self.id);
         {
             let _ = self.read_pipe.take();
             let _ = self.write_pipe.take();
