@@ -30,9 +30,9 @@ function Handler:register(type, oneshot, callback)
     logger.trace(
       function()
         return 'Receiver:register immediate dispatch: type='
-          .. tostring(type)
-          .. ', oneshot='
-          .. tostring(oneshot)
+            .. tostring(type)
+            .. ', oneshot='
+            .. tostring(oneshot)
       end
     )
     callback(data)
@@ -47,9 +47,9 @@ function Handler:register(type, oneshot, callback)
   logger.trace(
     function()
       return 'Receiver:registered handler: type='
-        .. tostring(type)
-        .. ', oneshot='
-        .. tostring(oneshot)
+          .. tostring(type)
+          .. ', oneshot='
+          .. tostring(oneshot)
     end
   )
 end
@@ -64,9 +64,9 @@ function Handler:run()
 
     while #buffer >= 4 do
       local length = bit.lshift(string.byte(buffer, 1), 24)
-        + bit.lshift(string.byte(buffer, 2), 16)
-        + bit.lshift(string.byte(buffer, 3), 8)
-        + string.byte(buffer, 4)
+          + bit.lshift(string.byte(buffer, 2), 16)
+          + bit.lshift(string.byte(buffer, 3), 8)
+          + string.byte(buffer, 4)
 
       if #buffer < 4 + length then break end
 
@@ -96,12 +96,6 @@ function Handler:setup_default_handlers()
   self:register('log', false, function(data)
     if data.level and data.message then
       logger.log(data.message, data.level)
-      if data.level == vim.log.levels.ERROR then
-        vim.schedule(function()
-          local manager = require('cord.server').manager
-          if manager then manager:pause() end
-        end)
-      end
     end
   end)
   logger.trace 'Receiver: default handlers registered'
