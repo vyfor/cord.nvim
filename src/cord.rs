@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::sync::Arc;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::time::Duration;
@@ -33,6 +34,7 @@ pub struct Cord {
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
+    pub log_buffer: VecDeque<Vec<u8>>,
     _lock: ServerLock,
 }
 
@@ -43,7 +45,7 @@ impl Cord {
 
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = Arc::new(SessionManager::default());
-        let _ = logger::LOGGER.set(Logger::new(tx.clone(), LogLevel::Off));
+        let _ = logger::LOGGER.set(Logger::new(tx.clone(), LogLevel::Trace));
 
         let activity_manager = ActivityManager::new(config.client_id, vec![]);
 
@@ -60,6 +62,7 @@ impl Cord {
             pipe: server,
             tx,
             rx,
+            log_buffer: VecDeque::with_capacity(100),
             _lock: lock,
         })
     }
