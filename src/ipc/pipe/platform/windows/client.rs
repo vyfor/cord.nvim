@@ -12,7 +12,7 @@ use crate::ipc::pipe::{PipeClientImpl, report_error};
 use crate::messages::events::client::ClientEvent;
 use crate::messages::events::event::Event;
 use crate::messages::message::Message;
-use crate::{client_event, debug, trace};
+use crate::{client_event, debug, error, trace};
 
 pub struct PipeClient {
     id: u32,
