@@ -66,6 +66,22 @@ local function log_raw(msg, level)
   flush_or_schedule()
 end
 
+local function log_server(logs)
+  local msgs = {}
+  local max_level = 0
+
+  for _, item in ipairs(logs) do
+    if item.level and item.level >= log_level then
+      table.insert(msgs, item.message)
+      if item.level > max_level then max_level = item.level end
+    end
+  end
+
+  if #msgs > 0 then
+    log_raw(table.concat(msgs, '\n[cord.nvim] '), max_level)
+  end
+end
+
 local function error(msg) log(msg, levels.ERROR) end
 local function warn(msg) log(msg, levels.WARN) end
 local function info(msg) log(msg, levels.INFO) end
@@ -76,6 +92,7 @@ return {
   set_level = set_level,
   notify = log_raw,
   log = log,
+  log_server = log_server,
   log_raw = log_raw,
   error = error,
   warn = warn,

@@ -1,6 +1,8 @@
+pub mod batch_log;
 pub mod log;
 pub mod status_update;
 
+pub use batch_log::BatchLogEvent;
 pub use log::LogEvent;
 pub use status_update::StatusUpdateEvent;
 
@@ -10,6 +12,8 @@ use crate::trace;
 #[derive(Debug)]
 pub enum ServerEvent {
     Log(LogEvent),
+    #[allow(dead_code)]
+    BatchLog(BatchLogEvent),
     StatusUpdate(StatusUpdateEvent),
 }
 
@@ -17,6 +21,7 @@ impl OnEvent for ServerEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         match self {
             Self::Log(e) => e.on_event(ctx),
+            Self::BatchLog(e) => e.on_event(ctx),
             Self::StatusUpdate(e) => {
                 trace!(
                     ctx.client_id,

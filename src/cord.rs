@@ -34,7 +34,7 @@ pub struct Cord {
     pub pipe: PipeServer,
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
-    pub log_buffer: VecDeque<Vec<u8>>,
+    pub log_buffer: VecDeque<LogEvent>,
     _lock: ServerLock,
 }
 

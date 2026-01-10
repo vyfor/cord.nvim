@@ -1,5 +1,5 @@
-use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
+use crate::messages::events::server::BatchLogEvent;
 use crate::trace;
 
 #[derive(Debug, Default)]
@@ -9,8 +9,13 @@ impl OnEvent for ConnectEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         trace!(ctx.client_id, "Processing connect event");
 
-        while let Some(data) = ctx.cord.log_buffer.pop_front() {
-            ctx.cord.pipe.write_to(ctx.client_id, &data)?;
+        let mut logs = Vec::new();
+        while let Some(log) = ctx.cord.log_buffer.pop_front() {
+            logs.push(log);
+        }
+
+        if !logs.is_empty() {
+            BatchLogEvent { logs }.on_event(ctx)?;
         }
 
         Ok(())

@@ -95,9 +95,16 @@ end
 function Handler:setup_default_handlers()
   self:register('log', false, function(data)
     if data.level and data.message then
-      logger.log('[SERVER] ' .. data.message, data.level)
+      logger.log_server({ data })
     end
   end)
+
+  self:register('log_batch', false, function(data)
+    if data then
+      logger.log_server(data)
+    end
+  end)
+
   logger.trace 'Receiver: default handlers registered'
 end
 

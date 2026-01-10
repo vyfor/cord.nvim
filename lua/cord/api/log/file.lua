@@ -7,6 +7,7 @@ local log_level = levels.TRACE
 local queue = {}
 local queue_start, queue_end = 1, 0
 local flushing = false
+local pending = false
 local fd
 
 local function set_level(level) log_level = level end
@@ -29,7 +30,7 @@ local level_names = {
   [levels.ERROR] = 'ERROR',
 }
 
-local function enqueue(msg, level)
+local function enqueue(msg, level, raw)
   if not fd then
     if not logfile_path or logfile_path == '' then
       notify('CORD_LOG_FILE is not set', levels.ERROR)
@@ -59,7 +60,7 @@ local function enqueue(msg, level)
   end
 
   queue_end = queue_end + 1
-  queue[queue_end] = { level = level, msg = msg }
+  queue[queue_end] = { level = level, msg = msg, raw = raw }
 end
 
 local function format_message(entry, message)
@@ -71,10 +72,14 @@ end
 local function flush()
   if not logfile_path or logfile_path == '' then
     flushing = false
+    pending = false
     return
   end
   if not fd then return end
-  if flushing then return end
+  if flushing then
+    pending = true
+    return
+  end
 
   flushing = true
 
@@ -96,7 +101,13 @@ local function flush()
       message = entry.msg
     end
 
-    if message ~= nil then table.insert(lines, format_message(entry, message)) end
+    if message ~= nil then
+      if entry.raw then
+        table.insert(lines, message)
+      else
+        table.insert(lines, format_message(entry, message))
+      end
+    end
   end
 
   local data = table.concat(lines, '\n')
@@ -106,6 +117,11 @@ local function flush()
   if not ok then notify('[cord.nvim] Failed to write log file: ' .. tostring(err), levels.ERROR) end
 
   flushing = false
+
+  if pending then
+    pending = false
+    flush()
+  end
 end
 
 local function log(msg, level)
@@ -124,6 +140,25 @@ local function log_raw(msg, level)
   end)
 end
 
+local function log_server(logs)
+  Async.run(function()
+    local msgs = {}
+    local ts = os.date '%Y-%m-%d %H:%M:%S'
+
+    for _, item in ipairs(logs) do
+      if item.level and item.level >= log_level then
+        local level_name = level_names[item.level] or tostring(item.level)
+        table.insert(msgs, string.format('[%s] [%s] [SERVER] %s', ts, level_name, item.message))
+      end
+    end
+
+    if #msgs > 0 then
+      enqueue(table.concat(msgs, '\n'), nil, true)
+      flush()
+    end
+  end)
+end
+
 local function error(msg) log(msg, levels.ERROR) end
 local function warn(msg) log(msg, levels.WARN) end
 local function info(msg) log(msg, levels.INFO) end
@@ -134,6 +169,7 @@ return {
   set_level = set_level,
   notify = notify,
   log = log,
+  log_server = log_server,
   log_raw = log_raw,
   error = error,
   warn = warn,
