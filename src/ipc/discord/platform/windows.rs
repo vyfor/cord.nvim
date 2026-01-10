@@ -50,7 +50,7 @@ impl Connection for RichClient {
                             "Failed to connect to Windows named pipe: {}",
                             error
                         );
-                        Err(DiscordError::Io(error).into())
+                        Ok(false)
                     }
                 };
             }

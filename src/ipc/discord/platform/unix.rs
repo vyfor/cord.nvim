@@ -45,7 +45,7 @@ impl Connection for RichClient {
                     }
                     _ => {
                         debug!("Failed to connect to Unix socket: {}", e);
-                        Err(DiscordError::Io(e).into())
+                        Ok(false)
                     }
                 };
             }
