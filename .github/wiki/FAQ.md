@@ -71,7 +71,7 @@ After the recent update, Discord started to strictly rate limit how often your R
 
 **UPD:** Through some testing I found that the rate limit moves between an 8/12s alternating cooldown and a 2-per-20s burst window depending on how long the presence has been running.
 
-If your status updates stop appearing, it might be because you've been rate limited. To make matters worse, Discord does not seem to "queue" updates anymore. To mitigate this, Cord provides an `advanced.discord.sync` feature. It's enabled by default so we strongly encourage you to keep up to date:
+Crucially, it looks like Discord no longer "queues" updates; if you're rate-limited, any updates seem to be simply dropped until the cooldown expires. To fix this, Cord includes an `advanced.discord.sync` feature (enabled by default). It ensures your status stays current by periodically resending your activity on every `interval`:
 
 ```lua
 require 'cord'.setup {
@@ -87,13 +87,14 @@ require 'cord'.setup {
 }
 ```
 
-Alternatively, you can use `mode = 'defer'` to throttle your updates more strictly and try to avoid being rate limited in the first place.
+Alternatively, you can use `mode = 'defer'`. Instead of sending updates immediately, this mode holds onto them and waits for the next `interval` before sending them out. It's a stricter way to throttle updates to avoid triggering a rate limit in the first place.
 
 > [!NOTE]
-> I also have a hypothesis that Discord's internal state is somehow getting desynced. It *may* be thinking an update isn't necessary even when the displayed activity is out of date. To prevent this, the server now "pads" fields with whitespaces (can be disabled via `advanced.discord.sync.pad`) to force Discord to recognize the update as new data. Even in case my hypothesis proves wrong, it carries no harm, and seems to provide better results in my observations. It all sounds a little silly but I can't think of any reason *why* would they intentionally remove queuing in the first place, thus, this must be some kind of a bug.
-
+> I also suspect that Discord's internal state is somehow getting desynced. It seems like the server might be "deciding" an update isn't necessary because it doesn't recognize the data as new, even when the displayed activity is stuck or out of date.
+> To fix this, the plugin now "pads" fields with whitespaces (can be disabled via `advanced.discord.sync.pad`) to hopefully trick Discord into seeing the update as brand new data. Even if my hypothesis is inaccurate, this "hack" carries no harm and, in my testing, consistently leads to more reliable updates. It's a bit of a workaround, but since Discord removed update queuing, this seems to be the best way to handle what looks like a bug on their end.
 
 This issue is not Cord's fault.
+
 See the [discussion](https://github.com/vyfor/cord.nvim/discussions/321) for details.
 
 > ### Q: Why can't I disable timestamps in my Rich Presence? Why are they misbehaving?
