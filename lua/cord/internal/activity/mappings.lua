@@ -240,6 +240,7 @@ M.filetype_mappings = {
   NeogitStashView = { 'vcs', M.default_icons.vcs, 'Neogit' },
   NeogitStatus = { 'vcs', M.default_icons.vcs, 'Neogit' },
   ['git.nvim'] = { 'vcs', M.default_icons.vcs, 'Git.nvim' },
+  jjdescription = { 'vcs', M.default_icons.vcs, 'Jujutsu' },
 
   -- Notes
   norg = { 'notes', 'neorg', 'Neorg' },
