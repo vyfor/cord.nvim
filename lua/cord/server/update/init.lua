@@ -137,9 +137,12 @@ M.build = async.wrap(function()
 end)
 
 M.local_version = async.wrap(function()
+  local fs = require 'cord.core.uv.fs'
   local process = require 'cord.core.uv.process'
   local executable_path =
       require('cord.server.fs').get_executable_path(require('cord.api.config').get())
+
+  if not fs.stat(executable_path):get() then return nil end
 
   local res = process
       .spawn({
@@ -151,6 +154,18 @@ M.local_version = async.wrap(function()
   if not res then return nil end
   if res.code ~= 0 then return nil end
   local version = res.stdout:gsub('^%s*(.-)%s*$', '%1')
+  if not version then return nil end
+
+  return version
+end)
+
+M.compatible_version = async.wrap(function()
+  local fs = require 'cord.core.uv.fs'
+  local path = require('cord.server.fs').get_plugin_root() .. '/.github/server-version.txt'
+
+  local content = fs.readfile(path):get()
+  if not content then return nil end
+  local version = content:gsub('^%s*(.-)%s*$', '%1')
   if not version then return nil end
 
   return version
@@ -196,14 +211,35 @@ M.check_version = async.wrap(function()
 
   async.run(function()
     logger.notify('Checking for updates...', vim.log.levels.INFO)
-    local current, latest = M.local_version():await(), M.remote_version():await()
 
-    if current and latest then
-      if latest == current then
-        logger.notify('You are on the latest server version ' .. latest, vim.log.levels.INFO)
+    local current = M.local_version():await()
+    local compatible = M.compatible_version():await()
+    local latest = M.remote_version():await()
+
+    logger.debug(
+      'current: ' .. tostring(current) ..
+      '; compatible: ' .. tostring(compatible) ..
+      '; latest: ' .. tostring(latest)
+    )
+
+    if not current then
+      logger.notify('Server executable is missing. Please run `:Cord update` to install it.', vim.log.levels.WARN)
+    elseif compatible and compatible ~= current then
+      logger.notify(
+        'The local server version (' .. current .. ') does not match the latest compatible version ('
+        .. compatible .. '). Please run `:Cord update`',
+        vim.log.levels.WARN
+      )
+    end
+
+    if compatible and latest then
+      if latest == compatible then
+        if current == compatible then
+          logger.notify('You are on the latest version ' .. compatible, vim.log.levels.INFO)
+        end
       else
         logger.notify(
-          'New version available: ' .. latest .. ' (current: ' .. current .. ')',
+          'New version available: ' .. latest .. ' (current compatible: ' .. compatible .. '). Please update the plugin.',
           vim.log.levels.INFO
         )
       end
@@ -235,7 +271,7 @@ M.fetch = async.wrap(function()
   local fetch_executable = vim.schedule_wrap(function(tag)
     local base_url
     if tag then
-      logger.info('Found new version: ' .. tag .. '. Downloading...')
+      logger.info('Downloading version ' .. tag .. '...')
       base_url = 'https://github.com/vyfor/cord.nvim/releases/download/v' .. tag .. '/'
     else
       logger.info 'Downloading latest version...'
@@ -308,19 +344,30 @@ M.fetch = async.wrap(function()
 
   async.run(function()
     logger.info 'Checking for updates...'
-    local current, latest = M.local_version():await(), M.remote_version():await()
+    local current = M.local_version():await()
+    local compatible = M.compatible_version():await()
 
-    if current and latest then
-      if latest == current then
+    if compatible then
+      if current ~= compatible then
+        fetch_executable(compatible)
+      else
         server.is_updating = false
-        logger.info('Already on latest server version ' .. latest)
+        logger.info('Already on latest compatible server version ' .. current)
+
+        if not server.client or server.client:is_closing() then server:initialize() end
+      end
+    else
+      logger.warn 'Could not determine compatible server version. Fetching latest...'
+
+      local latest = M.remote_version():await()
+      if latest and current == latest then
+        server.is_updating = false
+        logger.info('Already on latest server version ' .. current)
 
         if not server.client or server.client:is_closing() then server:initialize() end
       else
         fetch_executable(latest)
       end
-    else
-      fetch_executable()
     end
   end)
 end)
