@@ -112,6 +112,10 @@ If you want a fresh start, you can copy the default config and tweak it. I sugge
       autocmds = true,
       cursor_update = 'on_hold',
       match_in_mappings = true,
+      debounce = {
+        delay = 50,
+        interval = 750,
+      },
     },
     server = {
       update = 'fetch',
@@ -402,6 +406,8 @@ require('cord').setup {
 | `advanced.plugin.autocmds`          | `boolean` | `true`      | Enable autocmds                                                                                                      |
 | `advanced.plugin.cursor_update`     | `string`  | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode) |
 | `advanced.plugin.match_in_mappings` | `boolean` | `true`      | Whether to match against file extensions in mappings                                                                 |
+| `advanced.plugin.debounce.delay`    | `integer` | `50`       | Delay in milliseconds before sending the first update. Allows events received in quick succession (e.g., buffer switches) to settle before sending data. Set to 0 to disable. |
+| `advanced.plugin.debounce.interval` | `integer` | `750`      | Minimum interval in milliseconds between updates. Prevents flooding the server during rapid cursor movement. Set to 0 to disable. |
 
 ### Server Settings
 
