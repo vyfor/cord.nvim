@@ -89,6 +89,11 @@ local logger = require 'cord.api.log'
 ---@field autocmds? boolean Whether to enable autocmds
 ---@field cursor_update? string Cursor update mode
 ---@field match_in_mappings? boolean Whether to match against file extensions in mappings
+---@field debounce? CordAdvancedDebounceConfig Debounce/throttle configuration for activity updates
+
+---@class CordAdvancedDebounceConfig
+---@field delay? integer Delay in milliseconds before sending the first update. Allows events received in quick succession (e.g., buffer switches) to settle before sending data. Set to 0 to disable.
+---@field interval? integer Minimum interval in milliseconds between updates. Prevents flooding the server during rapid cursor movement. Set to 0 to disable.
 
 ---@class CordAdvancedServerConfig
 ---@field update? 'fetch'|'install'|'build'|'none'|string How to acquire the server executable: 'fetch' or 'install' or 'build' or 'none'
@@ -130,10 +135,10 @@ local logger = require 'cord.api.log'
 ---@field plugins? string[]|table<string, table>[] Plugin configuration
 ---@field advanced? CordAdvancedConfig Advanced configuration
 
----@class CordConfig
+---@class InternalCordConfig: CordConfig
 local M = {}
 
----@class CordConfig
+---@type CordConfig
 local defaults = {
   enabled = true,
   log_level = vim.log.levels.OFF,
@@ -204,6 +209,10 @@ local defaults = {
       autocmds = true,
       cursor_update = 'on_hold',
       match_in_mappings = true,
+      debounce = {
+        delay = 50,
+        interval = 750,
+      },
     },
     server = {
       update = 'fetch',
@@ -403,6 +412,9 @@ local rules = {
     ['advanced.plugin.autocmds'] = { 'boolean' },
     ['advanced.plugin.cursor_update'] = { 'string' },
     ['advanced.plugin.match_in_mappings'] = { 'boolean' },
+    ['advanced.plugin.debounce'] = { 'table' },
+    ['advanced.plugin.debounce.delay'] = { 'number' },
+    ['advanced.plugin.debounce.interval'] = { 'number' },
     ['advanced.server'] = { 'table' },
     ['advanced.server.update'] = { 'string' },
     ['advanced.server.pipe_path'] = { 'string' },
