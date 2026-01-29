@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0            Last change: 2026 January 07
+*cord.txt*             For NVIM v0.6.0            Last change: 2026 January 29
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -154,6 +154,10 @@ Default Configuration ~
           autocmds = true,
           cursor_update = 'on_hold',
           match_in_mappings = true,
+          debounce = {
+            delay = 50,
+            interval = 750,
+          },
         },
         server = {
           update = 'fetch',
@@ -579,6 +583,15 @@ PLUGIN SETTINGS ~
 
   advanced.plugin.match_in_mappings   boolean   true        Whether to match against file extensions in
                                                             mappings
+
+  advanced.plugin.debounce.delay      integer   50          Delay in milliseconds before sending the first
+                                                            update. Allows events received in quick
+                                                            succession (e.g., buffer switches) to settle
+                                                            before sending data. Set to 0 to disable.
+
+  advanced.plugin.debounce.interval   integer   750         Minimum interval in milliseconds between
+                                                            updates. Prevents flooding the server during
+                                                            rapid cursor movement. Set to 0 to disable.
   --------------------------------------------------------------------------------------------------------
 
 SERVER SETTINGS ~
