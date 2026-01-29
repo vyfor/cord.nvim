@@ -171,12 +171,9 @@ function M.setup(config)
     for event, resolvers in pairs(active_resolvers) do
         M.hooks[event] = {
             fun = function(opts)
-                logger.info('Resolver: Running event ' .. event)
-                logger.info('Current filetype: ' .. opts.filetype)
                 for name, resolver in pairs(resolvers) do
-                    logger.debug('Resolver: Checking resolver ' .. name)
                     if check_match(resolver.match, opts) then
-                        logger.info('Resolver: Running resolver ' .. name)
+                        logger.debug('Resolver: Running resolver ' .. name)
                         resolver.run(opts)
                     end
                 end
