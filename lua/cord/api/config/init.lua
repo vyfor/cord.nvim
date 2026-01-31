@@ -447,6 +447,8 @@ local rules = {
   },
   dict_paths = {
     ['assets'] = { 'string', 'table' },
+    ['variables'] = { 'string', 'function' },
+    ['plugins'] = { 'boolean', 'table' },
   },
 }
 
@@ -455,6 +457,18 @@ M.validate = function(user_config)
 
   local errors = {}
   local warnings = {}
+
+  local async = require 'cord.core.async'
+  local function is_async(v) return async.is_async(v) end
+
+  local function is_type_valid(value, allowed_types)
+    if is_async(value) then
+      for _, t in ipairs(allowed_types) do
+        if t == 'function' then return true end
+      end
+    end
+    return utils.validate_type(value, allowed_types)
+  end
 
   local function check_unknown_entries(config, prefix)
     prefix = prefix or ''
@@ -474,8 +488,8 @@ M.validate = function(user_config)
         table.insert(warnings, string.format('Unknown configuration entry: `%s`', full_path))
       end
 
-      if rules.dict_paths[base_path] and type(k) == 'string' then
-        if not utils.validate_type(v, rules.dict_paths[base_path]) then
+      if rules.dict_paths[base_path] and full_path ~= base_path and type(k) == 'string' then
+        if not is_type_valid(v, rules.dict_paths[base_path]) then
           table.insert(errors, {
             msg = string.format('Invalid type \'%s\' for `%s`', type(v), full_path),
             hint = string.format(
@@ -486,7 +500,7 @@ M.validate = function(user_config)
         end
       end
 
-      if type(v) == 'table' and not (rules.skip_subtrees[base_path] and type(k) == 'number') then
+      if type(v) == 'table' and not (rules.skip_subtrees[base_path] or is_async(v)) then
         check_unknown_entries(v, full_path)
       end
     end
@@ -496,7 +510,7 @@ M.validate = function(user_config)
 
   for path, allowed_types in pairs(rules.fields) do
     local value = utils.get_nested_value(user_config, path)
-    if value ~= nil and not utils.validate_type(value, allowed_types) then
+    if value ~= nil and not is_type_valid(value, allowed_types) then
       table.insert(errors, {
         msg = string.format('Invalid type \'%s\' for `%s`', type(value), path),
         hint = string.format('Allowed types: \'%s\'', table.concat(allowed_types, '\', \'')),
