@@ -1,6 +1,7 @@
 ---@diagnostic disable-next-line: deprecated
 local unpack = unpack or table.unpack
 local logger = require 'cord.api.log'
+local async = require 'cord.core.async'
 
 local M = {}
 
@@ -44,6 +45,7 @@ function M.register(event, fn, priority)
   table.insert(hook, {
     fn = fn,
     priority = priority,
+    is_async = async.is_async(fn),
   })
 
   -- Sort by priority (higher first)
@@ -61,8 +63,13 @@ function M.run(event, ...)
 
   local args = { ... }
   for _, ihook in ipairs(hook) do
-    local ok, err = pcall(ihook.fn, unpack(args))
-    if not ok then logger.notify(err, vim.log.levels.ERROR) end
+    if ihook.is_async then
+      local ok, err = ihook.fn(unpack(args)):get()
+      if not ok and err then logger.notify(tostring(err), vim.log.levels.ERROR) end
+    else
+      local ok, err = pcall(ihook.fn, unpack(args))
+      if not ok then logger.notify(err, vim.log.levels.ERROR) end
+    end
   end
 end
 

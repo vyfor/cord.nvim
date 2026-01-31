@@ -2,6 +2,8 @@
 ---@field _state 'pending' | 'fulfilled' | 'rejected'
 ---@field _value any
 ---@field _callbacks { on_fulfilled: fun(value: any), on_rejected: fun(reason: any) }[]
+---@field get fun(self: Future): any, string? Waits for the future and returns (value) or (nil, error)
+---@field await fun(self: Future): any Waits for the future and returns value, throws on error
 local Future = {}
 Future.__index = Future
 
@@ -92,6 +94,9 @@ function Future:catch(handler)
   return self:and_then(nil, handler)
 end
 
+---Waits for the future to resolve and returns the value. Throws on rejection.
+---@param f Future
+---@return any
 function Future.await(f)
   if not coroutine.running() then
     require('cord.api.log').error(
@@ -103,6 +108,10 @@ function Future.await(f)
   if ok then return res else error(res, 0) end
 end
 
+---Waits for the future to resolve. Returns (value) on success or (nil, error) on rejection.
+---@param f Future
+---@return any value
+---@return string? error
 function Future.get(f)
   if not coroutine.running() then
     require('cord.api.log').error(

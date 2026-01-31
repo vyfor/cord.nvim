@@ -89,7 +89,9 @@ function M:run()
 
               if not self.is_shut_down then
                 self.is_shut_down = true
-                require('cord.internal.hooks').run 'shutdown'
+                require('cord.core.async').run(function()
+                  require('cord.internal.hooks').run 'shutdown'
+                end)
               end
             end)
 
@@ -103,7 +105,9 @@ function M:run()
 
           if not self.is_shut_down then
             self.is_shut_down = true
-            require('cord.internal.hooks').run 'shutdown'
+            require('cord.core.async').run(function()
+              require('cord.internal.hooks').run 'shutdown'
+            end)
           end
 
           if config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
