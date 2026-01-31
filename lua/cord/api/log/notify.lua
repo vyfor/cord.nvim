@@ -77,9 +77,7 @@ local function log_server(logs)
     end
   end
 
-  if #msgs > 0 then
-    log_raw(table.concat(msgs, '\n[cord.nvim] '), max_level)
-  end
+  if #msgs > 0 then log_raw(table.concat(msgs, '\n[cord.nvim] '), max_level) end
 end
 
 local function error(msg) log(msg, levels.ERROR) end

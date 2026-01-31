@@ -57,13 +57,9 @@ end
 -- Modified to preserve metatables
 
 local function can_merge(v)
-  if type(v) ~= 'table' then
-    return false
-  end
+  if type(v) ~= 'table' then return false end
   local mt = getmetatable(v)
-  if mt and (vim._empty_dict_mt == nil or mt ~= vim._empty_dict_mt) then
-    return false
-  end
+  if mt and (vim._empty_dict_mt == nil or mt ~= vim._empty_dict_mt) then return false end
   return vim.tbl_isempty(v) or not vim.islist(v)
 end
 
@@ -103,12 +99,8 @@ local function tbl_extend(behavior, deep_extend, ...)
   return tbl_extend_rec(behavior, deep_extend, ...)
 end
 
-M.tbl_extend = function(behavior, ...)
-  return tbl_extend(behavior, false, ...)
-end
+M.tbl_extend = function(behavior, ...) return tbl_extend(behavior, false, ...) end
 
-M.tbl_deep_extend = function(behavior, ...)
-  return tbl_extend(behavior, true, ...)
-end
+M.tbl_deep_extend = function(behavior, ...) return tbl_extend(behavior, true, ...) end
 
 return M

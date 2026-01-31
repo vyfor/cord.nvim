@@ -23,9 +23,7 @@ local getmetatable = getmetatable
 ---Checks if a value is an async-wrapped function.
 ---@param fn any
 ---@return boolean
-function Async.is_async(fn)
-  return getmetatable(fn) == async_mt
-end
+function Async.is_async(fn) return getmetatable(fn) == async_mt end
 
 ---Wraps a function to return a Future when called within a coroutine.
 ---@param fn function The function to wrap
@@ -46,7 +44,9 @@ function Async.wrap(fn)
         local ok, result = pcall(fn, unpack(args, 1, n))
         if not ok then
           require('cord.api.log').trace(
-            function() return 'Error in async.wrap: ' .. tostring(result) .. '\n' .. debug.traceback() end
+            function()
+              return 'Error in async.wrap: ' .. tostring(result) .. '\n' .. debug.traceback()
+            end
           )
           reject(result)
           return

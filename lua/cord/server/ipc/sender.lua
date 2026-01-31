@@ -40,8 +40,7 @@ function Producer:initialize(config)
 end
 
 function Producer:update_activity(activity, force)
-  self:send_event('update_activity',
-    { activity = activity, force = force })
+  self:send_event('update_activity', { activity = activity, force = force })
 end
 
 function Producer:clear_activity(force) self:send_event('clear_activity', force or false) end

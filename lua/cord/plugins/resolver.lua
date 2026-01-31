@@ -88,9 +88,7 @@ local sources = {
         local cached = opts.manager.workspace:get(stripped)
 
         local repo_url = cached and cached.repo_url or nil
-        if not repo_url then
-          repo_url = ws_utils.find_git_repository(stripped):await()
-        end
+        if not repo_url then repo_url = ws_utils.find_git_repository(stripped):await() end
 
         local info = {
           dir = stripped,

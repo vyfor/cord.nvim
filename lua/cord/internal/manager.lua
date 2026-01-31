@@ -67,9 +67,7 @@ local uv = vim.loop or vim.uv
 local function resolve(value, ...)
   local is_async = async.is_async(value)
   if type(value) == 'function' or is_async then
-    if is_async then
-      return value(...):await()
-    end
+    if is_async then return value(...):await() end
     return value(...)
   end
   return value
@@ -122,7 +120,9 @@ local Cache = require 'cord.core.cache'
 local WorkspaceCache = {}
 WorkspaceCache.__index = WorkspaceCache
 
-function WorkspaceCache.new() return setmetatable({ inner = Cache.new(), current = nil }, WorkspaceCache) end
+function WorkspaceCache.new()
+  return setmetatable({ inner = Cache.new(), current = nil }, WorkspaceCache)
+end
 
 ---@param parent string
 ---@return WorkspaceInfo|false|nil
@@ -136,8 +136,8 @@ function WorkspaceCache:set(parent, info) self.inner:set(parent, info) end
 ---@return boolean changed
 function WorkspaceCache:set_current(info)
   local changed = not self.current
-      or (info and self.current.dir ~= info.dir)
-      or (not info and self.current ~= nil)
+    or (info and self.current.dir ~= info.dir)
+    or (not info and self.current ~= nil)
   self.current = info
   return changed
 end
@@ -205,7 +205,7 @@ function IdleTimer:check(is_focused)
 
   local elapsed = uv.now() - self.last_activity
   local should_idle = self.is_forced
-      or (elapsed >= config.idle.timeout and (config.idle.ignore_focus or not is_focused))
+    or (elapsed >= config.idle.timeout and (config.idle.ignore_focus or not is_focused))
 
   logger.trace(
     function()
@@ -230,13 +230,9 @@ end
 function IdleTimer:reschedule(remaining)
   if not self.timer then return end
   self.timer:stop()
-  self.timer:start(
-    remaining,
-    0,
-    function()
-      self.timer:start(0, config.idle.timeout, function() self:check() end)
-    end
-  )
+  self.timer:start(remaining, 0, function()
+    self.timer:start(0, config.idle.timeout, function() self:check() end)
+  end)
 end
 
 function IdleTimer:force()
@@ -437,8 +433,8 @@ function OptionsBuilder.new(manager) return setmetatable({ manager = manager }, 
 function OptionsBuilder:should_reset_timestamp()
   if not config.timestamp.enabled then return false end
   return config.timestamp.reset_on_change
-      or (config.timestamp.reset_on_idle and self.manager.idle_timer.is_idle)
-      or false
+    or (config.timestamp.reset_on_idle and self.manager.idle_timer.is_idle)
+    or false
 end
 
 function OptionsBuilder:build_base()
@@ -475,8 +471,8 @@ function OptionsBuilder:build(full)
 
   if full == false then
     opts.timestamp = mgr.opts and mgr.opts.timestamp
-        or mgr.last_opts and mgr.last_opts.timestamp
-        or nil
+      or mgr.last_opts and mgr.last_opts.timestamp
+      or nil
 
     opts.buttons = mgr.opts and mgr.opts.buttons or mgr.last_opts and mgr.last_opts.buttons or nil
   else
@@ -497,11 +493,11 @@ end
 function OptionsBuilder.has_changed(curr, prev)
   if not prev then return true end
   return curr.filename ~= prev.filename
-      or curr.filetype ~= prev.filetype
-      or curr.is_read_only ~= prev.is_read_only
-      or curr.cursor_line ~= prev.cursor_line
-      or curr.cursor_char ~= prev.cursor_char
-      or curr.is_focused ~= prev.is_focused
+    or curr.filetype ~= prev.filetype
+    or curr.is_read_only ~= prev.is_read_only
+    or curr.cursor_line ~= prev.cursor_line
+    or curr.cursor_char ~= prev.cursor_char
+    or curr.is_focused ~= prev.is_focused
 end
 
 --------------------------------------------------------------------------------

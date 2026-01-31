@@ -89,9 +89,9 @@ function M:run()
 
               if not self.is_shut_down then
                 self.is_shut_down = true
-                require('cord.core.async').run(function()
-                  require('cord.internal.hooks').run 'shutdown'
-                end)
+                require('cord.core.async').run(
+                  function() require('cord.internal.hooks').run 'shutdown' end
+                )
               end
             end)
 
@@ -105,9 +105,9 @@ function M:run()
 
           if not self.is_shut_down then
             self.is_shut_down = true
-            require('cord.core.async').run(function()
-              require('cord.internal.hooks').run 'shutdown'
-            end)
+            require('cord.core.async').run(
+              function() require('cord.internal.hooks').run 'shutdown' end
+            )
           end
 
           if config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
@@ -115,13 +115,7 @@ function M:run()
       end)
     )
 
-    M.rx:register(
-      'restart',
-      false,
-      vim.schedule_wrap(function()
-        M:initialize()
-      end)
-    )
+    M.rx:register('restart', false, vim.schedule_wrap(function() M:initialize() end))
 
     logger.debug 'Server initialized; starting receiver'
     M.rx:run()

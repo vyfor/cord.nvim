@@ -1,4 +1,3 @@
-local uv = vim.loop or vim.uv
 local logger = require 'cord.api.log'
 local async = require 'cord.core.async'
 local fs = require 'cord.core.uv.fs'
@@ -192,7 +191,7 @@ M.check_visibility = async.wrap(function(pending)
     logger.debug(
       function()
         return 'Visibility: resuming activities'
-            .. (rule and (' due to rule: ' .. vim.inspect(rule)) or '')
+          .. (rule and (' due to rule: ' .. vim.inspect(rule)) or '')
       end
     )
     if M.manager then M.manager:resume() end
@@ -200,13 +199,12 @@ M.check_visibility = async.wrap(function(pending)
     logger.debug(
       function()
         return 'Visibility: suppressing activities'
-            .. (rule and (' due to rule: ' .. vim.inspect(rule)) or '')
+          .. (rule and (' due to rule: ' .. vim.inspect(rule)) or '')
       end
     )
     if M.manager then M.manager:suppress() end
   end
 end)
-
 
 M.validate = async.wrap(function(config)
   if config.precedence ~= 'whitelist' and config.precedence ~= 'blacklist' then

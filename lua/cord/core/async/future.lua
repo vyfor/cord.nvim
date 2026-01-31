@@ -28,7 +28,8 @@ function Future.new(executor)
     end
   end
 
-  local ok, err = pcall(executor,
+  local ok, err = pcall(
+    executor,
     function(v) complete('fulfilled', v) end,
     function(e) complete('rejected', e) end
   )
@@ -90,9 +91,7 @@ function Future:next(on_ok, on_err)
   end)
 end
 
-function Future:catch(handler)
-  return self:next(nil, handler)
-end
+function Future:catch(handler) return self:next(nil, handler) end
 
 ---Waits for the future to resolve and returns the value. Throws on rejection.
 ---@param f Future
@@ -105,7 +104,11 @@ function Future.unwrap(f)
     return
   end
   local ok, res = coroutine.yield(f)
-  if ok then return res else error(res, 0) end
+  if ok then
+    return res
+  else
+    error(res, 0)
+  end
 end
 
 ---Waits for the future to resolve. Returns (value) on success or (nil, error) on rejection.
@@ -120,14 +123,18 @@ function Future.await(f)
     return
   end
   local ok, res = coroutine.yield(f)
-  if ok then return res else return nil, res end
+  if ok then
+    return res
+  else
+    return nil, res
+  end
 end
 
 function Future.all(list)
   return Future.new(function(resolve, reject)
     local count = #list
     if count == 0 then
-      resolve({})
+      resolve {}
       return
     end
 

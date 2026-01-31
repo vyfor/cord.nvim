@@ -37,7 +37,7 @@ M.spawn = async.wrap(function(config, pipe_path)
         config.advanced.server.timeout,
         '-r',
         config.advanced.discord.reconnect.enabled and config.advanced.discord.reconnect.interval
-        or 0,
+          or 0,
         config.advanced.discord.reconnect.initial and '-i' or nil,
       },
       on_stdout = function(data)

@@ -7,9 +7,9 @@ local uv = vim.uv or vim.loop
 local manager
 local BASE_URL = 'http://ws.audioscrobbler.com/2.0/?method='
 local LASTFM_LOGO =
-'https://us1.discourse-cdn.com/flex021/uploads/lastfm/optimized/2X/f/f1f8c34ea6f18aad5b8f89905e38ba7b3424d9b1_2_512x512.png'
+  'https://us1.discourse-cdn.com/flex021/uploads/lastfm/optimized/2X/f/f1f8c34ea6f18aad5b8f89905e38ba7b3424d9b1_2_512x512.png'
 local LASTFM_DEFAULT_IMAGE =
-'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png'
+  'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png'
 
 local credentials
 
@@ -123,9 +123,11 @@ end)
 
 local get_cached_track = Async.wrap(function(opts)
   if not opts or not opts.cache then return M.current_track end
-  local track = opts.cache:get_or_compute('lastfm:track', M.config.interval / 1000, function()
-    return M.fetch_track():await()
-  end)
+  local track = opts.cache:get_or_compute(
+    'lastfm:track',
+    M.config.interval / 1000,
+    function() return M.fetch_track():await() end
+  )
   M.current_track = track
   return track
 end)

@@ -13,13 +13,13 @@ M.supported_flavors = { 'dark', 'light', 'accent' }
 
 M.get = function(name, theme, flavor)
   return M.ICONS_URL
-      .. (theme or M.ICON_THEME)
-      .. '/'
-      .. (flavor or M.THEME_FLAVOR)
-      .. '/'
-      .. name
-      .. '.png?v='
-      .. M.ICONS_VERSION
+    .. (theme or M.ICON_THEME)
+    .. '/'
+    .. (flavor or M.THEME_FLAVOR)
+    .. '/'
+    .. name
+    .. '.png?v='
+    .. M.ICONS_VERSION
 end
 
 M.set = function(theme, flavor)

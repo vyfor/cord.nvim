@@ -239,14 +239,14 @@ M.validate = function(config)
       end
       if not ok then
         return 'Invalid save_on trigger \''
-            .. tostring(trig)
-            .. '\', must be one of: \'exit\', \'periodic\', \'focus_change\''
+          .. tostring(trig)
+          .. '\', must be one of: \'exit\', \'periodic\', \'focus_change\''
       end
     end
   end
 
   if
-      config.save_interval and (type(config.save_interval) ~= 'number' or config.save_interval <= 0)
+    config.save_interval and (type(config.save_interval) ~= 'number' or config.save_interval <= 0)
   then
     return 'Invalid save_interval value, must be a positive number'
   end
@@ -343,8 +343,8 @@ M.setup = function(config)
           if not key then return end
 
           local mode_to_run = (M.config.mode == 'active' and not opts.is_idle and 'active')
-              or (M.config.mode == 'idle' and opts.is_idle and 'idle')
-              or (M.config.mode == 'all' and 'all')
+            or (M.config.mode == 'idle' and opts.is_idle and 'idle')
+            or (M.config.mode == 'all' and 'all')
 
           if not mode_to_run then
             if M.current_key then
