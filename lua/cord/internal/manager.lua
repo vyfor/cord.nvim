@@ -127,8 +127,8 @@ function WorkspaceCache:set(parent, info) self.cache[parent] = info end
 ---@return boolean changed
 function WorkspaceCache:set_current(info)
   local changed = not self.current
-    or (info and self.current.dir ~= info.dir)
-    or (not info and self.current ~= nil)
+      or (info and self.current.dir ~= info.dir)
+      or (not info and self.current ~= nil)
   self.current = info
   return changed
 end
@@ -196,7 +196,7 @@ function IdleTimer:check(is_focused)
 
   local elapsed = uv.now() - self.last_activity
   local should_idle = self.is_forced
-    or (elapsed >= config.idle.timeout and (config.idle.ignore_focus or not is_focused))
+      or (elapsed >= config.idle.timeout and (config.idle.ignore_focus or not is_focused))
 
   logger.trace(
     function()
@@ -428,8 +428,8 @@ function OptionsBuilder.new(manager) return setmetatable({ manager = manager }, 
 function OptionsBuilder:should_reset_timestamp()
   if not config.timestamp.enabled then return false end
   return config.timestamp.reset_on_change
-    or (config.timestamp.reset_on_idle and self.manager.idle_timer.is_idle)
-    or false
+      or (config.timestamp.reset_on_idle and self.manager.idle_timer.is_idle)
+      or false
 end
 
 function OptionsBuilder:build_base()
@@ -465,8 +465,8 @@ function OptionsBuilder:build(full)
 
   if full == false then
     opts.timestamp = mgr.opts and mgr.opts.timestamp
-      or mgr.last_opts and mgr.last_opts.timestamp
-      or nil
+        or mgr.last_opts and mgr.last_opts.timestamp
+        or nil
 
     opts.buttons = mgr.opts and mgr.opts.buttons or mgr.last_opts and mgr.last_opts.buttons or nil
   else
@@ -487,11 +487,11 @@ end
 function OptionsBuilder.has_changed(curr, prev)
   if not prev then return true end
   return curr.filename ~= prev.filename
-    or curr.filetype ~= prev.filetype
-    or curr.is_read_only ~= prev.is_read_only
-    or curr.cursor_line ~= prev.cursor_line
-    or curr.cursor_char ~= prev.cursor_char
-    or curr.is_focused ~= prev.is_focused
+      or curr.filetype ~= prev.filetype
+      or curr.is_read_only ~= prev.is_read_only
+      or curr.cursor_line ~= prev.cursor_line
+      or curr.cursor_char ~= prev.cursor_char
+      or curr.is_focused ~= prev.is_focused
 end
 
 --------------------------------------------------------------------------------
@@ -572,31 +572,32 @@ function EventHandler.new(manager) return setmetatable({ manager = manager }, Ev
 function EventHandler:on_buf_enter()
   local mgr = self.manager
   logger.trace 'EventHandler.on_buf_enter'
-  hooks.run('buf_enter', mgr)
-
-  local rawdir, parent = get_buffer_dir()
-  local cached = mgr.workspace:get(parent)
-
-  if cached then
-    if mgr.workspace:set_current(cached) then
-      local opts = mgr.options_builder:build(false)
-      hooks.run('workspace_change', opts)
-    end
-    mgr:queue_update()
-    return
-  end
-
-  if cached == false then
-    logger.trace 'EventHandler: cached=false, clearing workspace'
-    if mgr.workspace:set_current(nil) then
-      local opts = mgr.options_builder:build(false)
-      hooks.run('workspace_change', opts)
-    end
-    mgr:queue_update()
-    return
-  end
 
   async.run(function()
+    hooks.run('buf_enter', mgr)
+
+    local rawdir, parent = get_buffer_dir()
+    local cached = mgr.workspace:get(parent)
+
+    if cached then
+      if mgr.workspace:set_current(cached) then
+        local opts = mgr.options_builder:build(false)
+        hooks.run('workspace_change', opts)
+      end
+      mgr:queue_update()
+      return
+    end
+
+    if cached == false then
+      logger.trace 'EventHandler: cached=false, clearing workspace'
+      if mgr.workspace:set_current(nil) then
+        local opts = mgr.options_builder:build(false)
+        hooks.run('workspace_change', opts)
+      end
+      mgr:queue_update()
+      return
+    end
+
     local info = mgr.workspace.discover(rawdir)
     logger.trace(
       function() return 'EventHandler: discovered dir=' .. tostring(info and info.dir) end
@@ -696,7 +697,9 @@ ActivityManager.new = async.wrap(function(opts)
     autocmds = AutocmdController.new(),
   }, ActivityManager)
 
-  self.idle_timer = IdleTimer.new(function() self.activity_updater:update_idle() end)
+  self.idle_timer = IdleTimer.new(function()
+    async.run(function() self.activity_updater:update_idle() end)
+  end)
   self.debouncer = UpdateDebouncer.new()
   self.options_builder = OptionsBuilder.new(self)
   self.activity_updater = ActivityUpdater.new(self)
@@ -729,8 +732,10 @@ function ActivityManager:run()
   self.is_ready = true
   self.idle_timer:record_activity()
 
-  hooks.run('ready', self)
-  hooks.run('buf_enter', self)
+  async.run(function()
+    hooks.run('ready', self)
+    hooks.run('buf_enter', self)
+  end)
   self:queue_update(true)
 
   if config.advanced.plugin.autocmds then self.autocmds.setup() end
@@ -753,7 +758,9 @@ end
 function ActivityManager:queue_update(force)
   if not self.events_enabled or not self.is_ready then return end
 
-  self.debouncer:request(force, function(debounced_force) self:do_update(debounced_force) end)
+  self.debouncer:request(force, function(debounced_force)
+    async.run(function() self:do_update(debounced_force) end)
+  end)
 end
 
 ---@param force? boolean
@@ -807,7 +814,9 @@ function ActivityManager:clear_activity(force) self.tx:clear_activity(force) end
 
 function ActivityManager:skip_update() self.should_skip_update = true end
 
-function ActivityManager:idle() self.activity_updater:update_idle() end
+function ActivityManager:idle()
+  async.run(function() self.activity_updater:update_idle() end)
+end
 
 function ActivityManager:force_idle() self.idle_timer:force() end
 

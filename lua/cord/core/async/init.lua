@@ -6,8 +6,12 @@ local unpack = unpack or table.unpack
 ---@class Async
 local Async = {}
 
+---Callable that returns a Future when invoked.
 ---@class AsyncFunction
 ---@field _fn fun(...): Future
+---@overload fun(...): Future
+
+---@type AsyncFunction|metatable
 local async_mt = { __name = 'async_function' }
 async_mt.__call = function(self, ...) return self._fn(...) end
 
@@ -19,9 +23,8 @@ function Async.is_async(fn)
 end
 
 ---Wraps a function to return a Future when called within a coroutine.
----@generic T
----@param fn T
----@return T
+---@param fn function The function to wrap
+---@return AsyncFunction wrapped A callable that returns a Future
 function Async.wrap(fn)
   ---@diagnostic disable-next-line: missing-fields
   return setmetatable({
