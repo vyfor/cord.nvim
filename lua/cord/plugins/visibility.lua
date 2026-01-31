@@ -1,5 +1,7 @@
 local uv = vim.loop or vim.uv
 local logger = require 'cord.api.log'
+local async = require 'cord.core.async'
+local fs = require 'cord.core.uv.fs'
 
 local M = {
   config = {
@@ -25,36 +27,36 @@ local function cache_key(workspace)
   return tostring(workspace) .. '::' .. path
 end
 
-local function normalize_path(path)
+local normalize_path = async.wrap(function(path)
   if not path then return nil end
   local norm = vim.fs.normalize(path)
   if M.config.resolve_symlinks then
-    local ok, real = pcall(uv.fs_realpath, norm)
-    if ok and real then return real end
+    local real = fs.realpath(norm):await()
+    if real then return real end
   end
   return norm
-end
+end)
 
-local function match_path(rule, file_dir)
+local match_path = async.wrap(function(rule, file_dir)
   if not rule then return false end
   if not file_dir or file_dir == '' then return false end
-  local dir = normalize_path(file_dir)
+  local dir = normalize_path(file_dir):await()
   return rule == dir
-end
+end)
 
 local function match_name(rule, workspace_name)
   if not (rule and workspace_name) then return false end
   return rule == workspace_name
 end
 
-local function match_glob(rule, file_dir)
+local match_glob = async.wrap(function(rule, file_dir)
   if not rule then return false end
   if not file_dir or file_dir == '' then return false end
-  local dir = normalize_path(file_dir)
+  local dir = normalize_path(file_dir):await()
   return vim.fn.match(tostring(dir), rule) ~= -1
-end
+end)
 
-local function rule_matches(rule, bufname)
+local rule_matches = async.wrap(function(rule, bufname)
   if type(rule) == 'function' then
     local ok, res = pcall(rule, {
       rule = rule,
@@ -73,25 +75,25 @@ local function rule_matches(rule, bufname)
       return ok and res and res ~= false
     end
     if ty == 'path' then
-      return match_path(val, M.workspace_dir)
+      return match_path(val, M.workspace_dir):await()
     elseif ty == 'name' then
       return match_name(val, M.workspace)
     elseif ty == 'glob' then
-      return match_glob(val, bufname)
+      return match_glob(val, bufname):await()
     end
   end
   return false
-end
+end)
 
-local function find_matching_rule(list, bufname)
+local find_matching_rule = async.wrap(function(list, bufname)
   for i = 1, #list do
     local r = list[i]
-    if rule_matches(r, bufname) then return r end
+    if rule_matches(r, bufname):await() then return r end
   end
   return nil
-end
+end)
 
-local function is_visible()
+local is_visible = async.wrap(function()
   local bufname = vim.api.nvim_buf_get_name(0)
 
   local cached = M.cache[cache_key(M.workspace)]
@@ -106,8 +108,8 @@ local function is_visible()
   local has_whitelist = #whitelist > 0
   local has_blacklist = #blacklist > 0
 
-  local matched_whitelist = find_matching_rule(whitelist, bufname)
-  local matched_blacklist = find_matching_rule(blacklist, bufname)
+  local matched_whitelist = find_matching_rule(whitelist, bufname):await()
+  local matched_blacklist = find_matching_rule(blacklist, bufname):await()
 
   local visible
   local rule
@@ -129,15 +131,15 @@ local function is_visible()
 
   M.cache[cache_key(M.workspace)] = { visible = visible, rule = rule }
   return visible, rule
-end
+end)
 
-M.check_visibility = function(pending)
+M.check_visibility = async.wrap(function(pending)
   if not pending then
     M.pending = true
     return
   end
 
-  local visible, rule = is_visible()
+  local visible, rule = is_visible():await()
   if not rule then
     if M.config.fallback then
       local ok, res = pcall(M.config.fallback, {
@@ -190,7 +192,7 @@ M.check_visibility = function(pending)
     logger.debug(
       function()
         return 'Visibility: resuming activities'
-          .. (rule and (' due to rule: ' .. vim.inspect(rule)) or '')
+            .. (rule and (' due to rule: ' .. vim.inspect(rule)) or '')
       end
     )
     if M.manager then M.manager:resume() end
@@ -198,14 +200,15 @@ M.check_visibility = function(pending)
     logger.debug(
       function()
         return 'Visibility: suppressing activities'
-          .. (rule and (' due to rule: ' .. vim.inspect(rule)) or '')
+            .. (rule and (' due to rule: ' .. vim.inspect(rule)) or '')
       end
     )
     if M.manager then M.manager:suppress() end
   end
-end
+end)
 
-M.validate = function(config)
+
+M.validate = async.wrap(function(config)
   if config.precedence ~= 'whitelist' and config.precedence ~= 'blacklist' then
     return 'invalid precedence; must be "whitelist" or "blacklist"'
   end
@@ -213,12 +216,12 @@ M.validate = function(config)
 
   local function is_pathlike(s) return s:find '[/\\]' ~= nil end
 
-  local function normalize_rule(r)
+  local normalize_rule = async.wrap(function(r)
     if type(r) == 'string' then
       if is_pathlike(r) then
         return {
           type = 'path',
-          value = normalize_path(r),
+          value = normalize_path(r):await(),
         }
       else
         return {
@@ -231,47 +234,48 @@ M.validate = function(config)
       local val = r.value
       local action = r.action
 
-      if action and type(action) ~= 'function' then return nil, 'actions must be functions' end
+      if action and type(action) ~= 'function' then error 'actions must be functions' end
 
       if type(val) == 'function' and ty ~= nil then
-        return nil, 'function values do not support type field'
+        error 'function values do not support type field'
       end
 
       if ty == 'path' and type(val) == 'string' then
-        r.value = normalize_path(val)
+        r.value = normalize_path(val):await()
       elseif ty == 'glob' and type(val) == 'string' then
         local ok, result = pcall(vim.fn.glob2regpat, val)
         if ok then
           r.value = result
         else
-          return nil, 'Invalid glob pattern: ' .. tostring(val) .. ' (' .. tostring(result) .. ')'
+          error('Invalid glob pattern: ' .. tostring(val) .. ' (' .. tostring(result) .. ')')
         end
       end
       return r
     elseif type(r) == 'function' then
       return r
     else
-      return nil, 'rules must be strings, tables, or functions'
+      error 'rules must be strings, tables, or functions'
     end
-  end
+  end)
 
   local rules = config.rules
   for _, listname in ipairs { 'whitelist', 'blacklist' } do
     local lst = rules[listname]
     if type(lst) == 'table' then
       for i = 1, #lst do
-        local norm, err = normalize_rule(lst[i])
+        local norm, err = normalize_rule(lst[i]):await()
         if err then return err end
         lst[i] = norm
       end
     end
   end
-end
+end)
 
-M.setup = function(config)
+M.setup = async.wrap(function(config)
   if config then
     config = vim.tbl_deep_extend('force', M.config, config)
-    local err = M.validate(config)
+    local val, err = M.validate(config):await()
+    if val then error(val, 0) end
     if err then error(err, 0) end
     M.config = config
   end
@@ -282,32 +286,32 @@ M.setup = function(config)
     name = 'Visibility',
     description = 'Control visibility of workspace based on rules',
     variables = {
-      has_match = function()
-        local visible, rule = is_visible()
+      has_match = async.wrap(function()
+        local visible, rule = is_visible():await()
         return { visible = visible, rule = rule }
-      end,
+      end),
     },
     hooks = M.config.override and {
       ready = function(m) M.manager = m end,
-      workspace_change = function(opts)
-        M.workspace = normalize_path(opts.workspace)
-        M.workspace_dir = normalize_path(opts.workspace_dir)
+      workspace_change = async.wrap(function(opts)
+        M.workspace = normalize_path(opts.workspace):await()
+        M.workspace_dir = normalize_path(opts.workspace_dir):await()
 
         local pending = M.pending
         if pending then
           M.pending = nil
-          M.check_visibility(true)
+          M.check_visibility(true):await()
           return
         end
 
         if not initialized then
           initialized = true
-          M.check_visibility()
+          M.check_visibility():await()
         end
-      end,
-      buf_enter = function() M.check_visibility() end,
+      end),
+      buf_enter = async.wrap(function() M.check_visibility():await() end),
     } or nil,
   }
-end
+end)
 
 return M

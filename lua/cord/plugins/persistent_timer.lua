@@ -331,19 +331,12 @@ M.setup = function(config)
     description = 'Persistently track time spent scope-wise across sessions',
     hooks = {
       post_activity = {
-        function(opts, activity)
+        fun = Async.wrap(function(opts, activity)
           if not M.is_initialized then
             M.is_initialized = true
-            logger.debug 'post_activity: First run, pausing manager for initial load.'
-            local manager = opts.manager
-            manager:skip_update()
-            manager:pause()
-            Async.run(function()
-              load_timers():await()
-              logger.debug 'post_activity: Initial load complete. Resuming manager.'
-              manager:resume()
-            end)
-            return
+            logger.debug 'post_activity: First run, performing initial load.'
+            load_timers():await()
+            logger.debug 'post_activity: Initial load complete.'
           end
 
           local key = get_key(opts)
@@ -376,7 +369,7 @@ M.setup = function(config)
 
           activity.timestamps = activity.timestamps or {}
           activity.timestamps.start = bucket.display_start_time
-        end,
+        end),
         priority = 10,
       },
     },

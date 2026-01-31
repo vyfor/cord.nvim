@@ -21,6 +21,7 @@ local M = {
     fallback_image = LASTFM_LOGO,
   },
   current_track = nil,
+  last_reported_track = nil,
 }
 
 local request = Async.wrap(function(endpoint, params)
@@ -120,33 +121,44 @@ M.fetch_track = Async.wrap(function()
   }
 end)
 
+local get_cached_track = Async.wrap(function(opts)
+  if not opts or not opts.cache then return M.current_track end
+  local track = opts.cache:get_or_compute('lastfm:track', M.config.interval / 1000, function()
+    return M.fetch_track():await()
+  end)
+  M.current_track = track
+  return track
+end)
+
 local compare_tracks = function(a, b)
   return a.title == b.title and a.artist == b.artist and a.album == b.album
 end
 
 M.run = Async.wrap(function()
+  if not M.config.override then return end
+
   local timer = uv.new_timer()
   timer:start(
     0,
     M.config.interval,
     vim.schedule_wrap(function()
       Async.run(function()
-        local track = M.fetch_track():unwrap()
+        local track = get_cached_track({ cache = manager.opts_cache }):await()
         if not track then
           logger.debug 'LastFM: No track found'
           M.current_track = nil
-          if M.config.override then manager:clear_activity() end
+          manager:clear_activity()
           return
         end
 
-        if M.current_track and compare_tracks(M.current_track, track) then
+        if M.last_reported_track and compare_tracks(M.last_reported_track, track) then
           logger.debug 'LastFM: Track unchanged'
           return
         end
-        M.current_track = track
+        M.last_reported_track = track
 
-        if M.config.override then
-          manager:set_activity({
+        if manager then
+          manager.tx:update_activity({
             type = 'listening',
             status_display_type = 'state',
             details = track.title,
@@ -160,8 +172,6 @@ M.run = Async.wrap(function()
               start = os.time(),
             },
           }, true)
-        else
-          manager:queue_update(true)
         end
       end)
     end)
@@ -184,11 +194,26 @@ M.setup = function(config)
     name = 'LastFM',
     description = 'Display information about your Last.fm activity',
     variables = {
-      track_title = function() return M.current_track and M.current_track.title or nil end,
-      track_artist = function() return M.current_track and M.current_track.artist or nil end,
-      track_album = function() return M.current_track and M.current_track.album or nil end,
-      track_url = function() return M.current_track and M.current_track.url or nil end,
-      track_image = function() return M.current_track and M.current_track.image or nil end,
+      track_title = Async.wrap(function(opts)
+        local track = get_cached_track(opts):await()
+        return track and track.title or nil
+      end),
+      track_artist = Async.wrap(function(opts)
+        local track = get_cached_track(opts):await()
+        return track and track.artist or nil
+      end),
+      track_album = Async.wrap(function(opts)
+        local track = get_cached_track(opts):await()
+        return track and track.album or nil
+      end),
+      track_url = Async.wrap(function(opts)
+        local track = get_cached_track(opts):await()
+        return track and track.url or nil
+      end),
+      track_image = Async.wrap(function(opts)
+        local track = get_cached_track(opts):await()
+        return track and track.image or nil
+      end),
     },
     hooks = {
       ready = {
