@@ -36,6 +36,7 @@ local uv = vim.loop or vim.uv
 
 ---@class CordOpts
 ---@field manager ActivityManager Reference to the ActivityManager instance
+---@field cache CordCache Global cache instance
 ---@field name? string Name associated with the current mapping
 ---@field tooltip? string Tooltip associated with the current mapping
 ---@field filename string Current buffer's filename
@@ -66,7 +67,7 @@ local uv = vim.loop or vim.uv
 local function resolve(value, ...)
   if type(value) == 'function' then
     if async.is_async(value) then
-      return value(...):get()
+      return value(...):await()
     end
     return value(...)
   end
@@ -107,26 +108,28 @@ end
 -- Workspace caching
 --------------------------------------------------------------------------------
 
+local Cache = require 'cord.core.cache'
+
 ---@class WorkspaceInfo
 ---@field dir string Workspace directory
 ---@field name string Workspace name
 ---@field repo_url? string Git repository URL
 
 ---@class WorkspaceCache
----@field cache table<string, WorkspaceInfo|false>
+---@field inner CordCache
 ---@field current WorkspaceInfo|nil
 local WorkspaceCache = {}
 WorkspaceCache.__index = WorkspaceCache
 
-function WorkspaceCache.new() return setmetatable({ cache = {}, current = nil }, WorkspaceCache) end
+function WorkspaceCache.new() return setmetatable({ inner = Cache.new(), current = nil }, WorkspaceCache) end
 
 ---@param parent string
 ---@return WorkspaceInfo|false|nil
-function WorkspaceCache:get(parent) return self.cache[parent] end
+function WorkspaceCache:get(parent) return self.inner:get(parent) end
 
 ---@param parent string
 ---@param info WorkspaceInfo|false
-function WorkspaceCache:set(parent, info) self.cache[parent] = info end
+function WorkspaceCache:set(parent, info) self.inner:set(parent, info) end
 
 ---@param info WorkspaceInfo|nil
 ---@return boolean changed
@@ -141,11 +144,11 @@ end
 ---@param rawdir string
 ---@return WorkspaceInfo
 function WorkspaceCache.discover(rawdir)
-  local dir = ws_utils.find(rawdir):get() or vim.fn.getcwd()
+  local dir = ws_utils.find(rawdir):await() or vim.fn.getcwd()
   return {
     dir = dir,
     name = vim.fn.fnamemodify(dir, ':t'),
-    repo_url = ws_utils.find_git_repository(dir):get(),
+    repo_url = ws_utils.find_git_repository(dir):await(),
   }
 end
 
@@ -446,6 +449,7 @@ function OptionsBuilder:build_base()
 
   return {
     manager = mgr,
+    cache = mgr.opts_cache,
     filename = vim.fn.expand '%:t',
     filetype = vim.bo.filetype,
     buftype = vim.bo.buftype,
@@ -664,6 +668,7 @@ end
 ---@field options_builder OptionsBuilder
 ---@field activity_updater ActivityUpdater
 ---@field event_handler EventHandler
+---@field opts_cache CordCache
 local ActivityManager = {}
 ActivityManager.__index = ActivityManager
 
@@ -709,6 +714,7 @@ ActivityManager.new = async.wrap(function(opts)
   self.options_builder = OptionsBuilder.new(self)
   self.activity_updater = ActivityUpdater.new(self)
   self.event_handler = EventHandler.new(self)
+  self.opts_cache = Cache.new()
 
   local rawdir, parent = get_buffer_dir()
   local info = self.workspace.discover(rawdir)
