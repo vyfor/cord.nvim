@@ -37,9 +37,10 @@
 - 🛠️ Finds repositories and workspaces based on VCS files without relying on command-line tools.
 - 🧠 Manages activities across all instances with a single connection to Discord.
 - 💤 Detects when you're idle and switches to the most recent active instance.
+- 🎯 [Async](https://github.com/vyfor/cord.nvim/wiki/Async)-first design with an async-aware configuration layer.
 - 📦 Works with different Discord setups (Snap, Flatpak, [WSL](https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-running-inside-wsl), and even the [~~browser~~](https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-using-discord-in-a-browser)).
 - 🌍 Runs on Windows, Linux, macOS, and FreeBSD.
-- 🌸 Includes 120+ unique icons for over 200 file types and plugins.
+- 🌸 Includes 120+ icons for 200+ file types and plugins, featured in distinct themes and flavors.
 - 🔁 Reconnects automatically if connection to Discord is lost.
 
 ## 📦 Installation
