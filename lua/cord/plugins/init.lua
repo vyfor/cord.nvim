@@ -58,20 +58,28 @@ function M.init()
 
     if type(ty) == 'number' then
       name = def
-      logger.debug('Loading plugin: ' .. name)
-      local ok, mod = pcall(require, name)
-      if not ok then return 'Failed to load plugin \'' .. name .. '\': ' .. mod end
-      plugin = mod
     elseif type(ty) == 'string' and type(def) == 'table' then
       name = ty
       cfg = def
-      logger.debug('Loading plugin with config: ' .. name)
-      local ok, mod = pcall(require, name)
-      if not ok then return 'Failed to load plugin \'' .. name .. '\': ' .. mod end
-      plugin = mod
     else
       return 'Plugin entry must be a string or table'
     end
+
+    if type(name) ~= 'string' then return 'Plugin entry must be a string' end
+
+    logger.debug('Loading plugin: ' .. name)
+    local ok, mod = pcall(require, name)
+    if not ok and not name:find '%.' then
+      local built_in_name = 'cord.plugins.' .. name
+      local ok_built_in, mod_built_in = pcall(require, built_in_name)
+      if ok_built_in then
+        name = built_in_name
+        ok, mod = true, mod_built_in
+      end
+    end
+
+    if not ok then return 'Failed to load plugin \'' .. name .. '\': ' .. mod end
+    plugin = mod
 
     if plugin.setup then
       logger.debug('Setting up plugin: ' .. name)
