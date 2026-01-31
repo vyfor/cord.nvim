@@ -51,7 +51,7 @@ local function get_option(option, args)
         function() return 'config.get: variable ${' .. var .. '} = ' .. tostring(arg) end
       )
       if type(arg) == 'function' then
-        local result = async.is_async(arg) and arg(args):get() or arg(args)
+        local result = async.is_async(arg) and arg(args):await() or arg(args)
         logger.trace(
           function() return 'config.get: function variable ${' .. var .. '} = ' .. tostring(result) end
         )
@@ -68,7 +68,7 @@ local function get_option(option, args)
   end
 
   local result = ty == 'function'
-      and (async.is_async(option) and option(args):get() or option(args))
+      and (async.is_async(option) and option(args):await() or option(args))
       or option
   logger.trace(function() return 'config.get: returning ' .. tostring(type(result)) end)
   return result

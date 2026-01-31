@@ -1,13 +1,13 @@
 local M = {}
 
 M.install = function()
-  require('cord.core.async').run(function() require('cord.server.update').install():await() end)
+  require('cord.core.async').run(function() require('cord.server.update').install():unwrap() end)
 end
 M.fetch = function()
-  require('cord.core.async').run(function() require('cord.server.update').fetch():await() end)
+  require('cord.core.async').run(function() require('cord.server.update').fetch():unwrap() end)
 end
 M.build = function()
-  require('cord.core.async').run(function() require('cord.server.update').build():await() end)
+  require('cord.core.async').run(function() require('cord.server.update').build():unwrap() end)
 end
 M.update = function()
   local mode = require('cord.api.config').advanced.server.update
@@ -122,11 +122,11 @@ M.status = function(silent)
 end
 M.check = function()
   require('cord.core.async').run(
-    function() require('cord.server.update').check_version():await() end
+    function() require('cord.server.update').check_version():unwrap() end
   )
 end
 M.version = function()
-  require('cord.core.async').run(function() require('cord.server.update').version():await() end)
+  require('cord.core.async').run(function() require('cord.server.update').version():unwrap() end)
 end
 M.health = function() vim.cmd 'checkhealth cord' end
 

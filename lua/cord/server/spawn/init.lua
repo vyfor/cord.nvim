@@ -10,15 +10,15 @@ M.spawn = async.wrap(function(config, pipe_path)
     local exec_path = require('cord.server.fs').get_executable_path(config)
 
     local fs = require 'cord.core.uv.fs'
-    local stat = fs.stat(exec_path):get()
+    local stat = fs.stat(exec_path):await()
     if not stat then
       logger.debug('Spawn: executable missing at ' .. tostring(exec_path))
       if update_strategy == 'fetch' then
-        require('cord.server.update').fetch():await()
+        require('cord.server.update').fetch():unwrap()
       elseif update_strategy == 'install' then
-        require('cord.server.update').install():await()
+        require('cord.server.update').install():unwrap()
       elseif update_strategy == 'build' then
-        require('cord.server.update').build():await()
+        require('cord.server.update').build():unwrap()
       else
         require('cord.api.log').error 'Could not find the server executable'
       end
@@ -37,7 +37,7 @@ M.spawn = async.wrap(function(config, pipe_path)
         config.advanced.server.timeout,
         '-r',
         config.advanced.discord.reconnect.enabled and config.advanced.discord.reconnect.interval
-          or 0,
+        or 0,
         config.advanced.discord.reconnect.initial and '-i' or nil,
       },
       on_stdout = function(data)

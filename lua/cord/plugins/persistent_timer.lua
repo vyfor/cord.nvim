@@ -110,7 +110,7 @@ local function merge_timers(other_data)
 end
 
 local load_timers = Async.wrap(function()
-  local content, err = FS.readfile(M.config.file):get()
+  local content, err = FS.readfile(M.config.file):await()
   if err then
     logger.debug('Could not read timer file (may not exist yet): ' .. tostring(err))
     return
@@ -161,7 +161,7 @@ local save_timers = Async.wrap(function()
   end
 
   local dir = get_dir(M.config.file)
-  local _, mkdir_err = FS.mkdirp(dir):get()
+  local _, mkdir_err = FS.mkdirp(dir):await()
   if mkdir_err then
     logger.debug('save_timers: Failed to create directory: ' .. tostring(mkdir_err))
     M.save_in_progress = false
@@ -169,17 +169,17 @@ local save_timers = Async.wrap(function()
   end
 
   local temp_file = M.config.file .. '.tmp.' .. M.instance_id
-  local _, write_err = FS.writefile(temp_file, json_content):get()
+  local _, write_err = FS.writefile(temp_file, json_content):await()
   if write_err then
     logger.debug('save_timers: Failed to write temp file: ' .. tostring(write_err))
     M.save_in_progress = false
     return false
   end
 
-  local _, rename_err = FS.rename(temp_file, M.config.file):get()
+  local _, rename_err = FS.rename(temp_file, M.config.file):await()
   if rename_err then
     logger.debug('save_timers: Failed to rename temp file: ' .. tostring(rename_err))
-    FS.unlink(temp_file):get()
+    FS.unlink(temp_file):await()
     M.save_in_progress = false
     return false
   end
@@ -239,14 +239,14 @@ M.validate = function(config)
       end
       if not ok then
         return 'Invalid save_on trigger \''
-          .. tostring(trig)
-          .. '\', must be one of: \'exit\', \'periodic\', \'focus_change\''
+            .. tostring(trig)
+            .. '\', must be one of: \'exit\', \'periodic\', \'focus_change\''
       end
     end
   end
 
   if
-    config.save_interval and (type(config.save_interval) ~= 'number' or config.save_interval <= 0)
+      config.save_interval and (type(config.save_interval) ~= 'number' or config.save_interval <= 0)
   then
     return 'Invalid save_interval value, must be a positive number'
   end
@@ -287,9 +287,9 @@ M.setup = function(config)
           local json_content = vim.json.encode(timers_to_save)
           if json_content and json_content ~= '' then
             local dir = get_dir(M.config.file)
-            local _, mkdir_err = FS.mkdirp(dir):get()
+            local _, mkdir_err = FS.mkdirp(dir):await()
             if not mkdir_err then
-              local _, write_err = FS.writefile(M.config.file, json_content):get()
+              local _, write_err = FS.writefile(M.config.file, json_content):await()
               if write_err then
                 logger.debug('VimLeavePre: Final save failed: ' .. tostring(write_err))
               end
@@ -310,7 +310,7 @@ M.setup = function(config)
     vim.api.nvim_create_autocmd('FocusLost', {
       group = group,
       callback = function()
-        if now() - M.last_save_time >= 5 then Async.run(function() save_timers():get() end) end
+        if now() - M.last_save_time >= 5 then Async.run(function() save_timers():await() end) end
       end,
     })
   end
@@ -320,7 +320,7 @@ M.setup = function(config)
     if timer then
       timer:start(M.config.save_interval * 1000, M.config.save_interval * 1000, function()
         if now() - M.last_save_time >= M.config.save_interval then
-          Async.run(function() save_timers():get() end)
+          Async.run(function() save_timers():await() end)
         end
       end)
     end
@@ -339,7 +339,7 @@ M.setup = function(config)
             manager:skip_update()
             manager:pause()
             Async.run(function()
-              load_timers():get()
+              load_timers():await()
               logger.debug 'post_activity: Initial load complete. Resuming manager.'
               manager:resume()
             end)
@@ -350,8 +350,8 @@ M.setup = function(config)
           if not key then return end
 
           local mode_to_run = (M.config.mode == 'active' and not opts.is_idle and 'active')
-            or (M.config.mode == 'idle' and opts.is_idle and 'idle')
-            or (M.config.mode == 'all' and 'all')
+              or (M.config.mode == 'idle' and opts.is_idle and 'idle')
+              or (M.config.mode == 'all' and 'all')
 
           if not mode_to_run then
             if M.current_key then

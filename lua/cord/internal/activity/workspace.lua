@@ -17,7 +17,7 @@ M.protocol_handlers = {
 local check_vcs_marker = async.wrap(function(curr_dir, marker)
   local marker_path = curr_dir .. '/' .. marker
   logger.trace(function() return 'check_vcs_marker: checking ' .. marker_path end)
-  local stat = fs.stat(marker_path):get()
+  local stat = fs.stat(marker_path):await()
   if not stat then return end
   logger.trace(
     function() return 'check_vcs_marker: found marker ' .. marker .. ' in ' .. curr_dir end
@@ -44,7 +44,7 @@ M.find_vcs_root = async.wrap(function(initial_path)
       table.insert(marker_futures, check_vcs_marker(curr_dir, marker))
     end
 
-    local results = Future.all(marker_futures):get()
+    local results = Future.all(marker_futures):await()
     if not results then return end
 
     for _, result in ipairs(results) do
@@ -83,7 +83,7 @@ M.find = async.wrap(function(initial_path)
     local extracted_path, is_final = M.protocol_handlers[protocol](path)
     if not extracted_path or extracted_path == '' or extracted_path == '.' then
       logger.trace 'find: protocol handler returned invalid path, using CWD'
-      return M.find_vcs_root(vim.fn.getcwd()):get()
+      return M.find_vcs_root(vim.fn.getcwd()):await()
     end
 
     if is_final then
@@ -95,13 +95,13 @@ M.find = async.wrap(function(initial_path)
       logger.trace(
         function() return 'find: protocol handler returned path for VCS search: ' .. extracted_path end
       )
-      return M.find_vcs_root(extracted_path):get()
+      return M.find_vcs_root(extracted_path):await()
     end
   end
 
   if has_initial_path then initial_path = vim.fn.fnamemodify(initial_path, ':h') end
   logger.trace(function() return 'find: searching VCS root from ' .. initial_path end)
-  return M.find_vcs_root(initial_path):get()
+  return M.find_vcs_root(initial_path):await()
 end)
 
 local function format_url(url)
@@ -130,7 +130,7 @@ M.find_git_repository = async.wrap(function(workspace_path)
   )
   local config_path = workspace_path .. '/.git/config'
 
-  local content = fs.readfile(config_path):get()
+  local content = fs.readfile(config_path):await()
   if not content then
     logger.trace(
       function() return 'find_git_repository: no .git/config found at ' .. config_path end

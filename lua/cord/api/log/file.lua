@@ -37,20 +37,20 @@ local function enqueue(msg, level, raw)
       return
     end
 
-    local ok, err = fs.mkdirp(logfile_path:match '^(.*)[/\\]'):get()
+    local ok, err = fs.mkdirp(logfile_path:match '^(.*)[/\\]'):await()
     if not ok then
       notify('Failed to create log file directory: ' .. tostring(err), levels.ERROR)
       return
     end
 
-    local ok2, err2 = fs.openfile(logfile_path, 'w'):get()
+    local ok2, err2 = fs.openfile(logfile_path, 'w'):await()
     if err2 then
       notify('Failed to open log file: ' .. tostring(err2), levels.ERROR)
       return
     end
 
     fs.closefile(ok2)
-    local ok3, err3 = fs.openfile(logfile_path, 'a'):get()
+    local ok3, err3 = fs.openfile(logfile_path, 'a'):await()
     if err3 then
       notify('Failed to open log file: ' .. tostring(err3), levels.ERROR)
       return
@@ -113,7 +113,7 @@ local function flush()
   local data = table.concat(lines, '\n')
   if #data > 0 then data = data .. '\n' end
 
-  local ok, err = fs.write(fd, data):await()
+  local ok, err = fs.write(fd, data):unwrap()
   if not ok then notify('[cord.nvim] Failed to write log file: ' .. tostring(err), levels.ERROR) end
 
   flushing = false

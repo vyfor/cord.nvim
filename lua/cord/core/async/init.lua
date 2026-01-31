@@ -13,7 +13,10 @@ local Async = {}
 
 ---@type AsyncFunction|metatable
 local async_mt = { __name = 'async_function' }
-async_mt.__call = function(self, ...) return self._fn(...) end
+async_mt.__call = function(self, ...)
+  ---@cast self AsyncFunction
+  return self._fn(...)
+end
 
 ---Checks if a value is an async-wrapped function.
 ---@param fn any
@@ -48,7 +51,7 @@ function Async.wrap(fn)
         end
 
         if type(result) == 'table' and result._state then
-          result:and_then(resolve, reject)
+          result:next(resolve, reject)
         else
           resolve(result)
         end

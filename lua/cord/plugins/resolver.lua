@@ -24,7 +24,7 @@ local cache = {
 
 local has_file = async.wrap(function(dir, filename)
   local path = dir .. '/' .. filename
-  local stat = fs.stat(path):get()
+  local stat = fs.stat(path):await()
   return stat ~= nil
 end)
 
@@ -43,7 +43,7 @@ local sources = {
       local cached = cache.nestjs[ws]
 
       if cached == nil then
-        cached = has_file(ws, 'nest-cli.json'):get()
+        cached = has_file(ws, 'nest-cli.json'):await()
         cache.nestjs[ws] = cached
       end
 
@@ -89,7 +89,7 @@ local sources = {
 
         local repo_url = cached and cached.repo_url or nil
         if not repo_url then
-          repo_url = ws_utils.find_git_repository(stripped):get()
+          repo_url = ws_utils.find_git_repository(stripped):await()
         end
 
         local info = {
@@ -171,7 +171,7 @@ function M.setup(user_config)
           if check_match(resolver.source.match, opts) then
             logger.debug('Resolver: Running resolver ' .. resolver.name)
             local result = resolver.source.run(opts)
-            if resolver.is_async then result:get() end
+            if resolver.is_async then result:await() end
           end
         end
       end),

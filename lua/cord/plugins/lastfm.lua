@@ -7,9 +7,9 @@ local uv = vim.uv or vim.loop
 local manager
 local BASE_URL = 'http://ws.audioscrobbler.com/2.0/?method='
 local LASTFM_LOGO =
-  'https://us1.discourse-cdn.com/flex021/uploads/lastfm/optimized/2X/f/f1f8c34ea6f18aad5b8f89905e38ba7b3424d9b1_2_512x512.png'
+'https://us1.discourse-cdn.com/flex021/uploads/lastfm/optimized/2X/f/f1f8c34ea6f18aad5b8f89905e38ba7b3424d9b1_2_512x512.png'
 local LASTFM_DEFAULT_IMAGE =
-  'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png'
+'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png'
 
 local credentials
 
@@ -41,7 +41,7 @@ local request = Async.wrap(function(endpoint, params)
       '--retry',
       tostring(M.config.max_retries),
     },
-  }):await()
+  }):unwrap()
 
   if res.code ~= 0 then
     local err_msg = 'Process exited with code ' .. res.code
@@ -74,7 +74,7 @@ M.fetch_track = Async.wrap(function()
   local recent_tracks = request('user.getrecenttracks', {
     limit = 1,
     extended = 1,
-  }):await()
+  }):unwrap()
   logger.trace(function() return 'LastFM: Received data:\n' .. vim.inspect(recent_tracks) end)
 
   local track
@@ -131,7 +131,7 @@ M.run = Async.wrap(function()
     M.config.interval,
     vim.schedule_wrap(function()
       Async.run(function()
-        local track = M.fetch_track():await()
+        local track = M.fetch_track():unwrap()
         if not track then
           logger.debug 'LastFM: No track found'
           M.current_track = nil

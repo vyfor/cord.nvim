@@ -17,13 +17,13 @@ function M:connect(path, retried)
 
     logger.trace('Pipe: ' .. path)
     M.client = require('cord.core.uv.pipe').new()
-    local _, err = M.client:connect(path):get()
+    local _, err = M.client:connect(path):await()
 
     if not err then
       self.status = 'initialized'
       logger.debug 'Connected to server'
 
-      return M:run():await()
+      return M:run():unwrap()
     end
 
     if retried then error('Failed to connect to pipe: ' .. err, 0) end
@@ -31,7 +31,7 @@ function M:connect(path, retried)
     if err ~= 'ENOENT' and err ~= 'ECONNRESET' then
       if err == 'ECONNREFUSED' or err == 'ETIMEDOUT' then
         logger.debug 'Found stale pipe. Removing...'
-        require('cord.core.uv.fs').unlink(path):get()
+        require('cord.core.uv.fs').unlink(path):await()
         goto spawn
       end
 
@@ -42,12 +42,12 @@ function M:connect(path, retried)
     logger.debug 'Pipe not found. Spawning server executable...'
 
     local process = require('cord.server.spawn').spawn(config.get(), path)
-    local should_continue, retry = process:await()
+    local should_continue, retry = process:unwrap()
     if not should_continue then return end
 
     logger.debug 'Server executable spawned'
-    if retry then return M:connect(path):await() end
-    M:connect(path, true):await()
+    if retry then return M:connect(path):unwrap() end
+    M:connect(path, true):unwrap()
   end)()
 end
 
@@ -75,7 +75,7 @@ function M:run()
             logger.info 'Connected to Discord'
 
             local ActivityManager = require 'cord.internal.manager'
-            local manager, err = ActivityManager.new({ tx = M.tx }):get()
+            local manager, err = ActivityManager.new({ tx = M.tx }):await()
             if not manager or err then
               self.status = 'disconnected'
               self.client:close()
@@ -136,7 +136,7 @@ function M:initialize()
     local path = config.advanced.server.pipe_path or require('cord.core.util').get_pipe_path()
 
     logger.trace(function() return 'Server pipe path: ' .. tostring(path) end)
-    local _, err = M:connect(path):get()
+    local _, err = M:connect(path):await()
     if err then
       self.status = 'disconnected'
       logger.error(err)

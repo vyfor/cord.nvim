@@ -32,7 +32,7 @@ M.install = async.wrap(function()
                 require('cord.server.fs').get_data_path(),
               },
             })
-            :and_then(function(res)
+            :next(function(res)
               if res.code ~= 0 then
                 server.is_updating = false
                 logger.error 'Failed to build executable'
@@ -99,7 +99,7 @@ M.build = async.wrap(function()
                 require('cord.server.fs').get_data_path(),
               },
             })
-            :and_then(function(res)
+            :next(function(res)
               if res.code ~= 0 then
                 server.is_updating = false
                 logger.error 'Failed to build executable'
@@ -142,14 +142,14 @@ M.local_version = async.wrap(function()
   local executable_path =
       require('cord.server.fs').get_executable_path(require('cord.api.config').get())
 
-  if not fs.stat(executable_path):get() then return nil end
+  if not fs.stat(executable_path):await() then return nil end
 
   local res = process
       .spawn({
         cmd = executable_path,
         args = { '-v' },
       })
-      :get()
+      :await()
 
   if not res then return nil end
   if res.code ~= 0 then return nil end
@@ -163,7 +163,7 @@ M.compatible_version = async.wrap(function()
   local fs = require 'cord.core.uv.fs'
   local path = require('cord.server.fs').get_plugin_root() .. '/.github/server-version.txt'
 
-  local content = fs.readfile(path):get()
+  local content = fs.readfile(path):await()
   if not content then return nil end
   local version = content:gsub('^%s*(.-)%s*$', '%1')
   if not version then return nil end
@@ -183,7 +183,7 @@ M.remote_version = async.wrap(function()
           '--show-error',
         },
       })
-      :await()
+      :unwrap()
 
   if res.code ~= 0 then
     error('Failed to fetch latest version; code: ' .. tostring(res.code), 0)
@@ -212,9 +212,9 @@ M.check_version = async.wrap(function()
   async.run(function()
     logger.notify('Checking for updates...', vim.log.levels.INFO)
 
-    local current = M.local_version():await()
-    local compatible = M.compatible_version():await()
-    local latest = M.remote_version():await()
+    local current = M.local_version():unwrap()
+    local compatible = M.compatible_version():unwrap()
+    local latest = M.remote_version():unwrap()
 
     logger.debug(
       'current: ' .. tostring(current) ..
@@ -249,7 +249,7 @@ end)
 
 M.version = async.wrap(function()
   async.run(function()
-    local version = M.local_version():await()
+    local version = M.local_version():unwrap()
     if version then logger.notify('Server version: ' .. version, vim.log.levels.INFO) end
   end)
 end)
@@ -304,7 +304,7 @@ M.fetch = async.wrap(function()
                 'Accept: application/octet-stream',
               },
             })
-            :and_then(function(res)
+            :next(function(res)
               if res.code ~= 0 then
                 server.is_updating = false
                 logger.error('Failed to download executable; code: ' .. res.code .. ', path: ' .. url)
@@ -317,7 +317,7 @@ M.fetch = async.wrap(function()
 
               async.run(function()
                 server.is_updating = false
-                require('cord.core.uv.fs').chmod(executable_path, '755'):await()
+                require('cord.core.uv.fs').chmod(executable_path, '755'):unwrap()
                 server:initialize()
               end)
             end, function(err)
@@ -344,8 +344,8 @@ M.fetch = async.wrap(function()
 
   async.run(function()
     logger.info 'Checking for updates...'
-    local current = M.local_version():await()
-    local compatible = M.compatible_version():await()
+    local current = M.local_version():unwrap()
+    local compatible = M.compatible_version():unwrap()
 
     if compatible then
       if current ~= compatible then
@@ -359,7 +359,7 @@ M.fetch = async.wrap(function()
     else
       logger.warn 'Could not determine compatible server version. Fetching latest...'
 
-      local latest = M.remote_version():await()
+      local latest = M.remote_version():unwrap()
       if latest and current == latest then
         server.is_updating = false
         logger.info('Already on latest server version ' .. current)

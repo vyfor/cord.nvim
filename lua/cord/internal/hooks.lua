@@ -64,7 +64,7 @@ function M.run(event, ...)
   local args = { ... }
   for _, ihook in ipairs(hook) do
     if ihook.is_async then
-      local ok, err = ihook.fn(unpack(args)):get()
+      local ok, err = ihook.fn(unpack(args)):await()
       if not ok and err then logger.notify(tostring(err), vim.log.levels.ERROR) end
     else
       local ok, err = pcall(ihook.fn, unpack(args))

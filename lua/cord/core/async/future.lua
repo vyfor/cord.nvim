@@ -2,8 +2,8 @@
 ---@field _state 'pending' | 'fulfilled' | 'rejected'
 ---@field _value any
 ---@field _callbacks { on_fulfilled: fun(value: any), on_rejected: fun(reason: any) }[]
----@field get fun(self: Future): any, string? Waits for the future and returns (value) or (nil, error)
----@field await fun(self: Future): any Waits for the future and returns value, throws on error
+---@field await fun(self: Future): any, string? Waits for the future and returns (value) or (nil, error)
+---@field unwrap fun(self: Future): any Waits for the future and returns value, throws on error
 local Future = {}
 Future.__index = Future
 
@@ -45,16 +45,16 @@ end
 
 local function chain_result(result, resolve, reject)
   if type(result) == 'table' and result._state then
-    result:and_then(resolve, reject)
+    result:next(resolve, reject)
   else
     resolve(result)
   end
 end
 
-function Future:and_then(on_ok, on_err)
+function Future:next(on_ok, on_err)
   if not coroutine.running() then
     require('cord.api.log').error(
-      function() return 'Future:and_then must be called within a coroutine\n' .. debug.traceback() end
+      function() return 'Future:next must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
@@ -91,16 +91,16 @@ function Future:and_then(on_ok, on_err)
 end
 
 function Future:catch(handler)
-  return self:and_then(nil, handler)
+  return self:next(nil, handler)
 end
 
 ---Waits for the future to resolve and returns the value. Throws on rejection.
 ---@param f Future
 ---@return any
-function Future.await(f)
+function Future.unwrap(f)
   if not coroutine.running() then
     require('cord.api.log').error(
-      function() return 'Future.await must be called within a coroutine\n' .. debug.traceback() end
+      function() return 'Future.unwrap must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
@@ -112,10 +112,10 @@ end
 ---@param f Future
 ---@return any value
 ---@return string? error
-function Future.get(f)
+function Future.await(f)
   if not coroutine.running() then
     require('cord.api.log').error(
-      function() return 'Future.get must be called within a coroutine\n' .. debug.traceback() end
+      function() return 'Future.await must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
