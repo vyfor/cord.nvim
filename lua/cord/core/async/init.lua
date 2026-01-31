@@ -15,8 +15,10 @@ local Async = {}
 local async_mt = { __name = 'async_function' }
 async_mt.__call = function(self, ...)
   ---@cast self AsyncFunction
-  return self._fn(...)
+  return self[1](...)
 end
+
+local getmetatable = getmetatable
 
 ---Checks if a value is an async-wrapped function.
 ---@param fn any
@@ -31,7 +33,7 @@ end
 function Async.wrap(fn)
   ---@diagnostic disable-next-line: missing-fields
   return setmetatable({
-    _fn = function(...)
+    function(...)
       local args, n = { ... }, select('#', ...)
       return Future.new(function(resolve, reject)
         if not coroutine.running() then

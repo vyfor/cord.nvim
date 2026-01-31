@@ -182,7 +182,7 @@ function IdleTimer:start()
   if not config.idle.enabled then return end
   logger.trace(function() return 'IdleTimer: starting; timeout=' .. config.idle.timeout end)
   self.timer = uv.new_timer()
-  self.timer:start(0, config.idle.timeout, vim.schedule_wrap(function() self:check() end))
+  self.timer:start(0, config.idle.timeout, function() self:check() end)
 end
 
 function IdleTimer:stop()
@@ -220,7 +220,7 @@ function IdleTimer:check(is_focused)
   if should_idle then
     logger.debug 'IdleTimer: entering idle'
     self.is_idle = true
-    self.on_idle()
+    vim.schedule(self.on_idle)
   else
     self:reschedule(config.idle.timeout - elapsed)
   end
@@ -233,9 +233,9 @@ function IdleTimer:reschedule(remaining)
   self.timer:start(
     remaining,
     0,
-    vim.schedule_wrap(function()
-      self.timer:start(0, config.idle.timeout, vim.schedule_wrap(function() self:check() end))
-    end)
+    function()
+      self.timer:start(0, config.idle.timeout, function() self:check() end)
+    end
   )
 end
 
@@ -255,7 +255,7 @@ function IdleTimer:reset()
   self:leave()
   if not self.timer then return end
   self.timer:stop()
-  self.timer:start(0, config.idle.timeout, vim.schedule_wrap(function() self:check() end))
+  self.timer:start(0, config.idle.timeout, function() self:check() end)
 end
 
 --------------------------------------------------------------------------------
@@ -336,7 +336,7 @@ end
 function UpdateDebouncer:schedule(duration, callback)
   self.timer:stop()
   self.is_active = true
-  self.timer:start(duration, 0, vim.schedule_wrap(function() self:execute(callback) end))
+  self.timer:start(duration, 0, function() self:execute(callback) end)
 end
 
 ---Request a debounced update
@@ -403,7 +403,7 @@ function UpdateDebouncer:execute(callback)
   self.pending_force = nil
   self.is_active = false
   self.in_delay_phase = false
-  callback(was_forced)
+  vim.schedule(function() callback(was_forced) end)
 end
 
 ---Cancel any pending update
@@ -747,8 +747,8 @@ function ActivityManager:run()
   async.run(function()
     hooks.run('ready', self)
     hooks.run('buf_enter', self)
+    self:queue_update(true)
   end)
-  self:queue_update(true)
 
   if config.advanced.plugin.autocmds then self.autocmds.setup() end
   self.idle_timer:start()
