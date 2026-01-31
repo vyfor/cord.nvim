@@ -4,14 +4,14 @@ Cord comes with several built-in plugins that you can easily enable and configur
 
 ## 🚀 Enabling Plugins
 
-To use a built-in plugin, simply add its `require` path to the `plugins` table in your `cord.setup()` configuration.
+To use a plugin, simply add its `require` path to the `plugins` table in your `cord.setup()` configuration. If the plugin is built-in, you can simply use the name alone.
 
 **Basic Plugin Enablement:**
 
 ```lua
 require('cord').setup {
   plugins = {
-    'cord.plugins.diagnostics', -- Enable the diagnostics plugin
+    'diagnostics', -- Enable the diagnostics plugin
   },
 }
 ```
@@ -23,7 +23,7 @@ If a plugin has configuration options, you can provide a configuration table usi
 ```lua
 require('cord').setup {
   plugins = {
-    ['cord.plugins.diagnostics'] = { -- Enable AND configure diagnostics plugin
+    diagnostics = { -- Enable AND configure diagnostics plugin
       scope = 'workspace', -- Set scope to 'workspace' instead of default 'buffer'
       severity = vim.diagnostic.severity.WARN, -- Show warnings and above
     },
@@ -106,7 +106,7 @@ text = {
 -- Enable all except oil
 require('cord').setup {
   plugins = {
-    ['cord.plugins.resolver'] = {
+    resolver = {
       sources = { true, oil = false },
     },
   },
@@ -164,7 +164,7 @@ require('cord').setup {
 ```lua
 require('cord').setup {
   plugins = {
-    ['cord.plugins.visibility'] = {
+    visibility = {
       precedence = 'blacklist',
       rules = {
         blacklist = {
@@ -315,7 +315,7 @@ require('cord').setup {
 ```lua
 require('cord').setup {
   plugins = {
-    ['cord.plugins.lastfm'] = { override = false },
+    lastfm = { override = false },
   },
 
   text = {
