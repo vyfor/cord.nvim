@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0            Last change: 2026 January 29
+*cord.txt*             For NVIM v0.6.0            Last change: 2026 January 31
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -1085,6 +1085,42 @@ current buffer or workspace.
     
       -- In functions
       workspace = function(opts) return 'In ' .. opts.workspace .. ' - ' .. opts.diagnostics(opts) .. ' problems' end,
+    }
+<
+
+
+RESOLVER (CORD.PLUGINS.RESOLVER) ~
+
+**Purpose:** Provides specialized metadata resolvers for accurate filetype and
+workspace detection in edge cases where standard detection falls short.
+
+**Configuration Options:**
+
+>lua
+    {
+      sources = {
+        nestjs = false,
+        toggleterm = false,
+        oil = false,
+      },
+    }
+<
+
+- **sources**:
+    - A table of resolver sources that can be individually enabled or disabled.
+    - Supports global toggle: `sources = true` enables all sources, `sources = false` disables all.
+    - Selective overrides: `sources = { true, nestjs = false }` enables all except **NestJS**.
+
+**Usage Examples:**
+
+>lua
+    -- Enable all except oil
+    require('cord').setup {
+      plugins = {
+        ['cord.plugins.resolver'] = {
+          sources = { true, oil = false },
+        },
+      },
     }
 <
 
