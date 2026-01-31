@@ -79,6 +79,40 @@ text = {
 }
 ```
 
+### 🧩 Resolver (`cord.plugins.resolver`)
+
+**Purpose:** Provides specialized metadata resolvers for accurate filetype and workspace detection in edge cases where standard detection falls short.
+
+**Configuration Options:**
+
+```lua
+{
+  sources = {
+    nestjs = false,
+    toggleterm = false,
+    oil = false,
+  },
+}
+```
+
+- **`sources`**:
+    - A table of resolver sources that can be individually enabled or disabled.
+    - Supports global toggle: `sources = true` enables all sources, `sources = false` disables all.
+    - Selective overrides: `sources = { true, nestjs = false }` enables all except **NestJS**.
+
+**Usage Examples:**
+
+```lua
+-- Enable all except oil
+require('cord').setup {
+  plugins = {
+    ['cord.plugins.resolver'] = {
+      sources = { true, oil = false },
+    },
+  },
+}
+```
+
 ### 🧩 Visibility (`cord.plugins.visibility`)
 
 **Purpose:**  Controls whether the Rich Presence activity is shown for a workspace or buffer based on rules. Useful for hiding activity for specific projects, directories, or file types.
