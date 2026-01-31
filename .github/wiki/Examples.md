@@ -99,6 +99,10 @@ hooks = {
 ```
 
 ### Git Branch & Status
+
+> [!NOTE]
+> Strongly recommended to be used with [Async Configuration](./Async.md).
+
 ```lua
 local git_branch = vim.fn.system('git branch --show-current'):gsub('\n', '')
 

@@ -9,6 +9,7 @@
 
 ### Advanced Topics
 - 🛠️ **[Plugin System](./Plugin-System.md)**: Develop your own plugins to extend Cord's capabilities.
+- ⏳ **[Async Guide](./Async.md)**: Optimize your configuration with non-blocking async operations.
 - 🏗️ **[Build From Source](./Build.md)**: Build the server binary from source.
 - 🤝 **[Contributing](./Contributing.md)**:  Learn how you can contribute to the cord.nvim.
 
