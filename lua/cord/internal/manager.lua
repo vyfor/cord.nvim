@@ -691,7 +691,7 @@ local function initialize_global()
     end
   end
 
-  return require('cord.plugins').init()
+  return require('cord.plugins').init():await()
 end
 
 ---@param opts {tx: table}

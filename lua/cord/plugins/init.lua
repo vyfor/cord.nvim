@@ -2,6 +2,7 @@ local hooks = require 'cord.internal.hooks'
 local config = require 'cord.api.config'
 local config_util = require 'cord.api.config.util'
 local logger = require 'cord.api.log'
+local async = require 'cord.core.async'
 
 local M = {}
 
@@ -51,7 +52,7 @@ end
 
 ---Initialize all plugins and merge their variables and configs with user config
 ---@return string? Error message if initialization failed
-function M.init()
+M.init = async.wrap(function()
   if not config.plugins or not next(config.plugins) then return end
 
   for ty, def in pairs(config.plugins) do
@@ -85,6 +86,17 @@ function M.init()
     if plugin.setup then
       logger.debug('Setting up plugin: ' .. name)
       local success, result = pcall(plugin.setup, cfg)
+      if success and async.is_async(plugin.setup) then
+        ---@cast result Future
+        local val, err = result:await()
+        if err then
+          success = false
+          result = err
+        else
+          success = true
+          result = val
+        end
+      end
       if not success then return 'Plugin \'' .. name .. '\' setup failed: ' .. result end
       if type(result) ~= 'table' then
         return 'Plugin \'' .. name .. '\' setup must return a table'
@@ -130,6 +142,6 @@ function M.init()
   local final_config = config_util.tbl_deep_extend('force', config.get(), merged_config)
 
   if not require('cord.api.config').verify(final_config) then return 'Invalid config' end
-end
+end)
 
 return M
