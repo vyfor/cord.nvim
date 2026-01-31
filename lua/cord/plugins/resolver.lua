@@ -1,7 +1,9 @@
 local logger = require 'cord.api.log'
 local config = require 'cord.api.config'
 local mappings = require 'cord.internal.activity.mappings'
-local uv = vim.uv or vim.loop
+local async = require 'cord.core.async'
+local fs = require 'cord.core.uv.fs'
+local ws_utils = require 'cord.internal.activity.workspace'
 
 local M = {}
 
@@ -20,7 +22,11 @@ local cache = {
   nestjs = {},
 }
 
-local function has_file(dir, filename) return vim.fs.root(dir, filename) ~= nil end
+local has_file = async.wrap(function(dir, filename)
+  local path = dir .. '/' .. filename
+  local stat = fs.stat(path):get()
+  return stat ~= nil
+end)
 
 local sources = {
   nestjs = {
@@ -32,18 +38,17 @@ local sources = {
         'typescript',
       },
     },
-    run = function(opts)
-      local ws = opts.workspace_dir or uv.cwd()
+    run = async.wrap(function(opts)
+      local ws = opts.workspace_dir or vim.uv.cwd()
       local cached = cache.nestjs[ws]
 
       if cached == nil then
-        -- `0` for current buffer
-        cached = has_file(0, 'nest-cli.json')
+        cached = has_file(ws, 'nest-cli.json'):get()
         cache.nestjs[ws] = cached
       end
 
       if cached then opts.force_filetype = 'nest' end
-    end,
+    end),
   },
   toggleterm = {
     event = { 'pre_activity' },
@@ -76,16 +81,21 @@ local sources = {
       workspace = '.',
       filetype = { 'oil', 'oil_preview', 'oil_progress' },
     },
-    run = function(opts)
+    run = async.wrap(function(opts)
       local path = vim.fn.expand '%:p:h'
       if path:sub(1, 7) == 'oil:///' then
         local stripped = path:sub(7)
         local cached = opts.manager.workspace:get(stripped)
 
+        local repo_url = cached and cached.repo_url or nil
+        if not repo_url then
+          repo_url = ws_utils.find_git_repository(stripped):get()
+        end
+
         local info = {
           dir = stripped,
           name = vim.fn.fnamemodify(stripped, ':t'),
-          repo_url = cached and cached.repo_url or nil,
+          repo_url = repo_url,
         }
 
         opts.manager.workspace:set(path, info)
@@ -95,7 +105,7 @@ local sources = {
         opts.workspace_dir = info.dir
         opts.repo_url = info.repo_url
       end
-    end,
+    end),
   },
 }
 
@@ -117,10 +127,10 @@ local function check_match(match, opts)
   return true
 end
 
-function M.setup(config)
-  if config then M.config = vim.tbl_deep_extend('force', M.config, config) end
+function M.setup(user_config)
+  if user_config then M.config = vim.tbl_deep_extend('force', M.config, user_config) end
 
-  local user_resolvers = config and config.resolvers
+  local user_resolvers = user_config and user_config.resolvers
   if type(user_resolvers) == 'boolean' then
     user_resolvers = { user_resolvers }
   elseif type(user_resolvers) ~= 'table' then
@@ -141,7 +151,11 @@ function M.setup(config)
     if enabled then
       for _, event in ipairs(source.event) do
         if not active_resolvers[event] then active_resolvers[event] = {} end
-        table.insert(active_resolvers[event], source)
+        table.insert(active_resolvers[event], {
+          name = name,
+          source = source,
+          is_async = async.is_async(source.run),
+        })
       end
 
       logger.debug('Resolver: Registered resolver ' .. name)
@@ -152,14 +166,15 @@ function M.setup(config)
   M.hooks = {}
   for event, resolvers in pairs(active_resolvers) do
     M.hooks[event] = {
-      fun = function(opts)
-        for name, resolver in pairs(resolvers) do
-          if check_match(resolver.match, opts) then
-            logger.debug('Resolver: Running resolver ' .. name)
-            resolver.run(opts)
+      fun = async.wrap(function(opts)
+        for _, resolver in ipairs(resolvers) do
+          if check_match(resolver.source.match, opts) then
+            logger.debug('Resolver: Running resolver ' .. resolver.name)
+            local result = resolver.source.run(opts)
+            if resolver.is_async then result:get() end
           end
         end
-      end,
+      end),
       priority = priorities.HIGHEST,
     }
   end
