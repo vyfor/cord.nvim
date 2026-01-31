@@ -3,160 +3,154 @@
 ---@field _value any
 ---@field _callbacks { on_fulfilled: fun(value: any), on_rejected: fun(reason: any) }[]
 local Future = {}
-local mt = { __index = Future }
+Future.__index = Future
 
 function Future.new(executor)
-  local self = setmetatable({}, mt)
-  self._state = 'pending'
-  self._value = nil
-  self._callbacks = {}
+  local self = setmetatable({
+    _state = 'pending',
+    _value = nil,
+    _callbacks = {},
+  }, Future)
 
-  local function resolve(value)
+  local function complete(state, value)
     if self._state ~= 'pending' then return end
-    self._state = 'fulfilled'
+    self._state = state
     self._value = value
-    for _, callback in ipairs(self._callbacks) do
-      callback.on_fulfilled(value)
+    local cbs = self._callbacks
+    for i = 1, #cbs do
+      if state == 'fulfilled' then
+        cbs[i].on_fulfilled(value)
+      else
+        cbs[i].on_rejected(value)
+      end
     end
   end
 
-  local function reject(reason)
-    if self._state ~= 'pending' then return end
-    self._state = 'rejected'
-    self._value = reason
-    for _, callback in ipairs(self._callbacks) do
-      callback.on_rejected(reason)
-    end
-  end
+  local ok, err = pcall(executor,
+    function(v) complete('fulfilled', v) end,
+    function(e) complete('rejected', e) end
+  )
 
-  xpcall(function() executor(resolve, reject) end, function(err)
+  if not ok then
     require('cord.api.log').trace(
-      function() return 'Error in executor: ' .. err .. '\n' .. debug.traceback() end
+      function() return 'Error in executor: ' .. tostring(err) .. '\n' .. debug.traceback() end
     )
-    reject(err)
-  end)
+    complete('rejected', err)
+  end
 
   return self
 end
 
-function Future:and_then(on_fulfilled, on_rejected)
-  local current = coroutine.running()
-  if not current then
+local function chain_result(result, resolve, reject)
+  if type(result) == 'table' and result._state then
+    result:and_then(resolve, reject)
+  else
+    resolve(result)
+  end
+end
+
+function Future:and_then(on_ok, on_err)
+  if not coroutine.running() then
     require('cord.api.log').error(
       function() return 'Future:and_then must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
 
+  local parent = self
   return Future.new(function(resolve, reject)
-    local function handle_callback(callback, resolve, reject, value)
-      if type(callback) ~= 'function' then
-        if self._state == 'fulfilled' then
-          resolve(value or self._value)
-        else
-          reject(value or self._value)
-        end
+    local function run_handler(handler, value, passthrough)
+      if type(handler) ~= 'function' then
+        passthrough(value)
         return
       end
-
-      local success, result = xpcall(
-        function() return callback(value or self._value) end,
-        function(err)
-          require('cord.api.log').trace(
-            function() return 'Error in callback: ' .. err .. '\n' .. debug.traceback() end
-          )
-        end
-      )
-
-      if not success then
-        reject(result)
-        return
-      end
-
-      if type(result) == 'table' and result._state then
-        result:and_then(resolve, reject)
+      local ok, res = pcall(handler, value)
+      if ok then
+        chain_result(res, resolve, reject)
       else
-        resolve(result)
+        require('cord.api.log').trace(
+          function() return 'Error in handler: ' .. tostring(res) .. '\n' .. debug.traceback() end
+        )
+        reject(res)
       end
     end
 
-    if self._state == 'pending' then
-      table.insert(self._callbacks, {
-        on_fulfilled = function(value) handle_callback(on_fulfilled, resolve, reject, value) end,
-        on_rejected = function(reason) handle_callback(on_rejected, resolve, reject, reason) end,
-      })
+    if parent._state == 'pending' then
+      parent._callbacks[#parent._callbacks + 1] = {
+        on_fulfilled = function(v) run_handler(on_ok, v, resolve) end,
+        on_rejected = function(e) run_handler(on_err, e, reject) end,
+      }
+    elseif parent._state == 'fulfilled' then
+      vim.schedule(function() run_handler(on_ok, parent._value, resolve) end)
     else
-      vim.defer_fn(function()
-        if self._state == 'fulfilled' then
-          handle_callback(on_fulfilled, resolve, reject)
-        else
-          handle_callback(on_rejected, resolve, reject)
-        end
-      end, 0)
+      vim.schedule(function() run_handler(on_err, parent._value, reject) end)
     end
   end)
 end
 
-function Future:catch(on_rejected) return self:and_then(nil, on_rejected) end
+function Future:catch(handler)
+  return self:and_then(nil, handler)
+end
 
----@return any
-function Future.await(future)
-  local co = coroutine.running()
-  if not co then
+function Future.await(f)
+  if not coroutine.running() then
     require('cord.api.log').error(
-      function() return 'Future:await must be called within a coroutine\n' .. debug.traceback() end
+      function() return 'Future.await must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
-
-  future:and_then(
-    function(value) coroutine.resume(co, true, value) end,
-    function(reason) coroutine.resume(co, false, reason) end
-  )
-
-  local success, result = coroutine.yield()
-  if success then
-    return result
-  else
-    error(result, 0)
-  end
+  local ok, res = coroutine.yield(f)
+  if ok then return res else error(res, 0) end
 end
 
-function Future.get(future)
-  local co = coroutine.running()
-  if not co then
+function Future.get(f)
+  if not coroutine.running() then
     require('cord.api.log').error(
-      function() return 'Future:get must be called within a coroutine\n' .. debug.traceback() end
+      function() return 'Future.get must be called within a coroutine\n' .. debug.traceback() end
     )
     return
   end
-
-  future:and_then(
-    function(value) coroutine.resume(co, true, value) end,
-    function(reason) coroutine.resume(co, false, reason) end
-  )
-
-  local success, result = coroutine.yield()
-  if success then
-    return result
-  else
-    return nil, result
-  end
+  local ok, res = coroutine.yield(f)
+  if ok then return res else return nil, res end
 end
 
-function Future.all(futures)
+function Future.all(list)
   return Future.new(function(resolve, reject)
-    local results = {}
-    local completed = 0
-    for i, future in ipairs(futures) do
-      future
-        :and_then(function(result)
-          results[i] = result
-          completed = completed + 1
-          if completed == #futures then resolve(results) end
-        end)
-        :catch(reject)
+    local count = #list
+    if count == 0 then
+      resolve({})
+      return
     end
+
+    local out, done, failed = {}, 0, false
+
+    for idx, f in ipairs(list) do
+      if f._state == 'fulfilled' then
+        out[idx] = f._value
+        done = done + 1
+      elseif f._state == 'rejected' then
+        if not failed then
+          failed = true
+          reject(f._value)
+        end
+      else
+        f._callbacks[#f._callbacks + 1] = {
+          on_fulfilled = function(v)
+            out[idx] = v
+            done = done + 1
+            if done == count and not failed then resolve(out) end
+          end,
+          on_rejected = function(e)
+            if not failed then
+              failed = true
+              reject(e)
+            end
+          end,
+        }
+      end
+    end
+
+    if done == count and not failed then resolve(out) end
   end)
 end
 

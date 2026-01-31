@@ -2,24 +2,22 @@ local Future = require 'cord.core.async.future'
 
 local Async = {}
 
+---@diagnostic disable-next-line: deprecated
+local unpack_args = unpack or table.unpack
+
 function Async.wrap(fn)
   return function(...)
     local args = { ... }
     return Future.new(function(resolve, reject)
-      local current = coroutine.running()
-      if not current then
+      if not coroutine.running() then
         require('cord.api.log').error(
           function() return 'async.wrap must be called within a coroutine\n' .. debug.traceback() end
         )
         return
       end
 
-      local success, result = pcall(function()
-        ---@diagnostic disable-next-line: deprecated
-        local unpack = unpack or table.unpack
-        return fn(unpack(args))
-      end)
-      if not success then
+      local ok, result = pcall(fn, unpack_args(args))
+      if not ok then
         require('cord.api.log').trace(
           function() return 'Error in async.wrap: ' .. result .. '\n' .. debug.traceback() end
         )
@@ -36,36 +34,49 @@ function Async.wrap(fn)
   end
 end
 
-function Async.run(fn)
-  local co = coroutine.create(fn)
-  local function resume(success, ...)
-    if not success then
-      error(...)
-      return
-    end
+local function drive_coroutine(co, ok, val)
+  while coroutine.status(co) ~= 'dead' do
+    local res = { coroutine.resume(co, ok, val) }
+    if not res[1] then error(res[2], 0) end
+    if coroutine.status(co) == 'dead' then break end
 
-    local ret = { coroutine.resume(co, ...) }
-    success = table.remove(ret, 1)
-
-    if success then
-      if coroutine.status(co) ~= 'dead' then
-        local future = ret[1]
-        if future then
-          if type(future) == 'table' and future._state then
-            future:and_then(function(value)
-              if coroutine.status(co) ~= 'dead' then resume(true, value) end
-            end, function(err) resume(false, err) end)
-          else
-            resume(true, future)
-          end
-        end
-      end
+    local yielded = res[2]
+    if type(yielded) ~= 'table' or not yielded._state then
+      ok, val = true, yielded
+    elseif yielded._state ~= 'pending' then
+      ok = yielded._state == 'fulfilled'
+      val = yielded._value
     else
-      error(ret[1], 0)
+      local resolved_inline, inline_ok, inline_val
+      yielded._callbacks[#yielded._callbacks + 1] = {
+        on_fulfilled = function(v)
+          if resolved_inline == nil then
+            resolved_inline, inline_ok, inline_val = true, true, v
+          else
+            vim.schedule(function() drive_coroutine(co, true, v) end)
+          end
+        end,
+        on_rejected = function(e)
+          if resolved_inline == nil then
+            resolved_inline, inline_ok, inline_val = true, false, e
+          else
+            vim.schedule(function() drive_coroutine(co, false, e) end)
+          end
+        end,
+      }
+      resolved_inline = false
+      if inline_ok ~= nil then
+        ok, val = inline_ok, inline_val
+      else
+        return
+      end
     end
   end
+end
 
-  resume(true)
+function Async.run(fn)
+  local co = coroutine.create(fn)
+  drive_coroutine(co, true, nil)
   return co
 end
 
