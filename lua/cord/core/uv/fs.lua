@@ -191,4 +191,16 @@ function M.chmod(path, mode)
   end)
 end
 
+function M.realpath(path)
+  return Future.new(function(resolve, reject)
+    uv.fs_realpath(path, function(err, real_path)
+      if err then
+        reject(err)
+        return
+      end
+      resolve(real_path)
+    end)
+  end)
+end
+
 return M
