@@ -2,6 +2,7 @@ local logger = require 'cord.api.log'
 local mappings = require 'cord.internal.activity.mappings'
 local icons = require 'cord.api.icon'
 local config = require 'cord.api.config'
+local async = require 'cord.core.async'
 
 local function get_custom_asset(config, filename, filetype)
   if not config.assets then return end
@@ -50,11 +51,11 @@ local function get_option(option, args)
         function() return 'config.get: variable ${' .. var .. '} = ' .. tostring(arg) end
       )
       if type(arg) == 'function' then
-        local result = tostring(arg(args))
+        local result = async.is_async(arg) and arg(args):get() or arg(args)
         logger.trace(
-          function() return 'config.get: function variable ${' .. var .. '} = ' .. result end
+          function() return 'config.get: function variable ${' .. var .. '} = ' .. tostring(result) end
         )
-        return result
+        return tostring(result)
       elseif arg ~= nil then
         return tostring(arg)
       end
@@ -66,7 +67,9 @@ local function get_option(option, args)
     logger.trace(function() return 'config.get: final string: ' .. tostring(option) end)
   end
 
-  local result = ty == 'function' and option(args) or option
+  local result = ty == 'function'
+      and (async.is_async(option) and option(args):get() or option(args))
+      or option
   logger.trace(function() return 'config.get: returning ' .. tostring(type(result)) end)
   return result
 end
@@ -102,8 +105,8 @@ local function build_activity(opts)
       opts.text = get_option(custom_icon.text, opts)
       opts.filetype = override_type or opts.filetype
       opts.icon = get_option(custom_icon.icon, opts)
-        or (custom_icon.type and icons.get(mappings.get_default_icon(custom_icon.type)))
-        or opts.icon
+          or (custom_icon.type and icons.get(mappings.get_default_icon(custom_icon.type)))
+          or opts.icon
     end
   end
 
