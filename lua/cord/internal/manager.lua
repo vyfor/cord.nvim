@@ -65,8 +65,9 @@ local uv = vim.loop or vim.uv
 ---@param ... any Arguments to pass if value is a function
 ---@return T
 local function resolve(value, ...)
-  if type(value) == 'function' then
-    if async.is_async(value) then
+  local is_async = async.is_async(value)
+  if type(value) == 'function' or is_async then
+    if is_async then
       return value(...):await()
     end
     return value(...)

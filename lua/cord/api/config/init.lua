@@ -253,7 +253,7 @@ function M.verify(new_config)
   local user_config = new_config or require('cord').user_config or {}
   local icons = require 'cord.api.icon'
 
-  local final_config = vim.tbl_deep_extend('force', M.get(), user_config)
+  local final_config = utils.tbl_deep_extend('force', M.get(), user_config)
 
   local log_level = final_config.log_level
   if type(log_level) == 'string' then

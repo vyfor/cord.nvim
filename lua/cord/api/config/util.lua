@@ -53,4 +53,62 @@ M.get_nested_value = function(config, path)
   return current
 end
 
+-- Source: https://github.com/neovim/neovim/blob/1e6c4ea896b784754cb0ba18ea510a9c407ab54c/runtime/lua/vim/_core/shared.lua#L535C1-L647C4
+-- Modified to preserve metatables
+
+local function can_merge(v)
+  if type(v) ~= 'table' then
+    return false
+  end
+  local mt = getmetatable(v)
+  if mt and (vim._empty_dict_mt == nil or mt ~= vim._empty_dict_mt) then
+    return false
+  end
+  return vim.tbl_isempty(v) or not vim.islist(v)
+end
+
+local function tbl_extend_rec(behavior, deep_extend, ...)
+  local ret = {}
+  if vim._empty_dict_mt ~= nil and getmetatable(select(1, ...)) == vim._empty_dict_mt then
+    ret = vim.empty_dict()
+  end
+
+  for i = 1, select('#', ...) do
+    local tbl = select(i, ...)
+    if tbl then
+      for k, v in pairs(tbl) do
+        if deep_extend and can_merge(v) and can_merge(ret[k]) then
+          ret[k] = tbl_extend_rec(behavior, true, ret[k], v)
+        elseif behavior == 'force' or ret[k] == nil then
+          ret[k] = v
+        end
+      end
+    end
+  end
+
+  return ret
+end
+
+local function tbl_extend(behavior, deep_extend, ...)
+  if behavior ~= 'keep' and behavior ~= 'force' then
+    error('invalid "behavior": ' .. tostring(behavior))
+  end
+
+  local nargs = select('#', ...)
+
+  if nargs < 2 then
+    error(('wrong number of arguments (given %d, expected at least 3)'):format(1 + nargs))
+  end
+
+  return tbl_extend_rec(behavior, deep_extend, ...)
+end
+
+M.tbl_extend = function(behavior, ...)
+  return tbl_extend(behavior, false, ...)
+end
+
+M.tbl_deep_extend = function(behavior, ...)
+  return tbl_extend(behavior, true, ...)
+end
+
 return M
