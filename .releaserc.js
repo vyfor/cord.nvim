@@ -48,6 +48,7 @@ module.exports = {
       "@semantic-release/exec",
       {
         "verifyConditionsCmd": "semantic-release-cargo verify-conditions",
+        "prepareCmd": "semantic-release-cargo prepare ${nextRelease.version}",
         "publishCmd": "semantic-release-cargo publish"
       }
     ],

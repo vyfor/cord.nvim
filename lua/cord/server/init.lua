@@ -130,6 +130,11 @@ function M:initialize()
     local path = config.advanced.server.pipe_path or require('cord.core.util').get_pipe_path()
 
     logger.trace(function() return 'Server pipe path: ' .. tostring(path) end)
+    if config.advanced.server.update == 'fetch' and config.advanced.server.auto_update ~= false then
+      logger.info 'Automatically checking for server updates...'
+      local updated = require('cord.server.update').auto_update(config.get(), path):unwrap()
+      if updated then return end
+    end
     local _, err = M:connect(path):await()
     if err then
       self.status = 'disconnected'

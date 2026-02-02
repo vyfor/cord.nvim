@@ -401,19 +401,20 @@ require('cord').setup {
 
 ### Plugin Settings
 
-| Option                              | Type      | Default     | Description                                                                                                          |
-|-------------------------------------|-----------|-------------|----------------------------------------------------------------------------------------------------------------------|
-| `advanced.plugin.autocmds`          | `boolean` | `true`      | Enable autocmds                                                                                                      |
-| `advanced.plugin.cursor_update`     | `string`  | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode) |
-| `advanced.plugin.match_in_mappings` | `boolean` | `true`      | Whether to match against file extensions in mappings                                                                 |
-| `advanced.plugin.debounce.delay`    | `integer` | `50`       | Delay in milliseconds before sending the first update. Allows events received in quick succession (e.g., buffer switches) to settle before sending data. Set to 0 to disable. |
-| `advanced.plugin.debounce.interval` | `integer` | `750`      | Minimum interval in milliseconds between updates. Prevents flooding the server during rapid cursor movement. Set to 0 to disable. |
+| Option                              | Type      | Default     | Description                                                                                                                                                                   |
+|-------------------------------------|-----------|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `advanced.plugin.autocmds`          | `boolean` | `true`      | Enable autocmds                                                                                                                                                               |
+| `advanced.plugin.cursor_update`     | `string`  | `'on_hold'` | When to update cursor position: `'on_move'`, `'on_hold'`, or `'none'`. See [Cursor Update Mode](#cursor-update-mode)                                                          |
+| `advanced.plugin.match_in_mappings` | `boolean` | `true`      | Whether to match against file extensions in mappings                                                                                                                          |
+| `advanced.plugin.debounce.delay`    | `integer` | `50`        | Delay in milliseconds before sending the first update. Allows events received in quick succession (e.g., buffer switches) to settle before sending data. Set to 0 to disable. |
+| `advanced.plugin.debounce.interval` | `integer` | `750`       | Minimum interval in milliseconds between updates. Prevents flooding the server during rapid cursor movement. Set to 0 to disable.                                             |
 
 ### Server Settings
 
 | Option                            | Type            | Default   | Description                                                                                                                                                                                                                              |
 |-----------------------------------|-----------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `advanced.server.update`          | `string`        | `'fetch'` | Default way to acquire the server executable either if the executable is not found or a manual update is requested: `'fetch'` - fetch from GitHub, `'install'` - install from crates.io, `'build'` - build from source, `'none'` - no-op |
+| `advanced.server.auto_update`     | `boolean`       | `true`    | Whether to auto-update the server executable (when using the 'fetch' strategy)                                                                                                                                                           |
 | `advanced.server.pipe_path`       | `string \| nil` | `nil`     | Custom IPC pipe path                                                                                                                                                                                                                     |
 | `advanced.server.executable_path` | `string \| nil` | `nil`     | Custom server executable path                                                                                                                                                                                                            |
 | `advanced.server.timeout`         | `number`        | `300000`  | Server shutdown timeout (ms)                                                                                                                                                                                                             |
