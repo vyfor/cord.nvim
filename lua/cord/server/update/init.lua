@@ -3,6 +3,36 @@ local logger = require 'cord.api.log'
 
 local M = {}
 
+local function parse_server_version(content)
+  if not content then return nil end
+  local trimmed = content:gsub('^%s*(.-)%s*$', '%1')
+  if trimmed == '' then return nil end
+
+  local version_part, timestamp_part = trimmed:match '^([^|]+)|(.+)$'
+  if version_part then
+    local timestamp = tonumber(timestamp_part)
+    return version_part, timestamp
+  end
+
+  return trimmed, nil
+end
+
+local request_shutdown = async.wrap(function(pipe_path)
+  if not pipe_path or pipe_path == '' then return false end
+
+  local client = require('cord.core.uv.pipe').new()
+  local _, err = client:connect(pipe_path):await()
+  if err then
+    client:close()
+    return false
+  end
+
+  local tx = require('cord.server.ipc.sender').new(client)
+  tx:shutdown()
+  client:close()
+  return true
+end)
+
 M.install = async.wrap(function()
   local server = require 'cord.server'
   if server.is_updating then return end
@@ -160,24 +190,34 @@ M.local_version = async.wrap(function()
 end)
 
 M.compatible_version = async.wrap(function()
+  local metadata = M.compatible_metadata():unwrap()
+  return metadata.version
+end)
+
+M.compatible_metadata = async.wrap(function()
   local fs = require 'cord.core.uv.fs'
-  local path = require('cord.server.fs').get_plugin_root() .. '/.github/server-version.txt'
+  local path = require('cord.server.fs').get_plugin_root() .. '/.github/server-metadata.txt'
 
   local content = fs.readfile(path):await()
   if not content then return nil end
-  local version = content:gsub('^%s*(.-)%s*$', '%1')
+  local version, timestamp = parse_server_version(content)
   if not version then return nil end
 
-  return version
+  return { version = version, timestamp = timestamp }
 end)
 
 M.remote_version = async.wrap(function()
+  local metadata = M.remote_metadata():unwrap()
+  return metadata.version
+end)
+
+M.remote_metadata = async.wrap(function()
   local process = require 'cord.core.uv.process'
   local res = process
     .spawn({
       cmd = 'curl',
       args = {
-        'https://raw.githubusercontent.com/vyfor/cord.nvim/refs/heads/master/.github/server-version.txt',
+        'https://raw.githubusercontent.com/vyfor/cord.nvim/refs/heads/master/.github/server-metadata.txt',
         '--fail',
         '--silent',
         '--show-error',
@@ -191,13 +231,24 @@ M.remote_version = async.wrap(function()
     return nil
   end
 
-  local version = res.stdout and res.stdout:gsub('^%s*(.-)%s*$', '%1') or nil
+  local version, timestamp = parse_server_version(res.stdout)
   if not version or version == '' then
     error('Failed to parse latest version', 0)
     return nil
   end
 
-  return version
+  return { version = version, timestamp = timestamp }
+end)
+
+M.is_stale = async.wrap(function(local_mtime)
+  local metadata = M.compatible_metadata():unwrap()
+  if not metadata.version or not metadata.timestamp then return false end
+
+  local local_seconds = local_mtime
+  if local_mtime then local_seconds = local_mtime.sec end
+
+  if not local_seconds then return false end
+  return local_seconds < metadata.timestamp
 end)
 
 M.check_version = async.wrap(function()
@@ -267,7 +318,7 @@ M.version = async.wrap(function()
   end)
 end)
 
-M.fetch = async.wrap(function()
+M.fetch_executable = async.wrap(function(tag, pipe_path)
   local server = require 'cord.server'
   if server.is_updating then return end
   server.is_updating = true
@@ -281,7 +332,7 @@ M.fetch = async.wrap(function()
     require('cord.server.fs').get_executable_path(require('cord.api.config').get())
   local process = require 'cord.core.uv.process'
 
-  local fetch_executable = vim.schedule_wrap(function(tag)
+  local schedule_fetch = vim.schedule_wrap(function(tag)
     local base_url
     if tag then
       logger.info('Downloading version ' .. tag .. '...')
@@ -301,6 +352,11 @@ M.fetch = async.wrap(function()
 
     local function initialize()
       async.run(function()
+        if pipe_path then
+          logger.debug 'Shutting down existing server...'
+          request_shutdown(pipe_path):unwrap()
+        end
+
         process
           .spawn({
             cmd = 'curl',
@@ -309,6 +365,7 @@ M.fetch = async.wrap(function()
               '--create-dirs',
               '--fail',
               '--location',
+              '--remote-time',
               '--silent',
               '--show-error',
               '-o',
@@ -341,19 +398,27 @@ M.fetch = async.wrap(function()
     end
 
     if server.manager then server.manager:cleanup() end
-    if not server.tx then return initialize() end
-    if not server.client then return initialize() end
-    if server.client:is_closing() then return initialize() end
+    if server.tx and server.client and not server.client:is_closing() then
+      if server.client.on_close then server.client.on_close() end
 
-    if server.client.on_close then server.client.on_close() end
+      server.client.on_close = function()
+        server.client.on_close = nil
+        initialize()
+      end
 
-    server.client.on_close = function()
-      server.client.on_close = nil
-      initialize()
+      server.tx:shutdown()
+      return
     end
 
-    server.tx:shutdown()
+    initialize()
   end)
+
+  schedule_fetch(tag)
+end)
+
+M.fetch = async.wrap(function()
+  local server = require 'cord.server'
+  if server.is_updating then return end
 
   async.run(function()
     logger.info 'Checking for updates...'
@@ -362,7 +427,7 @@ M.fetch = async.wrap(function()
 
     if compatible then
       if current ~= compatible then
-        fetch_executable(compatible)
+        M.fetch_executable(compatible):unwrap()
       else
         server.is_updating = false
         logger.info('Already on latest compatible server version ' .. current)
@@ -379,10 +444,36 @@ M.fetch = async.wrap(function()
 
         if not server.client or server.client:is_closing() then server:initialize() end
       else
-        fetch_executable(latest)
+        M.fetch_executable(latest):unwrap()
       end
     end
   end)
+end)
+
+M.auto_update = async.wrap(function(config, pipe_path)
+  local server = require 'cord.server'
+  if server.is_updating then return false end
+
+  local update_strategy = config.advanced.server.update
+  if update_strategy ~= 'fetch' then return false end
+  if config.advanced.server.auto_update == false then return false end
+
+  local exec_path = require('cord.server.fs').get_executable_path(config)
+  local fs = require 'cord.core.uv.fs'
+  local stat = fs.stat(exec_path):await()
+
+  if not stat then return false end
+
+  local is_stale = M.is_stale(stat.mtime):unwrap()
+  if not is_stale then return false end
+
+  local compatible = M.compatible_version():unwrap()
+  if compatible then
+    M.fetch_executable(compatible, pipe_path):unwrap()
+    return true
+  end
+
+  return false
 end)
 
 return M

@@ -45,16 +45,28 @@
 
 ## 📦 Installation
 
+> [!NOTE]
+> **cord.nvim** will automatically load with defaults; calling `setup()` is optional.
+> The default configuration is found [here](https://github.com/vyfor/cord.nvim/wiki/Configuration#%EF%B8%8F-default-configuration).
+
 <details>
 <summary><strong>lazy.nvim</strong></summary>
 
 ```lua
 {
-  'vyfor/cord.nvim',
-  build = ':Cord update',
-  -- opts = {}
+  'vyfor/cord.nvim'
 }
 ```
+
+> #### ⚙️ Configuring
+> ```lua
+> {
+>   'vyfor/cord.nvim',
+>   opts = {
+>     -- ...
+>   }
+> }
+> ```
 
 </details>
 
@@ -63,13 +75,21 @@
 
 ```lua
 use {
-  'vyfor/cord.nvim',
-  run = ':Cord update',
-  -- config = function()
-  --   require('cord').setup {}
-  -- end
+  'vyfor/cord.nvim'
 }
 ```
+
+> #### ⚙️ Configuring
+> ```lua
+> use {
+>   'vyfor/cord.nvim',
+>   config = function()
+>     require('cord').setup {
+>       -- ...
+>     }
+>   end
+> }
+> ```
 
 </details>
 
@@ -82,7 +102,12 @@ Cord is available on [LuaRocks](https://luarocks.org/modules/vyfor/cord.nvim).
 :Rocks install cord.nvim
 ```
 
-Invoke `:Cord update` whenever the plugin is updated.
+> #### ⚙️ Configuring
+> ```lua
+> require('cord').setup {
+>   -- ...
+> }
+> ```
 
 </details>
 
@@ -91,14 +116,16 @@ Invoke `:Cord update` whenever the plugin is updated.
 
 ```lua
 vim.pack.add { 'https://github.com/vyfor/cord.nvim' }
-vim.api.nvim_create_autocmd('PackChanged', {
-  callback = function(opts)
-    if opts.data.spec.name == 'cord.nvim' and opts.data.kind == 'update' then 
-      vim.cmd 'Cord update'
-    end
-  end
-})
 ```
+
+**Configuring:**
+
+> #### ⚙️ Configuring
+> ```lua
+> require('cord').setup {
+>   -- ...
+> }
+> ```
 
 </details>
 
@@ -115,7 +142,12 @@ git clone https://github.com/vyfor/cord.nvim ~/.local/share/nvim/site/pack/plugi
 git clone https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 ```
 
-Invoke `:Cord update` whenever the plugin is updated.
+> #### ⚙️ Configuring
+> ```lua
+> require('cord').setup {
+>   -- ...
+> }
+> ```
 
 </details>
 

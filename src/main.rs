@@ -18,13 +18,15 @@ use error::Result;
 
 fn main() -> Result<()> {
     let args = Args::parse()?;
-    Cord::new(Config::new(
+    let config = Config::new(
         args.pipe_name,
         args.client_id,
         args.timeout,
         args.reconnect_interval,
         args.initial_reconnect,
         false,
-    ))?
-    .run()
+    );
+    let mut cord = Cord::new(config)?;
+
+    cord.run()
 }

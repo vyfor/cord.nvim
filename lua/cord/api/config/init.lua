@@ -97,6 +97,7 @@ local logger = require 'cord.api.log'
 
 ---@class CordAdvancedServerConfig
 ---@field update? 'fetch'|'install'|'build'|'none'|string How to acquire the server executable: 'fetch' or 'install' or 'build' or 'none'
+---@field auto_update? boolean Whether to auto-update the server executable (when using the 'fetch' strategy)
 ---@field pipe_path? string Path to the server's pipe
 ---@field executable_path? string Path to the server's executable
 ---@field timeout? integer Timeout in milliseconds
@@ -216,6 +217,7 @@ local defaults = {
     },
     server = {
       update = 'fetch',
+      auto_update = true,
       pipe_path = nil,
       executable_path = nil,
       timeout = 300000,
@@ -417,6 +419,7 @@ local rules = {
     ['advanced.plugin.debounce.interval'] = { 'number' },
     ['advanced.server'] = { 'table' },
     ['advanced.server.update'] = { 'string' },
+    ['advanced.server.auto_update'] = { 'boolean' },
     ['advanced.server.pipe_path'] = { 'string' },
     ['advanced.server.executable_path'] = { 'string' },
     ['advanced.server.timeout'] = { 'number' },

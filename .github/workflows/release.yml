@@ -65,7 +65,6 @@ jobs:
     if: needs.get-next-version.outputs.new-release-published == 'true'
     needs:
       - get-next-version
-      - check-server
     strategy:
       matrix:
         include:
@@ -171,67 +170,10 @@ jobs:
           name: binaries
           pattern: cord-server-*
 
-  check-server:
-    runs-on: ubuntu-latest
-    if: needs.get-next-version.outputs.new-release-published == 'true'
-    needs:
-      - get-next-version
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Cache Cargo
-        uses: actions/cache@v4
-        id: cargo-cache
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: x86_64-unknown-linux-musl-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            x86_64-unknown-linux-musl-cargo-
-
-      - name: Install semantic-release-cargo
-        uses: taiki-e/install-action@v2
-        with:
-          tool: semantic-release-cargo@2
-
-      - name: Prepare semantic-release for Rust
-        run: semantic-release-cargo prepare ${{ needs.get-next-version.outputs.new-release-version }}
-
-      - name: Check Server Version
-        run: |
-          CARGO_VERSION="${{ needs.get-next-version.outputs.new-release-version }}"
-
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add Cargo.toml Cargo.lock
-          git commit -m "build: bump project version to $CARGO_VERSION [skip ci]" || echo "nothing to commit"
-
-          changes=$(git diff --name-only $(git describe --tags --abbrev=0)..HEAD -- src/)
-
-          if [ -n "$changes" ]; then
-            SERVER_VERSION=$(cat .github/server-version.txt | tr -d '\n')
-            if [ "$CARGO_VERSION" != "$SERVER_VERSION" ]; then
-              echo "Server version needs to be updated"
-              echo "$CARGO_VERSION" > .github/server-version.txt
-              
-              git add .github/server-version.txt
-              git commit -m "chore: update server version to $CARGO_VERSION [skip ci]" || echo "nothing to commit"
-            fi
-          fi
-
-          git push || echo "nothing to commit"
-
   release:
     runs-on: ubuntu-latest
     if: needs.get-next-version.outputs.new-release-published == 'true'
-    needs: [get-next-version, build, check-server, merge]
+    needs: [get-next-version, build, merge]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -281,6 +223,61 @@ jobs:
           npm install -g @semantic-release-cargo/semantic-release-cargo
           npm install -g semantic-release-export-data
           npx semantic-release --repository-url https://github.com/vyfor/cord.nvim
+
+  sync-server-version:
+    name: Sync Server Version Metadata
+    runs-on: ubuntu-latest
+    if: needs.get-next-version.outputs.new-release-published == 'true'
+    needs: [get-next-version, release, merge]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git pull
+
+      - name: Install semantic-release-cargo
+        uses: taiki-e/install-action@v2
+        with:
+          tool: semantic-release-cargo@2
+
+      - name: Update version metadata
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.get-next-version.outputs.new-release-version }}"
+          
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          semantic-release-cargo prepare $VERSION
+          git add Cargo.toml Cargo.lock
+
+          changes=$(git diff --name-only $(git describe --tags --abbrev=0)..HEAD -- src/)
+
+          if [ -n "$changes" ]; then
+            API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/v${VERSION}"
+            RESPONSE=$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" "$API_URL")
+            TIMESTAMP=$(echo "$RESPONSE" | jq -r '[.assets[].updated_at] | max | if . then fromdate else empty end')
+
+            if [ -z "$TIMESTAMP" ]; then
+              echo "No release assets found for v${VERSION}"
+              exit 1
+            fi
+
+            echo "${VERSION}|${TIMESTAMP}" > .github/server-metadata.txt
+            git add .github/server-metadata.txt
+          fi
+
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "chore: release ${VERSION} [skip ci]"
+            git push
+          fi
 
   luarocks:
     name: LuaRocks Publish
