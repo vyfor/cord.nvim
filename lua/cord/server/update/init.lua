@@ -190,8 +190,8 @@ M.local_version = async.wrap(function()
 end)
 
 M.compatible_version = async.wrap(function()
-  local version = M.compatible_metadata():unwrap()
-  return version
+  local metadata = M.compatible_metadata():unwrap()
+  return metadata.version
 end)
 
 M.compatible_metadata = async.wrap(function()
@@ -203,12 +203,12 @@ M.compatible_metadata = async.wrap(function()
   local version, timestamp = parse_server_version(content)
   if not version then return nil end
 
-  return version, timestamp
+  return { version = version, timestamp = timestamp }
 end)
 
 M.remote_version = async.wrap(function()
-  local version = M.remote_metadata():unwrap()
-  return version
+  local metadata = M.remote_metadata():unwrap()
+  return metadata.version
 end)
 
 M.remote_metadata = async.wrap(function()
@@ -237,18 +237,18 @@ M.remote_metadata = async.wrap(function()
     return nil
   end
 
-  return version, timestamp
+  return { version = version, timestamp = timestamp }
 end)
 
 M.is_stale = async.wrap(function(local_mtime)
-  local version, timestamp = M.compatible_metadata():unwrap()
-  if not version or not timestamp then return false end
+  local metadata = M.compatible_metadata():unwrap()
+  if not metadata.version or not metadata.timestamp then return false end
 
   local local_seconds = local_mtime
   if local_mtime then local_seconds = local_mtime.sec end
 
   if not local_seconds then return false end
-  return local_seconds < timestamp
+  return local_seconds < metadata.timestamp
 end)
 
 M.check_version = async.wrap(function()
