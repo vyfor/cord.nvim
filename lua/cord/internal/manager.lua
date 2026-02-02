@@ -1,4 +1,5 @@
 local async = require 'cord.core.async'
+local Future = require 'cord.core.async.future'
 local builder = require 'cord.internal.activity.builder'
 local ws_utils = require 'cord.internal.activity.workspace'
 local hooks = require 'cord.internal.hooks'
@@ -65,11 +66,7 @@ local uv = vim.loop or vim.uv
 ---@param ... any Arguments to pass if value is a function
 ---@return T
 local function resolve(value, ...)
-  local is_async = async.is_async(value)
-  if type(value) == 'function' or is_async then
-    if is_async then return value(...):await() end
-    return value(...)
-  end
+  if type(value) == 'function' then return value(...) end
   return value
 end
 
@@ -96,8 +93,36 @@ function ButtonBuilder.build(opts)
 
   local buttons = {}
   for _, source in ipairs(config.buttons) do
-    local label = resolve(source.label, opts)
-    local url = resolve(source.url, opts)
+    local label_val = source.label
+    local url_val = source.url
+
+    local label_is_async = async.is_async(label_val)
+    local url_is_async = async.is_async(url_val)
+
+    local label, url
+
+    if label_is_async or url_is_async then
+      local label_future = label_is_async and label_val(opts) or nil
+      local url_future = url_is_async and url_val(opts) or nil
+
+      if not label_is_async then label = resolve(label_val, opts) end
+      if not url_is_async then url = resolve(url_val, opts) end
+
+      if label_is_async and url_is_async then
+        local results = Future.all({ label_future, url_future }):await()
+        label, url = results[1], results[2]
+      elseif label_is_async then
+        ---@diagnostic disable-next-line: undefined-field
+        label = label_future:await()
+      elseif url_is_async then
+        ---@diagnostic disable-next-line: undefined-field
+        url = url_future:await()
+      end
+    else
+      label = resolve(label_val, opts)
+      url = resolve(url_val, opts)
+    end
+
     if label and url then buttons[#buttons + 1] = { label = label, url = url } end
   end
   return buttons
