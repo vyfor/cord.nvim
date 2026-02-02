@@ -256,7 +256,6 @@ M.check_version = async.wrap(function()
   if server.is_updating then return end
 
   if not vim.fn.executable 'curl' then
-    server.is_updating = false
     error('curl is not installed or not in PATH', 0)
     return
   end
