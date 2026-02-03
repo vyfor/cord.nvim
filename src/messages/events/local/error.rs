@@ -55,6 +55,7 @@ impl OnEvent for ErrorEvent {
                         &StatusUpdateEvent::disconnected(),
                     )?)?;
                     error!(ctx.client_id, "{}", self.error);
+
                     return Ok(());
                 }
             }
