@@ -43,7 +43,7 @@ module.exports = {
             if [ -f .github/server-metadata.txt ]; then
               OLD_TS=$(cut -d'|' -f2 .github/server-metadata.txt)
               echo "\${nextRelease.version}|$OLD_TS" > .github/server-metadata.txt
-              echo "new metadata: \${nextRelease.version}|\${OLD_TS}"
+              echo "new metadata: \${nextRelease.version}|$OLD_TS"
             fi
           else
             echo "updating server metadata"
