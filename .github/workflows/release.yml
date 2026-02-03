@@ -268,7 +268,7 @@ jobs:
           if [ -n "$changes" ]; then
             API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/v${VERSION}"
             RESPONSE=$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" "$API_URL")
-            TIMESTAMP=$(echo "$RESPONSE" | jq -r '[.assets[].updated_at] | max | if . then fromdate else empty end')
+            TIMESTAMP=$(echo "$RESPONSE" | jq -r '[.assets[].updated_at] | min | if . then fromdate else empty end')
 
             if [ -z "$TIMESTAMP" ]; then
               echo "No release assets found for v${VERSION}"
