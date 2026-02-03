@@ -117,6 +117,7 @@ impl RichClient {
     pub fn update(&self, packet: &Packet) -> crate::Result<()> {
         trace!("Updating Discord rich presence");
         let encoded = Json::serialize(packet)?;
+
         match self.write(1, Some(encoded.as_bytes())) {
             Err(_) => Err("The connection to Discord was lost".into()),
             _ => Ok(()),
