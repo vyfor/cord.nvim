@@ -256,7 +256,14 @@ jobs:
           semantic-release-cargo prepare $VERSION
           git add Cargo.toml Cargo.lock
 
-          changes=$(git diff --name-only $(git describe --tags --abbrev=0)..HEAD -- src/)
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, assuming first release"
+            changes="true"
+          else
+            changes=$(git diff --name-only ${PREVIOUS_TAG}..v${VERSION} -- src/)
+          fi
 
           if [ -n "$changes" ]; then
             API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/v${VERSION}"
