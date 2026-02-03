@@ -62,6 +62,7 @@
 > ```lua
 > {
 >   'vyfor/cord.nvim',
+    ---@type CordConfig
 >   opts = {
 >     -- ...
 >   }
