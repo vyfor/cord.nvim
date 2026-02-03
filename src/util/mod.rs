@@ -14,6 +14,7 @@ impl Lcg {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_nanos() as u64;
+
         Self { state: seed }
     }
 
