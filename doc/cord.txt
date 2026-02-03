@@ -1,4 +1,4 @@
-*cord.txt*             For NVIM v0.6.0            Last change: 2026 January 31
+*cord.txt*            For NVIM v0.6.0            Last change: 2026 February 03
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -573,26 +573,25 @@ ADVANCED                                         *cord-configuration-advanced*
 
 PLUGIN SETTINGS ~
 
-  --------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------
   Option                              Type      Default     Description
-  ----------------------------------- --------- ----------- ----------------------------------------------
+  ----------------------------------- --------- ----------- ----------------------------------------------------
   advanced.plugin.autocmds            boolean   true        Enable autocmds
 
   advanced.plugin.cursor_update       string    'on_hold'   When to update cursor position: 'on_move',
                                                             'on_hold', or 'none'. See Cursor Update Mode
 
-  advanced.plugin.match_in_mappings   boolean   true        Whether to match against file extensions in
-                                                            mappings
+  advanced.plugin.match_in_mappings   boolean   true        Whether to match against file extensions in mappings
 
   advanced.plugin.debounce.delay      integer   50          Delay in milliseconds before sending the first
-                                                            update. Allows events received in quick
-                                                            succession (e.g., buffer switches) to settle
-                                                            before sending data. Set to 0 to disable.
+                                                            update. Allows events received in quick succession
+                                                            (e.g., buffer switches) to settle before sending
+                                                            data. Set to 0 to disable.
 
-  advanced.plugin.debounce.interval   integer   750         Minimum interval in milliseconds between
-                                                            updates. Prevents flooding the server during
-                                                            rapid cursor movement. Set to 0 to disable.
-  --------------------------------------------------------------------------------------------------------
+  advanced.plugin.debounce.interval   integer   750         Minimum interval in milliseconds between updates.
+                                                            Prevents flooding the server during rapid cursor
+                                                            movement. Set to 0 to disable.
+  --------------------------------------------------------------------------------------------------------------
 
 SERVER SETTINGS ~
 
@@ -604,6 +603,9 @@ SERVER SETTINGS ~
                                                               requested: 'fetch' - fetch from GitHub, 'install' -
                                                               install from crates.io, 'build' - build from source,
                                                               'none' - no-op
+
+  advanced.server.auto_update       boolean         true      Whether to auto-update the server executable (when
+                                                              using the ‘fetch’ strategy)
 
   advanced.server.pipe_path         string \| nil   nil       Custom IPC pipe path
 
@@ -1616,28 +1618,49 @@ FEATURES                                              *cord-examples-features*
 
 INSTALLATION                                      *cord-examples-installation*
 
+
+  [!NOTE] **cord.nvim** will automatically load with defaults; calling `setup()`
+  is optional. The default configuration is found here
+  <https://github.com/vyfor/cord.nvim/wiki/Configuration#%EF%B8%8F-default-configuration>.
 lazy.nvim ~
 
 >lua
     {
-      'vyfor/cord.nvim',
-      build = ':Cord update',
-      -- opts = {}
+      'vyfor/cord.nvim'
     }
 <
 
+
+  CONFIGURING
+  >lua
+      {
+        'vyfor/cord.nvim',
+      ---@type CordConfig
+        opts = {
+          -- ...
+        }
+      }
+  <
 packer.nvim ~
 
 >lua
     use {
-      'vyfor/cord.nvim',
-      run = ':Cord update',
-      -- config = function()
-      --   require('cord').setup {}
-      -- end
+      'vyfor/cord.nvim'
     }
 <
 
+
+  CONFIGURING
+  >lua
+      use {
+        'vyfor/cord.nvim',
+        config = function()
+          require('cord').setup {
+            -- ...
+          }
+        end
+      }
+  <
 rocks.nvim ~
 
 Cord is available on LuaRocks <https://luarocks.org/modules/vyfor/cord.nvim>.
@@ -1646,21 +1669,28 @@ Cord is available on LuaRocks <https://luarocks.org/modules/vyfor/cord.nvim>.
     :Rocks install cord.nvim
 <
 
-Invoke `:Cord update` whenever the plugin is updated.
 
+  CONFIGURING
+  >lua
+      require('cord').setup {
+        -- ...
+      }
+  <
 vim.pack (v0.12+) ~
 
 >lua
     vim.pack.add { 'https://github.com/vyfor/cord.nvim' }
-    vim.api.nvim_create_autocmd('PackChanged', {
-      callback = function(opts)
-        if opts.data.spec.name == 'cord.nvim' and opts.data.kind == 'update' then 
-          vim.cmd 'Cord update'
-        end
-      end
-    })
 <
 
+**Configuring:**
+
+
+  CONFIGURING
+  >lua
+      require('cord').setup {
+        -- ...
+      }
+  <
 Vim packages ~
 
 **Unix:**
@@ -1675,8 +1705,13 @@ Vim packages ~
     git clone https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/plugins/start/cord.nvim
 <
 
-Invoke `:Cord update` whenever the plugin is updated.
 
+  CONFIGURING
+  >lua
+      require('cord').setup {
+        -- ...
+      }
+  <
 Considerations ~
 
 Cord requires the **server executable** to be present. By default, the plugin
