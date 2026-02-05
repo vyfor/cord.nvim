@@ -1,4 +1,4 @@
-*cord.txt*            For NVIM v0.6.0            Last change: 2026 February 03
+*cord.txt*            For NVIM v0.6.0            Last change: 2026 February 05
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -13,7 +13,7 @@ Table of Contents                                     *cord-table-of-contents*
   - Assets                                         |cord-configuration-assets|
   - Variables                                   |cord-configuration-variables|
   - Hooks                                           |cord-configuration-hooks|
-  - Plugins                                       |cord-configuration-plugins|
+  - Extensions                                 |cord-configuration-extensions|
   - Advanced                                     |cord-configuration-advanced|
   - User Commands                           |cord-configuration-user-commands|
   - Options Table                           |cord-configuration-options-table|
@@ -26,9 +26,9 @@ Table of Contents                                     *cord-table-of-contents*
   - Examples                                     |cord-custom-assets-examples|
   - Overriding Defaults               |cord-custom-assets-overriding-defaults|
   - Tip                                               |cord-custom-assets-tip|
-3. Plugins                                                      |cord-plugins|
-  - Enabling Plugins                           |cord-plugins-enabling-plugins|
-  - Available Plugins                         |cord-plugins-available-plugins|
+3. Extensions                                                |cord-extensions|
+  - Using Extensions                        |cord-extensions-using-extensions|
+  - Available Extensions                |cord-extensions-available-extensions|
 4. Examples                                                    |cord-examples|
   - Features                                          |cord-examples-features|
   - Installation                                  |cord-examples-installation|
@@ -53,7 +53,7 @@ TABLE OF CONTENTS ~
 - |cord-assets|
 - |cord-variables|
 - |cord-hooks|
-- |cord-plugins|
+- |cord-extensions|
 - |cord-advanced|
 - |cord-user-commands|
 - |cord-options-table|
@@ -148,7 +148,7 @@ Default Configuration ~
         workspace_change = nil,
         buf_enter = nil,
       },
-      plugins = nil,
+      extensions = nil,
       advanced = {
         plugin = {
           autocmds = true,
@@ -555,18 +555,18 @@ HOOKS                                               *cord-configuration-hooks*
                                                                                                                 (manager)
   --------------------------------------------------------------------------------------------------------------------------------------------------
 
-PLUGINS                                           *cord-configuration-plugins*
+EXTENSIONS                                     *cord-configuration-extensions*
 
-  ---------------------------------------------------------------------------------------
-  Option    Type                               Description
-  --------- ---------------------------------- ------------------------------------------
-  plugins   string[] \| table<string, table>   Extend Cord with plugins. See the Wiki for
-                                               more info
+  -------------------------------------------------------------------------------------------
+  Option       Type                               Description
+  ------------ ---------------------------------- -------------------------------------------
+  extensions   string[] \| table<string, table>   Extend Cord with extensions. See the Wiki
+                                                  for more info
 
-  ---------------------------------------------------------------------------------------
+  -------------------------------------------------------------------------------------------
 
-  If you want to develop your own plugin, check out Cord’s Plugin System
-  <./Plugin-System.md>
+  If you want to develop your own extension, check out Cord’s Extension System
+  <./Extension-System.md>
 
 ADVANCED                                         *cord-configuration-advanced*
 
@@ -1002,52 +1002,38 @@ them:
 
 
 ==============================================================================
-3. Plugins                                                      *cord-plugins*
+3. Extensions                                                *cord-extensions*
 
-Cord comes with several built-in plugins that you can easily enable and
-configure. These plugins provide ready-made functionality for common use cases.
+Cord comes with several built-in extensions that you can easily enable and
+configure. These extensions provide ready-made functionality for common use
+cases.
 
 
-ENABLING PLUGINS                               *cord-plugins-enabling-plugins*
+USING EXTENSIONS                            *cord-extensions-using-extensions*
 
-To use a plugin, simply add its `require` path to the `plugins` table in your
-`cord.setup()` configuration. If the plugin is built-in, you can simply use the
-name alone.
-
-**Basic Plugin Enablement:**
-
->lua
-    require('cord').setup {
-      plugins = {
-        'diagnostics', -- Enable the diagnostics plugin
-      },
-    }
-<
-
-**Enabling and Configuring a Plugin:**
-
-If a plugin has configuration options, you can provide a configuration table
-using the plugin’s require path as the key in the `plugins` table.
+To use an extension, simply add its `require` path to the `extensions` table in
+your `cord.setup()` configuration. If the extension is built-in, you can simply
+use the name alone.
 
 >lua
     require('cord').setup {
-      plugins = {
-        diagnostics = { -- Enable AND configure diagnostics plugin
-          scope = 'workspace', -- Set scope to 'workspace' instead of default 'buffer'
-          severity = vim.diagnostic.severity.WARN, -- Show warnings and above
-        },
+      extensions = {
+        -- Enable an extension with its default config
+        'diagnostics',
+    
+        -- Enable AND configure an extension
+        resolver = {
+          -- ...
+        }
       },
     }
 <
 
 
-AVAILABLE PLUGINS                             *cord-plugins-available-plugins*
-
-Here’s a list of the built-in plugins included with Cord, along with their
-descriptions and configuration options:
+AVAILABLE EXTENSIONS                    *cord-extensions-available-extensions*
 
 
-DIAGNOSTICS (CORD.PLUGINS.DIAGNOSTICS) ~
+DIAGNOSTICS (DIAGNOSTICS) ~
 
 **Purpose:** Adds real-time LSP diagnostics (errors, warnings, hints)
 information to your Rich Presence. Displays the number of diagnostics in the
@@ -1071,13 +1057,13 @@ current buffer or workspace.
     - Example: `{ min = vim.diagnostic.severity.WARN }` will count warnings and errors, but not information messages or hints.
     - Defaults to showing errors.
 - **override**:
-    - `true` (default): The plugin will automatically override the `text.viewing`, `text.editing`, and `text.workspace` options to display diagnostics information. Recommended for seamless integration.
-    - `false`: The plugin will _not_ override text options. You’ll need to manually use the plugin’s variables in your `text` configuration to display diagnostics (see "Usage Example" below).
+    - `true` (default): The extension will automatically override the `text.viewing`, `text.editing`, and `text.workspace` options to display diagnostics information. Recommended for seamless integration.
+    - `false`: The extension will _not_ override text options. You’ll need to manually use the extension’s variables in your `text` configuration to display diagnostics (see "Usage Example" below).
 
 **Variables Added:**
 
 - **diagnostic**: A table containing the scoped diagnostics data (useful for advanced customization).
-- **diagnostics**: A function that returns the number of diagnostics in the current scope (buffer or workspace), based on the plugin’s configuration.
+- **diagnostics**: A function that returns the number of diagnostics in the current scope (buffer or workspace), based on the extension’s configuration.
 
 **Usage Example (override = false):**
 
@@ -1092,7 +1078,7 @@ current buffer or workspace.
 <
 
 
-RESOLVER (CORD.PLUGINS.RESOLVER) ~
+RESOLVER (RESOLVER) ~
 
 **Purpose:** Provides specialized metadata resolvers for accurate filetype and
 workspace detection in edge cases where standard detection falls short.
@@ -1119,7 +1105,7 @@ workspace detection in edge cases where standard detection falls short.
 >lua
     -- Enable all except oil
     require('cord').setup {
-      plugins = {
+      extensions = {
         resolver = {
           sources = { true, oil = false },
         },
@@ -1128,7 +1114,7 @@ workspace detection in edge cases where standard detection falls short.
 <
 
 
-VISIBILITY (CORD.PLUGINS.VISIBILITY) ~
+VISIBILITY (VISIBILITY) ~
 
 **Purpose:** Controls whether the Rich Presence activity is shown for a
 workspace or buffer based on rules. Useful for hiding activity for specific
@@ -1138,7 +1124,7 @@ projects, directories, or file types.
 
 >lua
     {
-      override = true,            -- Whether the plugin overrides activity updates directly
+      override = true,            -- Whether the extension overrides activity updates directly
       precedence = 'blacklist',   -- 'blacklist' or 'whitelist' to resolve conflicts
       resolve_symlinks = true,    -- Resolve symlinks when matching paths
       rules = {
@@ -1151,8 +1137,8 @@ projects, directories, or file types.
 <
 
 - **override**:
-    - `true` (default): Plugin will automatically `suppress()` or `resume()` the manager based on rules.
-    - `false`: The plugin will not change activity directly; use the provided variables.
+    - `true` (default): Extension will automatically `suppress()` or `resume()` the manager based on rules.
+    - `false`: The extension will not change activity directly; use the provided variables.
 - **precedence**:
     - `'blacklist'` (default): Blacklist rules take precedence when both types match.
     - `'whitelist'`: Whitelist rules take precedence.
@@ -1177,7 +1163,7 @@ projects, directories, or file types.
 
 >lua
     require('cord').setup {
-      plugins = {
+      extensions = {
         visibility = {
           precedence = 'blacklist',
           rules = {
@@ -1199,7 +1185,7 @@ projects, directories, or file types.
 <
 
 
-LOCAL TIME (CORD.PLUGINS.LOCAL_TIME) ~
+LOCAL TIME (LOCAL_TIME) ~
 
 **Purpose:** Sets the Rich Presence timestamp to display the current local
 clock time (hours, minutes and seconds) instead of elapsed time.
@@ -1221,9 +1207,9 @@ clock time (hours, minutes and seconds) instead of elapsed time.
 - **local_timestamp**: A function that returns the zeroed timestamp of the current local time (midnight of the current day).
 
 
-  [!NOTE] Incompatible with any other timestamp-related plugins.
+  [!NOTE] Incompatible with any other timestamp-related extensions.
 
-PERSISTENT TIMER (CORD.PLUGINS.PERSISTENT_TIMER) ~
+PERSISTENT TIMER (PERSISTENT_TIMER) ~
 
 **Purpose:** Provides a persistent timer that tracks the total time spent
 across multiple Neovim sessions. This timer is scoped and saved to a data file,
@@ -1237,7 +1223,7 @@ simultaneously open clients without data races.
     {
       scope = 'workspace', -- 'workspace', 'file', 'filetype', or 'global'
       mode = 'all',        -- 'all', 'active', or 'idle'
-      file = vim.fn.stdpath 'data' .. '/cord/plugins/persistent_timer/data.json', -- Path to the timer data file
+      file = vim.fn.stdpath 'data' .. '/cord/extensions/persistent_timer/data.json', -- Path to the timer data file
       save_on = { 'exit', 'focus_change', 'periodic' }, -- Events that trigger a save
       save_interval = 30,  -- Interval in seconds for periodic saves
     }
@@ -1264,9 +1250,9 @@ simultaneously open clients without data races.
     - The number of seconds between automatic saves if `'periodic'` is enabled.
 
 
-  [!NOTE] Incompatible with any other timestamp-related plugins.
+  [!NOTE] Incompatible with any other timestamp-related extensions.
 
-SCOPED TIMESTAMPS (CORD.PLUGINS.SCOPED_TIMESTAMPS) ~
+SCOPED TIMESTAMPS (SCOPED_TIMESTAMPS) ~
 
 **Purpose:** Tracks elapsed time independently for each buffer or workspace.
 Optionally "pauses" and "resumes" the timestamp when switching between buffers,
@@ -1291,12 +1277,12 @@ providing more context-aware time tracking.
 
 **Variables Added:**
 
-- **get_scoped_timestamp()**: A function that returns the appropriate timestamp value based on the plugin’s `scope` and `pause` settings. This is used internally by the plugin.
+- **get_scoped_timestamp()**: A function that returns the appropriate timestamp value based on the extension’s `scope` and `pause` settings. This is used internally by the extension.
 
 
-  [!NOTE] Incompatible with any other timestamp-related plugins.
+  [!NOTE] Incompatible with any other timestamp-related extensions.
 
-LAST.FM (CORD.PLUGINS.LASTFM) ~
+LAST.FM (LASTFM) ~
 
 **Purpose:** Displays your current Last.fm "Now Playing" track in Rich
 Presence. By default, takes full control of the activity. If you want to
@@ -1321,8 +1307,8 @@ disable this behavior, set `override = false`.
 - **interval**: How often to poll Last.fm for the latest track. Minimum is 500ms.
 - **max_retries**: Number of times failed HTTP requests will be retried.
 - **override**:
-    - `true` (default): The plugin fully manages activity updates.
-    - `false`: The plugin will not change activity directly; instead, it exposes variables you can use in your own configuration.
+    - `true` (default): The extension fully manages activity updates.
+    - `false`: The extension will not change activity directly; instead, it exposes variables you can use in your own configuration.
 - **fallback_image**: Image URL used when the track has no album art or Last.fm returns a placeholder.
 
 **Variables Added:**
@@ -1337,7 +1323,7 @@ disable this behavior, set `override = false`.
 
 >lua
     require('cord').setup {
-      plugins = {
+      extensions = {
         lastfm = { override = false },
       },
     
@@ -1349,7 +1335,7 @@ disable this behavior, set `override = false`.
 <
 
 
-  [!NOTE] Incompatible with any other plugin if `override = true`.
+  [!NOTE] Incompatible with any other extension if `override = true`.
 
 ==============================================================================
 4. Examples                                                    *cord-examples*
@@ -1421,9 +1407,11 @@ NEOVIM VERSION IN SMALL TOOLTIP ~
 
 WORKSPACE BLACKLIST ~
 
+// TODO: fix hyperlinks
 
-  [!NOTE] Use the **Visibility** <./Plugins.md#-visibility-cordpluginsvisibility>
-  plugin instead.
+
+  [!NOTE] Use the **Visibility**
+  <./Extensions.md#-visibility-cordextensionsvisibility> extension instead.
 >lua
     local blacklist = {
       'blacklisted_workspace',
@@ -1605,7 +1593,7 @@ FEATURES                                              *cord-examples-features*
 - Dynamic string templates with custom variables.
 - Customizable assets for any file/buffer type.
 - Flexible configuration with rich API, function-based fields, hooks, user commands and custom IPC paths.
-- Plugin system of its own, with many plugins out-of-the-box.
+- Extension system of its own, with many extensions out-of-the-box.
 - Finds repositories and workspaces based on VCS files without relying on command-line tools.
 - Manages activities across all instances with a single connection to Discord.
 - Detects when you’re idle and switches to the most recent active instance.
@@ -1635,7 +1623,7 @@ lazy.nvim ~
   >lua
       {
         'vyfor/cord.nvim',
-      ---@type CordConfig
+         ---@type CordConfig
         opts = {
           -- ...
         }
