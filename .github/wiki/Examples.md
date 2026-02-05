@@ -58,8 +58,6 @@ hooks = {
 
 ### Workspace Blacklist
 
-// TODO: fix hyperlinks
-
 > [!NOTE]
 > Use the [**Visibility**](./Extensions.md#-visibility-cordextensionsvisibility) extension instead.
 
