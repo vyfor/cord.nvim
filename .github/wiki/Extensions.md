@@ -22,7 +22,10 @@ require('cord').setup {
 
 ## 🔌 Available Extensions
 
-### 🧩 Diagnostics (`diagnostics`)
+<details>
+<summary><h3><strong>🧩 Diagnostics</strong></h3></summary>
+
+**Name:** `diagnostics`
 
 **Purpose:**  Adds real-time LSP diagnostics (errors, warnings, hints) information to your Rich Presence. Displays the number of diagnostics in the current buffer or workspace.
 
@@ -66,7 +69,12 @@ text = {
 }
 ```
 
-### 🧩 Resolver (`resolver`)
+</details>
+
+<details>
+<summary><h3><strong>🧩 Resolver</strong></h3></summary>
+
+**Name:** `resolver`
 
 **Purpose:** Provides specialized metadata resolvers for accurate filetype and workspace detection in edge cases where standard detection falls short.
 
@@ -100,7 +108,12 @@ require('cord').setup {
 }
 ```
 
-### 🧩 Visibility (`visibility`)
+</details>
+
+<details>
+<summary><h3><strong>🧩 Visibility</strong></h3></summary>
+
+**Name:** `visibility`
 
 **Purpose:**  Controls whether the Rich Presence activity is shown for a workspace or buffer based on rules. Useful for hiding activity for specific projects, directories, or file types.
 
@@ -171,7 +184,12 @@ require('cord').setup {
 }
 ```
 
-### 🧩 Local Time (`local_time`)
+</details>
+
+<details>
+<summary><h3><strong>🧩 Local Time</strong></h3></summary>
+
+**Name:** `local_time`
 
 **Purpose:**  Sets the Rich Presence timestamp to display the current local clock time (hours, minutes and seconds) instead of elapsed time.
 
@@ -194,7 +212,12 @@ require('cord').setup {
 > [!NOTE]
 > Incompatible with any other timestamp-related extensions.
 
-### 🧩 Persistent Timer (`persistent_timer`)
+</details>
+
+<details>
+<summary><h3><strong>🧩 Persistent Timer</strong></h3></summary>
+
+**Name:** `persistent_timer`
 
 **Purpose:** Provides a persistent timer that tracks the total time spent across multiple Neovim sessions. This timer is scoped and saved to a data file, so that your time spent on a certain scope continues from where it was left off previously, even after restarting Neovim. It's also able to handle multiple simultaneously open clients without data races.
 
@@ -233,7 +256,12 @@ require('cord').setup {
 > [!NOTE]
 > Incompatible with any other timestamp-related extensions.
 
-### 🧩 Scoped Timestamps (`scoped_timestamps`)
+</details>
+
+<details>
+<summary><h3><strong>🧩 Scoped Timestamps</strong></h3></summary>
+
+**Name:** `scoped_timestamps`
 
 **Purpose:** Tracks elapsed time independently for each buffer or workspace.  Optionally "pauses" and "resumes" the timestamp when switching between buffers, providing more context-aware time tracking.
 
@@ -262,7 +290,12 @@ require('cord').setup {
 > [!NOTE]
 > Incompatible with any other timestamp-related extensions.
 
-### 🧩 Last.fm (`lastfm`)
+</details>
+
+<details>
+<summary><h3><strong>🧩 Last.fm</strong></h3></summary>
+
+**Name:** `lastfm`
 
 **Purpose:** Displays your current Last.fm "Now Playing" track in Rich Presence. By default, takes full control of the activity. If you want to disable this behavior, set `override = false`.
 
@@ -314,3 +347,5 @@ require('cord').setup {
 
 > [!NOTE]
 > Incompatible with any other extension if `override = true`.
+
+</details>
