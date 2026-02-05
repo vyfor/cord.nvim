@@ -133,7 +133,8 @@ local logger = require 'cord.api.log'
 ---@field assets? CordAssetConfig[] Assets configuration
 ---@field variables? boolean|CordVariablesConfig Variables configuration. If true, uses default options table. If table, extends default table. If false, disables custom variables.
 ---@field hooks? CordHooksConfig Hooks configuration
----@field plugins? string[]|table<string, table>[] Plugin configuration
+---@field extensions? string[]|table<string, table>[] Extension configuration
+---@field plugins? string[]|table<string, table>[] Deprecated, use `extensions`
 ---@field advanced? CordAdvancedConfig Advanced configuration
 
 ---@class InternalCordConfig: CordConfig
@@ -204,7 +205,7 @@ local defaults = {
     workspace_change = nil,
     buf_enter = nil,
   },
-  plugins = nil,
+  extensions = nil,
   advanced = {
     plugin = {
       autocmds = true,
@@ -256,6 +257,10 @@ function M.verify(new_config)
   local icons = require 'cord.api.icon'
 
   local final_config = utils.tbl_deep_extend('force', M.get(), user_config)
+
+  if final_config.extensions == nil and final_config.plugins ~= nil then
+    final_config.extensions = final_config.plugins
+  end
 
   local log_level = final_config.log_level
   if type(log_level) == 'string' then
@@ -398,6 +403,7 @@ local rules = {
     ['buttons.*.url'] = { 'string', 'function' },
     ['assets'] = { 'table' },
     ['variables'] = { 'boolean', 'table' },
+    ['extensions'] = { 'table' },
     ['plugins'] = { 'table' },
 
     ['hooks'] = { 'table' },
@@ -441,16 +447,22 @@ local rules = {
   },
   array_paths = {
     ['buttons'] = true,
+    ['extensions'] = true,
     ['plugins'] = true,
     ['advanced.discord.pipe_paths'] = true,
     ['advanced.workspace.root_markers'] = true,
   },
   skip_subtrees = {
+    ['extensions'] = true,
     ['plugins'] = true,
+  },
+  deprecated_paths = {
+    ['plugins'] = { message = 'Use `extensions` instead.' },
   },
   dict_paths = {
     ['assets'] = { 'string', 'table' },
     ['variables'] = { 'string', 'function' },
+    ['extensions'] = { 'boolean', 'table' },
     ['plugins'] = { 'boolean', 'table' },
   },
 }
@@ -473,19 +485,42 @@ M.validate = function(user_config)
     return utils.validate_type(value, allowed_types)
   end
 
+  local function check_deprecations(config, prefix)
+    prefix = prefix or ''
+    for k, v in pairs(config) do
+      local full_path = prefix == '' and k or (prefix .. '.' .. k)
+      if rules.deprecated_paths[full_path] then
+        table.insert(
+          warnings,
+          string.format(
+            '`%s` is deprecated: %s',
+            full_path,
+            rules.deprecated_paths[full_path].message
+          )
+        )
+      end
+      if type(v) == 'table' and not rules.deprecated_paths[full_path] then
+        check_deprecations(v, full_path)
+      end
+    end
+  end
+
+  check_deprecations(user_config)
+
   local function check_unknown_entries(config, prefix)
     prefix = prefix or ''
     for k, v in pairs(config) do
       local full_path = prefix == '' and k or (prefix .. '.' .. k)
       local base_path = vim.split(full_path, '.', { plain = true })[1]
-      local is_plugin_config = base_path == 'plugins' and type(k) == 'number'
+      local is_extension_config = (base_path == 'extensions' or base_path == 'plugins')
+        and type(k) == 'number'
 
       if
         not (
           (rules.array_paths[prefix] and type(k) == 'number')
           or (rules.array_paths[base_path] and type(k) == 'number')
           or (rules.dict_paths[base_path] and type(k) == 'string')
-          or is_plugin_config
+          or is_extension_config
         ) and not utils.is_valid_path(rules.fields, rules.dict_paths, full_path)
       then
         table.insert(warnings, string.format('Unknown configuration entry: `%s`', full_path))

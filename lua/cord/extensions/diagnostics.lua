@@ -100,7 +100,7 @@ vim.api.nvim_create_autocmd('DiagnosticChanged', {
     M.diagnostics = M.get_diagnostics()
     M.diagnostic_count = #M.diagnostics
   end,
-  group = vim.api.nvim_create_augroup('CordDiagnosticsPlugin', { clear = true }),
+  group = vim.api.nvim_create_augroup('CordDiagnosticsExtension', { clear = true }),
 })
 
 return M

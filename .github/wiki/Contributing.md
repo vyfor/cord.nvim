@@ -19,7 +19,7 @@ If you're new to contributing in general, we recommend starting small by improvi
 ## Project Overview
 
 ### Lua runtime: `lua/cord/`
-The Neovim-side implementation: configuration, activity detection, hooks, built-in plugins, and orchestration with the server.
+The Neovim-side implementation: configuration, activity detection, hooks, built-in extensions, and orchestration with the server.
 
 <details>
 <summary><strong>Expand</strong></summary>
@@ -44,8 +44,8 @@ The Neovim-side implementation: configuration, activity detection, hooks, built-
   - `constants/`: Constants and enums used across the plugin.
   - `manager.lua`: Builds/schedules/sends activities; idle handling; queueing.
   - `hooks.lua`: Hook registration and execution used by the manager.
-- `lua/cord/plugins/`: Built-in plugins.
-  - `init.lua`: Plugin API.
+- `lua/cord/extensions/`: Built-in extensions.
+  - `init.lua`: Extension API.
 - `lua/cord/server/`
   - `init.lua`: High-level server lifecycle: connect, restart, shutdown, and integration with events.
   - `ipc/`: Message bus between Lua and Rust server.

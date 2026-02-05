@@ -13,7 +13,7 @@
   - [🗃️ Assets](#️-assets)
   - [🧩 Variables](#-variables)
   - [🪝 Hooks](#-hooks)
-  - [🔌 Plugins](#-plugins)
+  - [🔌 Extensions](#-extensions)
   - [⚙️ Advanced](#️-advanced)
   - [User Commands](#user-commands)
   - [Options Table](#options-table)
@@ -106,7 +106,7 @@ If you want a fresh start, you can copy the default config and tweak it. I sugge
     workspace_change = nil,
     buf_enter = nil,
   },
-  plugins = nil,
+  extensions = nil,
   advanced = {
     plugin = {
       autocmds = true,
@@ -389,13 +389,13 @@ require('cord').setup {
 | `hooks.workspace_change` | `function(opts) \| table<fun: function(opts), priority: number>`                     | Called when workspace changes ([opts](#options-table))                                                             |
 | `hooks.buf_enter`        | `function(manager) \| table<fun: function(manager), priority: number>`               | Called when entering a buffer ([manager](#activitymanager-methods))                                                |
 
-## 🔌 Plugins
+## 🔌 Extensions
 
-| Option    | Type                               | Description                                                          |
-|-----------|------------------------------------|----------------------------------------------------------------------|
-| `plugins` | `string[] \| table<string, table>` | Extend Cord with plugins. See the [Wiki](./Plugins.md) for more info |
+| Option       | Type                               | Description                                                                  |
+|--------------|------------------------------------|------------------------------------------------------------------------------|
+| `extensions` | `string[] \| table<string, table>` | Extend Cord with extensions. See the [Wiki](./Extensions.md) for more info   |
 
-> If you want to develop your own plugin, check out Cord's [Plugin System](./Plugin-System.md)
+> If you want to develop your own extension, check out Cord's [Extension System](./Extension-System.md)
 
 ## ⚙️ Advanced
 

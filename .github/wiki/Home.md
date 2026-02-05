@@ -4,11 +4,11 @@
 - 🚀 **[Installation](https://github.com/vyfor/cord.nvim?tab=readme-ov-file#-installation)**: Installation instructions for a variety of plugin managers.
 - ⚙️ **[Configuration Guide](./Configuration.md)**: Default configuration and detailed explanation of all available configuration options.
 - 💡 **[Examples](./Examples.md)**: See how Cord can be customized with a rich set of code snippets.
-- 🔌 **[Plugins](./Plugins.md)**: Extend Cord's functionality with built-in and custom plugins.
+- 🔌 **[Extensions](./Extensions.md)**: Extend Cord's functionality with built-in and custom extensions.
 - 🎨 **[Custom Assets](./Assets.md)**: Personalize your Rich Presence with custom icons and text.
 
 ### Advanced Topics
-- 🛠️ **[Plugin System](./Plugin-System.md)**: Develop your own plugins to extend Cord's capabilities.
+- 🛠️ **[Extension System](./Extension-System.md)**: Develop your own extensions to extend Cord's capabilities.
 - ⏳ **[Async Guide](./Async.md)**: Optimize your configuration with non-blocking async operations.
 - 🏗️ **[Build From Source](./Build.md)**: Build the server binary from source.
 - 🤝 **[Contributing](./Contributing.md)**:  Learn how you can contribute to the cord.nvim.

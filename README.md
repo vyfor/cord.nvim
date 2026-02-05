@@ -33,7 +33,7 @@
 - 🎨 Dynamic string templates with custom variables.
 - 🗃️ Customizable assets for any file/buffer type.
 - 🔧 Flexible configuration with rich API, function-based fields, hooks, user commands and custom IPC paths.
-- 🔌 Plugin system of its own, with many plugins out-of-the-box.
+- 🔌 Extension system of its own, with many extensions out-of-the-box.
 - 🛠️ Finds repositories and workspaces based on VCS files without relying on command-line tools.
 - 🧠 Manages activities across all instances with a single connection to Discord.
 - 💤 Detects when you're idle and switches to the most recent active instance.
@@ -62,7 +62,7 @@
 > ```lua
 > {
 >   'vyfor/cord.nvim',
-    ---@type CordConfig
+>    ---@type CordConfig
 >   opts = {
 >     -- ...
 >   }

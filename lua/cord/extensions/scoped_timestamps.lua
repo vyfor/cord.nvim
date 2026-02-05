@@ -65,7 +65,7 @@ M.setup = function(config)
   end
 
   if M.config.pause then
-    local group = vim.api.nvim_create_augroup('CordScopedTimestampsPlugin', { clear = true })
+    local group = vim.api.nvim_create_augroup('CordScopedTimestampsExtension', { clear = true })
     vim.api.nvim_create_autocmd('BufLeave', {
       group = group,
       callback = handle_buffer_leave,

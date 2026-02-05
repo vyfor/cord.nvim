@@ -112,10 +112,10 @@ function ButtonBuilder.build(opts)
         local results = Future.all({ label_future, url_future }):await()
         label, url = results[1], results[2]
       elseif label_is_async then
-        ---@diagnostic disable-next-line: undefined-field
+        ---@diagnostic disable-next-line: undefined-field, need-check-nil
         label = label_future:await()
       elseif url_is_async then
-        ---@diagnostic disable-next-line: undefined-field
+        ---@diagnostic disable-next-line: undefined-field, need-check-nil
         url = url_future:await()
       end
     else
@@ -697,10 +697,10 @@ ActivityManager.__index = ActivityManager
 local has_initialized = false
 local has_loaded_workspace = false
 
----Initialize hooks and plugins (once, globally)
+---Initialize hooks and extensions (once, globally)
 ---@return string|nil
 local function initialize_global()
-  logger.debug 'ActivityManager: initializing hooks and plugins'
+  logger.debug 'ActivityManager: initializing hooks and extensions'
 
   if config.hooks then
     for event, hook in pairs(config.hooks) do
@@ -712,7 +712,7 @@ local function initialize_global()
     end
   end
 
-  return require('cord.plugins').init():await()
+  return require('cord.extensions').init():await()
 end
 
 ---@param opts {tx: table}

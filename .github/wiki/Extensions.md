@@ -1,41 +1,28 @@
-# 📦 Plugins
+# 📦 Extensions
 
-Cord comes with several built-in plugins that you can easily enable and configure. These plugins provide ready-made functionality for common use cases.
+Cord comes with several built-in extensions that you can easily enable and configure. These extensions provide ready-made functionality for common use cases.
 
-## 🚀 Enabling Plugins
+## 🚀 Using Extensions
 
-To use a plugin, simply add its `require` path to the `plugins` table in your `cord.setup()` configuration. If the plugin is built-in, you can simply use the name alone.
-
-**Basic Plugin Enablement:**
+To use an extension, simply add its `require` path to the `extensions` table in your `cord.setup()` configuration. If the extension is built-in, you can simply use the name alone.
 
 ```lua
 require('cord').setup {
-  plugins = {
-    'diagnostics', -- Enable the diagnostics plugin
+  extensions = {
+    -- Enable an extension with its default config
+    'diagnostics',
+
+    -- Enable AND configure an extension
+    resolver = {
+      -- ...
+    }
   },
 }
 ```
 
-**Enabling and Configuring a Plugin:**
+## 🔌 Available Extensions
 
-If a plugin has configuration options, you can provide a configuration table using the plugin's require path as the key in the `plugins` table.
-
-```lua
-require('cord').setup {
-  plugins = {
-    diagnostics = { -- Enable AND configure diagnostics plugin
-      scope = 'workspace', -- Set scope to 'workspace' instead of default 'buffer'
-      severity = vim.diagnostic.severity.WARN, -- Show warnings and above
-    },
-  },
-}
-```
-
-## 🔌 Available Plugins
-
-Here's a list of the built-in plugins included with Cord, along with their descriptions and configuration options:
-
-### 🧩 Diagnostics (`cord.plugins.diagnostics`)
+### 🧩 Diagnostics (`diagnostics`)
 
 **Purpose:**  Adds real-time LSP diagnostics (errors, warnings, hints) information to your Rich Presence. Displays the number of diagnostics in the current buffer or workspace.
 
@@ -59,13 +46,13 @@ Here's a list of the built-in plugins included with Cord, along with their descr
     -  Defaults to showing errors.
 
 - **`override`**:
-    - `true` (default):  The plugin will automatically override the `text.viewing`, `text.editing`, and `text.workspace` options to display diagnostics information. Recommended for seamless integration.
-    - `false`: The plugin will *not* override text options. You'll need to manually use the plugin's variables in your `text` configuration to display diagnostics (see "Usage Example" below).
+    - `true` (default):  The extension will automatically override the `text.viewing`, `text.editing`, and `text.workspace` options to display diagnostics information. Recommended for seamless integration.
+    - `false`: The extension will *not* override text options. You'll need to manually use the extension's variables in your `text` configuration to display diagnostics (see "Usage Example" below).
 
 **Variables Added:**
 
 - **`diagnostic`**: A table containing the scoped diagnostics data (useful for advanced customization).
-- **`diagnostics`**: A function that returns the number of diagnostics in the current scope (buffer or workspace), based on the plugin's configuration.
+- **`diagnostics`**: A function that returns the number of diagnostics in the current scope (buffer or workspace), based on the extension's configuration.
 
 **Usage Example (`override = false`):**
 
@@ -79,7 +66,7 @@ text = {
 }
 ```
 
-### 🧩 Resolver (`cord.plugins.resolver`)
+### 🧩 Resolver (`resolver`)
 
 **Purpose:** Provides specialized metadata resolvers for accurate filetype and workspace detection in edge cases where standard detection falls short.
 
@@ -105,7 +92,7 @@ text = {
 ```lua
 -- Enable all except oil
 require('cord').setup {
-  plugins = {
+  extensions = {
     resolver = {
       sources = { true, oil = false },
     },
@@ -113,7 +100,7 @@ require('cord').setup {
 }
 ```
 
-### 🧩 Visibility (`cord.plugins.visibility`)
+### 🧩 Visibility (`visibility`)
 
 **Purpose:**  Controls whether the Rich Presence activity is shown for a workspace or buffer based on rules. Useful for hiding activity for specific projects, directories, or file types.
 
@@ -121,7 +108,7 @@ require('cord').setup {
 
 ```lua
 {
-  override = true,            -- Whether the plugin overrides activity updates directly
+  override = true,            -- Whether the extension overrides activity updates directly
   precedence = 'blacklist',   -- 'blacklist' or 'whitelist' to resolve conflicts
   resolve_symlinks = true,    -- Resolve symlinks when matching paths
   rules = {
@@ -134,8 +121,8 @@ require('cord').setup {
 ```
 
 - **`override`**:
-    - `true` (default): Plugin will automatically `suppress()` or `resume()` the manager based on rules.
-    - `false`: The plugin will not change activity directly; use the provided variables.
+    - `true` (default): Extension will automatically `suppress()` or `resume()` the manager based on rules.
+    - `false`: The extension will not change activity directly; use the provided variables.
 
 - **`precedence`**:
     - `'blacklist'` (default): Blacklist rules take precedence when both types match.
@@ -163,7 +150,7 @@ require('cord').setup {
 
 ```lua
 require('cord').setup {
-  plugins = {
+  extensions = {
     visibility = {
       precedence = 'blacklist',
       rules = {
@@ -184,7 +171,7 @@ require('cord').setup {
 }
 ```
 
-### 🧩 Local Time (`cord.plugins.local_time`)
+### 🧩 Local Time (`local_time`)
 
 **Purpose:**  Sets the Rich Presence timestamp to display the current local clock time (hours, minutes and seconds) instead of elapsed time.
 
@@ -205,9 +192,9 @@ require('cord').setup {
 - **`local_timestamp`**: A function that returns the zeroed timestamp of the current local time (midnight of the current day).
 
 > [!NOTE]
-> Incompatible with any other timestamp-related plugins.
+> Incompatible with any other timestamp-related extensions.
 
-### 🧩 Persistent Timer (`cord.plugins.persistent_timer`)
+### 🧩 Persistent Timer (`persistent_timer`)
 
 **Purpose:** Provides a persistent timer that tracks the total time spent across multiple Neovim sessions. This timer is scoped and saved to a data file, so that your time spent on a certain scope continues from where it was left off previously, even after restarting Neovim. It's also able to handle multiple simultaneously open clients without data races.
 
@@ -217,36 +204,36 @@ require('cord').setup {
 {
   scope = 'workspace', -- 'workspace', 'file', 'filetype', or 'global'
   mode = 'all',        -- 'all', 'active', or 'idle'
-  file = vim.fn.stdpath 'data' .. '/cord/plugins/persistent_timer/data.json', -- Path to the timer data file
+  file = vim.fn.stdpath 'data' .. '/cord/extensions/persistent_timer/data.json', -- Path to the timer data file
   save_on = { 'exit', 'focus_change', 'periodic' }, -- Events that trigger a save
   save_interval = 30,  -- Interval in seconds for periodic saves
 }
 ```
 
 - **`scope`**:
-  - `'workspace'` (default): Track one continuous timer for the entire workspace.
-  - `'file'`: Track a separate timer for each individual file.
-  - `'filetype'`: Track a separate timer for each filetype (e.g., all `lua` files share one timer).
-  - `'global'`: Track a single timer for all activity within Neovim.
+    - `'workspace'` (default): Track one continuous timer for the entire workspace.
+    - `'file'`: Track a separate timer for each individual file.
+    - `'filetype'`: Track a separate timer for each filetype (e.g., all `lua` files share one timer).
+    - `'global'`: Track a single timer for all activity within Neovim.
 - **`mode`**:
-  - `'all'` (default): Count all time the corresponding scope is active.
-  - `'active'`: Only accumulate time when you are actively moving or typing.
-  - `'idle'`: Only accumulate time when the instance is idle.
+    - `'all'` (default): Count all time the corresponding scope is active.
+    - `'active'`: Only accumulate time when you are actively moving or typing.
+    - `'idle'`: Only accumulate time when the instance is idle.
 - **`file`**:
-  - Defines the absolute path to the JSON file where time data is stored.
-  - Defaults to a file within Neovim's standard data directory.
+    - Defines the absolute path to the JSON file where time data is stored.
+    - Defaults to a file within Neovim's standard data directory.
 - **`save_on`**:
-  - A table of strings defining when the timer data should be saved to disk.
-  - `'exit'`: Saves when Neovim is closed. **(Recommended)**
-  - `'focus_change'`: Saves when you focus away from the Neovim window. Important for multi-client sync.
-  - `'periodic'`: Saves automatically at the interval defined by `save_interval`.
+    - A table of strings defining when the timer data should be saved to disk.
+    - `'exit'`: Saves when Neovim is closed. **(Recommended)**
+    - `'focus_change'`: Saves when you focus away from the Neovim window. Important for multi-client sync.
+    - `'periodic'`: Saves automatically at the interval defined by `save_interval`.
 - **`save_interval`**:
-  - The number of seconds between automatic saves if `'periodic'` is enabled.
+    - The number of seconds between automatic saves if `'periodic'` is enabled.
 
 > [!NOTE]
-> Incompatible with any other timestamp-related plugins.
+> Incompatible with any other timestamp-related extensions.
 
-### 🧩 Scoped Timestamps (`cord.plugins.scoped_timestamps`)
+### 🧩 Scoped Timestamps (`scoped_timestamps`)
 
 **Purpose:** Tracks elapsed time independently for each buffer or workspace.  Optionally "pauses" and "resumes" the timestamp when switching between buffers, providing more context-aware time tracking.
 
@@ -270,12 +257,12 @@ require('cord').setup {
 
 **Variables Added:**
 
-- **`get_scoped_timestamp()`**: A function that returns the appropriate timestamp value based on the plugin's `scope` and `pause` settings. This is used internally by the plugin.
+- **`get_scoped_timestamp()`**: A function that returns the appropriate timestamp value based on the extension's `scope` and `pause` settings. This is used internally by the extension.
 
 > [!NOTE]
-> Incompatible with any other timestamp-related plugins.
+> Incompatible with any other timestamp-related extensions.
 
-### 🧩 Last.fm (`cord.plugins.lastfm`)
+### 🧩 Last.fm (`lastfm`)
 
 **Purpose:** Displays your current Last.fm "Now Playing" track in Rich Presence. By default, takes full control of the activity. If you want to disable this behavior, set `override = false`.
 
@@ -298,8 +285,8 @@ require('cord').setup {
 - **`interval`**: How often to poll Last.fm for the latest track. Minimum is 500ms.
 - **`max_retries`**: Number of times failed HTTP requests will be retried.
 - **`override`**:
-  - `true` (default): The plugin fully manages activity updates.
-  - `false`: The plugin will not change activity directly; instead, it exposes variables you can use in your own configuration.
+  - `true` (default): The extension fully manages activity updates.
+  - `false`: The extension will not change activity directly; instead, it exposes variables you can use in your own configuration.
 - **`fallback_image`**: Image URL used when the track has no album art or Last.fm returns a placeholder.
 
 **Variables Added:**
@@ -314,7 +301,7 @@ require('cord').setup {
 
 ```lua
 require('cord').setup {
-  plugins = {
+  extensions = {
     lastfm = { override = false },
   },
 
@@ -326,4 +313,4 @@ require('cord').setup {
 ```
 
 > [!NOTE]
-> Incompatible with any other plugin if `override = true`.
+> Incompatible with any other extension if `override = true`.

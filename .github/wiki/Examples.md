@@ -58,8 +58,10 @@ hooks = {
 
 ### Workspace Blacklist
 
+// TODO: fix hyperlinks
+
 > [!NOTE]
-> Use the [**Visibility**](./Plugins.md#-visibility-cordpluginsvisibility) plugin instead.
+> Use the [**Visibility**](./Extensions.md#-visibility-cordextensionsvisibility) extension instead.
 
 ```lua
 local blacklist = {

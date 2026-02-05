@@ -13,7 +13,7 @@ local M = {
     scope = 'workspace',
     ---The absolute path to the file where timer data will be saved.
     ---@type string
-    file = vim.fn.stdpath 'data' .. '/cord/plugins/persistent_timer/data.json',
+    file = vim.fn.stdpath 'data' .. '/cord/extensions/persistent_timer/data.json',
     ---The primary mode of time tracking to use.
     ---@type 'active' | 'idle' | 'all'
     mode = 'all',
@@ -274,7 +274,7 @@ M.setup = function(config)
   M.instance_id = generate_instance_id()
   logger.debug('PersistentTimer initializing. Instance ID: ' .. M.instance_id)
 
-  local group = vim.api.nvim_create_augroup('CordPersistentTimerPlugin', { clear = true })
+  local group = vim.api.nvim_create_augroup('CordPersistentTimerExtension', { clear = true })
 
   if should_save 'exit' then
     vim.api.nvim_create_autocmd('VimLeavePre', {

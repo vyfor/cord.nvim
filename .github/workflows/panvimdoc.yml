@@ -8,7 +8,7 @@ on:
       - README.md
       - .github/wiki/Configuration.md
       - .github/wiki/Assets.md
-      - .github/wiki/Plugins.md
+      - .github/wiki/Extensions.md
       - .github/wiki/Examples.md
       - .github/workflows/panvimdoc.yml 
 
@@ -25,7 +25,7 @@ jobs:
       - run: git pull origin master
 
       - run: |
-          INCLUDES="\`\`\`{.include}\n.github/wiki/Configuration.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Assets.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Plugins.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Examples.md\n\`\`\`\n\n"
+          INCLUDES="\`\`\`{.include}\n.github/wiki/Configuration.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Assets.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Extensions.md\n\`\`\`\n\n\`\`\`{.include}\n.github/wiki/Examples.md\n\`\`\`\n\n"
           echo -e "$INCLUDES$(cat README.md)" > _README.md
 
       - uses: kdheepak/panvimdoc@main
