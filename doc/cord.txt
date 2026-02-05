@@ -1032,8 +1032,9 @@ use the name alone.
 
 AVAILABLE EXTENSIONS                    *cord-extensions-available-extensions*
 
+Diagnostics ~
 
-DIAGNOSTICS (DIAGNOSTICS) ~
+**Name:** `diagnostics`
 
 **Purpose:** Adds real-time LSP diagnostics (errors, warnings, hints)
 information to your Rich Presence. Displays the number of diagnostics in the
@@ -1077,8 +1078,9 @@ current buffer or workspace.
     }
 <
 
+Resolver ~
 
-RESOLVER (RESOLVER) ~
+**Name:** `resolver`
 
 **Purpose:** Provides specialized metadata resolvers for accurate filetype and
 workspace detection in edge cases where standard detection falls short.
@@ -1113,8 +1115,9 @@ workspace detection in edge cases where standard detection falls short.
     }
 <
 
+Visibility ~
 
-VISIBILITY (VISIBILITY) ~
+**Name:** `visibility`
 
 **Purpose:** Controls whether the Rich Presence activity is shown for a
 workspace or buffer based on rules. Useful for hiding activity for specific
@@ -1184,8 +1187,9 @@ projects, directories, or file types.
     }
 <
 
+Local Time ~
 
-LOCAL TIME (LOCAL_TIME) ~
+**Name:** `local_time`
 
 **Purpose:** Sets the Rich Presence timestamp to display the current local
 clock time (hours, minutes and seconds) instead of elapsed time.
@@ -1208,8 +1212,9 @@ clock time (hours, minutes and seconds) instead of elapsed time.
 
 
   [!NOTE] Incompatible with any other timestamp-related extensions.
+Persistent Timer ~
 
-PERSISTENT TIMER (PERSISTENT_TIMER) ~
+**Name:** `persistent_timer`
 
 **Purpose:** Provides a persistent timer that tracks the total time spent
 across multiple Neovim sessions. This timer is scoped and saved to a data file,
@@ -1251,8 +1256,9 @@ simultaneously open clients without data races.
 
 
   [!NOTE] Incompatible with any other timestamp-related extensions.
+Scoped Timestamps ~
 
-SCOPED TIMESTAMPS (SCOPED_TIMESTAMPS) ~
+**Name:** `scoped_timestamps`
 
 **Purpose:** Tracks elapsed time independently for each buffer or workspace.
 Optionally "pauses" and "resumes" the timestamp when switching between buffers,
@@ -1281,8 +1287,9 @@ providing more context-aware time tracking.
 
 
   [!NOTE] Incompatible with any other timestamp-related extensions.
+Last.fm ~
 
-LAST.FM (LASTFM) ~
+**Name:** `lastfm`
 
 **Purpose:** Displays your current Last.fm "Now Playing" track in Rich
 Presence. By default, takes full control of the activity. If you want to
