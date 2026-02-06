@@ -176,9 +176,9 @@ Cord features over 120 meticulously crafted icons available in distinct themes:
 - **Atom**: A sleek theme based on [Atom Material Icons](https://github.com/AtomMaterialUI/a-file-icon-vscode/).
   <img width="800px" alt="Atom Theme" src="https://github.com/user-attachments/assets/1a125c33-ad91-475a-8c97-72d67679818d">
 - **Catppuccin**: A soothing pastel theme based on [Catppuccin](https://github.com/catppuccin/vscode-icons) icons.
-  <img width="800px" alt="Catppuccin Theme" src="https://github.com/user-attachments/assets/d500f49b-c432-43eb-bea9-dbc3e8776449" />
+  <img width="800px" alt="Catppuccin Theme" src="https://github.com/user-attachments/assets/b789cebc-a7c1-4e7d-9698-828f6c6d4cc4" />
 - **Minecraft**: A blocky pixel-art set based on [Datapack Icons](https://github.com/FuncFusion/mc-dp-icons).
-  <img width="800px" alt="Minecraft Theme" src="https://github.com/user-attachments/assets/f701fbda-1698-4694-8533-d2af91de0eac" />
+  <img width="800px" alt="Minecraft Theme" src="https://github.com/user-attachments/assets/94b295e4-22b1-42f4-ad3e-f52c4adb76a0" />
 - **Classic**: A clean theme featuring widely recognized icons.
   <img width="800px" alt="Classic Theme" src="https://github.com/user-attachments/assets/f8fd66c1-aa0b-4529-b97e-b3aefad8ed00" />
 
