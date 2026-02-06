@@ -9,7 +9,7 @@
   <img src="https://github.com/user-attachments/assets/8e684058-f3ea-4010-817e-529b47730abb" alt="Cord Logo" width="200px">
   <h3>🚀 The most extensible Discord Rich Presence plugin for Neovim, powered by Rust.
   </h3>
-  <img src="https://github.com/user-attachments/assets/df73221e-565b-49e5-9dad-1c60aed6f9c3" alt="Cord Banner">
+  <img src="https://github.com/user-attachments/assets/be9e492a-daf3-427f-bf44-2fe6876befce" alt="Cord Banner">
 </div>
 
 <div align="center">
@@ -172,16 +172,24 @@ Alternatively, you can provide the executable manually:
 Cord features over 120 meticulously crafted icons available in distinct themes:
 
 - **Default**: A stylish theme based on [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts) icons.
+  <img width="800px" alt="Default Theme" src="https://github.com/user-attachments/assets/14944aaa-b123-4c93-8c27-3b8c7af3c9ac" />
 - **Atom**: A sleek theme based on [Atom Material Icons](https://github.com/AtomMaterialUI/a-file-icon-vscode/).
+  <img width="800px" alt="Atom Theme" src="https://github.com/user-attachments/assets/1a125c33-ad91-475a-8c97-72d67679818d">
 - **Catppuccin**: A soothing pastel theme based on [Catppuccin](https://github.com/catppuccin/vscode-icons) icons.
+  <img width="800px" alt="Catppuccin Theme" src="https://github.com/user-attachments/assets/d500f49b-c432-43eb-bea9-dbc3e8776449" />
 - **Minecraft**: A blocky pixel-art set based on [Datapack Icons](https://github.com/FuncFusion/mc-dp-icons).
+  <img width="800px" alt="Minecraft Theme" src="https://github.com/user-attachments/assets/f701fbda-1698-4694-8533-d2af91de0eac" />
 - **Classic**: A clean theme featuring widely recognized icons.
+  <img width="800px" alt="Classic Theme" src="https://github.com/user-attachments/assets/f8fd66c1-aa0b-4529-b97e-b3aefad8ed00" />
 
-See the [showcase](https://github.com/vyfor/icons#showcase) for a visual comparison.
+See the [showcase](https://github.com/vyfor/icons#showcase) for an extended comparison.
 
 > [!TIP]
 > Each theme includes multiple flavors, typically `dark`, `light`, and `accent`, representing the background color of the icons.
 > Choose your theme in the [`display`](https://github.com/vyfor/cord.nvim/wiki/Configuration#-display) configuration option. More themes are coming soon!
+> | Atom (Light) | Minecraft (Dark) |
+> | :---: | :---: |
+> | <img src="https://github.com/user-attachments/assets/561f5964-0108-48d3-aab1-3e138dcf3b15" width="400" /> | <img src="https://github.com/user-attachments/assets/19eda5e1-cbf4-494c-96ba-9ec4f7168121" width="400" /> |
 
 ## ❤️ Support the Project
 I'm the sole maintainer of cord.nvim and dedicate much of my free time to this project. If you find Cord helpful, you can show your support by giving the repo a star or [sponsoring me on GitHub](https://github.com/sponsors/vyfor). Every bit of support helps me continue to improve and maintain Cord for everyone. Thank you!
