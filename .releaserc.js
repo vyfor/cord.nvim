@@ -15,6 +15,7 @@ module.exports = {
       {
         "preset": "angular",
         "releaseRules": [
+          { "message": "*[trigger release]*", "release": "patch" },
           { "scope": "no-release", "release": false },
           { "type": "docs", "release": false },
           { "type": "refactor", "release": false },
