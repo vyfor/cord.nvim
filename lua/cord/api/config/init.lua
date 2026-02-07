@@ -13,7 +13,7 @@ local logger = require 'cord.api.log'
 ---@field icon? string Optional editor icon
 
 ---@class CordDisplayConfig
----@field theme? 'default'|'atom'|'catppuccin'|'minecraft'|'classic'|string Set icon theme
+---@field theme? 'default'|'atom'|'catppuccin'|'minecraft'|'void'|'classic'|string Set icon theme
 ---@field flavor? 'dark'|'light'|'accent'|string Set icon theme flavor
 ---@field view? 'full'|'editor'|'asset'|'auto'|string Control what shows up as the large and small images
 ---@field swap_fields? boolean Whether to swap activity fields
