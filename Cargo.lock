@@ -4,4 +4,4 @@ version = 4
 
 [[package]]
 name = "cord-nvim"
-version = "2.3.19"
+version = "2.3.20"
