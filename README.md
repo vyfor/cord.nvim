@@ -179,6 +179,8 @@ Cord features over 120 meticulously crafted icons available in distinct themes:
   <img width="800px" alt="Catppuccin Theme" src="https://github.com/user-attachments/assets/b789cebc-a7c1-4e7d-9698-828f6c6d4cc4" />
 - **Minecraft**: A blocky pixel-art set based on [Datapack Icons](https://github.com/FuncFusion/mc-dp-icons).
   <img width="800px" alt="Minecraft Theme" src="https://github.com/user-attachments/assets/94b295e4-22b1-42f4-ad3e-f52c4adb76a0" />
+- **Void**: A monochrome set defined by negative space.
+  <img width="800px" alt="Void Theme" src="https://github.com/user-attachments/assets/f1b97ccc-ca4c-4d9c-8724-e9ac394355e6" />
 - **Classic**: A clean theme featuring widely recognized icons.
   <img width="800px" alt="Classic Theme" src="https://github.com/user-attachments/assets/f8fd66c1-aa0b-4529-b97e-b3aefad8ed00" />
 
