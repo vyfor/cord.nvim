@@ -1,0 +1,47 @@
+name: LuaRocks Manual Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: true
+        type: string
+
+jobs:
+  luarocks:
+    name: LuaRocks Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set LuaRocks version
+        id: set_version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [[ $VERSION == *"-beta"* ]]; then
+            # Convert 2.0.0-beta.1 to 2.0.0beta-1
+            BASE_VERSION=$(echo $VERSION | cut -d'-' -f1)
+            BETA_NUM=$(echo $VERSION | grep -oP '(?<=beta\.)\d+')
+            echo "version=${BASE_VERSION}beta" >> $GITHUB_OUTPUT
+            echo "rockspec_revision=$BETA_NUM" >> $GITHUB_OUTPUT
+          else
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "rockspec_revision=1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to LuaRocks
+        uses: nvim-neorocks/luarocks-tag-release@v7
+        with:
+          copy_directories: "plugin"
+          version: ${{ steps.set_version.outputs.version }}
+          specrev: ${{ steps.set_version.outputs.rockspec_revision }}
+          detailed_description: |
+            Meet the future of rich presence with Cord, the most extensible Discord Rich Presence plugin for Neovim, powered by Rust. 
+            Cord offers a wide range of customization options allowing you to create custom and dynamic experiences that adapt to your needs.
+            The possibilities are endless, and the only limit is your creativity!
+        env:
+          LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
