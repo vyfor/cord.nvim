@@ -9,7 +9,7 @@
   <img src="https://github.com/user-attachments/assets/8e684058-f3ea-4010-817e-529b47730abb" alt="Cord Logo" width="200px">
   <h3>🚀 The most extensible Discord Rich Presence plugin for Neovim, powered by Rust.
   </h3>
-  <img src="https://github.com/user-attachments/assets/2270b15b-9651-49b3-af4b-22ee939ba298" alt="Cord Banner">
+  <img src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/main_banner.png" alt="Cord Banner">
 </div>
 
 <div align="center">
@@ -172,17 +172,17 @@ Alternatively, you can provide the executable manually:
 Cord features over 120 meticulously crafted icons available in distinct themes:
 
 - **Default**: A stylish theme based on [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts) icons.
-  <img width="800px" alt="Default Theme" src="https://github.com/user-attachments/assets/14944aaa-b123-4c93-8c27-3b8c7af3c9ac" />
+  <img width="800px" alt="Default Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/default_theme.png" />
 - **Atom**: A sleek theme based on [Atom Material Icons](https://github.com/AtomMaterialUI/a-file-icon-vscode/).
-  <img width="800px" alt="Atom Theme" src="https://github.com/user-attachments/assets/1a125c33-ad91-475a-8c97-72d67679818d">
+  <img width="800px" alt="Atom Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/atom_theme.png">
 - **Catppuccin**: A soothing pastel theme based on [Catppuccin](https://github.com/catppuccin/vscode-icons) icons.
-  <img width="800px" alt="Catppuccin Theme" src="https://github.com/user-attachments/assets/b789cebc-a7c1-4e7d-9698-828f6c6d4cc4" />
+  <img width="800px" alt="Catppuccin Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/catppuccin_theme.png" />
 - **Minecraft**: A blocky pixel-art set based on [Datapack Icons](https://github.com/FuncFusion/mc-dp-icons).
-  <img width="800px" alt="Minecraft Theme" src="https://github.com/user-attachments/assets/94b295e4-22b1-42f4-ad3e-f52c4adb76a0" />
+  <img width="800px" alt="Minecraft Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/minecraft_theme.png" />
 - **Void**: A monochrome set defined by negative space.
-  <img width="800px" alt="Void Theme" src="https://github.com/user-attachments/assets/f1b97ccc-ca4c-4d9c-8724-e9ac394355e6" />
+  <img width="800px" alt="Void Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/void_theme.png" />
 - **Classic**: A clean theme featuring widely recognized icons.
-  <img width="800px" alt="Classic Theme" src="https://github.com/user-attachments/assets/f8fd66c1-aa0b-4529-b97e-b3aefad8ed00" />
+  <img width="800px" alt="Classic Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/classic_theme.png" />
 
 See the [showcase](https://github.com/vyfor/icons#showcase) for an extended comparison.
 
@@ -191,7 +191,7 @@ See the [showcase](https://github.com/vyfor/icons#showcase) for an extended comp
 > Choose your theme in the [`display`](https://github.com/vyfor/cord.nvim/wiki/Configuration#-display) configuration option. More themes are coming soon!
 > | Atom (Light) | Minecraft (Dark) |
 > | :---: | :---: |
-> | <img src="https://github.com/user-attachments/assets/561f5964-0108-48d3-aab1-3e138dcf3b15" width="400" /> | <img src="https://github.com/user-attachments/assets/19eda5e1-cbf4-494c-96ba-9ec4f7168121" width="400" /> |
+> | <img src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/atom_theme_2.png" width="400" /> | <img src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/minecraft_theme_2.png" width="400" /> |
 
 ## ❤️ Support the Project
 I'm the sole maintainer of cord.nvim and dedicate much of my free time to this project. If you find Cord helpful, you can show your support by giving the repo a star or [sponsoring me on GitHub](https://github.com/sponsors/vyfor). Every bit of support helps me continue to improve and maintain Cord for everyone. Thank you!
