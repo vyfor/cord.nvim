@@ -1,4 +1,4 @@
-*cord.txt*            For NVIM v0.6.0            Last change: 2026 February 07
+*cord.txt*            For NVIM v0.6.0            Last change: 2026 February 08
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
