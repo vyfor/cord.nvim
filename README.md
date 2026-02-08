@@ -119,8 +119,6 @@ Cord is available on [LuaRocks](https://luarocks.org/modules/vyfor/cord.nvim).
 vim.pack.add { 'https://github.com/vyfor/cord.nvim' }
 ```
 
-**Configuring:**
-
 > #### ⚙️ Configuring
 > ```lua
 > require('cord').setup {
@@ -164,6 +162,8 @@ Alternatively, you can provide the executable manually:
 
 - **Build from source:**  
   Run `:Cord update install` to install from crates.io or `:Cord update build` to build from source locally.
+
+> Note: If you decide to build from source, it is your responsibility to keep the server binary up-to-date.
 
 </details>
 
