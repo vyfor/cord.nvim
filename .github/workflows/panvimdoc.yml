@@ -38,6 +38,7 @@ jobs:
       - run: rm _README.md
 
       - uses: stefanzweifel/git-auto-commit-action@v4
+        continue-on-error: true
         with:
           commit_message: "chore(docs): update vimdoc [skip ci]"
           branch: ${{ github.head_ref }}
