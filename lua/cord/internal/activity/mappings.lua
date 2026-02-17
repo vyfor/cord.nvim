@@ -200,6 +200,7 @@ M.filetype_mappings = {
   },
   Yanil = { 'file_browser', M.default_icons.file_browser, 'Yanil' },
   yazi = { 'file_browser', M.default_icons.file_browser, 'Yazi' },
+  ['artio-picker'] = { 'file_browser', M.default_icons.file_browser, 'artio.nvim' },
   ['neo-tree'] = { 'file_browser', M.default_icons.file_browser, 'Neo-Tree' },
 
   -- Plugin Managers
