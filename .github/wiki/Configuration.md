@@ -28,6 +28,9 @@ require('cord').setup {
 }
 ```
 
+>[!NOTE]
+> This is an in-depth reference to all available configuration options. For a more beginner-friendly guide with examples, see the [Examples Wiki](./Examples.md).
+
 ### 🏷️ Default Configuration
 
 If you want a fresh start, you can copy the default config and tweak it. I suggest only changing what you need, since the rest falls back to defaults.

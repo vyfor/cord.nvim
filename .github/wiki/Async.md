@@ -102,7 +102,7 @@ local content = fs.readfile('critical_data.txt'):unwrap()
 When you call an async function *without* awaiting it, it starts executing immediately in the background. To run multiple operations concurrently, start them all first, then use `Future.all` to wait for the results.
 
 > [!NOTE]
-> Unlike "lazy" async models (like Rust or Python) where a task only starts when you await it, Cord's model is **eager**. The task begins the moment the function is called. This is why simply storing futures in variables is enough to start them running in parallel.
+> Unlike "lazy" async models (like Rust or Python) where a task only starts when you await it, Cord's model is **eager**. The task begins the moment the function is called. This allows for easy concurrency and fire-and-forget patterns.
 
 **Sequential (Slow):**
 ```lua
@@ -125,19 +125,6 @@ local status_fut = get_status()
 local results = Future.all({ branch_fut, status_fut }):await()
 local branch, status = results[1], results[2]
 -- time = max(time(branch), time(status))
-```
-
-### Fire and Forget
-
-Because execution is eager, you can start an operation and simply return without awaiting it. This is useful for side effects like logging or updating an external file—where you don't care about the result and don't want to wait for it.
-
-```lua
--- the write starts in the background and we return 'Done' immediately
-fs.writefile('log.txt', 'Activity updated'):catch(function(err)
-  print('Logging failed: ' .. err)
-end)
-
-return 'Done'
 ```
 
 ---
