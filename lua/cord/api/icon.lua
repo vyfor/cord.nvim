@@ -33,7 +33,7 @@ M.set = function(theme, flavor)
 
   M.ICON_THEME = theme
   M.THEME_FLAVOR = flavor
-  M.DEFAULT_IDLE_ICON = (theme == 'default' and flavor ~= 'accent') and 'keyboard' or 'idle'
+  M.DEFAULT_IDLE_ICON = 'idle'
 end
 
 return M
