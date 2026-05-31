@@ -1,5 +1,5 @@
 *cord.txt*
-                                   For NVIM v0.6.0    Last change: 2026 May 30
+                                   For NVIM v0.6.0    Last change: 2026 May 31
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -2054,6 +2054,9 @@ Alternatively, you can provide the executable manually:
 
   Note: If you decide to build from source, it is your responsibility to keep the
   server binary up-to-date.
+See the Examples <https://github.com/vyfor/cord.nvim/wiki/Examples> to get
+started.
+
 
 THEMES                                                  *cord-examples-themes*
 
