@@ -167,6 +167,8 @@ Alternatively, you can provide the executable manually:
 
 </details>
 
+See the [Examples](https://github.com/vyfor/cord.nvim/wiki/Examples) to get started.
+
 ## 🎨 Themes
 
 Cord features over 120 meticulously crafted icons available in distinct themes:
