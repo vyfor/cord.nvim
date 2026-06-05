@@ -1,5 +1,5 @@
 *cord.txt*
-                                   For NVIM v0.6.0    Last change: 2026 May 31
+                                  For NVIM v0.6.0    Last change: 2026 June 05
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -1919,7 +1919,9 @@ Share your snippets in GitHub Discussions
 
 
 
+------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------
 
   [!IMPORTANT] Cord no longer requires Rust to be installed. Server component
   will be automatically downloaded from GitHub Releases.
