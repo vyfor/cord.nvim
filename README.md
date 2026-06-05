@@ -16,13 +16,17 @@
   <div><a href="https://discord.gg/q9rC4bjCHv"><img src="https://discord.com/api/guilds/1322899307925602366/widget.png?style=banner2" alt="cord.nvim"/></a></div>
 </div>
 
+---
+
 <div align="center">
-  <a href="#-installation">Installation</a>
-  <span> • </span>
-  <a href="https://github.com/vyfor/cord.nvim/wiki">Documentation</a>
-  <span> • </span>
-  <a href="https://discord.gg/q9rC4bjCHv">Discord</a>
+  
+  **[<kbd>&nbsp;<br>&nbsp;Installation&nbsp;<br>&nbsp;</kbd>](#-installation)**&emsp;
+  **[<kbd>&nbsp;<br>&nbsp;Configuration&nbsp;<br>&nbsp;</kbd>](https://github.com/vyfor/cord.nvim/wiki/Configuration)**&emsp;
+  **[<kbd>&nbsp;<br>&nbsp;Examples&nbsp;<br>&nbsp;</kbd>](https://github.com/vyfor/cord.nvim/wiki/Examples)**&emsp;
+  
 </div>
+
+---
 
 > [!IMPORTANT]
 > Cord no longer requires Rust to be installed. Server component will be automatically downloaded from GitHub Releases.
