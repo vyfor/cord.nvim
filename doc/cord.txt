@@ -1,5 +1,5 @@
 *cord.txt*
-                                  For NVIM v0.6.0    Last change: 2026 June 05
+                                  For NVIM v0.6.0    Last change: 2026 June 15
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
