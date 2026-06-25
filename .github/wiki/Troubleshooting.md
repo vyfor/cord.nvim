@@ -20,6 +20,10 @@
 
    If you get nothing or "False", the pipe does not exist in the expected location.
 
+## 🔁 Plugin Not Loaded (lazy.nvim)
+
+Add `event = 'VeryLazy'` to the plugin spec.
+
 ## 🎛️ No Buttons in Rich Presence
 
 You might not be seeing buttons in your own Rich Presence. This is due to a client-sided bug on the app.
@@ -29,6 +33,12 @@ But there is actually a way to see them, join a voice channel and hover over you
 ## ⏱️ Rich Presence Timer Stuck at 00:00
 
 This usually means your system clock is off. Sync your clock with NTP.
+
+## 🔒 EACCES: Permission Denied
+
+```sh
+chmod +x ~/.local/share/nvim/cord/bin/cord
+```
 
 ## ❓ Still Having Trouble?
 
