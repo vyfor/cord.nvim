@@ -15,6 +15,9 @@ local hooks = {
   idle_enter = {},
   idle_leave = {},
 
+  focus_gained = {},
+  focus_lost = {},
+
   workspace_change = {},
 
   buf_enter = {},

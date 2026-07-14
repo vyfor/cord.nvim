@@ -651,6 +651,8 @@ function EventHandler:on_focus_gained()
   if mgr.opts then mgr.opts.is_focused = true end
   logger.trace 'EventHandler.on_focus_gained'
 
+  async.run(function() hooks.run('focus_gained', mgr) end)
+
   if config.idle.unidle_on_focus then mgr:queue_update(true) end
 end
 
@@ -661,6 +663,8 @@ function EventHandler:on_focus_lost()
   mgr.is_focused = false
   if mgr.opts then mgr.opts.is_focused = false end
   logger.trace 'EventHandler.on_focus_lost'
+
+  async.run(function() hooks.run('focus_lost', mgr) end)
 end
 
 function EventHandler:on_cursor_update()
