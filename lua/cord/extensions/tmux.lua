@@ -7,6 +7,7 @@ local M = {
 
   config = {
     interval = 20000,
+    focus_events = true,
     on_attach = 'show',
     on_detach = 'hide',
   },
@@ -19,6 +20,7 @@ M.setup = function(config)
   local async = require 'cord.core.async'
   local process = require 'cord.core.uv.process'
   local timer
+  local update_state
 
   return {
     name = 'tmux',
@@ -40,12 +42,9 @@ M.setup = function(config)
         M.in_tmux = true
         M.pane = tmux_pane
 
-        timer = uv.new_timer()
-        if not timer then return end
-
         local was_detached = false
 
-        local update_state = function()
+        update_state = function()
           async.run(function()
             local result, err = process
               .spawn({
@@ -100,8 +99,22 @@ M.setup = function(config)
           end)
         end
 
-        timer:start(0, M.config.interval, vim.schedule_wrap(update_state))
+        if type(M.config.interval) == 'number' and M.config.interval > 0 then
+          timer = uv.new_timer()
+          if timer then timer:start(0, M.config.interval, vim.schedule_wrap(update_state)) end
+        else
+          vim.schedule(update_state)
+        end
       end),
+
+      focus_gained = function()
+        if M.config.focus_events and update_state then update_state() end
+      end,
+
+      focus_lost = function()
+        if M.config.focus_events and update_state then update_state() end
+      end,
+
       shutdown = function()
         if timer then
           timer:stop()
