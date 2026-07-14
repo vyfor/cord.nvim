@@ -20,7 +20,7 @@ pub enum CordErrorKind {
     Cli,
     /// Errors related to Discord operations.
     Discord,
-    /// Other unspecified errors.
+    /// Other errors.
     Other,
 }
 
