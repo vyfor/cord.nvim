@@ -109,15 +109,15 @@ jobs:
         run: |
           git pull
 
-      - name: Write version to server-metadata.txt
+      - name: Set CORD_VERSION env
         shell: bash
         run: |
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [ -n "$PREVIOUS_TAG" ] && git diff --quiet "$PREVIOUS_TAG" HEAD -- src/; then
-            echo "release: skipping metadata update"
+            echo "no source changes"
             exit 0
           fi
-          echo "${{ needs.get-next-version.outputs.new-release-version }}|$(date +%s)" > .github/server-metadata.txt
+          echo "CORD_VERSION=${{ needs.get-next-version.outputs.new-release-version }}" >> $GITHUB_ENV
 
       - name: Cache Cargo
         uses: actions/cache@v4
