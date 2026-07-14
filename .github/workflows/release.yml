@@ -110,6 +110,7 @@ jobs:
           git pull
 
       - name: Write version to server-metadata.txt
+        shell: bash
         run: |
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [ -n "$PREVIOUS_TAG" ] && git diff --quiet "$PREVIOUS_TAG" HEAD -- src/; then
