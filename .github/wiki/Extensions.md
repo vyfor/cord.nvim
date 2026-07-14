@@ -293,6 +293,47 @@ require('cord').setup {
 </details>
 
 <details>
+<summary><h3><strong>🧩 Tmux</strong></h3></summary>
+
+**Name:** `tmux`
+
+**Purpose:** Provides tmux-related hooks and status tracking.
+
+**Configuration Options:**
+
+```lua
+{
+  interval = 20000,       -- Polling interval in ms (0 to disable). Preferably disable if focus events work fine
+  focus_events = true,    -- Whether to enable reacting to focus events
+  on_attach = 'show',     -- 'show' or custom function
+  on_detach = 'hide',     -- 'hide', 'idle', or custom function
+}
+```
+
+- **`interval`**:
+    - A number (default: `20000`): The background polling interval in milliseconds to check the tmux client attachment state.
+- **`focus_events`**:
+    - `true` (default): Instantly run the attachment state check on `FocusGained` and `FocusLost` events.
+    - `false`: Disable focus events, and rely solely on the background interval timer.
+- **`on_attach`**:
+    - `'show'` (default): Restore Rich Presence when a client attaches to the current tmux session.
+    - `function`: A custom callback function.
+- **`on_detach`**:
+    - `'hide'` (default): Hide current Neovim session's Rich Presence. Other sessions can still take over.
+    - `'idle'`: Set current Neovim session's status to idle.
+    - `function`: A custom callback function.
+
+**Variables Added:**
+
+- **`in_tmux`**: Returns `true` if Neovim is running inside a tmux session, otherwise `false`.
+- **`tmux_pane`**: Returns the active tmux pane ID (e.g., `%0`).
+- **`tmux_session`**: Returns the name of the active tmux session.
+- **`tmux_window`**: Returns the name of the active tmux window.
+- **`attached_count`**: Returns the number of clients currently attached to this tmux session.
+
+</details>
+
+<details>
 <summary><h3><strong>🧩 Last.fm</strong></h3></summary>
 
 **Name:** `lastfm`
