@@ -109,6 +109,15 @@ jobs:
         run: |
           git pull
 
+      - name: Write version to server-metadata.txt
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$PREVIOUS_TAG" ] && git diff --quiet "$PREVIOUS_TAG" HEAD -- src/; then
+            echo "release: skipping metadata update"
+            exit 0
+          fi
+          echo "${{ needs.get-next-version.outputs.new-release-version }}|$(date +%s)" > .github/server-metadata.txt
+
       - name: Cache Cargo
         uses: actions/cache@v4
         id: cargo-cache
