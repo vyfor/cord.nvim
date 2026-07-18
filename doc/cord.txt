@@ -1,5 +1,5 @@
 *cord.txt*
-                                  For NVIM v0.6.0    Last change: 2026 July 14
+                                  For NVIM v0.6.0    Last change: 2026 July 18
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -188,11 +188,11 @@ Default Configuration ~
             initial = true,
           },
           sync = {
-            enabled = true,
+            enabled = false,
             mode = 'periodic',
             interval = 12000,
             reset_on_update = true,
-            pad = true,
+            pad = false,
           },
         },
         workspace = {
@@ -653,7 +653,7 @@ DISCORD SETTINGS ~
   advanced.discord.reconnect.initial      boolean    true         Whether to reconnect if initial
                                                                   connection fails
 
-  advanced.discord.sync.enabled           boolean    true         Whether synchronization logic is
+  advanced.discord.sync.enabled           boolean    false        Whether synchronization logic is
                                                                   enabled
 
   advanced.discord.sync.mode              string     'periodic'   Synchronization mode: 'periodic' or
@@ -665,7 +665,7 @@ DISCORD SETTINGS ~
   advanced.discord.sync.reset_on_update   boolean    true         Whether to reset periodic
                                                                   synchronization on activity updates
 
-  advanced.discord.sync.pad               boolean    true         Whether to pad activity fields with
+  advanced.discord.sync.pad               boolean    false        Whether to pad activity fields with
                                                                   whitespace
   ---------------------------------------------------------------------------------------------------
 
