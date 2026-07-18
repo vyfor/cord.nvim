@@ -334,6 +334,41 @@ require('cord').setup {
 </details>
 
 <details>
+<summary><h3><strong>🦎 Zellij</strong></h3></summary>
+
+**Name:** `zellij`
+
+**Purpose:** Provides zellij-related hooks and status tracking.
+
+**Configuration Options:**
+
+```lua
+{
+  interval = 20000,    -- Polling interval in ms (0 to disable)
+  on_attach = 'show',  -- 'show' or custom function
+  on_detach = 'hide',  -- 'hide', 'idle', or custom function
+}
+```
+
+- **`interval`**:
+    - A number (default: `20000`): The background polling interval in milliseconds to check the zellij client attachment state.
+- **`on_attach`**:
+    - `'show'` (default): Restore Rich Presence when a client attaches to the current zellij session.
+    - `function`: A custom callback function.
+- **`on_detach`**:
+    - `'hide'` (default): Hide current Neovim session's Rich Presence. Other sessions can still take over.
+    - `'idle'`: Set current Neovim session's status to idle.
+    - `function`: A custom callback function.
+
+**Variables Added:**
+
+- **`in_zellij`**: Returns `true` if Neovim is running inside a zellij session, otherwise `false`.
+- **`zellij_session`**: Returns the name of the active zellij session.
+- **`attached_count`**: Returns the number of clients currently attached to this zellij session.
+
+</details>
+
+<details>
 <summary><h3><strong>🎵 Last.fm</strong></h3></summary>
 
 **Name:** `lastfm`
