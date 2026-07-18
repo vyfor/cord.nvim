@@ -27,18 +27,28 @@ the [Discord Developer Portal](https://discord.com/developers/applications),
 then pass its application ID as `editor.client`:
 
 ```lua
-require('cord').setup {
-  editor = {
-    client = '1234567890123456789',
-    -- icon = 'https://...', -- optional icon override
-  },
-}
+editor = {
+  client = '1234567890123456789',
+  -- icon = 'https://...', -- optional icon override
+},
 ```
 
 >[!NOTE]
 > Changing `editor.client` takes effect after `:Cord restart`.
 
----
+### Reconnecting to Discord
+
+Cord can automatically reconnect to Discord in case the active connection is lost. This is also useful in cases where Neovim happens to be started earlier than Discord.
+
+```lua
+advanced = {
+  discord = {
+    reconnect = {
+      enabled = true,
+    },
+  },
+},
+```
 
 ## 🎨 Appearance
 
@@ -49,7 +59,7 @@ Cord provides 120+ icons across several themes, each with `dark`, `light`, and
 display = {
   theme = 'default',   -- 'default', 'atom', 'catppuccin', 'minecraft', 'void', 'classic'
   flavor = 'accent',   -- 'dark', 'light', 'accent'
-}
+},
 ```
 
 ### Choosing which icons show up
@@ -62,7 +72,7 @@ display = {
   -- view = 'asset',  -- only the file/asset icon
   -- view = 'editor', -- only the editor icon
   -- view = 'auto',   -- both, but drop the file icon in new/empty buffers
-}
+},
 ```
 
 **`full`**:
@@ -86,7 +96,7 @@ display = {
 display = {
   swap_icons = true,  -- editor icon becomes the large image, file icon the small one
   swap_fields = true, -- show the workspace name above the file name
-}
+},
 ```
 
 | Default | Swapped |
@@ -129,7 +139,7 @@ text = {
   editing = 'Editing a file',
   viewing = 'Reading some code',
   workspace = 'Working on a project',
-}
+},
 ```
 
 ### Dynamic text with functions
@@ -141,7 +151,7 @@ text = {
   editing = function(opts) return 'Editing ' .. opts.filename end,
   workspace = function(opts) return 'Project: ' .. opts.workspace end,
   terminal = function(opts) return 'In a terminal (' .. opts.name .. ')' end,
-}
+},
 ```
 
 ### Showing the cursor position
@@ -151,7 +161,7 @@ text = {
   editing = function(opts)
     return string.format('Editing %s:%d:%d', opts.filename, opts.cursor_line, opts.cursor_char)
   end,
-}
+},
 ```
 
 ### Marking modified (unsaved) buffers
@@ -163,7 +173,7 @@ text = {
     if vim.bo.modified then text = text .. ' [+]' end
     return text
   end,
-}
+},
 ```
 
 ### Hiding or collapsing lines
@@ -183,7 +193,7 @@ text = {
 
   plugin_manager = false,  -- hide presence while in a plugin manager
   file_browser = true,     -- ignore file browsers; keep showing the previous activity
-}
+},
 ```
 
 ### String templates with variables
@@ -197,7 +207,7 @@ text = {
     editing = 'Editing ${filename}',
     workspace = 'In ${workspace}',
   },
-}
+},
 ```
 
 You can also define your own variables:
@@ -210,7 +220,7 @@ You can also define your own variables:
   text = {
     workspace = 'Rolled a ${random}',
   },
-}
+},
 ```
 
 ### One default for everything
@@ -221,7 +231,7 @@ You can also define your own variables:
 text = {
   default = 'Using Neovim', -- applies to all unset categories
   workspace = function(opts) return 'In ' .. opts.workspace end, -- overrides the default
-}
+},
 ```
 
 ## 🕹️ Buttons
@@ -236,7 +246,7 @@ buttons = {
     label = 'My Website',
     url = 'https://example.com',
   },
-}
+},
 ```
 
 ### Dynamic label and URL
@@ -251,7 +261,7 @@ buttons = {
       return opts.repo_url or 'https://example.com'
     end,
   },
-}
+},
 ```
 
 ### Hiding a button conditionally
@@ -267,7 +277,7 @@ buttons = {
       return opts.repo_url
     end,
   },
-}
+},
 ```
 
 ## 💤 Idle Behavior
@@ -284,7 +294,7 @@ idle = {
   end,
   state = 'Be right back',
   tooltip = '😴',
-}
+},
 ```
 
 ### Hiding the presence entirely while idle
@@ -292,7 +302,7 @@ idle = {
 ```lua
 idle = {
   show_status = false, -- clear the presence instead of showing an idle status
-}
+},
 ```
 
 ## 🗃️ Custom Assets
@@ -304,7 +314,7 @@ Defining new or overriding existing assets.
 ```lua
 assets = {
   ['.rs'] = 'https://example.com/my-rust-icon.png',
-}
+},
 ```
 
 ### Adding a missing filetype
@@ -317,7 +327,7 @@ assets = {
     tooltip = 'My custom filetype',
     type = 'file_browser',  -- categorize it
   },
-}
+},
 ```
 
 See [Assets Wiki](./Assets.md) for more details and examples.
@@ -354,7 +364,7 @@ hooks = {
     local v = vim.version()
     activity.assets.small_text = string.format('Neovim %d.%d.%d', v.major, v.minor, v.patch)
   end,
-}
+},
 ```
 
 ### Make certain fields clickable
@@ -368,7 +378,7 @@ hooks = {
       activity.details_url = opts.repo_url
     end
   end,
-}
+},
 ```
 
 Images:
@@ -380,7 +390,7 @@ hooks = {
       activity.assets.large_url = opts.repo_url
     end
   end,
-}
+},
 ```
 
 ### Change the activity type
@@ -392,7 +402,7 @@ hooks = {
   post_activity = function(opts, activity)
     activity.type = 'playing' -- 'playing' | 'listening' | 'watching' | 'competing'
   end,
-}
+},
 ```
 
 ### Change the shown activity field
@@ -409,7 +419,7 @@ hooks = {
   post_activity = function(opts, activity)
     activity.status_display_type = 'name' -- 'name' | 'details' | 'state'
   end,
-}
+},
 ```
 
 ## ⏳ Going Further with Async
@@ -482,7 +492,7 @@ buttons = {
       return opts.repo_url
     end),
   },
-}
+},
 ```
 
 ### Commits ahead upstream

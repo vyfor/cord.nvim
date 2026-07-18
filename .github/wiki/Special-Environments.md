@@ -2,7 +2,7 @@
 
 ## 🐧 Running inside WSL
 
-WSL doesn't expose existing Windows named pipes by default, which Cord needs. To work around that, use `socat` and `npiperelay`.
+WSL doesn't expose existing Windows named pipes that Cord relies on. To work around that, use `socat` and `npiperelay`.
 This method is based on [this gist](https://gist.github.com/mousebyte/af45cbecaf0028ea78d0c882c477644a#aliasing-nvim).
 
 1. **Install `socat`** in WSL: `sudo apt install socat`
@@ -21,7 +21,7 @@ This method is based on [this gist](https://gist.github.com/mousebyte/af45cbecaf
    }
    ```
 
-   > Do note that you must either add the path to npiperelay to your Windows PATH, or specify an absolute path to it inside `EXEC`.
+   > Do note that you must either add the path to npiperelay to your Windows PATH, or specify an absolute path to it inside `EXEC` (e.g. `/mnt/c/.../npiperelay.exe`).
    > Always launch Neovim using this alias in WSL.
 
 ## 🖥️ Remote Server (SSH)

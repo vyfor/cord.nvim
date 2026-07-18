@@ -29,7 +29,7 @@
 ---
 
 > [!IMPORTANT]
-> Cord no longer requires Rust to be installed. Server component will be automatically downloaded from GitHub Releases.
+> Cord does **not** require Rust to be installed.
 
 ## 💎 Features
 - ⚡ Fast, lightweight, and batteries included.
@@ -44,8 +44,8 @@
 - 🎯 [Async](https://github.com/vyfor/cord.nvim/wiki/Async)-first design with an async-aware configuration layer.
 - 📦 Works with different Discord setups (Snap, Flatpak, [WSL](https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-running-inside-wsl), and even the [~~browser~~](https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-using-discord-in-a-browser)).
 - 🌍 Runs on Windows, Linux, macOS, and FreeBSD.
-- 🌸 Includes 120+ icons for 200+ file types and plugins, featured in distinct themes and flavors.
-- 🔁 Reconnects automatically if connection to Discord is lost.
+- 🌸 Includes 120+ icons for 200+ file types and plugins, featured in distinct [themes](#-themes) and flavors.
+- 🔁 [Reconnects](https://github.com/vyfor/cord.nvim/wiki/Examples#reconnecting-to-discord) automatically if connection to Discord is lost.
 
 ## 📦 Installation
 
@@ -157,21 +157,16 @@ git clone https://github.com/vyfor/cord.nvim $LOCALAPPDATA/nvim-data/site/pack/p
 <details>
 <summary><strong>Considerations</strong></summary>
 
-Cord requires the **server executable** to be present. By default, the plugin automatically fetches it from GitHub, which requires a dependency on [**`curl`**](https://curl.se).
-
-Alternatively, you can provide the executable manually:
-
-- **Download from GitHub:**  
-  Get the latest release from [https://github.com/vyfor/cord.nvim/releases/latest](https://github.com/vyfor/cord.nvim/releases/latest), rename it to `cord` (or `cord.exe` on Windows), and place it under `nvim-data-dir/cord/bin`. This is essentially what `:Cord update fetch` does.
-
-- **Build from source:**  
-  Run `:Cord update install` to install from crates.io or `:Cord update build` to build from source locally.
+Cord requires the **server executable** to be present. By default, the plugin will fetch it from GitHub, which requires a dependency on [**`curl`**](https://curl.se).
+  
+If preferred, the server can be built from source. Run `:Cord update install` to install from crates.io or `:Cord update build` to build from source locally.
 
 > Note: If you decide to build from source, it is your responsibility to keep the server binary up-to-date.
 
 </details>
 
 See the [Examples](https://github.com/vyfor/cord.nvim/wiki/Examples) to get started.
+Ask any questions in [Discussions](https://github.com/vyfor/cord.nvim/discussions).
 
 ## 🎨 Themes
 
@@ -200,9 +195,4 @@ See the [showcase](https://github.com/vyfor/icons#showcase) for an extended comp
 > | <img src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/atom_theme_2.png" width="400" /> | <img src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/minecraft_theme_2.png" width="400" /> |
 
 ## ❤️ Support the Project
-I'm the sole maintainer of cord.nvim and dedicate much of my free time to this project. If you find Cord helpful, you can show your support by giving the repo a star or [sponsoring me on GitHub](https://github.com/sponsors/vyfor). Every bit of support helps me continue to improve and maintain Cord for everyone. Thank you!
-
-<div align="center">  
-  <p>💬 Questions? Post in <a href="https://github.com/vyfor/cord.nvim/discussions">Discussions</a> or reach me out on Discord: <a href="https://discord.com/users/446729269872427018"><strong>vyfor</strong></a></p>
-  <div><a href="https://discord.gg/q9rC4bjCHv"><img src="https://discord.com/api/guilds/1322899307925602366/widget.png?style=banner3" alt="cord.nvim"/></a></div>
-</div>
+I'm the sole maintainer of cord.nvim and dedicate much of my free time to this project. If you find Cord helpful, you can show your support by starring the repo or [sponsoring me on GitHub](https://github.com/sponsors/vyfor). Every bit of support helps me continue to improve and maintain Cord for everyone. Thank you!

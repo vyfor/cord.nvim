@@ -8,7 +8,7 @@ Thank you for your interest in contributing to cord.nvim! This document provides
 - Style:
   - Lua: format with `stylua` and lint with `luacheck`.
   - Rust: format with `cargo fmt --all` and lint with `cargo clippy --all-targets --all-features`.
-- If your changes affect the server component, [build](./Build.md) the binary from source.
+- If your changes affect the server side, [build](./Build.md) the binary from source.
 - Update docs when your change affects behavior or config.
 - Submit a PR with a clear overview and description of your changes. PR title and commits must follow [Conventional Commits](https://www.conventionalcommits.org/) spec.
 
@@ -100,15 +100,13 @@ Discord IPC, message protocol, session management, cross-platform pipes and some
 {
   'vyfor/cord.nvim',
   dir = 'path/to/cloned/cord.nvim',
-  -- comment this out if you're working on the server component
-  -- see https://github.com/vyfor/cord.nvim/wiki/Build
-  build = ':Cord update',
+  -- see https://github.com/vyfor/cord.nvim/wiki/Build for building the server from source
 }
 ```
 
 ### Logging and debugging
 
-If something work as expected, it's always a good idea to check the logs. See https://github.com/vyfor/cord.nvim/wiki/FAQ#q-how-to-see-the-logs.
+If something doesn't work as expected, it's always a good idea to check the logs. See https://github.com/vyfor/cord.nvim/wiki/FAQ#q-logging-for-debugging
 
 ## Versioning
 

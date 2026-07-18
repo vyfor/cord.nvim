@@ -4,7 +4,7 @@
 
 1. Update cord.nvim, make sure `:Cord update` is also executed.
 2. Double-check your [Discord Activity Privacy settings](https://github.com/vyfor/cord.nvim/assets/92883017/c0c8c410-e90e-425e-bf10-8b59f04f15ce).
-3. Enable logging. See [FAQ](./FAQ.md#q-how-to-see-the-logs).
+3. Enable logging. See [FAQ](./FAQ.md#q-logging-for-debugging).
 4. Run `:checkhealth cord` for a config check.
 5. Make sure the Discord IPC pipe exists:
 
@@ -26,13 +26,11 @@ Add `event = 'VeryLazy'` to the plugin spec.
 
 ## 🎛️ No Buttons in Rich Presence
 
-You might not be seeing buttons in your own Rich Presence. This is due to a client-sided bug on the app.
-
-But there is actually a way to see them, join a voice channel and hover over your name. Buttons should show up in the tooltip.
+Client-sided bug. Join any voice channel and hover over your name.
 
 ## ⏱️ Rich Presence Timer Stuck at 00:00
 
-This usually means your system clock is off. Sync your clock with NTP.
+Your system clock might be off. Sync your clock with NTP.
 
 ## 🔒 EACCES: Permission Denied
 
@@ -49,4 +47,4 @@ If nothing above works:
 3. [Open a new issue](https://github.com/vyfor/cord.nvim/issues/new/choose).
    Be clear and include as much detail as possible.
 
-You can also ask in Discussions or Discord if you're unsure.
+You can also ask in the Discord server if you're unsure.

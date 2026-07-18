@@ -14,20 +14,23 @@ If you'd rather build it yourself, check the [Build guide](./Build.md).
 
 > ### Q: How to see the logs?
 
-You can check the logs in two ways:
-
-1. Set a log level in your config. Messages at that level (and higher) will show up in `:messages`.
+Cord's notifications/messages/logs are controlled by the `CORD_LOG_LEVEL` env var OR `log_level` configuration option. Usually, you want this value to be set to one of `off`, `error`, `warn`, `info`.
 
 ```lua
-require 'cord'.setup {
+require('cord').setup {
     log_level = '...' -- one of 'trace', 'debug', 'info', 'warn', 'error'
 }
 ```
 
-2. Set the `CORD_LOG_FILE` environment variable to a file path. This saves logs to a file instead of spamming your editor, which is especially useful when using `trace` or `debug` levels.
+Where logs go depends on the presence of the `CORD_LOG_FILE` environment variable. The log file is cleared at plugin startup.
 
-> [!NOTE]
-> If you were asked to provide logs as part of an issue, you should enable verbose logging via `log_level = 'trace'` and set `CORD_LOG_FILE` environment variable. Use of relative paths is allowed, e.g. `export CORD_LOG_FILE="./cord.log"`. The log file gets cleared at plugin startup, so keep that in mind.
+> ### Q: Logging for debugging
+
+For comfortable debugging, have the log file open and periodically reload it (`:e`).
+
+```sh
+CORD_LOG_LEVEL="trace" CORD_LOG_FILE="cord.log" nvim cord.log
+```
 
 > ### Q: Can I use a custom name in my Rich Presence?
 

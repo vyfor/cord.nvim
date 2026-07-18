@@ -23,7 +23,7 @@ require('cord').setup {
 ## 🔌 Available Extensions
 
 <details>
-<summary><h3><strong>🧩 Diagnostics</strong></h3></summary>
+<summary><h3><strong>⚠️ Diagnostics</strong></h3></summary>
 
 **Name:** `diagnostics`
 
@@ -72,7 +72,7 @@ text = {
 </details>
 
 <details>
-<summary><h3><strong>🧩 Resolver</strong></h3></summary>
+<summary><h3><strong>🧭 Resolver</strong></h3></summary>
 
 **Name:** `resolver`
 
@@ -111,7 +111,7 @@ require('cord').setup {
 </details>
 
 <details>
-<summary><h3><strong>🧩 Visibility</strong></h3></summary>
+<summary><h3><strong>👁️ Visibility</strong></h3></summary>
 
 **Name:** `visibility`
 
@@ -187,7 +187,7 @@ require('cord').setup {
 </details>
 
 <details>
-<summary><h3><strong>🧩 Local Time</strong></h3></summary>
+<summary><h3><strong>🕒 Local Time</strong></h3></summary>
 
 **Name:** `local_time`
 
@@ -215,7 +215,7 @@ require('cord').setup {
 </details>
 
 <details>
-<summary><h3><strong>🧩 Persistent Timer</strong></h3></summary>
+<summary><h3><strong>⏱️ Persistent Timer</strong></h3></summary>
 
 **Name:** `persistent_timer`
 
@@ -259,7 +259,7 @@ require('cord').setup {
 </details>
 
 <details>
-<summary><h3><strong>🧩 Scoped Timestamps</strong></h3></summary>
+<summary><h3><strong>⏳ Scoped Timestamps</strong></h3></summary>
 
 **Name:** `scoped_timestamps`
 
@@ -293,7 +293,7 @@ require('cord').setup {
 </details>
 
 <details>
-<summary><h3><strong>🧩 Tmux</strong></h3></summary>
+<summary><h3><strong>🪟 Tmux</strong></h3></summary>
 
 **Name:** `tmux`
 
@@ -334,7 +334,7 @@ require('cord').setup {
 </details>
 
 <details>
-<summary><h3><strong>🧩 Last.fm</strong></h3></summary>
+<summary><h3><strong>🎵 Last.fm</strong></h3></summary>
 
 **Name:** `lastfm`
 
