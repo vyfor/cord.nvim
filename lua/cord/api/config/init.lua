@@ -231,11 +231,11 @@ local defaults = {
         initial = true,
       },
       sync = {
-        enabled = true,
+        enabled = false,
         mode = 'periodic',
         interval = 12000,
         reset_on_update = true,
-        pad = true,
+        pad = false,
       },
     },
     workspace = {
