@@ -1438,17 +1438,31 @@ the Discord Developer Portal <https://discord.com/developers/applications>,
 then pass its application ID as `editor.client`:
 
 >lua
-    require('cord').setup {
-      editor = {
-        client = '1234567890123456789',
-        -- icon = 'https://...', -- optional icon override
-      },
-    }
+    editor = {
+      client = '1234567890123456789',
+      -- icon = 'https://...', -- optional icon override
+    },
 <
 
 
   [!NOTE] Changing `editor.client` takes effect after `:Cord restart`.
-------------------------------------------------------------------------------
+
+RECONNECTING TO DISCORD ~
+
+Cord can automatically reconnect to Discord in case the active connection is
+lost. This is also useful in cases where Neovim happens to be started earlier
+than Discord.
+
+>lua
+    advanced = {
+      discord = {
+        reconnect = {
+          enabled = true,
+        },
+      },
+    },
+<
+
 
 APPEARANCE                                          *cord-examples-appearance*
 
@@ -1460,7 +1474,7 @@ Cord provides 120+ icons across several themes, each with `dark`, `light`, and
     display = {
       theme = 'default',   -- 'default', 'atom', 'catppuccin', 'minecraft', 'void', 'classic'
       flavor = 'accent',   -- 'dark', 'light', 'accent'
-    }
+    },
 <
 
 
@@ -1474,7 +1488,7 @@ CHOOSING WHICH ICONS SHOW UP ~
       -- view = 'asset',  -- only the file/asset icon
       -- view = 'editor', -- only the editor icon
       -- view = 'auto',   -- both, but drop the file icon in new/empty buffers
-    }
+    },
 <
 
 **full**:
@@ -1490,7 +1504,7 @@ SWAPPING THE ICON AND FIELD LAYOUT ~
     display = {
       swap_icons = true,  -- editor icon becomes the large image, file icon the small one
       swap_fields = true, -- show the workspace name above the file name
-    }
+    },
 <
 
   -----------------------------------------------------------------------
@@ -1538,7 +1552,7 @@ SIMPLE STATIC TEXT ~
       editing = 'Editing a file',
       viewing = 'Reading some code',
       workspace = 'Working on a project',
-    }
+    },
 <
 
 
@@ -1552,7 +1566,7 @@ string.
       editing = function(opts) return 'Editing ' .. opts.filename end,
       workspace = function(opts) return 'Project: ' .. opts.workspace end,
       terminal = function(opts) return 'In a terminal (' .. opts.name .. ')' end,
-    }
+    },
 <
 
 
@@ -1563,7 +1577,7 @@ SHOWING THE CURSOR POSITION ~
       editing = function(opts)
         return string.format('Editing %s:%d:%d', opts.filename, opts.cursor_line, opts.cursor_char)
       end,
-    }
+    },
 <
 
 
@@ -1576,7 +1590,7 @@ MARKING MODIFIED (UNSAVED) BUFFERS ~
         if vim.bo.modified then text = text .. ' [+]' end
         return text
       end,
-    }
+    },
 <
 
 
@@ -1600,7 +1614,7 @@ The return value of a text entry has special meanings:
     
       plugin_manager = false,  -- hide presence while in a plugin manager
       file_browser = true,     -- ignore file browsers; keep showing the previous activity
-    }
+    },
 <
 
 
@@ -1615,7 +1629,7 @@ STRING TEMPLATES WITH VARIABLES ~
         editing = 'Editing ${filename}',
         workspace = 'In ${workspace}',
       },
-    }
+    },
 <
 
 You can also define your own variables:
@@ -1628,7 +1642,7 @@ You can also define your own variables:
       text = {
         workspace = 'Rolled a ${random}',
       },
-    }
+    },
 <
 
 
@@ -1640,7 +1654,7 @@ ONE DEFAULT FOR EVERYTHING ~
     text = {
       default = 'Using Neovim', -- applies to all unset categories
       workspace = function(opts) return 'In ' .. opts.workspace end, -- overrides the default
-    }
+    },
 <
 
 
@@ -1657,7 +1671,7 @@ A STATIC BUTTON ~
         label = 'My Website',
         url = 'https://example.com',
       },
-    }
+    },
 <
 
 
@@ -1673,7 +1687,7 @@ DYNAMIC LABEL AND URL ~
           return opts.repo_url or 'https://example.com'
         end,
       },
-    }
+    },
 <
 
 
@@ -1691,7 +1705,7 @@ example, hiding the repository button when the instance is idle:
           return opts.repo_url
         end,
       },
-    }
+    },
 <
 
 
@@ -1710,7 +1724,7 @@ CUSTOM IDLE MESSAGES ~
       end,
       state = 'Be right back',
       tooltip = '😴',
-    }
+    },
 <
 
 
@@ -1719,7 +1733,7 @@ HIDING THE PRESENCE ENTIRELY WHILE IDLE ~
 >lua
     idle = {
       show_status = false, -- clear the presence instead of showing an idle status
-    }
+    },
 <
 
 
@@ -1733,7 +1747,7 @@ REPLACE AN ICON BY EXTENSION ~
 >lua
     assets = {
       ['.rs'] = 'https://example.com/my-rust-icon.png',
-    }
+    },
 <
 
 
@@ -1747,7 +1761,7 @@ ADDING A MISSING FILETYPE ~
         tooltip = 'My custom filetype',
         type = 'file_browser',  -- categorize it
       },
-    }
+    },
 <
 
 See Assets Wiki <./Assets.md> for more details and examples.
@@ -1790,7 +1804,7 @@ SHOW THE NEOVIM VERSION IN THE SMALL ICON’S TOOLTIP ~
         local v = vim.version()
         activity.assets.small_text = string.format('Neovim %d.%d.%d', v.major, v.minor, v.patch)
       end,
-    }
+    },
 <
 
 
@@ -1805,7 +1819,7 @@ Text:
           activity.details_url = opts.repo_url
         end
       end,
-    }
+    },
 <
 
 Images:
@@ -1817,7 +1831,7 @@ Images:
           activity.assets.large_url = opts.repo_url
         end
       end,
-    }
+    },
 <
 
 
@@ -1832,7 +1846,7 @@ with:
       post_activity = function(opts, activity)
         activity.type = 'playing' -- 'playing' | 'listening' | 'watching' | 'competing'
       end,
-    }
+    },
 <
 
 
@@ -1847,7 +1861,7 @@ main.lua”_ - State: _“In workspace”_
       post_activity = function(opts, activity)
         activity.status_display_type = 'name' -- 'name' | 'details' | 'state'
       end,
-    }
+    },
 <
 
 
@@ -1924,7 +1938,7 @@ HIDE THE REPOSITORY BUTTON FOR PRIVATE REPOSITORIES ~
           return opts.repo_url
         end),
       },
-    }
+    },
 <
 
 
@@ -1967,8 +1981,7 @@ Share your snippets in GitHub Discussions
 
 ------------------------------------------------------------------------------
 
-  [!IMPORTANT] Cord no longer requires Rust to be installed. Server component
-  will be automatically downloaded from GitHub Releases.
+  [!IMPORTANT] Cord does **not** require Rust to be installed.
 
 FEATURES                                              *cord-examples-features*
 
@@ -1984,8 +1997,8 @@ FEATURES                                              *cord-examples-features*
 - Async <https://github.com/vyfor/cord.nvim/wiki/Async>-first design with an async-aware configuration layer.
 - Works with different Discord setups (Snap, Flatpak, WSL <https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-running-inside-wsl>, and even the ~browser~ <https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-using-discord-in-a-browser>).
 - Runs on Windows, Linux, macOS, and FreeBSD.
-- Includes 120+ icons for 200+ file types and plugins, featured in distinct themes and flavors.
-- Reconnects automatically if connection to Discord is lost.
+- Includes 120+ icons for 200+ file types and plugins, featured in distinct |cord-themes| and flavors.
+- Reconnects <https://github.com/vyfor/cord.nvim/wiki/Examples#reconnecting-to-discord> automatically if connection to Discord is lost.
 
 
 INSTALLATION                                      *cord-examples-installation*
@@ -2085,23 +2098,18 @@ Vim packages ~
 Considerations ~
 
 Cord requires the **server executable** to be present. By default, the plugin
-automatically fetches it from GitHub, which requires a dependency on **curl**
+will fetch it from GitHub, which requires a dependency on **curl**
 <https://curl.se>.
 
-Alternatively, you can provide the executable manually:
-
-- **Download from GitHub:** Get the latest release from
-<https://github.com/vyfor/cord.nvim/releases/latest>, rename it to `cord` (or
-    `cord.exe` on Windows), and place it under `nvim-data-dir/cord/bin`. This is
-    essentially what `:Cord update fetch` does.
-- **Build from source:** Run `:Cord update install` to install from crates.io or
-    `:Cord update build` to build from source locally.
+If preferred, the server can be built from source. Run `:Cord update install`
+to install from crates.io or `:Cord update build` to build from source locally.
 
 
   Note: If you decide to build from source, it is your responsibility to keep the
   server binary up-to-date.
 See the Examples <https://github.com/vyfor/cord.nvim/wiki/Examples> to get
-started.
+started. Ask any questions in Discussions
+<https://github.com/vyfor/cord.nvim/discussions>.
 
 
 THEMES                                                  *cord-examples-themes*
@@ -2128,11 +2136,10 @@ comparison.
 SUPPORT THE PROJECT                        *cord-examples-support-the-project*
 
 I’m the sole maintainer of cord.nvim and dedicate much of my free time to
-this project. If you find Cord helpful, you can show your support by giving the
-repo a star or sponsoring me on GitHub <https://github.com/sponsors/vyfor>.
-Every bit of support helps me continue to improve and maintain Cord for
-everyone. Thank you!
-
+this project. If you find Cord helpful, you can show your support by starring
+the repo or sponsoring me on GitHub <https://github.com/sponsors/vyfor>. Every
+bit of support helps me continue to improve and maintain Cord for everyone.
+Thank you!
 
 ==============================================================================
 5. Links                                                          *cord-links*
