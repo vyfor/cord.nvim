@@ -33,6 +33,7 @@ M.setup = function(config)
       ready = async.wrap(function(manager)
         local zellij = vim.env.ZELLIJ
         if not zellij or zellij == '' then return end
+        if vim.fn.executable 'zellij' ~= 1 then return end
 
         M.in_zellij = true
         M.session = vim.env.ZELLIJ_SESSION_NAME

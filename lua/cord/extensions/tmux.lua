@@ -38,6 +38,7 @@ M.setup = function(config)
       ready = async.wrap(function(manager)
         local tmux_pane = vim.env.TMUX_PANE
         if not tmux_pane or tmux_pane == '' then return end
+        if vim.fn.executable 'tmux' ~= 1 then return end
 
         M.in_tmux = true
         M.pane = tmux_pane
