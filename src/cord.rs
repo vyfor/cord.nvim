@@ -11,6 +11,7 @@ use crate::messages::events::server::{LogEvent, ServerEvent};
 use crate::messages::message::Message;
 use crate::presence::manager::ActivityManager;
 use crate::protocol::msgpack::Serialize;
+use crate::types::reconnect::ReconnectState;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
 use crate::util::logger::{self, LOGGER, LogLevel, Logger};
@@ -35,6 +36,7 @@ pub struct Cord {
     pub tx: Sender<Message>,
     pub rx: Receiver<Message>,
     pub log_buffer: VecDeque<LogEvent>,
+    pub reconnect_state: ReconnectState,
     _lock: ServerLock,
 }
 
@@ -63,6 +65,7 @@ impl Cord {
             tx,
             rx,
             log_buffer: VecDeque::with_capacity(100),
+            reconnect_state: ReconnectState::default(),
             _lock: lock,
         })
     }
@@ -126,6 +129,8 @@ impl Cord {
 
     /// Cleans up before shutdown.
     pub fn cleanup(&mut self) {
+        self.reconnect_state.cancel();
+
         if let Ok(mut client) = self.activity_manager.client.write() {
             client.close();
         }

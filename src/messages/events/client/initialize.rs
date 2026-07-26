@@ -5,11 +5,13 @@ use crate::error::CordErrorKind;
 use crate::ipc::discord::client::Connection;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
+use crate::messages::events::local::ReconnectEvent;
 use crate::messages::events::server::StatusUpdateEvent;
 use crate::messages::events::server::status_update::Status;
 use crate::protocol::msgpack::MsgPack;
 use crate::types::config::PluginConfig;
 use crate::util::{logger, now};
+use crate::local_event;
 
 #[derive(Debug)]
 pub struct InitializeEvent {
@@ -67,15 +69,11 @@ impl OnEvent for InitializeEvent {
                         ctx.client_id,
                         "Connection failed, scheduling reconnect"
                     );
-                    drop(client);
-                    let client_clone = rich_client.clone();
-                    let tx = ctx.cord.tx.clone();
-
-                    let reconnect_interval = config.reconnect_interval;
-                    std::thread::spawn(move || {
-                        let mut client = client_clone.write().unwrap();
-                        client.reconnect(reconnect_interval, tx.clone());
-                    });
+                    let _ = ctx.cord.tx.send(local_event!(
+                        0,
+                        Reconnect,
+                        ReconnectEvent::new(false)
+                    ));
                 } else {
                     debug!(
                         ctx.client_id,

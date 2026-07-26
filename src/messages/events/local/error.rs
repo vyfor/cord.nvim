@@ -1,9 +1,10 @@
 use crate::ipc::discord::error::DiscordError;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
+use crate::messages::events::local::ReconnectEvent;
 use crate::messages::events::server::StatusUpdateEvent;
 use crate::protocol::msgpack::MsgPack;
-use crate::{debug, error};
+use crate::{debug, error, local_event};
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 
@@ -37,14 +38,10 @@ impl OnEvent for ErrorEvent {
                         &StatusUpdateEvent::disconnected(),
                     )?)?;
 
-                    let rich_client = ctx.cord.activity_manager.client.clone();
-                    let tx = ctx.cord.tx.clone();
-                    std::thread::spawn(move || {
-                        rich_client
-                            .write()
-                            .unwrap()
-                            .reconnect(reconnect_interval, tx);
-                    });
+                    let _ = ctx
+                        .cord
+                        .tx
+                        .send(local_event!(0, Reconnect, ReconnectEvent::new(false)));
 
                     debug!("Discord closed the connection");
 
