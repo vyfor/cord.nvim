@@ -2,7 +2,6 @@ use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::Sender;
 use std::thread::JoinHandle;
-use std::time::Duration;
 
 use crate::ipc::discord::error::DiscordError;
 use crate::messages::events::server::status_update::Status;
@@ -134,39 +133,6 @@ impl RichClient {
             Err(_) => Err("The connection to Discord was lost".into()),
             _ => Ok(()),
         }
-    }
-
-    /// Reconnects to Discord with exponential backoff.
-    pub fn reconnect(&mut self, interval: u64, tx: Sender<Message>) {
-        debug!(
-            "Initiating reconnection to Discord with interval={}ms",
-            interval
-        );
-        self.is_reconnecting = true;
-        self.close();
-
-        std::thread::sleep(Duration::from_millis(500));
-
-        let mut client = Self::new(self.client_id, self.pipe_paths.clone());
-        while self.is_reconnecting {
-            trace!("Attempting to reconnect to Discord");
-            if client.connect().is_ok() {
-                if client.handshake().is_ok() {
-                    debug!("Successfully reconnected to Discord");
-                    *self = client;
-                    let _ = self.start_read_thread(tx);
-
-                    break;
-                } else {
-                    trace!("Handshake failed during reconnection");
-                    client.close();
-                }
-            };
-
-            std::thread::sleep(Duration::from_millis(interval));
-        }
-
-        self.is_reconnecting = false;
     }
 }
 
