@@ -92,6 +92,26 @@ M.restart = function()
     cord.tx:restart()
   end)
 end
+M.reconnect = function()
+  vim.schedule(function()
+    local cord = require 'cord.server'
+    if cord.is_updating then
+      require('cord.api.log').notify('Operation cancelled: Server is updating', vim.log.levels.WARN)
+      return
+    end
+
+    require('cord.api.log').debug 'Reconnecting...'
+    local function initialize()
+      require('cord.core.async').run(function() cord:initialize() end)
+    end
+
+    if not cord.tx then return initialize() end
+    if not cord.client then return initialize() end
+    if cord.client:is_closing() then return initialize() end
+
+    cord.tx:reconnect()
+  end)
+end
 M.shutdown = function()
   local cord = require 'cord.server'
 
@@ -208,6 +228,7 @@ M.commands = {
   status = M.status,
   version = M.version,
   restart = M.restart,
+  reconnect = M.reconnect,
   shutdown = M.shutdown,
   health = M.health,
 }

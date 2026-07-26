@@ -483,6 +483,7 @@ The `advanced.cursor_update_mode` option controls how cursor position updates ar
 - `:Cord status` - Show connection status
 - `:Cord version` - Show current server version
 - `:Cord restart` - Restart the server
+- `:Cord reconnect` - Reconnect to Discord
 - `:Cord shutdown` - Disconnect from Discord and shutdown the server
 - `:Cord health` - Validate user configuration
 

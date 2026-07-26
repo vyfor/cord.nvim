@@ -51,4 +51,6 @@ function Producer:shutdown() self:send_event 'shutdown' end
 
 function Producer:restart() self:send_event 'restart' end
 
+function Producer:reconnect() self:send_event 'reconnect' end
+
 return Producer
