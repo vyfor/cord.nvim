@@ -99,6 +99,7 @@ function M:run()
             M.manager = manager
           end)
         elseif data.status == 'disconnected' then
+          local was_connected = self.status == 'ready' or self.status == 'connected'
           self.status = 'initialized'
 
           if M.manager then M.manager:cleanup() end
@@ -110,7 +111,7 @@ function M:run()
             )
           end
 
-          if config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
+          if was_connected and config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
         end
       end)
     )
