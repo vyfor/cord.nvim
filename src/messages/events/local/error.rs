@@ -34,10 +34,6 @@ impl OnEvent for ErrorEvent {
                         return Err("Discord closed the connection".into());
                     }
 
-                    ctx.cord.pipe.broadcast(&MsgPack::serialize(
-                        &StatusUpdateEvent::disconnected(),
-                    )?)?;
-
                     let _ = ctx
                         .cord
                         .tx

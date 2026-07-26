@@ -64,7 +64,10 @@ impl OnEvent for ReconnectEvent {
             client.is_reconnecting = true;
             client.close();
 
+            std::thread::sleep(Duration::from_millis(500));
+
             let mut result = Ok(());
+            let mut first = true;
             loop {
                 if cancel.load(Ordering::SeqCst) {
                     debug!(client_id, "Reconnect loop cancelled");
@@ -72,7 +75,11 @@ impl OnEvent for ReconnectEvent {
                     break;
                 }
 
-                std::thread::sleep(Duration::from_millis(500));
+                if first {
+                    first = false;
+                } else if !manual && interval > 0 {
+                    std::thread::sleep(Duration::from_millis(interval));
+                }
 
                 let mut rich_client =
                     crate::ipc::discord::client::RichClient::new(
@@ -92,9 +99,6 @@ impl OnEvent for ReconnectEvent {
                                 );
                                 rich_client.close();
                                 if !manual && interval > 0 {
-                                    std::thread::sleep(Duration::from_millis(
-                                        interval,
-                                    ));
                                     continue;
                                 }
                                 result = Err(e);
@@ -108,9 +112,6 @@ impl OnEvent for ReconnectEvent {
                             debug!(client_id, "Reconnect: handshake failed: {}", e);
                             rich_client.close();
                             if !manual && interval > 0 {
-                                std::thread::sleep(Duration::from_millis(
-                                    interval,
-                                ));
                                 continue;
                             }
                             result = Err(e);
@@ -120,7 +121,6 @@ impl OnEvent for ReconnectEvent {
                     Err(e) => {
                         debug!(client_id, "Reconnect: connect failed: {}", e);
                         if !manual && interval > 0 {
-                            std::thread::sleep(Duration::from_millis(interval));
                             continue;
                         }
                         result = Err(e);
