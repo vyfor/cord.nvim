@@ -9,6 +9,7 @@ pub mod clear_activity;
 pub mod connect;
 pub mod disconnect;
 pub mod initialize;
+pub mod reconnect;
 pub mod restart;
 pub mod shutdown;
 pub mod update_activity;
@@ -17,6 +18,7 @@ pub use clear_activity::ClearActivityEvent;
 pub use connect::ConnectEvent;
 pub use disconnect::DisconnectEvent;
 pub use initialize::InitializeEvent;
+pub use reconnect::ReconnectClientEvent;
 pub use restart::RestartEvent;
 pub use shutdown::ShutdownEvent;
 pub use update_activity::UpdateActivityEvent;
@@ -30,6 +32,7 @@ pub enum ClientEvent {
     Disconnect(DisconnectEvent),
     Shutdown(ShutdownEvent),
     Restart(RestartEvent),
+    Reconnect(ReconnectClientEvent),
 }
 
 /// Extracts the 'data' field from a map and returns an error if it is missing or invalid.
@@ -75,6 +78,7 @@ impl ClientEvent {
             "disconnect" => Self::Disconnect(DisconnectEvent),
             "shutdown" => Self::Shutdown(ShutdownEvent),
             "restart" => Self::Restart(RestartEvent),
+            "reconnect" => Self::Reconnect(ReconnectClientEvent),
             _ => return Err(format!("Unknown message type: {}", ty).into()),
         })
     }
@@ -91,6 +95,7 @@ impl OnEvent for ClientEvent {
             Self::ClearActivity(e) => e.on_event(ctx),
             Self::Shutdown(e) => e.on_event(ctx),
             Self::Restart(e) => e.on_event(ctx),
+            Self::Reconnect(e) => e.on_event(ctx),
         }
     }
 }
