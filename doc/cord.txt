@@ -1,5 +1,5 @@
 *cord.txt*
-                                  For NVIM v0.6.0    Last change: 2026 July 18
+                                For NVIM v0.6.0    Last change: 2026 August 04
 
 ==============================================================================
 Table of Contents                                     *cord-table-of-contents*
@@ -723,6 +723,7 @@ USER COMMANDS                               *cord-configuration-user-commands*
 - `:Cord status` - Show connection status
 - `:Cord version` - Show current server version
 - `:Cord restart` - Restart the server
+- `:Cord reconnect` - Reconnect to Discord
 - `:Cord shutdown` - Disconnect from Discord and shutdown the server
 - `:Cord health` - Validate user configuration
 
