@@ -125,6 +125,7 @@ end
 
 function M:initialize()
   self.status = 'initializing'
+  require('cord.internal.manager').reset_persisted_state()
   async.run(function()
     logger.debug 'Initializing server...'
 

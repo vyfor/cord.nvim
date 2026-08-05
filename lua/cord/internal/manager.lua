@@ -78,6 +78,11 @@ local function get_buffer_dir()
   return rawdir, vim.fn.fnamemodify(rawdir, ':h')
 end
 
+local persisted_timestamp = nil
+local persisted_paused = nil
+local persisted_idle = nil
+local persisted_forced = nil
+
 --------------------------------------------------------------------------------
 -- Button configuration
 --------------------------------------------------------------------------------
@@ -221,7 +226,9 @@ function IdleTimer:cleanup()
   self.timer = nil
 end
 
-function IdleTimer:record_activity() self.last_activity = uv.now() end
+function IdleTimer:record_activity()
+  self.last_activity = uv.now()
+end
 
 ---@param is_focused? boolean
 function IdleTimer:check(is_focused)
@@ -245,6 +252,8 @@ function IdleTimer:check(is_focused)
   if should_idle then
     logger.debug 'IdleTimer: entering idle'
     self.is_idle = true
+    persisted_idle = true
+    persisted_forced = self.is_forced
     vim.schedule(self.on_idle)
   else
     self:reschedule(config.idle.timeout - elapsed)
@@ -263,6 +272,8 @@ end
 function IdleTimer:force()
   self.is_forced = true
   self.is_idle = true
+  persisted_idle = true
+  persisted_forced = true
   self.on_idle()
   logger.trace 'IdleTimer: forced'
 end
@@ -270,6 +281,8 @@ end
 function IdleTimer:leave()
   self.is_idle = false
   self.is_forced = false
+  persisted_idle = false
+  persisted_forced = false
 end
 
 function IdleTimer:reset()
@@ -502,7 +515,9 @@ function OptionsBuilder:build(full)
     opts.buttons = mgr.opts and mgr.opts.buttons or mgr.last_opts and mgr.last_opts.buttons or nil
   else
     if config.timestamp.enabled and not config.timestamp.shared then
-      opts.timestamp = (mgr.last_opts and mgr.last_opts.timestamp) or os.time()
+      opts.timestamp = (mgr.last_opts and mgr.last_opts.timestamp)
+        or persisted_timestamp
+        or os.time()
     end
     if self:should_reset_timestamp() then opts.timestamp = os.time() end
 
@@ -554,6 +569,7 @@ function ActivityUpdater:update()
   if activity == false then return mgr:clear_activity() end
 
   mgr:set_activity(activity --[[@as table]])
+  if mgr.opts.timestamp then persisted_timestamp = mgr.opts.timestamp end
   logger.trace(function() return 'ActivityUpdater.update: activity=' .. vim.inspect(activity) end)
 end
 
@@ -726,8 +742,8 @@ ActivityManager.new = async.wrap(function(opts)
     tx = opts.tx,
     is_ready = false,
     is_focused = true,
-    is_paused = false,
-    events_enabled = true,
+    is_paused = persisted_paused == true,
+    events_enabled = persisted_paused ~= true,
     should_skip_update = false,
     workspace = WorkspaceCache.new(),
     autocmds = AutocmdController.new(),
@@ -736,6 +752,10 @@ ActivityManager.new = async.wrap(function(opts)
   self.idle_timer = IdleTimer.new(function()
     async.run(function() self.activity_updater:update_idle() end)
   end)
+  if persisted_idle == true then
+    self.idle_timer.is_idle = true
+    self.idle_timer.is_forced = persisted_forced == true
+  end
   self.debouncer = UpdateDebouncer.new()
   self.options_builder = OptionsBuilder.new(self)
   self.activity_updater = ActivityUpdater.new(self)
@@ -772,11 +792,16 @@ function ActivityManager:run()
   async.run(function()
     hooks.run('ready', self)
     hooks.run('buf_enter', self)
-    self:queue_update(true)
+    if self.is_paused then return end
+    if self.idle_timer.is_idle then
+      self.activity_updater:update_idle()
+    else
+      self:queue_update(true)
+    end
   end)
 
   if config.advanced.plugin.autocmds then self.autocmds.setup() end
-  self.idle_timer:start()
+  if not self.is_paused then self.idle_timer:start() end
 end
 
 function ActivityManager:cleanup()
@@ -877,6 +902,7 @@ end
 function ActivityManager:pause()
   if self.is_paused then return end
   self.is_paused = true
+  persisted_paused = true
   self:pause_events()
   self.idle_timer:stop()
   logger.debug 'ActivityManager.pause'
@@ -885,6 +911,7 @@ end
 function ActivityManager:resume()
   if not self.is_paused then return end
   self.is_paused = false
+  persisted_paused = false
   self:resume_events()
   self.idle_timer:reset()
   logger.debug 'ActivityManager.resume'
@@ -937,5 +964,12 @@ function ActivityManager:on_focus_gained() self.event_handler:on_focus_gained() 
 function ActivityManager:on_focus_lost() self.event_handler:on_focus_lost() end
 
 function ActivityManager:on_cursor_update() self.event_handler:on_cursor_update() end
+
+function ActivityManager.reset_persisted_state()
+  persisted_timestamp = nil
+  persisted_paused = nil
+  persisted_idle = nil
+  persisted_forced = nil
+end
 
 return ActivityManager
