@@ -40,6 +40,7 @@ impl OnEvent for ReconnectCompleteEvent {
         match &self.status {
             ReconnectStatus::Ok => {
                 debug!(client_id, "Reconnect successful");
+                *ctx.cord.session_manager.last_activity.write().unwrap() = None;
             }
             ReconnectStatus::Err(err) => {
                 debug!(client_id, "Reconnect failed: {}", err);
