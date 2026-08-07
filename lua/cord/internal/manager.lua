@@ -515,11 +515,24 @@ function OptionsBuilder:build(full)
     opts.buttons = mgr.opts and mgr.opts.buttons or mgr.last_opts and mgr.last_opts.buttons or nil
   else
     if config.timestamp.enabled and not config.timestamp.shared then
-      opts.timestamp = (mgr.last_opts and mgr.last_opts.timestamp)
+      local timestamp = (mgr.last_opts and mgr.last_opts.timestamp)
         or persisted_timestamp
         or os.time()
+      opts.timestamp = timestamp
+      logger.trace(function()
+        local source = (mgr.last_opts and mgr.last_opts.timestamp and 'last_opts')
+          or (persisted_timestamp and 'persisted')
+          or 'fresh'
+        return 'OptionsBuilder.build: timestamp=' .. timestamp .. ' (' .. source .. ')'
+      end)
     end
-    if self:should_reset_timestamp() then opts.timestamp = os.time() end
+    if self:should_reset_timestamp() then
+      opts.timestamp = os.time()
+      logger.trace(function()
+        local source = config.timestamp.reset_on_change and 'reset_on_change' or 'reset_on_idle'
+        return 'OptionsBuilder.build: timestamp=' .. opts.timestamp .. ' (' .. source .. ')'
+      end)
+    end
 
     opts.buttons = ButtonBuilder.build(opts)
   end
@@ -756,6 +769,11 @@ ActivityManager.new = async.wrap(function(opts)
     self.idle_timer.is_idle = true
     self.idle_timer.is_forced = persisted_forced == true
   end
+  logger.trace(function()
+    return 'ActivityManager.new: restored persisted state (paused=' .. tostring(persisted_paused)
+      .. ', idle=' .. tostring(persisted_idle) .. ', forced=' .. tostring(persisted_forced)
+      .. ', timestamp=' .. tostring(persisted_timestamp) .. ')'
+  end)
   self.debouncer = UpdateDebouncer.new()
   self.options_builder = OptionsBuilder.new(self)
   self.activity_updater = ActivityUpdater.new(self)
@@ -966,6 +984,9 @@ function ActivityManager:on_focus_lost() self.event_handler:on_focus_lost() end
 function ActivityManager:on_cursor_update() self.event_handler:on_cursor_update() end
 
 function ActivityManager.reset_persisted_state()
+  if persisted_timestamp or persisted_paused or persisted_idle or persisted_forced then
+    logger.debug 'ActivityManager: resetting persisted state'
+  end
   persisted_timestamp = nil
   persisted_paused = nil
   persisted_idle = nil
