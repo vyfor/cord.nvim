@@ -29,6 +29,11 @@ impl OnEvent for ErrorEvent {
                     );
                 }
                 DiscordError::ConnectionClosed => {
+                    if ctx.cord.reconnect_state.in_progress {
+                        debug!("Discord closed the connection during reconnect");
+                        return Ok(());
+                    }
+
                     let reconnect_interval = ctx.cord.config.reconnect_interval;
                     if reconnect_interval == 0 {
                         return Err("Discord closed the connection".into());
