@@ -263,7 +263,9 @@ function M.verify(new_config)
   end
 
   local log_level = final_config.log_level
-  if type(log_level) == 'string' then
+  if logger.env_log_level then
+    log_level = logger.env_log_level
+  elseif type(log_level) == 'string' then
     local level = vim.log.levels[string.upper(log_level)]
     if not level then
       logger.notify('Unknown log level: ' .. log_level, vim.log.levels.ERROR)
