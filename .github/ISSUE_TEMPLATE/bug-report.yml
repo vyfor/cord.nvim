@@ -14,13 +14,13 @@ body:
   - type: textarea
     attributes:
       label: "Description"
-      description: "Description of the problem you are facing. You may include any relevant logs, screenshots, etc."
+      description: "Description of the problem you are facing. You may include any relevant logs, screenshots, etc. If you're willing to provide logs, please attach them as a file. [How to get logs?](https://github.com/vyfor/cord.nvim/wiki/FAQ#logging-for-debugging)"
     validations:
       required: true
   - type: textarea
     attributes:
-      label: "Checkhealth"
-      description: "Output of `:checkhealth cord`"
+      label: "Debug information"
+      description: "Output of `:Cord debug copy`"
       render: markdown
     validations:
       required: true
@@ -52,7 +52,6 @@ body:
           spec = {
             {
               'vyfor/cord.nvim',
-              build = ':Cord update',
             },
           },
         }
