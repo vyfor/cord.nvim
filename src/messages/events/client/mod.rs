@@ -86,7 +86,11 @@ impl ClientEvent {
 
 impl OnEvent for ClientEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        debug!(ctx.client_id, "Processing client event: {:?}", std::mem::discriminant(&self));
+        debug!(
+            ctx.client_id,
+            "Processing client event: {:?}",
+            std::mem::discriminant(&self)
+        );
         match self {
             Self::Initialize(e) => e.on_event(ctx),
             Self::Connect(e) => e.on_event(ctx),

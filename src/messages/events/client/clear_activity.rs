@@ -12,8 +12,11 @@ pub struct ClearActivityEvent {
 
 impl OnEvent for ClearActivityEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        debug!(ctx.client_id, "Processing clear_activity event, force={}", self.force);
-        
+        debug!(
+            ctx.client_id,
+            "Processing clear_activity event, force={}", self.force
+        );
+
         let global_last_activity = ctx
             .cord
             .session_manager
@@ -57,7 +60,10 @@ impl OnEvent for ClearActivityEvent {
 
             if let Some(session) = latest {
                 if let Some(mut activity) = session.last_activity.clone() {
-                    trace!(ctx.client_id, "Switching to activity from another session");
+                    trace!(
+                        ctx.client_id,
+                        "Switching to activity from another session"
+                    );
                     if ctx.cord.config.shared_timestamps {
                         let shared_ts =
                             &ctx.cord.session_manager.shared_timestamp;
@@ -78,7 +84,10 @@ impl OnEvent for ClearActivityEvent {
 
                     if let Some(global) = &global_last_activity {
                         if global == &activity {
-                            trace!(ctx.client_id, "Skipping: activity unchanged");
+                            trace!(
+                                ctx.client_id,
+                                "Skipping: activity unchanged"
+                            );
                             return Ok(());
                         }
                     }

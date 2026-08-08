@@ -9,11 +9,15 @@ pub struct DisconnectEvent;
 impl OnEvent for DisconnectEvent {
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
         debug!(ctx.client_id, "Processing disconnect event");
-        
+
         let mut sessions = ctx.cord.session_manager.sessions.write().unwrap();
         sessions.remove(&ctx.client_id);
-        trace!(ctx.client_id, "Session removed, remaining sessions: {}", sessions.len());
-        
+        trace!(
+            ctx.client_id,
+            "Session removed, remaining sessions: {}",
+            sessions.len()
+        );
+
         if sessions.is_empty() {
             debug!(ctx.client_id, "No remaining sessions, clearing activity");
             ctx.cord.activity_manager.clear()?;
@@ -64,7 +68,10 @@ impl OnEvent for DisconnectEvent {
             let mut last_activity =
                 ctx.cord.session_manager.last_activity.write().unwrap();
             if last_activity.is_some() {
-                debug!(ctx.client_id, "No other sessions with activity, clearing");
+                debug!(
+                    ctx.client_id,
+                    "No other sessions with activity, clearing"
+                );
                 *last_activity = None;
                 drop(last_activity);
                 ctx.cord.activity_manager.clear()?;

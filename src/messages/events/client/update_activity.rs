@@ -16,8 +16,11 @@ pub struct UpdateActivityEvent {
 impl OnEvent for UpdateActivityEvent {
     // if new activity is idle, set the most recent activity available, if not, display the new activity
     fn on_event(self, ctx: &mut EventContext) -> crate::Result<()> {
-        trace!(ctx.client_id, "Processing update_activity event, force={}", self.force);
-        
+        trace!(
+            ctx.client_id,
+            "Processing update_activity event, force={}", self.force
+        );
+
         if !ctx
             .cord
             .activity_manager
@@ -27,7 +30,10 @@ impl OnEvent for UpdateActivityEvent {
             .is_ready
             .load(Ordering::SeqCst)
         {
-            debug!(ctx.client_id, "Ignoring activity update: Discord not ready");
+            debug!(
+                ctx.client_id,
+                "Ignoring activity update: Discord not ready"
+            );
             return Ok(());
         }
 
@@ -83,7 +89,10 @@ impl OnEvent for UpdateActivityEvent {
 
             if let Some(global_last_activity) = last_activity.as_ref() {
                 if !self.force && global_last_activity == &activity {
-                    trace!(ctx.client_id, "Skipping activity update: no change");
+                    trace!(
+                        ctx.client_id,
+                        "Skipping activity update: no change"
+                    );
                     false
                 } else {
                     *last_activity = Some(activity.clone());
@@ -96,7 +105,10 @@ impl OnEvent for UpdateActivityEvent {
         };
 
         if should_update {
-            debug!(ctx.client_id, "Updating activity: is_idle={}", activity.is_idle);
+            debug!(
+                ctx.client_id,
+                "Updating activity: is_idle={}", activity.is_idle
+            );
             ctx.cord.activity_manager.update(activity)?;
         }
 

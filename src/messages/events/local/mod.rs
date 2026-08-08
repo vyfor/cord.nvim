@@ -6,8 +6,8 @@ pub use error::ErrorEvent;
 pub use reconnect::ReconnectEvent;
 pub use reconnect_complete::ReconnectCompleteEvent;
 
-use crate::trace;
 use super::event::{EventContext, OnEvent};
+use crate::trace;
 
 #[derive(Debug)]
 pub enum LocalEvent {

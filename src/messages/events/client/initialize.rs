@@ -4,6 +4,7 @@ use crate::debug;
 use crate::error::CordErrorKind;
 use crate::ipc::discord::client::Connection;
 use crate::ipc::pipe::PipeServerImpl;
+use crate::local_event;
 use crate::messages::events::event::{EventContext, OnEvent};
 use crate::messages::events::local::ReconnectEvent;
 use crate::messages::events::server::StatusUpdateEvent;
@@ -11,7 +12,6 @@ use crate::messages::events::server::status_update::Status;
 use crate::protocol::msgpack::MsgPack;
 use crate::types::config::PluginConfig;
 use crate::util::{logger, now};
-use crate::local_event;
 
 #[derive(Debug)]
 pub struct InitializeEvent {

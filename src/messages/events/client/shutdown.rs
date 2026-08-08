@@ -1,5 +1,5 @@
-use crate::messages::events::event::{EventContext, OnEvent};
 use crate::debug;
+use crate::messages::events::event::{EventContext, OnEvent};
 
 #[derive(Debug, Default)]
 pub struct ShutdownEvent;

@@ -128,7 +128,9 @@ impl ActivityManager {
                                 let client_guard = client.read().unwrap();
                                 match op {
                                     PendingOp::Update(mut activity) => {
-                                        trace!("Deferred sync: updating activity");
+                                        trace!(
+                                            "Deferred sync: updating activity"
+                                        );
                                         if pad_enabled {
                                             pad_activity_field(
                                                 &mut activity.details,
@@ -144,7 +146,9 @@ impl ActivityManager {
                                         let _ = client_guard.update(&packet);
                                     }
                                     PendingOp::Clear => {
-                                        trace!("Deferred sync: clearing activity");
+                                        trace!(
+                                            "Deferred sync: clearing activity"
+                                        );
                                         let _ = client_guard.clear();
                                     }
                                 }
@@ -158,8 +162,10 @@ impl ActivityManager {
     }
 
     pub fn set_config(&self, new_config: SyncConfig) {
-        debug!("Setting ActivityManager sync config: mode={:?}, interval={}, enabled={}", 
-               new_config.mode, new_config.interval, new_config.enabled);
+        debug!(
+            "Setting ActivityManager sync config: mode={:?}, interval={}, enabled={}",
+            new_config.mode, new_config.interval, new_config.enabled
+        );
         *self.config.write().unwrap() = new_config;
     }
 
@@ -176,7 +182,9 @@ impl ActivityManager {
                 if is_first
                     || Instant::now().duration_since(*last_update) >= interval
                 {
-                    debug!("Sending activity update to Discord (defer mode, immediate)");
+                    debug!(
+                        "Sending activity update to Discord (defer mode, immediate)"
+                    );
                     let client = self.client.read().unwrap();
                     let mut padded_activity = activity.clone();
                     if config.pad {

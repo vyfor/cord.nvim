@@ -203,11 +203,7 @@ impl PipeServerImpl for PipeServer {
             self.session_manager.remove_session(*id);
         }
         if !dead.is_empty() {
-            debug!(
-                "broadcast: {} of {} clients removed",
-                dead.len(),
-                len
-            );
+            debug!("broadcast: {} of {} clients removed", dead.len(), len);
         }
         Ok(())
     }

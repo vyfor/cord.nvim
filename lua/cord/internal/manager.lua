@@ -226,9 +226,7 @@ function IdleTimer:cleanup()
   self.timer = nil
 end
 
-function IdleTimer:record_activity()
-  self.last_activity = uv.now()
-end
+function IdleTimer:record_activity() self.last_activity = uv.now() end
 
 ---@param is_focused? boolean
 function IdleTimer:check(is_focused)
@@ -769,11 +767,19 @@ ActivityManager.new = async.wrap(function(opts)
     self.idle_timer.is_idle = true
     self.idle_timer.is_forced = persisted_forced == true
   end
-  logger.trace(function()
-    return 'ActivityManager.new: restored persisted state (paused=' .. tostring(persisted_paused)
-      .. ', idle=' .. tostring(persisted_idle) .. ', forced=' .. tostring(persisted_forced)
-      .. ', timestamp=' .. tostring(persisted_timestamp) .. ')'
-  end)
+  logger.trace(
+    function()
+      return 'ActivityManager.new: restored persisted state (paused='
+        .. tostring(persisted_paused)
+        .. ', idle='
+        .. tostring(persisted_idle)
+        .. ', forced='
+        .. tostring(persisted_forced)
+        .. ', timestamp='
+        .. tostring(persisted_timestamp)
+        .. ')'
+    end
+  )
   self.debouncer = UpdateDebouncer.new()
   self.options_builder = OptionsBuilder.new(self)
   self.activity_updater = ActivityUpdater.new(self)

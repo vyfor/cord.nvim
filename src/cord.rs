@@ -11,8 +11,8 @@ use crate::messages::events::server::{LogEvent, ServerEvent};
 use crate::messages::message::Message;
 use crate::presence::manager::ActivityManager;
 use crate::protocol::msgpack::Serialize;
-use crate::types::reconnect::ReconnectState;
 use crate::session::SessionManager;
+use crate::types::reconnect::ReconnectState;
 use crate::util::lockfile::ServerLock;
 use crate::util::logger::{self, LOGGER, LogLevel, Logger};
 use crate::{debug, trace};
@@ -99,8 +99,7 @@ impl Cord {
                         .is_empty();
                     debug!(
                         "event handler returned error: {} (sessions_empty={})",
-                        e,
-                        sessions_empty
+                        e, sessions_empty
                     );
 
                     if sessions_empty {
@@ -129,10 +128,7 @@ impl Cord {
 
                         trace!("broadcasting error log to clients");
                         if let Err(b_err) = self.pipe.broadcast(&data) {
-                            debug!(
-                                "broadcast failed, continuing: {}",
-                                b_err
-                            );
+                            debug!("broadcast failed, continuing: {}", b_err);
                         }
                         return Ok(());
                     }

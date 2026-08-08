@@ -117,15 +117,21 @@ function M:run()
             )
           end
 
-          if was_connected and config.advanced.discord.reconnect.enabled then logger.info 'Reconnecting...' end
+          if was_connected and config.advanced.discord.reconnect.enabled then
+            logger.info 'Reconnecting...'
+          end
         end
       end)
     )
 
-    M.rx:register('restart', false, vim.schedule_wrap(function()
-      require('cord.internal.manager').reset_persisted_state()
-      M:initialize()
-    end))
+    M.rx:register(
+      'restart',
+      false,
+      vim.schedule_wrap(function()
+        require('cord.internal.manager').reset_persisted_state()
+        M:initialize()
+      end)
+    )
 
     logger.debug 'Server initialized; starting receiver'
     M.rx:run()

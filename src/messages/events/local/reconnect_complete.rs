@@ -48,7 +48,10 @@ impl OnEvent for ReconnectCompleteEvent {
                     &StatusUpdateEvent::disconnected(),
                 )?)?;
                 if self.manual {
-                    error!(client_id, "Failed to reconnect to Discord: {}", err);
+                    error!(
+                        client_id,
+                        "Failed to reconnect to Discord: {}", err
+                    );
                 }
             }
         }

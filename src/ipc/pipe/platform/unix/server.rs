@@ -128,11 +128,7 @@ impl PipeServerImpl for PipeServer {
             self.session_manager.remove_session(*id);
         }
         if !dead.is_empty() {
-            debug!(
-                "broadcast: {} of {} clients removed",
-                dead.len(),
-                len
-            );
+            debug!("broadcast: {} of {} clients removed", dead.len(), len);
         }
         Ok(())
     }
@@ -143,15 +139,9 @@ impl PipeServerImpl for PipeServer {
             && let Some(client) = session.get_pipe_client_mut()
             && let Err(e) = client.write(data)
         {
-            debug!(
-                "write_to: write failed for client {}: {}",
-                client_id, e
-            );
+            debug!("write_to: write failed for client {}: {}", client_id, e);
             drop(sessions);
-            debug!(
-                "write_to: removing dead session for client {}",
-                client_id
-            );
+            debug!("write_to: removing dead session for client {}", client_id);
             self.session_manager.remove_session(client_id);
         }
         Ok(())

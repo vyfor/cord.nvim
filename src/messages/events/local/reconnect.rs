@@ -5,8 +5,8 @@ use std::time::Duration;
 use crate::ipc::discord::client::Connection;
 use crate::ipc::pipe::PipeServerImpl;
 use crate::messages::events::event::{EventContext, OnEvent};
-use crate::messages::events::server::StatusUpdateEvent;
 use crate::messages::events::local::ReconnectCompleteEvent;
+use crate::messages::events::server::StatusUpdateEvent;
 use crate::protocol::msgpack::MsgPack;
 use crate::{debug, local_event, trace};
 
@@ -95,7 +95,8 @@ impl OnEvent for ReconnectEvent {
                             {
                                 debug!(
                                     client_id,
-                                    "Reconnect: start_read_thread failed: {}", e
+                                    "Reconnect: start_read_thread failed: {}",
+                                    e
                                 );
                                 rich_client.close();
                                 if !manual && interval > 0 {
@@ -109,7 +110,10 @@ impl OnEvent for ReconnectEvent {
                             break;
                         }
                         Err(e) => {
-                            debug!(client_id, "Reconnect: handshake failed: {}", e);
+                            debug!(
+                                client_id,
+                                "Reconnect: handshake failed: {}", e
+                            );
                             rich_client.close();
                             if !manual && interval > 0 {
                                 continue;
