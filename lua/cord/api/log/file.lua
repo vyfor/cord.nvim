@@ -43,20 +43,13 @@ local function enqueue(msg, level, raw)
       return
     end
 
-    local ok2, err2 = fs.openfile(logfile_path, 'w'):await()
+    local ok2, err2 = fs.openfile(logfile_path, 'a'):await()
     if err2 then
       notify('Failed to open log file: ' .. tostring(err2), levels.ERROR)
       return
     end
 
-    fs.closefile(ok2)
-    local ok3, err3 = fs.openfile(logfile_path, 'a'):await()
-    if err3 then
-      notify('Failed to open log file: ' .. tostring(err3), levels.ERROR)
-      return
-    end
-
-    fd = ok3
+    fd = ok2
   end
 
   queue_end = queue_end + 1
@@ -69,21 +62,7 @@ local function format_message(entry, message)
   return string.format('[%s] [%s] %s', ts, level_name, tostring(message))
 end
 
-local function flush()
-  if not logfile_path or logfile_path == '' then
-    flushing = false
-    pending = false
-    return
-  end
-  if not fd then return end
-  if flushing then
-    pending = true
-    return
-  end
-
-  flushing = true
-
-  local lines = {}
+local function drain(lines)
   while queue_start <= queue_end do
     local entry = queue[queue_start]
     queue[queue_start] = nil
@@ -109,6 +88,24 @@ local function flush()
       end
     end
   end
+end
+
+local function flush()
+  if not logfile_path or logfile_path == '' then
+    flushing = false
+    pending = false
+    return
+  end
+  if not fd then return end
+  if flushing then
+    pending = true
+    return
+  end
+
+  flushing = true
+
+  local lines = {}
+  drain(lines)
 
   local data = table.concat(lines, '\n')
   if #data > 0 then data = data .. '\n' end
@@ -123,6 +120,40 @@ local function flush()
     flush()
   end
 end
+
+local function flush_on_exit()
+  if not logfile_path or logfile_path == '' then return end
+
+  flushing = false
+  pending = false
+
+  local lines = {}
+  drain(lines)
+
+  local data = table.concat(lines, '\n')
+  if #data > 0 then data = data .. '\n' end
+  if #data == 0 then return end
+
+  local f, err = io.open(logfile_path, 'a')
+  if not f then
+    notify('[cord.nvim] Failed to flush log file on exit: ' .. tostring(err), levels.ERROR)
+    return
+  end
+
+  local ok, write_err = pcall(function()
+    f:write(data)
+    f:flush()
+  end)
+  f:close()
+  if not ok then
+    notify('[cord.nvim] Failed to flush log file on exit: ' .. tostring(write_err), levels.ERROR)
+  end
+end
+
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  group = vim.api.nvim_create_augroup('CordFlush', { clear = true }),
+  callback = flush_on_exit,
+})
 
 local function log(msg, level)
   if not level or level < log_level then return end

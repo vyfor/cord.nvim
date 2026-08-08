@@ -29,17 +29,15 @@ require('cord').setup {
 }
 ```
 
-Where logs go depends on the presence of the `CORD_LOG_FILE` environment variable. The log file is cleared at plugin startup.
+Where logs go depends on the presence of the `CORD_LOG_FILE` environment variable.
 
 </details>
 
 <details>
 <summary><h4>Logging for debugging</h4></summary>
 
-For comfortable debugging, have the log file open and periodically reload it (`:e`).
-
 ```sh
-CORD_LOG_LEVEL="trace" CORD_LOG_FILE="cord.log" nvim cord.log
+CORD_LOG_LEVEL="trace" CORD_LOG_FILE="cord.log" nvim
 ```
 
 </details>
