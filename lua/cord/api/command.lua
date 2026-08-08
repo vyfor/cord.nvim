@@ -102,6 +102,7 @@ M.reconnect = function()
 
     require('cord.api.log').debug 'Reconnecting...'
     local function initialize()
+      require('cord.api.log').debug 'reconnect: client dead, falling back to initialize'
       require('cord.core.async').run(function() cord:initialize() end)
     end
 
@@ -109,6 +110,7 @@ M.reconnect = function()
     if not cord.client then return initialize() end
     if cord.client:is_closing() then return initialize() end
 
+    require('cord.api.log').debug 'reconnect: sending reconnect event to server'
     cord.tx:reconnect()
   end)
 end

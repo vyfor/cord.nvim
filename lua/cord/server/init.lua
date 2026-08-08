@@ -69,7 +69,11 @@ function M:run()
           self.status = 'connected'
           logger.debug 'Handshaking with Discord...'
         elseif data.status == 'ready' then
-          if self.status == 'ready' then return end
+          if self.status == 'ready' then
+            logger.debug 'status_update: ready (already ready, skipping)'
+            return
+          end
+          logger.debug 'status_update: ready'
           self.status = 'ready'
           async.run(function()
             logger.info 'Connected to Discord'
@@ -84,6 +88,7 @@ function M:run()
             end
 
             M.client.on_close = vim.schedule_wrap(function()
+              logger.debug 'client: on_close'
               M.status = 'disconnected'
               M.manager:cleanup()
 
@@ -99,6 +104,7 @@ function M:run()
             M.manager = manager
           end)
         elseif data.status == 'disconnected' then
+          logger.debug 'status_update: disconnected'
           local was_connected = self.status == 'ready' or self.status == 'connected'
           self.status = 'initialized'
 
@@ -116,7 +122,10 @@ function M:run()
       end)
     )
 
-    M.rx:register('restart', false, vim.schedule_wrap(function() M:initialize() end))
+    M.rx:register('restart', false, vim.schedule_wrap(function()
+      require('cord.internal.manager').reset_persisted_state()
+      M:initialize()
+    end))
 
     logger.debug 'Server initialized; starting receiver'
     M.rx:run()
@@ -125,7 +134,6 @@ end
 
 function M:initialize()
   self.status = 'initializing'
-  require('cord.internal.manager').reset_persisted_state()
   async.run(function()
     logger.debug 'Initializing server...'
 

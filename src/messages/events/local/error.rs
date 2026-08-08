@@ -36,9 +36,16 @@ impl OnEvent for ErrorEvent {
 
                     let reconnect_interval = ctx.cord.config.reconnect_interval;
                     if reconnect_interval == 0 {
+                        debug!(
+                            "connection closed, reconnect_interval=0, returning error"
+                        );
                         return Err("Discord closed the connection".into());
                     }
 
+                    debug!(
+                        "connection closed, reconnect_interval={}, scheduling reconnect",
+                        reconnect_interval
+                    );
                     let _ = ctx
                         .cord
                         .tx

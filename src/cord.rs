@@ -15,6 +15,7 @@ use crate::types::reconnect::ReconnectState;
 use crate::session::SessionManager;
 use crate::util::lockfile::ServerLock;
 use crate::util::logger::{self, LOGGER, LogLevel, Logger};
+use crate::{debug, trace};
 
 pub const VERSION: &str = env!("CORD_VERSION");
 
@@ -48,6 +49,7 @@ impl Cord {
         let (tx, rx) = mpsc::channel::<Message>();
         let session_manager = Arc::new(SessionManager::default());
         let _ = logger::LOGGER.set(Logger::new(tx.clone(), LogLevel::Trace));
+        debug!("cord server v{}", VERSION);
 
         let activity_manager = ActivityManager::new(config.client_id, vec![]);
 
@@ -89,8 +91,20 @@ impl Cord {
                     cord: self,
                     client_id: msg.client_id,
                 }) {
-                    if self.session_manager.sessions.read().unwrap().is_empty()
-                    {
+                    let sessions_empty = self
+                        .session_manager
+                        .sessions
+                        .read()
+                        .unwrap()
+                        .is_empty();
+                    debug!(
+                        "event handler returned error: {} (sessions_empty={})",
+                        e,
+                        sessions_empty
+                    );
+
+                    if sessions_empty {
+                        debug!("no sessions, server shutting down");
                         return Err(e);
                     } else if let Some(logger) = LOGGER.get()
                         && logger.would_log(LogLevel::Error)
@@ -98,6 +112,7 @@ impl Cord {
                             LogEvent::new(e.to_string(), LogLevel::Error)
                                 .to_msgpack()
                     {
+                        trace!("draining queued log events");
                         while let Ok(ev) = self.rx.try_recv() {
                             match ev.event {
                                 Event::Server(sev)
@@ -112,11 +127,18 @@ impl Cord {
                             }
                         }
 
-                        self.pipe.broadcast(&data)?;
+                        trace!("broadcasting error log to clients");
+                        if let Err(b_err) = self.pipe.broadcast(&data) {
+                            debug!(
+                                "broadcast failed, continuing: {}",
+                                b_err
+                            );
+                        }
                         return Ok(());
                     }
 
-                    return Err(e);
+                    debug!("logging disabled or unavailable, continuing");
+                    return Ok(());
                 }
             } else if self.session_manager.sessions.read().unwrap().is_empty() {
                 break;

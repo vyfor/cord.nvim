@@ -112,22 +112,49 @@ impl PipeServerImpl for PipeServer {
 
     fn broadcast(&self, data: &[u8]) -> io::Result<()> {
         let mut sessions = self.session_manager.sessions.write().unwrap();
-        for session in sessions.values_mut() {
-            if let Some(client) = session.get_pipe_client_mut() {
-                client.write(data)?;
+        let len = sessions.len();
+        let mut dead = Vec::new();
+        for (id, session) in sessions.iter_mut() {
+            if let Some(client) = session.get_pipe_client_mut()
+                && let Err(e) = client.write(data)
+            {
+                debug!("broadcast: write failed for client {}: {}", id, e);
+                dead.push(*id);
             }
+        }
+        drop(sessions);
+        for id in &dead {
+            debug!("broadcast: removing dead session for client {}", id);
+            self.session_manager.remove_session(*id);
+        }
+        if !dead.is_empty() {
+            debug!(
+                "broadcast: {} of {} clients removed",
+                dead.len(),
+                len
+            );
         }
         Ok(())
     }
 
     fn write_to(&self, client_id: u32, data: &[u8]) -> io::Result<()> {
         let mut sessions = self.session_manager.sessions.write().unwrap();
-        if let Some(session) = sessions.get_mut(&client_id) {
-            if let Some(client) = session.get_pipe_client_mut() {
-                return client.write(data);
-            }
+        if let Some(session) = sessions.get_mut(&client_id)
+            && let Some(client) = session.get_pipe_client_mut()
+            && let Err(e) = client.write(data)
+        {
+            debug!(
+                "write_to: write failed for client {}: {}",
+                client_id, e
+            );
+            drop(sessions);
+            debug!(
+                "write_to: removing dead session for client {}",
+                client_id
+            );
+            self.session_manager.remove_session(client_id);
         }
-        Err(io::Error::new(io::ErrorKind::NotFound, "Client not found"))
+        Ok(())
     }
 
     fn disconnect(&self, client_id: u32) -> io::Result<()> {
