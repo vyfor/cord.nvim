@@ -233,6 +233,12 @@ M.commands = {
   reconnect = M.reconnect,
   shutdown = M.shutdown,
   health = M.health,
+  debug = {
+    default = function() require('cord.api.debug').show() end,
+    subcommands = {
+      copy = function() require('cord.api.debug').copy() end,
+    },
+  },
 }
 
 M.get_commands = function()
