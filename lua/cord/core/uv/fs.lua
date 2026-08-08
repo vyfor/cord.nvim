@@ -109,7 +109,7 @@ end
 
 function M.write(fd, data)
   return Future.new(function(resolve, reject)
-    uv.fs_write(fd, data, 0, function(err, bytes_written)
+    uv.fs_write(fd, data, -1, function(err, bytes_written)
       if err then
         reject(err)
         return
@@ -167,7 +167,7 @@ function M.writefile(path, data)
         return
       end
 
-      uv.fs_write(fd, data, 0, function(err, bytes_written)
+      uv.fs_write(fd, data, -1, function(err, bytes_written)
         uv.fs_close(fd)
         if err then
           reject(err)
