@@ -9,7 +9,7 @@
   <img src="https://github.com/user-attachments/assets/8e684058-f3ea-4010-817e-529b47730abb" alt="Cord Logo" width="200px">
   <h3>🚀 The most extensible Discord Rich Presence plugin for Neovim, powered by Rust.
   </h3>
-  <img src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/main_banner.png" alt="Cord Banner">
+  <img src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/main_banner.png?v=2" alt="Cord Banner">
 </div>
 
 <div align="center">
@@ -183,7 +183,7 @@ Cord features over 120 meticulously crafted icons available in distinct themes:
 - **Void**: A monochrome set defined by negative space.
   <img width="800px" alt="Void Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/void_theme.png" />
 - **Classic**: A clean theme featuring widely recognized icons.
-  <img width="800px" alt="Classic Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/classic_theme.png" />
+  <img width="800px" alt="Classic Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/classic_theme.png?v=2" />
 
 See the [showcase](https://github.com/vyfor/icons#showcase) for an extended comparison.
 
