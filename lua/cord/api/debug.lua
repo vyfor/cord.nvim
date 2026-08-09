@@ -11,6 +11,7 @@ local function get_os_info()
     release = uname.release,
     version = uname.version,
     machine = uname.machine,
+    wsl = os.getenv 'WSL_DISTRO_NAME',
   }
 end
 
@@ -42,16 +43,11 @@ local function get_server_info()
   local config = require('cord.api.config').get()
   local exec_path = require('cord.server.fs').get_executable_path(config)
   local stat = fs.stat(exec_path):await()
-  if not stat then
-    return { version = 'not installed', path = exec_path, executable = false }
-  end
+  if not stat then return { version = 'not installed', path = exec_path, executable = false } end
 
   local is_windows = get_os_info().sysname:lower():match 'windows'
   local is_exec = true
-  if not is_windows then
-    local uv = vim.loop or vim.uv
-    is_exec = vim.fn.executable(exec_path) == 1
-  end
+  if not is_windows then is_exec = vim.fn.executable(exec_path) == 1 end
 
   local version = 'unknown'
   if is_exec then
@@ -153,9 +149,7 @@ local function check_discord_pipes()
         for i = 0, 10 do
           local path = base .. '/discord-ipc-' .. i
           local stat = uv.fs_stat(path)
-          if stat and stat.type == 'socket' then
-            paths[#paths + 1] = path
-          end
+          if stat and stat.type == 'socket' then paths[#paths + 1] = path end
         end
       end
     end
@@ -183,9 +177,7 @@ local function build_report()
     table.insert(lines, '')
   end
 
-  local function kv(key, val)
-    table.insert(lines, '**`' .. key .. '`**: `' .. tostring(val) .. '`')
-  end
+  local function kv(key, val) table.insert(lines, '**`' .. key .. '`**: `' .. tostring(val) .. '`') end
 
   local function code_block(lang, text)
     table.insert(lines, '```' .. lang)
@@ -215,9 +207,7 @@ local function build_report()
       table.insert(lines, '- curl not found')
       has_warnings = true
     end
-    if not has_warnings then
-      table.insert(lines, 'none')
-    end
+    if not has_warnings then table.insert(lines, 'none') end
   end
 
   section 'status'
@@ -230,15 +220,16 @@ local function build_report()
 
   section 'discord rpc'
   local custom = require('cord.api.config').get().advanced.discord.pipe_paths
-  if custom and #custom > 0 then
-    table.insert(lines, '(using custom pipe paths)')
-  end
+  if custom and #custom > 0 then table.insert(lines, '(using custom pipe paths)') end
   local pipes = check_discord_pipes()
   if #pipes == 0 then
     table.insert(lines, 'none found')
   else
     for _, p in ipairs(pipes) do
-      table.insert(lines, '- `' .. p.path .. '`: ' .. (p.reachable and 'reachable' or 'unreachable'))
+      table.insert(
+        lines,
+        '- `' .. p.path .. '`: ' .. (p.reachable and 'reachable' or 'unreachable')
+      )
     end
   end
 
@@ -247,6 +238,7 @@ local function build_report()
   kv('sysname', os_info.sysname)
   kv('release', os_info.release)
   kv('machine', os_info.machine)
+  if os_info.wsl then kv('wsl', os_info.wsl) end
 
   section 'config validation'
   local results = require('cord.api.config').validate(require('cord').user_config)
@@ -277,9 +269,7 @@ local function build_report()
   return table.concat(lines, '\n')
 end
 
-M.report = async.wrap(function()
-  return build_report()
-end)
+M.report = async.wrap(function() return build_report() end)
 
 M.show = function()
   async.run(function()
