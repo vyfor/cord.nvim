@@ -44,7 +44,7 @@
 - 🎯 [Async](https://github.com/vyfor/cord.nvim/wiki/Async)-first design with an async-aware configuration layer.
 - 📦 Works with different Discord setups (Snap, Flatpak, [WSL](https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-running-inside-wsl), and even the [~~browser~~](https://github.com/vyfor/cord.nvim/wiki/Special-Environments#-using-discord-in-a-browser)).
 - 🌍 Runs on Windows, Linux, macOS, and FreeBSD.
-- 🌸 Includes 120+ icons for 200+ file types and plugins, featured in distinct [themes](#-themes) and flavors.
+- 🌸 Includes 140+ icons for 200+ file types and plugins, featured in distinct [themes](#-themes) and flavors.
 - 🔁 [Reconnects](https://github.com/vyfor/cord.nvim/wiki/Examples#reconnecting-to-discord) automatically if connection to Discord is lost.
 
 ## 📦 Installation
@@ -170,7 +170,7 @@ Ask any questions in [Discussions](https://github.com/vyfor/cord.nvim/discussion
 
 ## 🎨 Themes
 
-Cord features over 120 meticulously crafted icons available in distinct themes:
+Cord features over 140 meticulously crafted icons available in distinct themes:
 
 - **Default**: A stylish theme based on [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts) icons.
   <img width="800px" alt="Default Theme" src="https://raw.githubusercontent.com/vyfor/icons/master/.github/assets/default_theme.png" />
