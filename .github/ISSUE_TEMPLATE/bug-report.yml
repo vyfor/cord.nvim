@@ -26,25 +26,13 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: "Steps to reproduce (optional)"
-      description: "Steps to reproduce the issue with the minimal configuration"
-      placeholder: |
-        1. `nvim -nu repro.lua`
-        2. ...
-  - type: textarea
-    attributes:
-      label: "Expected behavior (optional)"
-      description: "What you expected to happen"
-  - type: textarea
-    attributes:
-      label: "Actual behavior (optional)"
-      description: "What actually happens."
-  - type: textarea
-    attributes:
       label: "Minimal configuration"
       description: "Minimal configuration to reproduce the issue"
-      render: Lua
+      render: markdown
       value: |
+        <!-- if possible, include steps to reproduce using this minimal config -->
+
+        ```lua
         vim.env.LAZY_STDPATH = '.repro'
         load(vim.fn.system 'curl -s https://raw.githubusercontent.com/folke/lazy.nvim/main/bootstrap.lua')()
 
@@ -55,7 +43,6 @@ body:
             },
           },
         }
-
-        -- do anything else you need to do to reproduce the issue
+        ```
     validations:
       required: true
