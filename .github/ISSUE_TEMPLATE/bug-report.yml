@@ -2,8 +2,7 @@ name: 🐛 Bug report
 description: Report a problem or unexpected behaviour
 labels: [bug]
 body:
-- type: checkboxes
-    id: checklist
+  - type: checkboxes
     attributes:
       label: "Checklist"
       options:
@@ -28,7 +27,6 @@ body:
         <!-- paste logs inside this block -->
 
         </details>
-
     validations:
       required: true
   - type: textarea
