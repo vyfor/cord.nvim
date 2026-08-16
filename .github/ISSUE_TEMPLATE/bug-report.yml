@@ -2,19 +2,33 @@ name: 🐛 Bug report
 description: Report a problem or unexpected behaviour
 labels: [bug]
 body:
-  - type: textarea
+- type: checkboxes
+    id: checklist
     attributes:
       label: "Checklist"
-      value: |
-        - [ ] My problem isn't listed in the [Troubleshooting](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting) section of the wiki
-        - [ ] I have looked through [existing issues](https://github.com/vyfor/cord.nvim/issues)
-        - [ ] I am aware of the recent [announcements](https://github.com/vyfor/cord.nvim/discussions/categories/announcements)
-    validations:
-      required: true
+      options:
+        - label: "My problem isn't listed in the [Troubleshooting](https://github.com/vyfor/cord.nvim/wiki/Troubleshooting) section of the wiki"
+          required: true
+        - label: "I have looked through [existing issues](https://github.com/vyfor/cord.nvim/issues)"
+          required: true
+        - label: "I am aware of the recent [announcements](https://github.com/vyfor/cord.nvim/discussions/categories/announcements)"
+          required: true
   - type: textarea
     attributes:
       label: "Description"
-      description: "Description of the problem you are facing. You may include any relevant logs, screenshots, etc. If you're willing to provide logs, please attach them as a file. [How to get logs?](https://github.com/vyfor/cord.nvim/wiki/FAQ#logging-for-debugging)"
+      description: "Explain the issue you are facing. You may include any relevant logs, screenshots, etc. In case the bug is subtle or hard to spot, consider providing additional [logs](https://github.com/vyfor/cord.nvim/wiki/FAQ#logging-for-debugging)."
+      value: |
+        <!-- describe the problem -->
+
+
+
+        <details>
+        <summary>Logs (optional)</summary>
+
+        <!-- paste logs inside this block -->
+
+        </details>
+
     validations:
       required: true
   - type: textarea
@@ -28,7 +42,6 @@ body:
     attributes:
       label: "Minimal configuration"
       description: "Minimal configuration to reproduce the issue"
-      render: markdown
       value: |
         <!-- if possible, include steps to reproduce using this minimal config -->
 
@@ -45,4 +58,4 @@ body:
         }
         ```
     validations:
-      required: true
+      required: false
